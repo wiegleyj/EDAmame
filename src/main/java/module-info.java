@@ -2,7 +2,7 @@ module com.cyte.edamame {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
-    requires org.hsqldb;
+    requires com.h2database;
 
 
     opens com.cyte.edamame to javafx.fxml;

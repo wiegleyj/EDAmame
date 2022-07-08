@@ -41,8 +41,8 @@ javafx {
 }
 
 dependencies {
-    implementation("org.hsqldb:hsqldb:2.6.1")
     implementation("org.yaml:snakeyaml:1.30")
+    implementation("com.h2database:h2:2.1.212")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
 }
