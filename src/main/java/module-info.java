@@ -3,6 +3,7 @@ module com.cyte.edamame {
     requires javafx.fxml;
     requires java.sql;
     requires com.h2database;
+    requires java.prefs;
 
 
     opens com.cyte.edamame to javafx.fxml;

@@ -1,35 +1,33 @@
 package com.cyte.edamame.editor;
 
-import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.VBox;
 
-import java.io.IOException;
 import java.io.InvalidClassException;
-import java.util.*;
+import java.util.Iterator;
+import java.util.List;
+import java.util.UUID;
 
 public abstract class Editor {
-    UUID editorID = UUID.randomUUID();
+    final UUID editorID = UUID.randomUUID();
 
+    // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
+    // The individual elements are extracted to these for use by the EDAmame Application.
     protected Tab tab = null;
-    protected List<StringProperty> tabIDs = new ArrayList<>();
-    protected List<Tab> tabs = new ArrayList<>();
     protected ToolBar toolBar = null;
-    protected Map<String, List<MenuItem>> menus = new HashMap<>();
-    protected List<StringProperty> menuItemIDs = new ArrayList<>();
+    protected ObservableList<Tab> tabs = FXCollections.observableArrayList();
+    protected ObservableMap<String, ObservableList<MenuItem>> menus = FXCollections.observableHashMap();
 
+    // accessors for the UI elements
     public Tab getEditorTab() { return tab; }
-    public StringProperty getEditorTabID() { return tab.idProperty(); }
-    public List<Tab> getControlTabs() { return tabs; }
-    public List<StringProperty> getControlTabIDs() { return tabIDs; }
     public ToolBar getToolBar() { return toolBar; }
-    public StringProperty getToolBarID() { return toolBar.idProperty(); }
-    public Map<String, List<MenuItem>> getMenus() { return menus; }
-    public List<StringProperty> getMenuItemIDs() { return menuItemIDs; }
-
-    public static Editor create() throws IOException { throw new UnsupportedOperationException(); }
+    public ObservableList<Tab> getControlTabs() { return tabs; }
+    public ObservableMap<String, ObservableList<MenuItem>> getMenus() { return menus; }
 
     protected void dissect(Scene scene) throws InvalidClassException {
         Node root = scene.getRoot();
@@ -41,42 +39,36 @@ public abstract class Editor {
         }
 
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
+        String prefix = editorID.toString();
+
         while (nodeIterator.hasNext()) {
             Node node = nodeIterator.next();
             if (node.getClass() == ToolBar.class) {
                 toolBar = (ToolBar) node;
-                toolBar.setId(editorID.toString()+"_TOOLBAR");
+                toolBar.setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
+                toolBar.setId(prefix+"_TOOLBAR");
             } else if (node.getClass() == MenuBar.class) {
-                menus = new HashMap<>();
                 Iterator<Menu> menuIterator = ((MenuBar) node).getMenus().iterator();
                 while (menuIterator.hasNext()) {
                     Menu menu = menuIterator.next();
                     if (!menus.containsKey(menu.getText()))
-                        menus.put(menu.getText(), new ArrayList<>());
+                        menus.put(menu.getText(), FXCollections.observableArrayList());
                     List<MenuItem> itemlist = menus.get(menu.getText());
                     Iterator<MenuItem> itemIterator = menu.getItems().iterator();
                     while (itemIterator.hasNext()) {
                         MenuItem item = itemIterator.next();
-                        item.setId(editorID.toString()+"_MENU_"+menu.getText()+"_ITEM_"+item.getText());
-                        menuItemIDs.add(item.idProperty());
                         itemlist.add(item);
                         itemIterator.remove();
                     }
                     menuIterator.remove();
                 }
             } else if (node.getClass() == TabPane.class) {
-                tabs = null;
                 Iterator<Tab> tabIterator = ((TabPane) node).getTabs().iterator();
                 while (tabIterator.hasNext()) {
                     Tab item = tabIterator.next();
                     if (item.getText().equals("EditorTab")) {
                         tab = item;
-                        tab.setId(editorID.toString()+"_EDITOR");
                     } else {
-                        if (tabs == null)
-                            tabs = new ArrayList<>();
-                        item.setId(editorID.toString()+"_CONTROL_"+item.idProperty().getValue());
-                        tabIDs.add(item.idProperty());
                         tabs.add(item);
                     }
                     tabIterator.remove();
@@ -84,5 +76,9 @@ public abstract class Editor {
             }
             nodeIterator.remove();
         }
+    }
+
+    public boolean close() {
+        return true;
     }
 }

@@ -17,24 +17,24 @@
    <children>
       <MenuBar>
         <menus>
-          <Menu mnemonicParsing="false" text="File">
+          <Menu text="_File">
             <items>
-              <MenuItem mnemonicParsing="false" text="Close" />
+              <MenuItem mnemonicParsing="false" text="EditorClose" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
+          <Menu text="_Edit">
             <items>
-              <MenuItem mnemonicParsing="false" text="Delete" />
+              <MenuItem mnemonicParsing="false" text="EditorDelete" />
             </items>
           </Menu>
-          <Menu mnemonicParsing="false" text="Help">
+          <Menu text="_Help">
             <items>
-              <MenuItem mnemonicParsing="false" text="About" />
+              <MenuItem mnemonicParsing="false" text="EditorAbout" />
             </items>
           </Menu>
         </menus>
       </MenuBar>
-      <ToolBar prefHeight="40.0" prefWidth="200.0">
+      <ToolBar>
         <items>
           <Button mnemonicParsing="false" text="Button" />
         </items>
@@ -54,10 +54,9 @@
                                        <children>
                                           <HBox HBox.hgrow="ALWAYS" />
                                           <ToolBar>
-                                            <items>
-                                              <Button mnemonicParsing="false" text="Button" />
-                                            </items>
-                                          </ToolBar>
+                                             <items>
+                                                <Button mnemonicParsing="false" onAction="#thisButton" text="Button" />
+                                             </items></ToolBar>
                                           <HBox HBox.hgrow="ALWAYS" />
                                        </children>
                                     </HBox>

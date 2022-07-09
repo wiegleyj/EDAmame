@@ -7,6 +7,7 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -23,54 +24,60 @@
    <top>
       <VBox BorderPane.alignment="CENTER">
          <children>
-            <MenuBar>
+            <MenuBar fx:id="menuBar">
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu text="_File">
                   <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
+                        <SeparatorMenuItem id="editorItemsBegin" mnemonicParsing="false" />
+                        <SeparatorMenuItem id="editorItemsEnd" mnemonicParsing="false" />
+                    <MenuItem mnemonicParsing="false" onAction="#performExit" text="one" />
+                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="two" />
+                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="three" />
+                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="four" />
+                        <MenuItem onAction="#performExit" text="E_xit" />
                   </items>
                 </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
+                <Menu text="_Edit">
                   <items>
                     <MenuItem mnemonicParsing="false" text="Delete" />
                   </items>
                 </Menu>
-                  <Menu mnemonicParsing="false" text="View">
+                  <Menu text="_View">
+                     <items>
+                        <MenuItem mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
+                     </items>
+                  </Menu>
+                  <Menu text="Proje_ct">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Project">
+                  <Menu text="_Place">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Place">
+                  <Menu text="_Design">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Design">
+                  <Menu text="_Tools">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Tools">
+                  <Menu text="_Reports">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Reports">
+                  <Menu text="_Window">
                      <items>
                         <MenuItem mnemonicParsing="false" text="Close" />
                      </items>
                   </Menu>
-                  <Menu mnemonicParsing="false" text="Window">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                <Menu mnemonicParsing="false" text="Help">
+                <Menu text="_Help">
                   <items>
                     <MenuItem mnemonicParsing="false" text="About" />
                   </items>
@@ -86,10 +93,10 @@
                               <Tooltip text="Empty Tooltip" />
                            </tooltip></Button>
                         <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
-                        <Button mnemonicParsing="false" text="EDAButton" />
+                        <Button mnemonicParsing="false" onAction="#toggleTestItem" text="EDAButton" />
                      </items>
                   </ToolBar>
-                  <StackPane HBox.hgrow="ALWAYS" />
+                  <StackPane fx:id="editorToolBarStack" HBox.hgrow="ALWAYS" />
                </children>
             </HBox>
          </children>
@@ -108,7 +115,7 @@
       </VBox>
    </bottom>
    <center>
-      <SplitPane dividerPositions="0.5" BorderPane.alignment="CENTER">
+      <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
          <items>
             <HBox SplitPane.resizableWithParent="false">
                <children>
@@ -140,7 +147,7 @@
                           <tabs>
                             <Tab text="Untitled Tab 1">
                               <content>
-                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+                                <AnchorPane />
                               </content>
                             </Tab>
                           </tabs>
@@ -151,13 +158,13 @@
             </HBox>
             <VBox>
                <children>
-                  <TabPane fx:id="editorTabPane" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                  <TabPane fx:id="editorTabPane" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
                     <tabs>
-                      <Tab text="Log">
+                      <Tab fx:id="logTab" text="Log">
                            <content>
                               <HBox>
                                  <children>
-                                    <TextArea fx:id="logArea" editable="false" focusTraversable="false" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS" />
+                                    <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
                                     <VBox style="-fx-background-color: #dcdcdc;">
                                        <children>
                                           <Group>
