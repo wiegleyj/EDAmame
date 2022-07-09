@@ -7,4 +7,6 @@ module com.cyte.edamame {
 
     opens com.cyte.edamame to javafx.fxml;
     exports com.cyte.edamame;
+    opens com.cyte.edamame.editor to javafx.fxml;
+    exports com.cyte.edamame.editor;
 }

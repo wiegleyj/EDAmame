@@ -8,7 +8,7 @@ CREATE TABLE version (
 
 CREATE TABLE symbols (
     'SymbolID' BINARY(16) NOT NULL PRIMARY KEY, -- every symbol gets a UUID.
-    'Version' SMALLINT NOT NULL DEFAULT '1', -- symbols can be edited/improved. Versions are tracked by a number
+    'Version' SMALLINT NOT NULL DEFAULT 1, -- symbols can be edited/improved. Versions are tracked by a number
     'Created' TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, -- original creation
     'Modified' TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, -- date of most recent version.
     'Author' VARCHAR(255), -- name of original author.
