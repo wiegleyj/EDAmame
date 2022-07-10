@@ -19,15 +19,17 @@ import java.io.IOException;
  */
 public class SymbolEditor extends Editor {
     /**
-     * Constructs a single SymbolEditor attached to a particular symbol library.
+     * Factory to create a single SymbolEditor and its UI attached to a particular symbol library.
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    public SymbolEditor() throws IOException {
+    public static Editor create() throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/SymbolEditor.fxml"));
-        fxmlLoader.setController(this);
-        Scene scene = new Scene(fxmlLoader.load(), 320, 240);
-        dissect(scene);
+        Scene scene = new Scene(fxmlLoader.load());
+        SymbolEditor editor = fxmlLoader.getController();
+
+        editor.dissect(scene);
+        return editor;
     }
 
     /**

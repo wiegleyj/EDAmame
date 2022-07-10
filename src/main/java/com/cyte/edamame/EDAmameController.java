@@ -460,7 +460,7 @@ public class EDAmameController implements Initializable {
     protected void onTestButtonClick() {
         try {
             // create and add a new editor
-            addEditor(new SymbolEditor());
+            addEditor(SymbolEditor.create());
         } catch (IOException ignored) {
         }
     }
