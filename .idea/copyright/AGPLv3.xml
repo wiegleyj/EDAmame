@@ -1,0 +1,6 @@
+<component name="CopyrightManager">
+  <copyright>
+    <option name="notice" value="Copyright (c) &amp;#36;originalComment.match(&quot;Copyright \(c\) (\d+)&quot;, 1, &quot;-&quot;, &quot;&amp;#36;today.year&quot;)&amp;#36;today.year. Jeff Wiegley&#10;This work is distributed and licensed under the AGPLv3 license.&#10;Terms and conditions of the AGPLv3 are documented&#10;in the LICENSE.TXT file included in the EDAmame sources." />
+    <option name="myName" value="AGPLv3" />
+  </copyright>
+</component>

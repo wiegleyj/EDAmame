@@ -1,3 +1,9 @@
+/**
+ * EDAmame access module.
+ *
+ * @author Jeff Wiegley, Ph.D.
+ * @author jeffrey.wiegley@gmail.com
+ */
 module com.cyte.edamame {
     requires javafx.controls;
     requires javafx.fxml;
@@ -6,8 +12,8 @@ module com.cyte.edamame {
     requires java.prefs;
 
 
-    opens com.cyte.edamame to javafx.fxml;
-    exports com.cyte.edamame;
-    opens com.cyte.edamame.editor to javafx.fxml;
-    exports com.cyte.edamame.editor;
+    opens com.cyte.edamame to javafx.fxml, javafx.graphics;
+    //exports com.cyte.edamame;
+    opens com.cyte.edamame.editor to javafx.fxml, javafx.graphics;
+    //exports com.cyte.edamame.editor;
 }

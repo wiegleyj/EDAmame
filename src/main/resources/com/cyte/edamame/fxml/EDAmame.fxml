@@ -37,7 +37,7 @@
                    <MenuItem mnemonicParsing="false" text="Delete" />
                </Menu>
                <Menu text="_View">
-                   <MenuItem mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
+                   <MenuItem fx:id="viewLogItem" mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
                </Menu>
                <Menu text="Proje_ct">
                    <MenuItem mnemonicParsing="false" text="Close" />
@@ -69,7 +69,7 @@
                        </tooltip>
                    </Button>
                    <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
-                   <Button mnemonicParsing="false" onAction="#toggleTestItem" text="EDAButton" />
+                   <Button mnemonicParsing="false" text="%key.unspecified" />
                </ToolBar>
                <StackPane fx:id="editorToolBarStack" HBox.hgrow="ALWAYS" />
            </HBox>
@@ -91,7 +91,7 @@
                        <Insets top="10.0" />
                    </padding>
                    <Group>
-                       <Label rotate="-90.0" text="Label" />
+                       <Label onMouseClicked="#selectNavigationTabPane" rotate="-90.0" text="Navigation" />
                    </Group>
                    <Group>
                        <Label rotate="-90.0" text="Label" />
@@ -100,17 +100,17 @@
                        <Label rotate="-90.0" text="Label" />
                    </Group>
                </VBox>
-               <StackPane HBox.hgrow="ALWAYS">
-                   <TabPane fx:id="controlTabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
-                       <Tab text="Untitled Tab 1">
+               <StackPane fx:id="controlsStackPane" HBox.hgrow="ALWAYS">
+                   <TabPane id="navigationTabPane" fx:id="controlTabPane" side="BOTTOM" style="-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;" tabClosingPolicy="UNAVAILABLE">
+                       <Tab id="projectsNavigationTab" text="Projects">
                            <AnchorPane />
                        </Tab>
                    </TabPane>
                </StackPane>
            </HBox>
            <VBox>
-               <TabPane fx:id="editorTabPane" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
-                   <Tab fx:id="logTab" text="log">
+               <TabPane fx:id="mainTabPane" style="-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
+                   <Tab fx:id="logTab" onClosed="#correctViewLogItemText" text="log">
                        <HBox>
                            <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
                            <VBox style="-fx-background-color: #dcdcdc;">
