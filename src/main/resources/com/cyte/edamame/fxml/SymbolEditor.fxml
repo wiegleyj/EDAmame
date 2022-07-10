@@ -13,81 +13,51 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.SymbolEditor">
-   <children>
-      <MenuBar>
-        <menus>
-          <Menu text="_File">
-            <items>
-              <MenuItem mnemonicParsing="false" text="EditorClose" />
-            </items>
-          </Menu>
-          <Menu text="_Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" text="EditorDelete" />
-            </items>
-          </Menu>
-          <Menu text="_Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="EditorAbout" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
-      <ToolBar>
-        <items>
-          <Button mnemonicParsing="false" text="Button" />
-        </items>
-      </ToolBar>
-      <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <tabs>
-            <Tab text="EditorTab">
-               <content>
-                  <HBox>
-                     <children>
-                        <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
-                           <children>
-                              <StackPane prefHeight="150.0" prefWidth="200.0" />
-                              <VBox StackPane.alignment="TOP_CENTER">
-                                 <children>
-                                    <HBox>
-                                       <children>
-                                          <HBox HBox.hgrow="ALWAYS" />
-                                          <ToolBar>
-                                             <items>
-                                                <Button mnemonicParsing="false" onAction="#thisButton" text="Button" />
-                                             </items></ToolBar>
-                                          <HBox HBox.hgrow="ALWAYS" />
-                                       </children>
-                                    </HBox>
-                                 </children>
-                              </VBox>
-                           </children>
-                        </StackPane>
-                        <VBox style="-fx-background-color: #dcdcdc;">
-                           <children>
-                              <Group>
-                                 <children>
-                                    <Button mnemonicParsing="false" rotate="90.0" text="Properties" />
-                                 </children>
-                              </Group>
-                           </children>
-                        </VBox>
-                     </children>
-                  </HBox>
-               </content>
-            </Tab>
-          <Tab text="ControlTab1">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-          <Tab text="ControlTab2">
-            <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-            </content>
-          </Tab>
-        </tabs>
-      </TabPane>
-   </children>
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0"
+      prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.cyte.edamame.editor.SymbolEditor">
+    <MenuBar>
+        <Menu text="_File">
+            <MenuItem mnemonicParsing="false" text="EditorClose"/>
+        </Menu>
+        <Menu text="_Edit">
+            <MenuItem mnemonicParsing="false" text="EditorDelete"/>
+        </Menu>
+        <Menu text="_Help">
+            <MenuItem mnemonicParsing="false" text="EditorAbout"/>
+        </Menu>
+    </MenuBar>
+    <ToolBar>
+        <Button mnemonicParsing="false" text="Button"/>
+    </ToolBar>
+    <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <Tab text="EditorTab">
+            <HBox>
+                <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+                    <StackPane prefHeight="150.0" prefWidth="200.0"/>
+                    <VBox StackPane.alignment="TOP_CENTER">
+                        <HBox>
+                            <HBox HBox.hgrow="ALWAYS"/>
+                            <ToolBar>
+                                <Button mnemonicParsing="false" onAction="#thisButton"
+                                        text="Button"/>
+                            </ToolBar>
+                            <HBox HBox.hgrow="ALWAYS"/>
+                        </HBox>
+                    </VBox>
+                </StackPane>
+                <VBox style="-fx-background-color: #dcdcdc;">
+                    <Group>
+                        <Button mnemonicParsing="false" rotate="90.0" text="Properties"/>
+                    </Group>
+                </VBox>
+            </HBox>
+        </Tab>
+        <Tab text="ControlTab1">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+        </Tab>
+        <Tab text="ControlTab2">
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0"/>
+        </Tab>
+    </TabPane>
 </VBox>

@@ -22,166 +22,106 @@
 
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
    <top>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <MenuBar fx:id="menuBar">
-              <menus>
-                <Menu text="_File">
-                  <items>
-                        <SeparatorMenuItem id="editorItemsBegin" mnemonicParsing="false" />
-                        <SeparatorMenuItem id="editorItemsEnd" mnemonicParsing="false" />
-                    <MenuItem mnemonicParsing="false" onAction="#performExit" text="one" />
-                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="two" />
-                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="three" />
-                        <MenuItem mnemonicParsing="false" onAction="#performExit" text="four" />
-                        <MenuItem onAction="#performExit" text="E_xit" />
-                  </items>
-                </Menu>
-                <Menu text="_Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-                  <Menu text="_View">
-                     <items>
-                        <MenuItem mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
-                     </items>
-                  </Menu>
-                  <Menu text="Proje_ct">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu text="_Place">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu text="_Design">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu text="_Tools">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu text="_Reports">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                  <Menu text="_Window">
-                     <items>
-                        <MenuItem mnemonicParsing="false" text="Close" />
-                     </items>
-                  </Menu>
-                <Menu text="_Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-            <HBox>
-               <children>
-                  <ToolBar>
-                     <items>
-                      <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#onTestButtonClick" text="test">
-                           <tooltip>
-                              <Tooltip text="Empty Tooltip" />
-                           </tooltip></Button>
-                        <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
-                        <Button mnemonicParsing="false" onAction="#toggleTestItem" text="EDAButton" />
-                     </items>
-                  </ToolBar>
-                  <StackPane fx:id="editorToolBarStack" HBox.hgrow="ALWAYS" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
+       <VBox BorderPane.alignment="CENTER">
+           <MenuBar fx:id="menuBar">
+               <Menu text="_File">
+                   <SeparatorMenuItem id="editorItemsBegin" mnemonicParsing="false" />
+                   <SeparatorMenuItem id="editorItemsEnd" mnemonicParsing="false" />
+                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="one" />
+                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="two" />
+                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="three" />
+                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="four" />
+                   <MenuItem onAction="#performExit" text="E_xit" />
+               </Menu>
+               <Menu text="_Edit">
+                   <MenuItem mnemonicParsing="false" text="Delete" />
+               </Menu>
+               <Menu text="_View">
+                   <MenuItem mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
+               </Menu>
+               <Menu text="Proje_ct">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Place">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Design">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Tools">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Reports">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Window">
+                   <MenuItem mnemonicParsing="false" text="Close" />
+               </Menu>
+               <Menu text="_Help">
+                   <MenuItem mnemonicParsing="false" text="About" />
+               </Menu>
+           </MenuBar>
+           <HBox>
+               <ToolBar>
+                   <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#onTestButtonClick" text="test">
+                       <tooltip>
+                           <Tooltip text="Empty Tooltip" />
+                       </tooltip>
+                   </Button>
+                   <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
+                   <Button mnemonicParsing="false" onAction="#toggleTestItem" text="EDAButton" />
+               </ToolBar>
+               <StackPane fx:id="editorToolBarStack" HBox.hgrow="ALWAYS" />
+           </HBox>
+       </VBox>
    </top>
    <bottom>
-      <VBox BorderPane.alignment="CENTER">
-         <children>
-            <StackPane />
-            <HBox style="-fx-background-color: #dcdcdc;">
-               <children>
-                  <Label text="EDAmame Status Area" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
+       <VBox BorderPane.alignment="CENTER">
+           <StackPane />
+           <HBox style="-fx-background-color: #dcdcdc;">
+               <Label text="EDAmame Status Area" />
+           </HBox>
+       </VBox>
    </bottom>
    <center>
-      <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
-         <items>
-            <HBox SplitPane.resizableWithParent="false">
-               <children>
-                  <VBox spacing="10.0" style="-fx-background-color: #dcdcdc;">
-                     <children>
-                        <Group>
-                           <children>
-                              <Label rotate="-90.0" text="Label" />
-                           </children>
-                        </Group>
-                        <Group>
-                           <children>
-                              <Label rotate="-90.0" text="Label" />
-                           </children>
-                        </Group>
-                        <Group>
-                           <children>
-                              <Label rotate="-90.0" text="Label" />
-                           </children>
-                        </Group>
-                     </children>
-                     <padding>
-                        <Insets top="10.0" />
-                     </padding>
-                  </VBox>
-                  <StackPane HBox.hgrow="ALWAYS">
-                     <children>
-                        <TabPane fx:id="controlTabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
-                          <tabs>
-                            <Tab text="Untitled Tab 1">
-                              <content>
-                                <AnchorPane />
-                              </content>
-                            </Tab>
-                          </tabs>
-                        </TabPane>
-                     </children>
-                  </StackPane>
-               </children>
-            </HBox>
-            <VBox>
-               <children>
-                  <TabPane fx:id="editorTabPane" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
-                    <tabs>
-                      <Tab fx:id="logTab" text="Log">
-                           <content>
-                              <HBox>
-                                 <children>
-                                    <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
-                                    <VBox style="-fx-background-color: #dcdcdc;">
-                                       <children>
-                                          <Group>
-                                             <children>
-                                                <Button mnemonicParsing="false" onAction="#clearLogAction" rotate="90.0" text="Clear Log" />
-                                             </children>
-                                          </Group>
-                                       </children>
-                                    </VBox>
-                                 </children>
-                              </HBox>
-                           </content></Tab>
-                    </tabs>
-                  </TabPane>
-               </children>
-            </VBox>
-         </items>
-      </SplitPane>
+       <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+           <HBox SplitPane.resizableWithParent="false">
+               <VBox spacing="10.0" style="-fx-background-color: #dcdcdc;">
+                   <padding>
+                       <Insets top="10.0" />
+                   </padding>
+                   <Group>
+                       <Label rotate="-90.0" text="Label" />
+                   </Group>
+                   <Group>
+                       <Label rotate="-90.0" text="Label" />
+                   </Group>
+                   <Group>
+                       <Label rotate="-90.0" text="Label" />
+                   </Group>
+               </VBox>
+               <StackPane HBox.hgrow="ALWAYS">
+                   <TabPane fx:id="controlTabPane" side="BOTTOM" tabClosingPolicy="UNAVAILABLE">
+                       <Tab text="Untitled Tab 1">
+                           <AnchorPane />
+                       </Tab>
+                   </TabPane>
+               </StackPane>
+           </HBox>
+           <VBox>
+               <TabPane fx:id="editorTabPane" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
+                   <Tab fx:id="logTab" text="log">
+                       <HBox>
+                           <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
+                           <VBox style="-fx-background-color: #dcdcdc;">
+                               <Group>
+                                   <Button mnemonicParsing="false" onAction="#clearLogAction" rotate="90.0" text="Clear Log" />
+                               </Group>
+                           </VBox>
+                       </HBox>
+                   </Tab>
+               </TabPane>
+           </VBox>
+       </SplitPane>
    </center>
 </BorderPane>
