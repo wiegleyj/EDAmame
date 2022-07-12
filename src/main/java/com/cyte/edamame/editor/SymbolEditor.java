@@ -10,14 +10,31 @@ package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmame;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Tab;
+import javafx.scene.control.ToolBar;
 
 import java.io.IOException;
+import java.io.InvalidClassException;
 
 /**
  * Editor for maintaining Symbol libraries.
  */
 public class SymbolEditor extends Editor {
+    @FXML
+    private Tab etab;
+
+    @FXML
+    private Tab ctab1;
+
+    @FXML
+    private ToolBar toolBar;
+
+    @FXML
+    private Button innerButton;
+
     /**
      * Factory to create a single SymbolEditor and its UI attached to a particular symbol library.
      *
@@ -36,6 +53,7 @@ public class SymbolEditor extends Editor {
      * Provides initialization of the Controller
      */
     public void initialize() {
+        System.out.println("I was initialized, the button was " + innerButton);
     }
 
     /**

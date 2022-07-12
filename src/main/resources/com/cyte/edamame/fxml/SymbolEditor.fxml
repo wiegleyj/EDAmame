@@ -29,14 +29,14 @@
         <Button mnemonicParsing="false" text="Button" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <Tab text="EditorTab">
+        <Tab fx:id="etab" text="EditorTab">
             <HBox>
                 <StackPane prefHeight="150.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
                     <StackPane prefHeight="150.0" prefWidth="200.0" />
                     <VBox StackPane.alignment="TOP_CENTER">
                         <HBox>
                             <HBox HBox.hgrow="ALWAYS" />
-                            <ToolBar>
+                            <ToolBar fx:id="toolBar">
                                 <Button mnemonicParsing="false" onAction="#thisButton" text="Button" />
                             </ToolBar>
                             <HBox HBox.hgrow="ALWAYS" />
@@ -50,7 +50,7 @@
                 </VBox>
             </HBox>
         </Tab>
-        <Tab text="ControlTab1">
+        <Tab fx:id="ctab1" text="ControlTab1">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
         </Tab>
         <Tab text="ControlTab2">
