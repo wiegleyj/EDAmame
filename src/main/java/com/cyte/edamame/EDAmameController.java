@@ -9,6 +9,7 @@ package com.cyte.edamame;
 
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.editor.SymbolEditor;
+import com.cyte.edamame.util.TextAreaHandler;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -28,15 +29,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Set;
-import java.util.Map;
 import java.util.ListIterator;
-import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-import java.util.ResourceBundle;
 
 /**
  * Main Controller for the {@link EDAmame} Application.<p>

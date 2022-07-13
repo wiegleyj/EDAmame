@@ -5,10 +5,12 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame;
+package com.cyte.edamame.util;
 
 import java.text.MessageFormat;
 import java.util.logging.LogRecord;
+
+import com.cyte.edamame.EDAmame;
 import javafx.scene.control.TextArea;
 
 /**

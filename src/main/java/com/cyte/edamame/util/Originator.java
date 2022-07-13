@@ -5,7 +5,7 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame.editor;
+package com.cyte.edamame.util;
 
 /**
  * {@link Originator}s are objects that can checkpoint themselves with {@link Memento}s.<p>

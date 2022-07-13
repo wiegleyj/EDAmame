@@ -5,7 +5,7 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame.editor;
+package com.cyte.edamame.util;
 
 /**
  * {@link Memento}s are objects that save the state of an {@link Originator} object from an instance in time.<p>
