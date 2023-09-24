@@ -6,15 +6,19 @@
  */
 
 package com.cyte.edamame.editor;
-
+import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.render.CanvasRenderSystem;
+import com.cyte.edamame.render.CanvasRenderShape;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Tab;
-import javafx.scene.control.ToolBar;
+import javafx.scene.*;
+import javafx.scene.layout.*;
+import javafx.scene.canvas.*;
+import javafx.scene.control.*;
+import javafx.scene.paint.*;
 
 import java.io.IOException;
 import java.io.InvalidClassException;
@@ -22,45 +26,73 @@ import java.io.InvalidClassException;
 /**
  * Editor for maintaining Symbol libraries.
  */
-public class SymbolEditor extends Editor {
+public class SymbolEditor extends Editor
+{
+    //// GLOBAL VARIABLES ////
+
     @FXML
     private Tab etab;
-
     @FXML
     private Tab ctab1;
-
     @FXML
     private ToolBar toolBar;
-
     @FXML
     private Button innerButton;
+
+    //// MAIN FUNCTIONS ////
 
     /**
      * Factory to create a single SymbolEditor and its UI attached to a particular symbol library.
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    public static Editor create() throws IOException {
+    public static Editor create(Integer editorType) throws IOException
+    {
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/SymbolEditor.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
-        SymbolEditor editor = fxmlLoader.getController();
 
-        editor.dissect(scene);
+        SymbolEditor editor = fxmlLoader.getController();
+        editor.editorName = "SymbolEditor";
+        editor.dissect(editorType, scene);
+
+        CanvasRenderShape testShape = new CanvasRenderShape();
+        testShape.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
+        testShape.permanent = true;
+
+        Double posX = -1000.0;
+        Double posY = -100.0;
+
+        for (int i = 0; i < 100; i++)
+        {
+            for (int j = 0; j < 100; j++)
+            {
+                editor.renderSystem.AddShape(-1, testShape, new PairMutable(posX, posY));
+                posX += 100.0;
+            }
+            posX = -1000.0;
+            posY += 100.0;
+            System.out.println(posY);
+        }
+
         return editor;
     }
 
     /**
      * Provides initialization of the Controller
      */
-    public void initialize() {
+    public void initialize()
+    {
         System.out.println("I was initialized, the button was " + innerButton);
     }
+
+    //// CALLBACK FUNCTIONS ////
 
     /**
      * a test button for checking if controller is working and unique. (hint: it is.) this can be removed.
      */
-    @FXML
-    private void thisButton() {
+    /*@FXML
+    private void thisButton()
+    {
         System.out.println("Button clicked on " + editorID);
-    }
+    }*/
 }

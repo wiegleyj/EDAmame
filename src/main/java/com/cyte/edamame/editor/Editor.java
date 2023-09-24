@@ -6,6 +6,10 @@
  */
 
 package com.cyte.edamame.editor;
+import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.render.CanvasRenderSystem;
+import com.cyte.edamame.render.CanvasRenderShape;
+import com.cyte.edamame.util.PairMutable;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -13,12 +17,16 @@ import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.canvas.*;
+import javafx.scene.paint.*;
 
 import java.io.InvalidClassException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.logging.Level;
 
 /**
  * Librarys and projects are all modified through the use of special purpose editor modules.<p>
@@ -29,9 +37,13 @@ import java.util.UUID;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-public abstract class Editor {
+public abstract class Editor
+{
+    //// GLOBAL VARIABLES ////
+
     /** Every editor can be uniquely identified by a random UUID (which do not persist across application execution. */
     final UUID editorID = UUID.randomUUID();
+    String editorName = null;
 
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
     // The individual elements are extracted to these for use by the EDAmame Application.
@@ -50,6 +62,9 @@ public abstract class Editor {
      * match exactly including mneumonic underscores and such. Missing menus at the EDAmame level are not created.
      */
     protected ObservableMap<String, ObservableList<MenuItem>> menus = FXCollections.observableHashMap();
+
+    public CanvasRenderSystem renderSystem = null;
+    public boolean visible = false;
 
     // accessors for the UI elements
 
@@ -87,52 +102,100 @@ public abstract class Editor {
      * @param scene The scene to dissect for expected UI elements.
      * @throws InvalidClassException if the expected UI scene organization is not found as expected.
      */
-    protected void dissect(Scene scene) throws InvalidClassException {
+    protected void dissect(Integer editorType, Scene scene) throws InvalidClassException
+    {
         Node root = scene.getRoot();
-        if (root == null)
-            throw new InvalidClassException("root of scene is null ");
 
-        if (root.getClass() != VBox.class) {
+        if (root == null)
+            throw new InvalidClassException("root of scene is null");
+        if (root.getClass() != VBox.class)
             throw new InvalidClassException("Expected VBox but found " + root.getClass());
-        }
 
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
         String prefix = editorID.toString();
 
-        while (nodeIterator.hasNext()) {
+        while (nodeIterator.hasNext())
+        {
             Node node = nodeIterator.next();
-            if (node.getClass() == ToolBar.class) {
+
+            if (node.getClass() == ToolBar.class)
+            {
+                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a ToolBar in Editor \"" + editorID + "\"...\n");
+
                 toolBar = (ToolBar) node;
                 toolBar.setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
-                toolBar.setId(prefix+"_TOOLBAR");
-            } else if (node.getClass() == MenuBar.class) {
-                Iterator<Menu> menuIterator = ((MenuBar) node).getMenus().iterator();
-                while (menuIterator.hasNext()) {
+                toolBar.setId(prefix + "_TOOLBAR");
+            }
+            else if (node.getClass() == MenuBar.class)
+            {
+                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + editorID + "\"...\n");
+
+                Iterator<Menu> menuIterator = ((MenuBar)node).getMenus().iterator();
+
+                while (menuIterator.hasNext())
+                {
                     Menu menu = menuIterator.next();
+
                     if (!menus.containsKey(menu.getText()))
                         menus.put(menu.getText(), FXCollections.observableArrayList());
+
                     List<MenuItem> itemlist = menus.get(menu.getText());
                     Iterator<MenuItem> itemIterator = menu.getItems().iterator();
-                    while (itemIterator.hasNext()) {
+
+                    while (itemIterator.hasNext())
+                    {
                         MenuItem item = itemIterator.next();
                         itemlist.add(item);
                         itemIterator.remove();
                     }
+
                     menuIterator.remove();
                 }
-            } else if (node.getClass() == TabPane.class) {
-                Iterator<Tab> tabIterator = ((TabPane) node).getTabs().iterator();
-                while (tabIterator.hasNext()) {
+            }
+            else if (node.getClass() == TabPane.class)
+            {
+                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a TabPane in Editor \"" + editorID + "\"...\n");
+
+                TabPane paneNode = (TabPane)node;
+                Iterator<Tab> tabIterator = paneNode.getTabs().iterator();
+
+                while (tabIterator.hasNext())
+                {
                     Tab item = tabIterator.next();
-                    if (item.getText().equals("EditorTab")) {
+
+                    if (item.getText().equals("EditorTab"))
+                    {
+                        // Searching for & declaring the canvas
+                        HBox editorBox = (HBox)item.getContent();
+                        Iterator<Node> canvasIterator = editorBox.getChildren().iterator();
+
+                        while (canvasIterator.hasNext())
+                        {
+                            Node nextNode = canvasIterator.next();
+
+                            if (nextNode.getClass() == Canvas.class)
+                            {
+                                this.renderSystem = new CanvasRenderSystem((Canvas)nextNode, EDAmameController.EditorsBackgroundColor, EDAmameController.EditorsMaxShapes);
+
+                                EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                            }
+                        }
+
+                        if (this.renderSystem == null)
+                            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.editorName + "\"!");
+
+                        item.setText(EDAmameController.EditorTypes[editorType]);
                         tab = item;
-                    } else {
+                    }
+                    else
+                    {
                         tabs.add(item);
                     }
-                    tabIterator.remove();
+
+                    // ????
+                    //tabIterator.remove();
                 }
             }
-            nodeIterator.remove();
         }
     }
 
@@ -140,7 +203,8 @@ public abstract class Editor {
      * Request an editor to close. Handling any information/state saving as it needs.
      * @return true if the editor was able to close without unsaved information/state, false otherwise.
      */
-    public boolean close() {
+    public boolean close()
+    {
         return true;
     }
 }

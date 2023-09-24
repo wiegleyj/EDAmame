@@ -20,7 +20,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
    <top>
        <VBox BorderPane.alignment="CENTER">
            <MenuBar fx:id="menuBar">
@@ -110,10 +110,10 @@
            </HBox>
            <VBox>
                <TabPane fx:id="mainTabPane" style="-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
-                   <Tab fx:id="logTab" onClosed="#correctViewLogItemText" text="log">
+                   <Tab fx:id="logTab" closable="false" onClosed="#correctViewLogItemText" text="log">
                        <HBox>
                            <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
-                           <VBox style="-fx-background-color: #dcdcdc;">
+                           <VBox fx:id="logSettings" style="-fx-background-color: #dcdcdc;">
                                <Group>
                                    <Button mnemonicParsing="false" onAction="#clearLogAction" rotate="90.0" text="Clear Log" />
                                </Group>

@@ -25,7 +25,8 @@ import java.util.ResourceBundle;
  *  @author Jeff Wiegley, Ph.D.
  *  @author jeffrey.wiegley@gmail.com
  */
-public class EDAmameApplication extends Application {
+public class EDAmameApplication extends Application
+{
     /**
      * Override for {@link Application} start method that is called as a result of the launch method.
      *
@@ -38,7 +39,8 @@ public class EDAmameApplication extends Application {
      * into the controller.
      */
     @Override
-    public void start(Stage stage) throws IOException {
+    public void start(Stage stage) throws IOException
+    {
         Locale locale = new Locale("en", "US");
         ResourceBundle bundle = ResourceBundle.getBundle("com.cyte.edamame.strings", locale);
         FXMLLoader loader = new FXMLLoader(EDAmame.class.getResource("fxml/EDAmame.fxml"));
@@ -60,7 +62,8 @@ public class EDAmameApplication extends Application {
      * The {@link Application} main start point.
      * @param args Command line Arguments. (Should be copied from the {@link EDAmame} startup veneer class.
      */
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         launch();
     }
 }

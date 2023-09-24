@@ -79,7 +79,8 @@ package com.cyte.edamame;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-public class EDAmame {
+public class EDAmame
+{
     /**
      * The main method that launches EDAmame.<p>
      *
@@ -88,7 +89,8 @@ public class EDAmame {
      *
      * @param args Command line arguments provided to EDAmame.
      */
-    public static void main(String [] args) {
+    public static void main(String [] args)
+    {
         EDAmameApplication.main(args);
     }
 }
