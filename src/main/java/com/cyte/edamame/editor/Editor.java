@@ -175,7 +175,14 @@ public abstract class Editor
 
                             if (nextNode.getClass() == Canvas.class)
                             {
-                                this.renderSystem = new CanvasRenderSystem((Canvas)nextNode, EDAmameController.EditorsBackgroundColor, EDAmameController.EditorsMaxShapes);
+                                this.renderSystem = new CanvasRenderSystem((Canvas)nextNode,
+                                                                           EDAmameController.EditorsTheaterSize,
+                                                                           EDAmameController.EditorsBackgroundColor,
+                                                                           EDAmameController.EditorsMaxShapes,
+                                                                           EDAmameController.EditorsZoomLimits,
+                                                                           EDAmameController.EditorsZoomFactor,
+                                                                           EDAmameController.EditorsMouseDragFactor,
+                                                                           EDAmameController.EditorsMouseCheckTimeout);
 
                                 EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
                             }

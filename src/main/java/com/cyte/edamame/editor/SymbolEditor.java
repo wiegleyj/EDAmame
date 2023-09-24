@@ -6,6 +6,7 @@
  */
 
 package com.cyte.edamame.editor;
+import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.render.CanvasRenderSystem;
@@ -48,6 +49,7 @@ public class SymbolEditor extends Editor
      */
     public static Editor create(Integer editorType) throws IOException
     {
+        // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/SymbolEditor.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
@@ -55,9 +57,10 @@ public class SymbolEditor extends Editor
         editor.editorName = "SymbolEditor";
         editor.dissect(editorType, scene);
 
-        CanvasRenderShape testShape = new CanvasRenderShape();
-        testShape.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
-        testShape.permanent = true;
+        // Creating test point grid
+        CanvasRenderShape testShapeBlueprint = new CanvasRenderShape();
+        testShapeBlueprint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
+        testShapeBlueprint.permanent = true;
 
         Double posX = -1000.0;
         Double posY = -100.0;
@@ -66,7 +69,10 @@ public class SymbolEditor extends Editor
         {
             for (int j = 0; j < 100; j++)
             {
-                editor.renderSystem.AddShape(-1, testShape, new PairMutable(posX, posY));
+                CanvasRenderShape testShape = new CanvasRenderShape(testShapeBlueprint);
+                testShape.posReal = new PairMutable(posX, posY);
+
+                editor.renderSystem.AddShape(-1, testShape);
                 posX += 100.0;
             }
             posX = -1000.0;

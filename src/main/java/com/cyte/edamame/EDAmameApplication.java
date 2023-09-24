@@ -9,6 +9,7 @@ package com.cyte.edamame;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -66,4 +67,10 @@ public class EDAmameApplication extends Application
     {
         launch();
     }
+
+    /*public static Parent loadFXML(String fxml) throws IOException
+    {
+        FXMLLoader fxmlLoader = new FXMLLoader(EDAmameApplication.class.getResource(fxml + ".fxml"));
+        return fxmlLoader.load();
+    }*/
 }

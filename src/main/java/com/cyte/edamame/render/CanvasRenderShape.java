@@ -31,7 +31,9 @@ public class CanvasRenderShape
     public Double globalOpacity;
     public BlendMode blendMode;
     public PairMutable boundingBox;
+    public PairMutable posReal;
     public PairMutable posDraw;
+    public PairMutable posMousePress;
     public boolean zoomScaling;
     public boolean permanent;
     //public EditorSchematic_Symbol symbol;
@@ -50,7 +52,9 @@ public class CanvasRenderShape
         this.globalOpacity = 1.0;
         this.blendMode = BlendMode.SRC_OVER;
         this.boundingBox = new PairMutable(0.0, 0.0);
+        this.posReal = new PairMutable(0.0, 0.0);
         this.posDraw = new PairMutable(0.0, 0.0);
+        this.posMousePress = new PairMutable(0.0, 0.0);
         this.zoomScaling = true;
         this.permanent = false;
         //this.symbol = null;
@@ -76,7 +80,9 @@ public class CanvasRenderShape
             this.AddLine(otherShape.lineIndices.get(i).GetLeftInteger(), otherShape.lineIndices.get(i).GetRightInteger(), otherShape.lineWidths.get(i), otherShape.lineColors.get(i), otherShape.lineOpacities.get(i));
 
         this.boundingBox = new PairMutable(otherShape.boundingBox);
+        this.posReal = new PairMutable(otherShape.posReal);
         this.posDraw = new PairMutable(otherShape.posDraw);
+        this.posMousePress = new PairMutable(otherShape.posMousePress);
         this.zoomScaling = otherShape.zoomScaling;
         this.permanent = otherShape.permanent;
         //this.symbol = otherShape.symbol;

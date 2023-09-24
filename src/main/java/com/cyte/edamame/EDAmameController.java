@@ -5,6 +5,27 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
+// TODO:
+// REFACTOR ALL COMMENTS
+// REFACTOR ALL FUNCTIONS & FUNCTION NAMES
+
+// Implement wire connection edges (into symbols)
+// Implement wires
+// Implement save & load features
+// Implement symbol editor
+// Implement undo-redo functions
+// Fix symbols not moving when viewport center on theater edges
+// Fix symbols pushing away from theater edges when zooming
+// Add zooming into cursor
+// Add symbol rotation while dropping
+// Fix symbol edge moving
+// Add symbol selection box blending
+// Fix symbol highlights only triggering when cursor moved
+// Fix symbol highlights not appearing instantly
+// Fix symbol highlights top-only not triggering instantly
+// Fix symbols remaining highlighted for a single frame when zooming
+// Implement transition to PCB
+
 package com.cyte.edamame;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.editor.Editor;
@@ -28,6 +49,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.scene.paint.*;
 import javafx.scene.canvas.*;
+import javafx.scene.input.*;
 
 import java.io.File;
 import java.io.IOException;
@@ -64,8 +86,14 @@ public class EDAmameController implements Initializable
 
     final static public String[] EditorTypes = {"Symbol Editor"};
     final static public Double EditorsHeartbeatDelay = 0.01;
+
+    final static public PairMutable EditorsTheaterSize = new PairMutable(1000.0, 1000.0);
     final static public Color EditorsBackgroundColor = Color.BEIGE;
     final static public Integer EditorsMaxShapes = 1000;
+    final static public PairMutable EditorsZoomLimits = new PairMutable(0.5, 5.0);
+    final static public Double EditorsZoomFactor = 1.5;
+    final static public Double EditorsMouseDragFactor = 1.0;
+    final static public Double EditorsMouseCheckTimeout = 0.0001;
 
     final static public Logger LOGGER = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
@@ -94,6 +122,8 @@ public class EDAmameController implements Initializable
     private final ObservableMap<Tab, Editor> editors = FXCollections.observableHashMap();   // All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.
 
     public Timeline editorsHeartbeatTimeline;
+
+    static public LinkedList<KeyCode> pressedKeys = new LinkedList<KeyCode>();
 
     //// MAIN FUNCTIONS ////
 
@@ -547,6 +577,51 @@ public class EDAmameController implements Initializable
         controlsStackPane.getChildren().forEach(e -> e.setVisible(e==controlTabPane));
     }
 
+    @FXML
+    public void globalKeyPress(KeyEvent event)
+    {
+        // Adding pressed key to the pressed keys list
+        if (!isGlobalKeyPressed(event.getCode()))
+            pressedKeys.add(event.getCode());
+
+        // Handling symbol deletion
+        /*if (this.EditorSchematic_IsKeyPressed(KeyCode.BACK_SPACE) || this.EditorSchematic_IsKeyPressed(KeyCode.DELETE))
+        {
+            Integer i = 0;
+
+            while (i < this.EditorSchematic_ViewportSymbolsDropped.size())
+            {
+                EditorSchematic_Symbol symbol = this.EditorSchematic_ViewportSymbolsDropped.get(i);
+
+                if (symbol.selected)
+                {
+                    this.EditorSchematic_ViewportSymbolsDropped.remove(symbol);
+                    i--;
+                }
+
+                i++;
+            }
+        }*/
+
+        event.consume();
+    }
+
+    @FXML
+    public void globalKeyRelease(KeyEvent event)
+    {
+        if (isGlobalKeyPressed(event.getCode()))
+            pressedKeys.remove(event.getCode());
+
+        event.consume();
+    }
+
+    //// SUPPORT FUNCTIONS ////
+
+    static public boolean isGlobalKeyPressed(KeyCode key)
+    {
+        return pressedKeys.contains(key);
+    }
+
     //// TESTING FUNCTIONS ////
 
     /**
@@ -560,8 +635,9 @@ public class EDAmameController implements Initializable
             // create and add a new editor
             addEditor(SymbolEditor.create(0));
         }
-        catch (IOException ignored)
+        catch (IOException e)
         {
+            System.out.println("ERROR!");
         }
     }
 

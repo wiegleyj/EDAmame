@@ -11,16 +11,6 @@ import java.util.LinkedList;
 
 public class Utils
 {
-    static public Integer NextID = 0;
-
-    static public Integer GetNextID()
-    {
-        if (NextID >= Integer.MAX_VALUE)
-            throw new java.lang.Error("ERROR: Used up all available unique IDs!");
-
-        return NextID++;
-    }
-
     static public Integer ListFindMaxIdx(LinkedList<Double> list)
     {
         int maxIdx = -1;
