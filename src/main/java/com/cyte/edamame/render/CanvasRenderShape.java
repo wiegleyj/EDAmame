@@ -19,6 +19,7 @@ import javafx.scene.effect.*;
 public class CanvasRenderShape
 {
     final UUID id = UUID.randomUUID();
+
     public String name;
     public LinkedList<PairMutable> points;
     public LinkedList<Double> pointWidths;

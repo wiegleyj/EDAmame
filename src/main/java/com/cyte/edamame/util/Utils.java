@@ -7,10 +7,21 @@
 
 package com.cyte.edamame.util;
 
+import com.cyte.edamame.render.CanvasRenderShape;
+
 import java.util.LinkedList;
 
 public class Utils
 {
+    static public Integer FindCanvasShape(LinkedList<CanvasRenderShape> shapes, String name)
+    {
+        for (int i = 0; i < shapes.size(); i++)
+            if (shapes.get(i).name.equals(name))
+                return i;
+
+        return -1;
+    }
+
     static public Integer ListFindMaxIdx(LinkedList<Double> list)
     {
         int maxIdx = -1;

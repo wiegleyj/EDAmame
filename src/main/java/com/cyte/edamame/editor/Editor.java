@@ -67,9 +67,13 @@ public abstract class Editor
 
     public CanvasRenderSystem renderSystem = null;
     public boolean visible = false;
+    public boolean pressedLMB = false;
+    public boolean pressedRMB = false;
+    public boolean rotating = false;
 
     //// MAIN FUNCTIONS ////
 
+    // ????
     /**
      * Request an editor to close. Handling any information/state saving as it needs.
      * @return true if the editor was able to close without unsaved information/state, false otherwise.
@@ -114,7 +118,7 @@ public abstract class Editor
     abstract public void ViewportOnMouseMoved();
     abstract public void ViewportOnMousePressed();
     abstract public void ViewportOnMouseReleased();
-    abstract public void ViewportOnMouseDragged();
+    abstract public void ViewportOnMouseDragged(PairMutable mouseDiffPos);
     abstract public void ViewportOnScroll();
 
     //// SUPPORT FUNCTIONS ////

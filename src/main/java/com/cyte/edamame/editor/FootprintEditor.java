@@ -7,6 +7,8 @@
 
 package com.cyte.edamame.editor;
 
+import com.cyte.edamame.util.PairMutable;
+
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Tab;
 import javafx.scene.control.ToolBar;
@@ -48,7 +50,7 @@ public class FootprintEditor extends Editor
         System.out.println("Footprint mouse released!");
     }
 
-    public void ViewportOnMouseDragged()
+    public void ViewportOnMouseDragged(PairMutable mouseDiffPos)
     {
         System.out.println("Footprint mouse dragged!");
     }

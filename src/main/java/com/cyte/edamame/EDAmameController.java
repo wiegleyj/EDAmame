@@ -6,9 +6,12 @@
  */
 
 // TODO:
+// Fix this grid shit...
+// Ask about editor sub-class overriding
 // REFACTOR ALL COMMENTS
 // REFACTOR ALL FUNCTIONS & FUNCTION NAMES
 // Implement dropping onto canvas
+// Fix mouse-specific release callback function
 
 // Implement wire connection edges (into symbols)
 // Implement wires
@@ -28,6 +31,7 @@
 // Implement transition to PCB
 
 package com.cyte.edamame;
+import com.cyte.edamame.render.CanvasRenderShape;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.editor.SymbolEditor;
@@ -126,6 +130,8 @@ public class EDAmameController implements Initializable
 
     static public LinkedList<KeyCode> pressedKeys = new LinkedList<KeyCode>();
 
+    static public LinkedList<CanvasRenderShape> basicShapes = new LinkedList<CanvasRenderShape>();
+
     //// MAIN FUNCTIONS ////
 
     /**
@@ -140,6 +146,8 @@ public class EDAmameController implements Initializable
     {
         this.stage = stage;
         stage.setOnShown((event) -> executeOnShown());
+
+        CreateBasicCanvasShapes();
     }
 
     /**
@@ -624,6 +632,45 @@ public class EDAmameController implements Initializable
     }
 
     //// TESTING FUNCTIONS ////
+
+    static public void CreateBasicCanvasShapes()
+    {
+        CanvasRenderShape gridPoint = new CanvasRenderShape();
+        gridPoint.name = "GridPoint";
+        gridPoint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
+        gridPoint.zoomScaling = true;
+        gridPoint.permanent = true;
+
+        basicShapes.add(gridPoint);
+
+        CanvasRenderShape gridBox = new CanvasRenderShape();
+        gridBox.name = "GridBox";
+        gridBox.AddPoint(-EditorsTheaterSize.GetLeftDouble() / 2, -EditorsTheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
+        gridBox.AddPoint(EditorsTheaterSize.GetLeftDouble() / 2, -EditorsTheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
+        gridBox.AddPoint(EditorsTheaterSize.GetLeftDouble() / 2, EditorsTheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
+        gridBox.AddPoint(-EditorsTheaterSize.GetLeftDouble() / 2, EditorsTheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
+        gridBox.AddLine(0, 1, 1.5, Color.BLACK, 1.0);
+        gridBox.AddLine(1, 2, 1.5, Color.BLACK, 1.0);
+        gridBox.AddLine(2, 3, 1.5, Color.BLACK, 1.0);
+        gridBox.AddLine(3, 0, 1.5, Color.BLACK, 1.0);
+        gridBox.zoomScaling = true;
+        gridBox.permanent = true;
+
+        basicShapes.add(gridBox);
+
+        CanvasRenderShape crosshair = new CanvasRenderShape();
+        crosshair.name = "Crosshair";
+        crosshair.AddPoint(0.0, -5.0, 0.0, Color.RED, 1.0);
+        crosshair.AddPoint(0.0, 5.0, 0.0, Color.RED, 1.0);
+        crosshair.AddPoint(-5.0, 0.0, 0.0, Color.RED, 1.0);
+        crosshair.AddPoint(5.0, 0.0, 0.0, Color.RED, 1.0);
+        crosshair.AddLine(0, 1, 0.5, Color.RED, 1.0);
+        crosshair.AddLine(2, 3, 0.5, Color.RED, 1.0);
+        crosshair.zoomScaling = false;
+        crosshair.permanent = true;
+
+        basicShapes.add(crosshair);
+    }
 
     /**
      * A test method for a test button to add a fake editor to the page to verify concept.
