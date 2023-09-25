@@ -45,6 +45,8 @@ public abstract class Editor
     final UUID editorID = UUID.randomUUID();
     String editorName = null;
 
+    // DO NOT EDIT
+
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
     // The individual elements are extracted to these for use by the EDAmame Application.
     /** The main tab for EDAmame to include in its main tab list. */
@@ -66,7 +68,18 @@ public abstract class Editor
     public CanvasRenderSystem renderSystem = null;
     public boolean visible = false;
 
-    // accessors for the UI elements
+    //// MAIN FUNCTIONS ////
+
+    /**
+     * Request an editor to close. Handling any information/state saving as it needs.
+     * @return true if the editor was able to close without unsaved information/state, false otherwise.
+     */
+    public boolean close()
+    {
+        return true;
+    }
+
+    //// GETTER FUNCTIONS ////
 
     /**
      * Returns the main editor Tab node for inclusion by EDAmame.
@@ -93,6 +106,18 @@ public abstract class Editor
      * @return a (possibly empty) structure of menu items
      */
     public ObservableMap<String, ObservableList<MenuItem>> getMenus() { return menus; }
+
+    //// CALLBACK FUNCTIONS ////
+
+    abstract public void ViewportOnDragOver();
+    abstract public void ViewportOnDragDropped();
+    abstract public void ViewportOnMouseMoved();
+    abstract public void ViewportOnMousePressed();
+    abstract public void ViewportOnMouseReleased();
+    abstract public void ViewportOnMouseDragged();
+    abstract public void ViewportOnScroll();
+
+    //// SUPPORT FUNCTIONS ////
 
     /** dissect a controller into its component for delivery to EDAmame<p>
      *
@@ -175,7 +200,8 @@ public abstract class Editor
 
                             if (nextNode.getClass() == Canvas.class)
                             {
-                                this.renderSystem = new CanvasRenderSystem((Canvas)nextNode,
+                                this.renderSystem = new CanvasRenderSystem(this,
+                                                                           (Canvas)nextNode,
                                                                            EDAmameController.EditorsTheaterSize,
                                                                            EDAmameController.EditorsBackgroundColor,
                                                                            EDAmameController.EditorsMaxShapes,
@@ -204,14 +230,5 @@ public abstract class Editor
                 }
             }
         }
-    }
-
-    /**
-     * Request an editor to close. Handling any information/state saving as it needs.
-     * @return true if the editor was able to close without unsaved information/state, false otherwise.
-     */
-    public boolean close()
-    {
-        return true;
     }
 }

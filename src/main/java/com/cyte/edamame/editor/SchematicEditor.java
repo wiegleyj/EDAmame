@@ -17,5 +17,44 @@ import java.util.Map;
 /**
  * Editor for developing schematics
  */
-public class SchematicEditor extends Editor {
+public class SchematicEditor extends Editor
+{
+
+
+    //// CALLBACK FUNCTIONS ////
+
+    public void ViewportOnDragOver()
+    {
+        System.out.println("Schematic dragged over!");
+    }
+
+    public void ViewportOnDragDropped()
+    {
+        System.out.println("Schematic drag dropped!");
+    }
+
+    public void ViewportOnMouseMoved()
+    {
+        System.out.println("Schematic mouse moved!");
+    }
+
+    public void ViewportOnMousePressed()
+    {
+        System.out.println("Schematic mouse pressed!");
+    }
+
+    public void ViewportOnMouseReleased()
+    {
+        System.out.println("Schematic mouse released!");
+    }
+
+    public void ViewportOnMouseDragged()
+    {
+        System.out.println("Schematic mouse dragged!");
+    }
+
+    public void ViewportOnScroll()
+    {
+        System.out.println("Schematic mouse scrolled!");
+    }
 }

@@ -8,6 +8,7 @@
 // TODO:
 // REFACTOR ALL COMMENTS
 // REFACTOR ALL FUNCTIONS & FUNCTION NAMES
+// Implement dropping onto canvas
 
 // Implement wire connection edges (into symbols)
 // Implement wires
@@ -633,7 +634,7 @@ public class EDAmameController implements Initializable
         try
         {
             // create and add a new editor
-            addEditor(SymbolEditor.create(0));
+            addEditor(SymbolEditor.create());
         }
         catch (IOException e)
         {

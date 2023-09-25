@@ -7,6 +7,7 @@
 
 package com.cyte.edamame.render;
 import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.util.PairMutable;
 
@@ -47,9 +48,11 @@ public class CanvasRenderSystem
     public PairMutable mouseDragFirstCenter;
     public boolean mouseDragReachedEdge;
 
+    public Editor editor;
+
     //// CONSTRUCTORS ////
 
-    public CanvasRenderSystem(Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public CanvasRenderSystem(Editor editorValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
@@ -60,7 +63,7 @@ public class CanvasRenderSystem
         this.zoomFactor = zoomFactorValue;
         this.mouseDragFactor = mouseDragFactorValue;
         this.mouseDragCheckTimeout = mouseDragCheckTimeoutValue;
-        this.InitListeners();
+        //this.InitListeners();
 
         this.shapes = new LinkedList<CanvasRenderShape>();
         //this.shapesPosReal = new LinkedList<PairMutable>();
@@ -72,6 +75,8 @@ public class CanvasRenderSystem
         this.mouseDragLastTime = System.nanoTime();
         this.mouseDragFirstCenter = null;
         this.mouseDragReachedEdge = false;
+
+        this.editor = editorValue;
     }
 
     //// RENDERING FUNCTIONS ////
@@ -220,6 +225,7 @@ public class CanvasRenderSystem
     {
         this.canvas.setOnDragOver(event -> {
             //System.out.println("Dragging over viewport!");
+            this.editor.ViewportOnDragOver();
 
             /*// Handling symbol dragging preview
             Dragboard db = event.getDragboard();
@@ -270,6 +276,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnDragDropped(event -> {
             //System.out.println("Drag dropped over viewport!");
+            this.editor.ViewportOnDragDropped();
 
             /*// Handling dropping of symbols
             Dragboard db = event.getDragboard();
@@ -326,6 +333,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnMouseMoved(event -> {
             //System.out.println("Mouse moving over viewport!");
+            this.editor.ViewportOnMouseMoved();
 
             //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
 
@@ -334,6 +342,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnMousePressed(event -> {
             //System.out.println("Mouse pressed over viewport!");
+            this.editor.ViewportOnMousePressed();
 
             /*// Checking whether the left mouse button is pressed
             if (event.isPrimaryButtonDown())
@@ -380,6 +389,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnMouseReleased(event -> {
             //System.out.println("Mouse released over viewport!");
+            this.editor.ViewportOnMouseReleased();
 
             // Acquiring the current mouse position
             //PairMutable posMouse = new PairMutable(event.getX(), event.getY());
@@ -472,6 +482,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnMouseDragged(event -> {
             //System.out.println("Mouse dragged over viewport!");
+            this.editor.ViewportOnMouseDragged();
 
             // Only check if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
@@ -653,6 +664,7 @@ public class CanvasRenderSystem
 
         this.canvas.setOnScroll(event -> {
             //System.out.println("Mouse scrolled over viewport!");
+            this.editor.ViewportOnScroll();
 
             // Handling symbol rotation
             boolean rotating = false;
@@ -737,8 +749,6 @@ public class CanvasRenderSystem
                 //this.EditorSchematic_ViewportZoomOffset = new PairMutable(event.getX() - this.EditorSchematic_ViewportCenter.GetLeftDouble(),
                 //                                                          event.getY() - this.EditorSchematic_ViewportCenter.GetRightDouble());
             }
-
-            System.out.println(this.zoom);
 
             // Checking for updated symbol highlights
             //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));

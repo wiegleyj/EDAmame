@@ -17,5 +17,44 @@ import java.util.Map;
 /**
  * Editor for developing Printed Circuit Boards
  */
-public class PCBEditor extends Editor {
+public class PCBEditor extends Editor
+{
+
+
+    //// CALLBACK FUNCTIONS ////
+
+    public void ViewportOnDragOver()
+    {
+        System.out.println("PCB dragged over!");
+    }
+
+    public void ViewportOnDragDropped()
+    {
+        System.out.println("PCB drag dropped!");
+    }
+
+    public void ViewportOnMouseMoved()
+    {
+        System.out.println("PCB mouse moved!");
+    }
+
+    public void ViewportOnMousePressed()
+    {
+        System.out.println("PCB mouse pressed!");
+    }
+
+    public void ViewportOnMouseReleased()
+    {
+        System.out.println("PCB mouse released!");
+    }
+
+    public void ViewportOnMouseDragged()
+    {
+        System.out.println("PCB mouse dragged!");
+    }
+
+    public void ViewportOnScroll()
+    {
+        System.out.println("PCB mouse scrolled!");
+    }
 }

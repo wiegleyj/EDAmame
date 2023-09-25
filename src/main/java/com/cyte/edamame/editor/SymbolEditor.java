@@ -47,7 +47,7 @@ public class SymbolEditor extends Editor
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    public static Editor create(Integer editorType) throws IOException
+    public static Editor create() throws IOException
     {
         // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/SymbolEditor.fxml"));
@@ -55,7 +55,9 @@ public class SymbolEditor extends Editor
 
         SymbolEditor editor = fxmlLoader.getController();
         editor.editorName = "SymbolEditor";
-        editor.dissect(editorType, scene);
+        editor.dissect(0, scene);
+
+        editor.renderSystem.InitListeners();
 
         // Creating test point grid
         CanvasRenderShape testShapeBlueprint = new CanvasRenderShape();
@@ -75,6 +77,7 @@ public class SymbolEditor extends Editor
                 editor.renderSystem.AddShape(-1, testShape);
                 posX += 100.0;
             }
+
             posX = -1000.0;
             posY += 100.0;
             System.out.println(posY);
@@ -92,6 +95,43 @@ public class SymbolEditor extends Editor
     }
 
     //// CALLBACK FUNCTIONS ////
+
+    public void ViewportOnDragOver()
+    {
+        System.out.println("Symbol dragged over!");
+    }
+
+    public void ViewportOnDragDropped()
+    {
+        System.out.println("Symbol drag dropped!");
+    }
+
+    public void ViewportOnMouseMoved()
+    {
+        System.out.println("Symbol mouse moved!");
+    }
+
+    public void ViewportOnMousePressed()
+    {
+        System.out.println("Symbol mouse pressed!");
+    }
+
+    public void ViewportOnMouseReleased()
+    {
+        System.out.println("Symbol mouse released!");
+    }
+
+    public void ViewportOnMouseDragged()
+    {
+        System.out.println("Symbol mouse dragged!");
+    }
+
+    public void ViewportOnScroll()
+    {
+        System.out.println("Symbol mouse scrolled!");
+    }
+
+    //// TESTING FUNCTIONS ////
 
     /**
      * a test button for checking if controller is working and unique. (hint: it is.) this can be removed.
