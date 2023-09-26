@@ -80,54 +80,54 @@ public class CanvasRenderSystem
 
     public void Render()
     {
+        // Clearing the viewport of all existing shapes
         this.Clear();
 
-        Integer i = 0;
+        long time = System.nanoTime();
 
-        while (i < this.shapes.size())
+        // Drawing all the shapes in the drawing queue
+        for (int i = 0; i < this.shapes.size(); i++)
         {
             CanvasRenderShape shape = this.shapes.get(i);
-            //PairMutable posReal = this.shapesPosReal.get(i);
-            //EditorSchematic_Symbol symbol = shape.symbol;
 
-            if (shape.posReal != null)
-                shape.posDraw = this.CalculatePosDraw(shape, shape.posReal);
+            shape.posDraw = this.CalculatePosDraw(shape, shape.posReal);
 
-            if (shape.zoomScaling)
+            // Draw the shape only if it's within the viewing bounds of the viewport
+            if (((shape.posDraw.GetLeftDouble() + shape.boundingBox.GetLeftDouble() / 2) > 0) && ((shape.posDraw.GetLeftDouble() - shape.boundingBox.GetLeftDouble() / 2) < this.canvas.getWidth()) &&
+                ((shape.posDraw.GetRightDouble() + shape.boundingBox.GetRightDouble() / 2) > 0) && ((shape.posDraw.GetRightDouble() - shape.boundingBox.GetRightDouble() / 2) < this.canvas.getHeight()))
             {
-                for (int j = 0; j < shape.points.size(); j++)
-                {
-                    shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() * this.zoom, shape.points.get(j).GetRightDouble() * this.zoom));
-                    shape.pointWidths.set(j, shape.pointWidths.get(j) * this.zoom);
+                if (shape.zoomScaling) {
+                    for (int j = 0; j < shape.points.size(); j++) {
+                        shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() * this.zoom, shape.points.get(j).GetRightDouble() * this.zoom));
+                        shape.pointWidths.set(j, shape.pointWidths.get(j) * this.zoom);
+                    }
+
+                    //for (int j = 0; j < symbol.wirePoints.size(); j++)
+                    //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() * this.zoom, symbol.wirePoints.get(j).GetRightDouble() * this.zoom));
                 }
 
-                //for (int j = 0; j < symbol.wirePoints.size(); j++)
-                //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() * this.zoom, symbol.wirePoints.get(j).GetRightDouble() * this.zoom));
-            }
+                shape.Draw(this.gc);
 
-            shape.DrawShape(this.gc);
+                if (shape.zoomScaling) {
+                    for (int j = 0; j < shape.points.size(); j++) {
+                        shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() / this.zoom, shape.points.get(j).GetRightDouble() / this.zoom));
+                        shape.pointWidths.set(j, shape.pointWidths.get(j) / this.zoom);
+                    }
 
-            if (shape.zoomScaling)
-            {
-                for (int j = 0; j < shape.points.size(); j++)
-                {
-                    shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() / this.zoom, shape.points.get(j).GetRightDouble() / this.zoom));
-                    shape.pointWidths.set(j, shape.pointWidths.get(j) / this.zoom);
+                    //for (int j = 0; j < symbol.wirePoints.size(); j++)
+                    //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() / this.zoom, symbol.wirePoints.get(j).GetRightDouble() / this.zoom));
                 }
-
-                //for (int j = 0; j < symbol.wirePoints.size(); j++)
-                //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() / this.zoom, symbol.wirePoints.get(j).GetRightDouble() / this.zoom));
             }
 
+            // Remove the shape from the drawing queue if it's not permanent
             if (!shape.permanent)
             {
                 this.shapes.remove(shape);
-                //this.shapesPosReal.remove(posReal);
                 i--;
             }
-
-            i++;
         }
+
+        System.out.println((double)(System.nanoTime() - time) / 1e9);
     }
 
     public void Clear()
@@ -292,8 +292,11 @@ public class CanvasRenderSystem
                         {
                             CanvasRenderShape shape = this.shapes.get(i);
 
+                            if (shape.posStatic)
+                                continue;
+
                             shape.posReal = new PairMutable(shape.posReal.GetLeftDouble() - center.GetLeftDouble(),
-                                    shape.posReal.GetRightDouble() - center.GetRightDouble());
+                                                            shape.posReal.GetRightDouble() - center.GetRightDouble());
 
                             this.shapes.set(i, shape);
                         }
@@ -334,7 +337,7 @@ public class CanvasRenderSystem
                 {
                     CanvasRenderShape shape = this.shapes.get(i);
 
-                    if (shape.posReal == null)
+                    if (shape.posStatic)
                         continue;
 
                     shape.posMousePress = new PairMutable(shape.posReal);
@@ -386,7 +389,7 @@ public class CanvasRenderSystem
                         {
                             CanvasRenderShape shape = this.shapes.get(i);
 
-                            if (shape.posReal == null)
+                            if (shape.posStatic)
                                 continue;
 
                             shape.posReal = new PairMutable(shape.posMousePress.GetLeftDouble() + mouseDiffPos.GetLeftDouble(),

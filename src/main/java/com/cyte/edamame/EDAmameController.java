@@ -6,10 +6,11 @@
  */
 
 // TODO:
-// Fix this grid shit...
 // Ask about editor sub-class overriding
+// Ask about symbol drawing method
 // REFACTOR ALL COMMENTS
 // REFACTOR ALL FUNCTIONS & FUNCTION NAMES
+// Fix slow rendering
 // Implement dropping onto canvas
 // Fix mouse-specific release callback function
 
@@ -94,7 +95,7 @@ public class EDAmameController implements Initializable
 
     final static public PairMutable EditorsTheaterSize = new PairMutable(1000.0, 1000.0);
     final static public Color EditorsBackgroundColor = Color.BEIGE;
-    final static public Integer EditorsMaxShapes = 1000;
+    final static public Integer EditorsMaxShapes = 10000;
     final static public PairMutable EditorsZoomLimits = new PairMutable(0.5, 5.0);
     final static public Double EditorsZoomFactor = 1.5;
     final static public Double EditorsMouseDragFactor = 1.0;
@@ -638,7 +639,6 @@ public class EDAmameController implements Initializable
         CanvasRenderShape gridPoint = new CanvasRenderShape();
         gridPoint.name = "GridPoint";
         gridPoint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
-        gridPoint.zoomScaling = true;
         gridPoint.permanent = true;
 
         basicShapes.add(gridPoint);
@@ -653,7 +653,6 @@ public class EDAmameController implements Initializable
         gridBox.AddLine(1, 2, 1.5, Color.BLACK, 1.0);
         gridBox.AddLine(2, 3, 1.5, Color.BLACK, 1.0);
         gridBox.AddLine(3, 0, 1.5, Color.BLACK, 1.0);
-        gridBox.zoomScaling = true;
         gridBox.permanent = true;
 
         basicShapes.add(gridBox);
@@ -668,6 +667,7 @@ public class EDAmameController implements Initializable
         crosshair.AddLine(2, 3, 0.5, Color.RED, 1.0);
         crosshair.zoomScaling = false;
         crosshair.permanent = true;
+        crosshair.posStatic = true;
 
         basicShapes.add(crosshair);
     }

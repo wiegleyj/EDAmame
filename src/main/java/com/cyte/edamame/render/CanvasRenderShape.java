@@ -37,6 +37,7 @@ public class CanvasRenderShape
     public PairMutable posMousePress;
     public boolean zoomScaling;
     public boolean permanent;
+    public boolean posStatic;
     //public EditorSchematic_Symbol symbol;
 
     public CanvasRenderShape()
@@ -58,6 +59,7 @@ public class CanvasRenderShape
         this.posMousePress = new PairMutable(0.0, 0.0);
         this.zoomScaling = true;
         this.permanent = false;
+        this.posStatic = false;
         //this.symbol = null;
     }
 
@@ -86,10 +88,11 @@ public class CanvasRenderShape
         this.posMousePress = new PairMutable(otherShape.posMousePress);
         this.zoomScaling = otherShape.zoomScaling;
         this.permanent = otherShape.permanent;
+        this.posStatic = otherShape.posStatic;
         //this.symbol = otherShape.symbol;
     }
 
-    public void DrawShape(GraphicsContext gc)
+    public void Draw(GraphicsContext gc)
     {
         // Checking whether our drawing elements are valid
         if (this.id == null)

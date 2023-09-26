@@ -65,12 +65,12 @@ public class SymbolEditor extends Editor
             // Loading the point grid
             CanvasRenderShape gridPointBlueprint = EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "GridPoint"));
 
-            Double posX = -1000.0;
-            Double posY = -100.0;
+            Double posX = -2500.0;
+            Double posY = -2500.0;
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 50; i++)
             {
-                for (int j = 0; j < 10; j++)
+                for (int j = 0; j < 50; j++)
                 {
                     CanvasRenderShape gridPoint = new CanvasRenderShape(gridPointBlueprint);
                     gridPoint.posReal = new PairMutable(posX, posY);
@@ -79,7 +79,7 @@ public class SymbolEditor extends Editor
                     posX += 100.0;
                 }
 
-                posX = -1000.0;
+                posX = -2500.0;
                 posY += 100.0;
                 //System.out.println(posY);
             }
@@ -91,7 +91,6 @@ public class SymbolEditor extends Editor
 
             // Loading the center crosshair
             CanvasRenderShape crosshair = new CanvasRenderShape(EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "Crosshair")));
-            crosshair.posReal = null;
             crosshair.posDraw = new PairMutable(editor.renderSystem.canvas.getWidth() / 2, editor.renderSystem.canvas.getHeight() / 2);
             editor.renderSystem.AddShape(-1, crosshair);
         }
