@@ -18,6 +18,7 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.canvas.*;
 import javafx.scene.paint.*;
@@ -194,27 +195,41 @@ public abstract class Editor
 
                     if (item.getText().equals("EditorTab"))
                     {
-                        // Searching for & declaring the canvas
+                        // Searching for & declaring the stack pane
                         HBox editorBox = (HBox)item.getContent();
-                        Iterator<Node> canvasIterator = editorBox.getChildren().iterator();
+                        Iterator<Node> stackpaneIterator = editorBox.getChildren().iterator();
 
-                        while (canvasIterator.hasNext())
+                        while (stackpaneIterator.hasNext())
                         {
-                            Node nextNode = canvasIterator.next();
+                            Node nextNode = stackpaneIterator.next();
 
-                            if (nextNode.getClass() == Canvas.class)
+                            if (nextNode.getClass() == StackPane.class)
                             {
-                                this.renderSystem = new CanvasRenderSystem(this,
-                                                                           (Canvas)nextNode,
-                                                                           EDAmameController.EditorsTheaterSize,
-                                                                           EDAmameController.EditorsBackgroundColor,
-                                                                           EDAmameController.EditorsMaxShapes,
-                                                                           EDAmameController.EditorsZoomLimits,
-                                                                           EDAmameController.EditorsZoomFactor,
-                                                                           EDAmameController.EditorsMouseDragFactor,
-                                                                           EDAmameController.EditorsMouseCheckTimeout);
+                                // Searching for & declaring the canvas
+                                System.out.println("A");
+                                Iterator<Node> canvasIterator = ((StackPane)nextNode).getChildren().iterator();
+                                System.out.println("B");
+                                while (canvasIterator.hasNext()) {
+                                    System.out.println("C");
+                                    Node nextStackPaneNode = canvasIterator.next();
+                                    if (nextStackPaneNode.getClass() == Canvas.class) {
+                                        this.renderSystem = new CanvasRenderSystem(this,
+                                                (Canvas) nextStackPaneNode,
+                                                EDAmameController.EditorsTheaterSize,
+                                                EDAmameController.EditorsBackgroundColor,
+                                                EDAmameController.EditorsMaxShapes,
+                                                EDAmameController.EditorsZoomLimits,
+                                                EDAmameController.EditorsZoomFactor,
+                                                EDAmameController.EditorsMouseDragFactor,
+                                                EDAmameController.EditorsMouseCheckTimeout);
 
-                                EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                                        EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                                        break;
+                                    }
+
+
+
+                                }
                             }
                         }
 

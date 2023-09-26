@@ -83,16 +83,6 @@ public class SymbolEditor extends Editor
                 posY += 100.0;
                 //System.out.println(posY);
             }
-
-            // Loading the grid box
-            CanvasRenderShape gridBox = new CanvasRenderShape(EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "GridBox")));
-            gridBox.posReal = new PairMutable(0.0, 0.0);
-            editor.renderSystem.AddShape(-1, gridBox);
-
-            // Loading the center crosshair
-            CanvasRenderShape crosshair = new CanvasRenderShape(EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "Crosshair")));
-            crosshair.posDraw = new PairMutable(editor.renderSystem.canvas.getWidth() / 2, editor.renderSystem.canvas.getHeight() / 2);
-            editor.renderSystem.AddShape(-1, crosshair);
         }
 
         return editor;
