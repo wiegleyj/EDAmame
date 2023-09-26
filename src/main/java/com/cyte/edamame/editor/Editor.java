@@ -206,15 +206,18 @@ public abstract class Editor
                             if (nextNode.getClass() == StackPane.class)
                             {
                                 // Searching for & declaring the canvas
-                                System.out.println("A");
+                                //System.out.println("A");
                                 Iterator<Node> canvasIterator = ((StackPane)nextNode).getChildren().iterator();
-                                System.out.println("B");
+                                //System.out.println("B");
                                 while (canvasIterator.hasNext()) {
-                                    System.out.println("C");
+                                    //System.out.println("C");
                                     Node nextStackPaneNode = canvasIterator.next();
                                     if (nextStackPaneNode.getClass() == Canvas.class) {
+                                        Canvas canvas = (Canvas) nextStackPaneNode;
+                                        canvas.widthProperty().bind(((StackPane) nextNode).widthProperty());
+                                        canvas.heightProperty().bind(((StackPane) nextNode).heightProperty());
                                         this.renderSystem = new CanvasRenderSystem(this,
-                                                (Canvas) nextStackPaneNode,
+                                                canvas,
                                                 EDAmameController.EditorsTheaterSize,
                                                 EDAmameController.EditorsBackgroundColor,
                                                 EDAmameController.EditorsMaxShapes,

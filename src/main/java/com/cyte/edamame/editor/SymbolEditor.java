@@ -98,6 +98,11 @@ public class SymbolEditor extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
+    public void callbackTest() {
+        System.out.println("ABC");
+    }
+
+
     public void ViewportOnDragOver()
     {
         //System.out.println("Symbol dragged over!");

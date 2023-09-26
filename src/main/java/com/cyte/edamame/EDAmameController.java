@@ -364,7 +364,7 @@ public class EDAmameController implements Initializable
             mainTabPane.getTabs().add(editorTab);
 
             // Preparing the canvas
-            editor.renderSystem.BindSize((Node)logArea);
+            //editor.renderSystem.BindSize((Node)logArea);
         }
 
         // Make sure the toolbar is invisible

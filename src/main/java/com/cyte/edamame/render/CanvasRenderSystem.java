@@ -73,7 +73,7 @@ public class CanvasRenderSystem
         this.mouseDragReachedEdge = false;
 
         this.editor = editorValue;
-        this.InitListeners();
+        //this.InitListeners();
     }
 
     //// RENDERING FUNCTIONS ////
@@ -127,7 +127,7 @@ public class CanvasRenderSystem
             }
         }
 
-        System.out.println((double)(System.nanoTime() - time) / 1e9);
+        //System.out.println((double)(System.nanoTime() - time) / 1e9);
     }
 
     public void Clear()

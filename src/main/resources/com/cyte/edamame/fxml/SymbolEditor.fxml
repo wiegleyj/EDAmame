@@ -32,7 +32,7 @@
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab fx:id="etab" text="EditorTab">
             <HBox>
-            <StackPane>
+            <StackPane onMouseClicked="#callbackTest" HBox.hgrow="ALWAYS">
                <children>
                   <Canvas height="100.0" width="100.0" />
                </children>
