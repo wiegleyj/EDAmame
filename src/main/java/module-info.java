@@ -10,6 +10,7 @@ module com.cyte.edamame {
     requires java.sql;
     requires com.h2database;
     requires java.prefs;
+    requires org.jetbrains.annotations;
 
 
     opens com.cyte.edamame to javafx.fxml, javafx.graphics;
