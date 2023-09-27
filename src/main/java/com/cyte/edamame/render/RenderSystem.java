@@ -8,7 +8,6 @@
 package com.cyte.edamame.render;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.util.PairMutable;
 
 import java.util.LinkedList;
@@ -19,15 +18,15 @@ import javafx.scene.canvas.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
-import javafx.event.*;
 import javafx.scene.input.*;
 
-public class CanvasRenderSystem
+public class RenderSystem
 {
     //// GLOBAL VARIABLES ////
 
     final UUID id = UUID.randomUUID();
 
+    public StackPane stackPane;
     public Canvas canvas;
     public GraphicsContext gc;
     public PairMutable theaterSize;
@@ -38,7 +37,7 @@ public class CanvasRenderSystem
     public Double mouseDragFactor;
     public Double mouseDragCheckTimeout;
 
-    public LinkedList<CanvasRenderShape> shapes;
+    //public LinkedList<RenderShape> shapes;
     //public LinkedList<PairMutable> shapesPosReal;
     public PairMutable center;
     public Double zoom;
@@ -51,8 +50,9 @@ public class CanvasRenderSystem
 
     //// CONSTRUCTORS ////
 
-    public CanvasRenderSystem(Editor editorValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, StackPane stackPaneValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
+        this.stackPane = stackPaneValue;
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
         this.theaterSize = theaterSizeValue;
@@ -63,7 +63,7 @@ public class CanvasRenderSystem
         this.mouseDragFactor = mouseDragFactorValue;
         this.mouseDragCheckTimeout = mouseDragCheckTimeoutValue;
 
-        this.shapes = new LinkedList<CanvasRenderShape>();
+        //this.shapes = new LinkedList<RenderShape>();
         //this.shapesPosReal = new LinkedList<PairMutable>();
         this.center = new PairMutable(0.0, 0.0);
         this.zoom = 1.0;
@@ -73,6 +73,8 @@ public class CanvasRenderSystem
         this.mouseDragReachedEdge = false;
 
         this.editor = editorValue;
+        //this.canvas.widthProperty().bind(this.stackPane.widthProperty());
+        //this.canvas.heightProperty().bind(this.stackPane.heightProperty());
         this.InitListeners();
     }
 
@@ -80,7 +82,9 @@ public class CanvasRenderSystem
 
     public void Render()
     {
-        // Clearing the viewport of all existing shapes
+        // TODO
+
+        /*// Clearing the viewport of all existing shapes
         this.Clear();
 
         long time = System.nanoTime();
@@ -88,7 +92,7 @@ public class CanvasRenderSystem
         // Drawing all the shapes in the drawing queue
         for (int i = 0; i < this.shapes.size(); i++)
         {
-            CanvasRenderShape shape = this.shapes.get(i);
+            RenderShape shape = this.shapes.get(i);
 
             shape.posDraw = this.CalculatePosDraw(shape, shape.posReal);
 
@@ -127,7 +131,7 @@ public class CanvasRenderSystem
             }
         }
 
-        System.out.println((double)(System.nanoTime() - time) / 1e9);
+        System.out.println((double)(System.nanoTime() - time) / 1e9);*/
     }
 
     public void Clear()
@@ -139,7 +143,7 @@ public class CanvasRenderSystem
 
     //// CANVAS FUNCTIONS ////
 
-    public void BindSize(Node node)
+    /*public void BindSize(Node node)
     {
         if (node.getClass() == TabPane.class)
         {
@@ -166,11 +170,11 @@ public class CanvasRenderSystem
     {
         this.canvas.widthProperty().unbind();
         this.canvas.heightProperty().unbind();
-    }
+    }*/
 
     public void SetSize(PairMutable sizeValue)
     {
-        this.UnbindSize();
+        //this.UnbindSize();
 
         this.canvas.setWidth(sizeValue.GetLeftDouble());
         this.canvas.setHeight(sizeValue.GetRightDouble());
@@ -183,7 +187,7 @@ public class CanvasRenderSystem
 
     //// SHAPE FUNCTIONS ////
 
-    public PairMutable CalculatePosDraw(CanvasRenderShape shape, PairMutable posReal)
+    public PairMutable CalculatePosDraw(RenderShape shape, PairMutable posReal)
     {
         PairMutable posDraw = new PairMutable(posReal);
 
@@ -193,7 +197,7 @@ public class CanvasRenderSystem
         return posDraw;
     }
 
-    public void AddShape(Integer idx, CanvasRenderShape shape)
+    /*public void AddShape(Integer idx, RenderShape shape)
     {
         if (this.shapes.size() >= this.maxShapes)
             return;
@@ -214,83 +218,88 @@ public class CanvasRenderSystem
     {
         this.shapes.remove(this.shapes.get(idx));
         //this.shapesPosReal.remove(this.shapesPosReal.get(idx));
-    }
+    }*/
 
     //// CALLBACK FUNCTIONS ////
 
     public void InitListeners()
     {
-        this.canvas.setOnDragOver(event -> {
+        // When we drag the mouse (from outside the viewport)...
+        this.stackPane.setOnDragOver(event -> {
             // Handling global callback actions
             {}
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnDragOver();
+            this.editor.Editor_ViewportOnDragOver();
 
             event.consume();
         });
 
-        this.canvas.setOnDragDropped(event -> {
+        // When we drop something with the cursor (from outside the viewport)...
+        this.stackPane.setOnDragDropped(event -> {
             // Handling global callback actions
             {}
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnDragDropped();
+            this.editor.Editor_ViewportOnDragDropped();
 
             event.setDropCompleted(true);
             event.consume();
         });
 
-        this.canvas.setOnMouseMoved(event -> {
+        // When we move the mouse (without clicking)...
+        this.stackPane.setOnMouseMoved(event -> {
             // Handling global callback actions
             {}
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnMouseMoved();
+            this.editor.Editor_ViewportOnMouseMoved();
 
             event.consume();
         });
 
-        this.canvas.setOnMousePressed(event -> {
+        // When we press down the mouse...
+        this.stackPane.setOnMousePressed(event -> {
             // Updating mouse pressed flags
             {
                 if (event.isPrimaryButtonDown())
-                    this.editor.pressedLMB = true;
+                    this.editor.Editor_PressedLMB = true;
                 if (event.isSecondaryButtonDown())
-                    this.editor.pressedRMB = true;
+                    this.editor.Editor_PressedRMB = true;
             }
 
             // Handling global callback actions
             {
-                if (this.editor.pressedLMB)
+                if (this.editor.Editor_PressedLMB)
                 {}
 
-                if (this.editor.pressedRMB)
+                if (this.editor.Editor_PressedRMB)
                 {}
 
                 this.mouseDragFirstPos = null;
             }
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnMousePressed();
+            this.editor.Editor_ViewportOnMousePressed();
 
             event.consume();
         });
 
-        this.canvas.setOnMouseReleased(event -> {
+        // When we release the mouse...
+        this.stackPane.setOnMouseReleased(event -> {
             // Handling global callback actions
             {
-                if (this.editor.pressedLMB)
+                if (this.editor.Editor_PressedLMB)
                 {}
 
-                if (this.editor.pressedRMB)
+                if (this.editor.Editor_PressedRMB)
                 {
                     // Handling auto-zoom
                     if (EDAmameController.isGlobalKeyPressed(KeyCode.ALT))
                     {
-                        for (int i = 0; i < this.shapes.size(); i++)
+                        /*for (int i = 0; i < this.shapes.size(); i++)
                         {
-                            CanvasRenderShape shape = this.shapes.get(i);
+                            RenderShape shape = this.shapes.get(i);
 
                             if (shape.posStatic)
                                 continue;
@@ -299,7 +308,7 @@ public class CanvasRenderSystem
                                                             shape.posReal.GetRightDouble() - center.GetRightDouble());
 
                             this.shapes.set(i, shape);
-                        }
+                        }*/
 
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
@@ -308,18 +317,19 @@ public class CanvasRenderSystem
             }
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnMouseReleased();
+            this.editor.Editor_ViewportOnMouseReleased();
 
             // Updating mouse pressed flags
             {
-                this.editor.pressedLMB = false;
-                this.editor.pressedRMB = false;
+                this.editor.Editor_PressedLMB = false;
+                this.editor.Editor_PressedRMB = false;
             }
 
             event.consume();
         });
 
-        this.canvas.setOnMouseDragged(event -> {
+        // When we drag the mouse (from inside the viewport)...
+        this.stackPane.setOnMouseDragged(event -> {
             // Only callback if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
                 return;
@@ -333,9 +343,9 @@ public class CanvasRenderSystem
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
 
-                for (int i = 0; i < this.shapes.size(); i++)
+                /*for (int i = 0; i < this.shapes.size(); i++)
                 {
-                    CanvasRenderShape shape = this.shapes.get(i);
+                    RenderShape shape = this.shapes.get(i);
 
                     if (shape.posStatic)
                         continue;
@@ -344,7 +354,7 @@ public class CanvasRenderSystem
                     //shape.posEdgeOffset = new PairMutable(new PairMutable(0.0, 0.0));
 
                     this.shapes.set(i, shape);
-                }
+                }*/
             }
 
             PairMutable mouseDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.mouseDragFactor / this.zoom,
@@ -352,10 +362,10 @@ public class CanvasRenderSystem
 
             // Handling global callback actions
             {
-                if (this.editor.pressedLMB)
+                if (this.editor.Editor_PressedLMB)
                 {}
 
-                if (this.editor.pressedRMB)
+                if (this.editor.Editor_PressedRMB)
                 {
                     // Handling the moving of the viewport
                     {
@@ -385,9 +395,9 @@ public class CanvasRenderSystem
                         this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble();
                         this.center.right = this.mouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble();
 
-                        for (int i = 0; i < this.shapes.size(); i++)
+                        /*for (int i = 0; i < this.shapes.size(); i++)
                         {
-                            CanvasRenderShape shape = this.shapes.get(i);
+                            RenderShape shape = this.shapes.get(i);
 
                             if (shape.posStatic)
                                 continue;
@@ -396,27 +406,34 @@ public class CanvasRenderSystem
                                                             shape.posMousePress.GetRightDouble() + mouseDiffPos.GetRightDouble());
 
                             this.shapes.set(i, shape);
-                        }
+                        }*/
+
+                        this.canvas.setLayoutX(this.center.GetLeftDouble());
+                        this.canvas.setLayoutY(this.center.GetRightDouble());
+
+                        System.out.println(this.canvas.getLayoutX());
+                        System.out.println(this.canvas.getLayoutY());
                     }
                 }
             }
 
             // Handling editor-specific callback actions
-            this.editor.ViewportOnMouseDragged(mouseDiffPos);
+            this.editor.Editor_ViewportOnMouseDragged(mouseDiffPos);
 
             this.mouseDragLastTime = System.nanoTime();
 
             event.consume();
         });
 
-        this.canvas.setOnScroll(event -> {
+        // When we scroll the mouse...
+        this.stackPane.setOnScroll(event -> {
             // Handling editor-specific callback actions
-            this.editor.ViewportOnScroll();
+            this.editor.Editor_ViewportOnScroll();
 
             // Handling global callback actions
             {
                 // Handling zoom scaling (only if we're not rotating anything)
-                if (!this.editor.rotating)
+                if (!this.editor.Editor_Rotating)
                 {
                     //boolean canMove = true;
 

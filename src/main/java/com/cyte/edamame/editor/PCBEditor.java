@@ -25,37 +25,37 @@ public class PCBEditor extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void ViewportOnDragOver()
+    public void Editor_ViewportOnDragOver()
     {
         System.out.println("PCB dragged over!");
     }
 
-    public void ViewportOnDragDropped()
+    public void Editor_ViewportOnDragDropped()
     {
         System.out.println("PCB drag dropped!");
     }
 
-    public void ViewportOnMouseMoved()
+    public void Editor_ViewportOnMouseMoved()
     {
         System.out.println("PCB mouse moved!");
     }
 
-    public void ViewportOnMousePressed()
+    public void Editor_ViewportOnMousePressed()
     {
         System.out.println("PCB mouse pressed!");
     }
 
-    public void ViewportOnMouseReleased()
+    public void Editor_ViewportOnMouseReleased()
     {
         System.out.println("PCB mouse released!");
     }
 
-    public void ViewportOnMouseDragged(PairMutable mouseDiffPos)
+    public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos)
     {
         System.out.println("PCB mouse dragged!");
     }
 
-    public void ViewportOnScroll()
+    public void Editor_ViewportOnScroll()
     {
         System.out.println("PCB mouse scrolled!");
     }

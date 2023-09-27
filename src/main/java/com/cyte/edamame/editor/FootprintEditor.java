@@ -25,37 +25,37 @@ public class FootprintEditor extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void ViewportOnDragOver()
+    public void Editor_ViewportOnDragOver()
     {
         System.out.println("Footprint dragged over!");
     }
 
-    public void ViewportOnDragDropped()
+    public void Editor_ViewportOnDragDropped()
     {
         System.out.println("Footprint drag dropped!");
     }
 
-    public void ViewportOnMouseMoved()
+    public void Editor_ViewportOnMouseMoved()
     {
         System.out.println("Footprint mouse moved!");
     }
 
-    public void ViewportOnMousePressed()
+    public void Editor_ViewportOnMousePressed()
     {
         System.out.println("Footprint mouse pressed!");
     }
 
-    public void ViewportOnMouseReleased()
+    public void Editor_ViewportOnMouseReleased()
     {
         System.out.println("Footprint mouse released!");
     }
 
-    public void ViewportOnMouseDragged(PairMutable mouseDiffPos)
+    public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos)
     {
         System.out.println("Footprint mouse dragged!");
     }
 
-    public void ViewportOnScroll()
+    public void Editor_ViewportOnScroll()
     {
         System.out.println("Footprint mouse scrolled!");
     }

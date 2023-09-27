@@ -16,7 +16,7 @@ import javafx.scene.canvas.*;
 import javafx.scene.paint.*;
 import javafx.scene.effect.*;
 
-public class CanvasRenderShape
+public class RenderShape
 {
     final UUID id = UUID.randomUUID();
 
@@ -40,7 +40,7 @@ public class CanvasRenderShape
     public boolean posStatic;
     //public EditorSchematic_Symbol symbol;
 
-    public CanvasRenderShape()
+    public RenderShape()
     {
         this.name = "";
         this.points = new LinkedList<PairMutable>();
@@ -63,7 +63,7 @@ public class CanvasRenderShape
         //this.symbol = null;
     }
 
-    public CanvasRenderShape(CanvasRenderShape otherShape)
+    public RenderShape(RenderShape otherShape)
     {
         this.name = otherShape.name;
         this.points = new LinkedList<PairMutable>();

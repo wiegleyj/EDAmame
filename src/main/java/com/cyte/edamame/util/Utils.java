@@ -7,13 +7,13 @@
 
 package com.cyte.edamame.util;
 
-import com.cyte.edamame.render.CanvasRenderShape;
+import com.cyte.edamame.render.RenderShape;
 
 import java.util.LinkedList;
 
 public class Utils
 {
-    static public Integer FindCanvasShape(LinkedList<CanvasRenderShape> shapes, String name)
+    static public Integer FindCanvasShape(LinkedList<RenderShape> shapes, String name)
     {
         for (int i = 0; i < shapes.size(); i++)
             if (shapes.get(i).name.equals(name))

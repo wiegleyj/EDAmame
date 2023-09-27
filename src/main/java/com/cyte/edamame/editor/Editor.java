@@ -7,8 +7,7 @@
 
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.render.CanvasRenderSystem;
-import com.cyte.edamame.render.CanvasRenderShape;
+import com.cyte.edamame.render.RenderSystem;
 import com.cyte.edamame.util.PairMutable;
 
 import javafx.collections.FXCollections;
@@ -17,10 +16,8 @@ import javafx.collections.ObservableMap;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.canvas.*;
-import javafx.scene.paint.*;
 
 import java.io.InvalidClassException;
 import java.util.Iterator;
@@ -65,11 +62,16 @@ public abstract class Editor
      */
     protected ObservableMap<String, ObservableList<MenuItem>> menus = FXCollections.observableHashMap();
 
-    public CanvasRenderSystem renderSystem = null;
-    public boolean visible = false;
-    public boolean pressedLMB = false;
-    public boolean pressedRMB = false;
-    public boolean rotating = false;
+    public RenderSystem Editor_RenderSystem;
+    //public StackPane Editor_StackPane;
+    //public Canvas Editor_Canvas;
+
+    // DO NOT EDIT
+
+    public boolean Editor_Visible = false;
+    public boolean Editor_PressedLMB = false;
+    public boolean Editor_PressedRMB = false;
+    public boolean Editor_Rotating = false;
 
     //// MAIN FUNCTIONS ////
 
@@ -113,13 +115,13 @@ public abstract class Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    abstract public void ViewportOnDragOver();
-    abstract public void ViewportOnDragDropped();
-    abstract public void ViewportOnMouseMoved();
-    abstract public void ViewportOnMousePressed();
-    abstract public void ViewportOnMouseReleased();
-    abstract public void ViewportOnMouseDragged(PairMutable mouseDiffPos);
-    abstract public void ViewportOnScroll();
+    abstract public void Editor_ViewportOnDragOver();
+    abstract public void Editor_ViewportOnDragDropped();
+    abstract public void Editor_ViewportOnMouseMoved();
+    abstract public void Editor_ViewportOnMousePressed();
+    abstract public void Editor_ViewportOnMouseReleased();
+    abstract public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos);
+    abstract public void Editor_ViewportOnScroll();
 
     //// SUPPORT FUNCTIONS ////
 
@@ -140,8 +142,11 @@ public abstract class Editor
         if (root.getClass() != VBox.class)
             throw new InvalidClassException("Expected VBox but found " + root.getClass());
 
+        // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
         String prefix = editorID.toString();
+        StackPane foundStackPane = null;
+        Canvas foundCanvas = null;
 
         while (nodeIterator.hasNext())
         {
@@ -192,47 +197,82 @@ public abstract class Editor
                 {
                     Tab item = tabIterator.next();
 
+                    // Processing the editor tab
                     if (item.getText().equals("EditorTab"))
                     {
-                        // Searching for & declaring the canvas
+                        // Searching the editor tab for the stack pane and the canvas
                         HBox editorBox = (HBox)item.getContent();
-                        Iterator<Node> canvasIterator = editorBox.getChildren().iterator();
+                        Iterator<Node> nodeIteratorA = editorBox.getChildren().iterator();
 
-                        while (canvasIterator.hasNext())
+                        // Searching for the stack pane...
+                        while (nodeIteratorA.hasNext())
                         {
-                            Node nextNode = canvasIterator.next();
+                            Node nextNodeA = nodeIteratorA.next();
 
-                            if (nextNode.getClass() == Canvas.class)
+                            if (nextNodeA.getClass() == StackPane.class)
                             {
-                                this.renderSystem = new CanvasRenderSystem(this,
-                                                                           (Canvas)nextNode,
-                                                                           EDAmameController.EditorsTheaterSize,
-                                                                           EDAmameController.EditorsBackgroundColor,
-                                                                           EDAmameController.EditorsMaxShapes,
-                                                                           EDAmameController.EditorsZoomLimits,
-                                                                           EDAmameController.EditorsZoomFactor,
-                                                                           EDAmameController.EditorsMouseDragFactor,
-                                                                           EDAmameController.EditorsMouseCheckTimeout);
+                                foundStackPane = (StackPane)nextNodeA;
 
-                                EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                                Iterator<Node> nodeIteratorB = foundStackPane.getChildren().iterator();
+
+                                // Searching for the pane...
+                                while (nodeIteratorB.hasNext())
+                                {
+                                    Node nextNodeB = nodeIteratorB.next();
+
+                                    if (nextNodeB.getClass() == Pane.class)
+                                    {
+                                        Iterator<Node> nodeIteratorC = ((Pane)nextNodeB).getChildren().iterator();
+
+                                        // Searching for the canvas...
+                                        while (nodeIteratorC.hasNext())
+                                        {
+                                            Node nextNodeC = nodeIteratorC.next();
+
+                                            if (nextNodeC.getClass() == Canvas.class) {
+
+                                                foundCanvas = (Canvas)nextNodeC;
+
+                                                EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+
+                                                break;
+                                            }
+                                        }
+
+                                        break;
+                                    }
+                                }
+
+                                break;
                             }
                         }
 
-                        if (this.renderSystem == null)
+                        if (foundStackPane == null)
+                            throw new InvalidClassException("Unable to locate stack pane for an editor with name \"" + this.editorName + "\"!");
+                        if (foundCanvas == null)
                             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.editorName + "\"!");
 
-                        item.setText(EDAmameController.EditorTypes[editorType]);
+                        // Setting the pointers to the editor tab
+                        item.setText(EDAmameController.Editor_Names[editorType]);
                         tab = item;
                     }
                     else
                     {
                         tabs.add(item);
                     }
-
-                    // ????
-                    //tabIterator.remove();
                 }
             }
         }
+
+        this.Editor_RenderSystem = new RenderSystem(this,
+                                                    foundStackPane,
+                                                    foundCanvas,
+                                                    EDAmameController.Editor_TheaterSize,
+                                                    EDAmameController.Editor_BackgroundColor,
+                                                    EDAmameController.Editor_MaxShapes,
+                                                    EDAmameController.Editor_ZoomLimits,
+                                                    EDAmameController.Editor_ZoomFactor,
+                                                    EDAmameController.Editor_MouseDragFactor,
+                                                    EDAmameController.Editor_MouseCheckTimeout);
     }
 }

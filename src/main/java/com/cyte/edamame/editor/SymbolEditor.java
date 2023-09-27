@@ -6,26 +6,15 @@
  */
 
 package com.cyte.edamame.editor;
-import com.cyte.edamame.EDAmameApplication;
-import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
-import com.cyte.edamame.render.CanvasRenderSystem;
-import com.cyte.edamame.render.CanvasRenderShape;
 
-import com.cyte.edamame.util.Utils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.*;
-import javafx.scene.input.KeyCode;
-import javafx.scene.layout.*;
-import javafx.scene.canvas.*;
 import javafx.scene.control.*;
-import javafx.scene.paint.*;
 
 import java.io.IOException;
-import java.io.InvalidClassException;
 
 /**
  * Editor for maintaining Symbol libraries.
@@ -60,10 +49,10 @@ public class SymbolEditor extends Editor
         editor.editorName = "SymbolEditor";
         editor.dissect(0, scene);
 
-        // Loading the basic shapes
+        /*// Loading the basic shapes
         {
             // Loading the point grid
-            CanvasRenderShape gridPointBlueprint = EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "GridPoint"));
+            CanvasRenderShape gridPointBlueprint = EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridPoint"));
 
             Double posX = -2500.0;
             Double posY = -2500.0;
@@ -85,15 +74,15 @@ public class SymbolEditor extends Editor
             }
 
             // Loading the grid box
-            CanvasRenderShape gridBox = new CanvasRenderShape(EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "GridBox")));
+            CanvasRenderShape gridBox = new CanvasRenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridBox")));
             gridBox.posReal = new PairMutable(0.0, 0.0);
             editor.renderSystem.AddShape(-1, gridBox);
 
             // Loading the center crosshair
-            CanvasRenderShape crosshair = new CanvasRenderShape(EDAmameController.basicShapes.get(Utils.FindCanvasShape(EDAmameController.basicShapes, "Crosshair")));
+            CanvasRenderShape crosshair = new CanvasRenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "Crosshair")));
             crosshair.posDraw = new PairMutable(editor.renderSystem.canvas.getWidth() / 2, editor.renderSystem.canvas.getHeight() / 2);
             editor.renderSystem.AddShape(-1, crosshair);
-        }
+        }*/
 
         return editor;
     }
@@ -108,7 +97,7 @@ public class SymbolEditor extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void ViewportOnDragOver()
+    public void Editor_ViewportOnDragOver()
     {
         //System.out.println("Symbol dragged over!");
 
@@ -157,7 +146,7 @@ public class SymbolEditor extends Editor
         this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));*/
     }
 
-    public void ViewportOnDragDropped()
+    public void Editor_ViewportOnDragDropped()
     {
         //System.out.println("Symbol drag dropped!");
 
@@ -211,18 +200,18 @@ public class SymbolEditor extends Editor
         event.setDropCompleted(success);*/
     }
 
-    public void ViewportOnMouseMoved()
+    public void Editor_ViewportOnMouseMoved()
     {
         //System.out.println("Symbol mouse moved!");
 
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void ViewportOnMousePressed()
+    public void Editor_ViewportOnMousePressed()
     {
         //System.out.println("Symbol mouse pressed!");
 
-        if (this.pressedLMB)
+        if (this.Editor_PressedLMB)
         {
             /*// Handling the wire drawing
             this.EditorSchematic_WireDrawingType = this.EditorSchematic_GetSelectedWire();
@@ -248,15 +237,15 @@ public class SymbolEditor extends Editor
             this.EditorSchematic_PressedMouseLeft = true;*/
         }
 
-        if (this.pressedRMB)
+        if (this.Editor_PressedRMB)
         {}
     }
 
-    public void ViewportOnMouseReleased()
+    public void Editor_ViewportOnMouseReleased()
     {
         //System.out.println("Symbol mouse released!");
 
-        if (this.pressedLMB)
+        if (this.Editor_PressedLMB)
         {
             /*// Handling wire drawing
             this.EditorSchematic_WireDrawingType = this.EditorSchematic_GetSelectedWire();
@@ -311,15 +300,15 @@ public class SymbolEditor extends Editor
             }*/
         }
 
-        if (this.pressedRMB)
+        if (this.Editor_PressedRMB)
         {}
     }
 
-    public void ViewportOnMouseDragged(PairMutable mouseDiffPos)
+    public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos)
     {
         //System.out.println("Symbol mouse dragged!");
 
-        if (this.pressedLMB)
+        if (this.Editor_PressedLMB)
         {
             /*// Handling the symbol moving (should only trigger if we got symbols selected)
             this.EditorSchematic_SymbolsMoving = false;
@@ -420,19 +409,19 @@ public class SymbolEditor extends Editor
             }*/
         }
 
-        if (this.pressedRMB)
+        if (this.Editor_PressedRMB)
         {}
 
         // Handling symbol highlighting
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void ViewportOnScroll()
+    public void Editor_ViewportOnScroll()
     {
         //System.out.println("Symbol mouse scrolled!");
 
         // Handling symbol rotation
-        this.rotating = false;
+        this.Editor_Rotating = false;
 
         /*if (this.EditorSchematic_IsKeyPressed(KeyCode.R))
         {
