@@ -15,12 +15,26 @@ import java.util.UUID;
 import javafx.scene.canvas.*;
 import javafx.scene.paint.*;
 import javafx.scene.effect.*;
+import javafx.scene.shape.*;
 
 public class RenderShape
 {
     final UUID id = UUID.randomUUID();
 
     public String name;
+    public Integer type; // 0 - JavaFX shape | 1 - canvas shape
+    public PairMutable boundingBox;
+    public PairMutable posReal;
+    public PairMutable posDraw;
+    public PairMutable posMousePress;
+    public Double globalOpacity;
+    public BlendMode blendMode;
+    public boolean zoomScaling;
+    public boolean permanent;
+    public boolean posStatic;
+
+    public Shape shape;
+
     public LinkedList<PairMutable> points;
     public LinkedList<Double> pointWidths;
     public LinkedList<Color> pointColors;
@@ -29,20 +43,23 @@ public class RenderShape
     public LinkedList<Double> lineWidths;
     public LinkedList<Color> lineColors;
     public LinkedList<Double> lineOpacities;
-    public Double globalOpacity;
-    public BlendMode blendMode;
-    public PairMutable boundingBox;
-    public PairMutable posReal;
-    public PairMutable posDraw;
-    public PairMutable posMousePress;
-    public boolean zoomScaling;
-    public boolean permanent;
-    public boolean posStatic;
-    //public EditorSchematic_Symbol symbol;
 
-    public RenderShape()
+    public RenderShape(String nameValue, Integer typeValue)
     {
-        this.name = "";
+        this.name = nameValue;
+        this.type = typeValue;
+        this.boundingBox = new PairMutable(0.0, 0.0);
+        this.posReal = null;
+        this.posDraw = new PairMutable(0.0, 0.0);
+        this.posMousePress = new PairMutable(0.0, 0.0);
+        this.globalOpacity = 1.0;
+        this.blendMode = BlendMode.SRC_OVER;
+        this.zoomScaling = true;
+        this.permanent = false;
+        this.posStatic = false;
+
+        this.shape = null;
+
         this.points = new LinkedList<PairMutable>();
         this.pointWidths = new LinkedList<Double>();
         this.pointColors = new LinkedList<Color>();
@@ -51,21 +68,28 @@ public class RenderShape
         this.lineWidths = new LinkedList<Double>();
         this.lineColors = new LinkedList<Color>();
         this.lineOpacities = new LinkedList<Double>();
-        this.globalOpacity = 1.0;
-        this.blendMode = BlendMode.SRC_OVER;
-        this.boundingBox = new PairMutable(0.0, 0.0);
-        this.posReal = new PairMutable(0.0, 0.0);
-        this.posDraw = new PairMutable(0.0, 0.0);
-        this.posMousePress = new PairMutable(0.0, 0.0);
-        this.zoomScaling = true;
-        this.permanent = false;
-        this.posStatic = false;
-        //this.symbol = null;
     }
 
     public RenderShape(RenderShape otherShape)
     {
         this.name = otherShape.name;
+        this.type = otherShape.type;
+        this.boundingBox = new PairMutable(otherShape.boundingBox);
+        this.posReal = null;
+
+        if (otherShape.posReal != null)
+            this.posReal = new PairMutable(otherShape.posReal);
+
+        this.posDraw = new PairMutable(otherShape.posDraw);
+        this.posMousePress = new PairMutable(otherShape.posMousePress);
+        this.globalOpacity = otherShape.globalOpacity;
+        this.blendMode = otherShape.blendMode;
+        this.zoomScaling = otherShape.zoomScaling;
+        this.permanent = otherShape.permanent;
+        this.posStatic = otherShape.posStatic;
+
+        this.shape = otherShape.shape;
+
         this.points = new LinkedList<PairMutable>();
         this.pointWidths = new LinkedList<Double>();
         this.pointColors = new LinkedList<Color>();
@@ -74,25 +98,14 @@ public class RenderShape
         this.lineWidths = new LinkedList<Double>();
         this.lineColors = new LinkedList<Color>();
         this.lineOpacities = new LinkedList<Double>();
-        this.globalOpacity = otherShape.globalOpacity;
-        this.blendMode = otherShape.blendMode;
 
         for (int i = 0; i < otherShape.points.size(); i++)
             this.AddPoint(otherShape.points.get(i).GetLeftDouble(), otherShape.points.get(i).GetRightDouble(), otherShape.pointWidths.get(i), otherShape.pointColors.get(i), otherShape.pointOpacities.get(i));
         for (int i = 0; i < otherShape.lineIndices.size(); i++)
             this.AddLine(otherShape.lineIndices.get(i).GetLeftInteger(), otherShape.lineIndices.get(i).GetRightInteger(), otherShape.lineWidths.get(i), otherShape.lineColors.get(i), otherShape.lineOpacities.get(i));
-
-        this.boundingBox = new PairMutable(otherShape.boundingBox);
-        this.posReal = new PairMutable(otherShape.posReal);
-        this.posDraw = new PairMutable(otherShape.posDraw);
-        this.posMousePress = new PairMutable(otherShape.posMousePress);
-        this.zoomScaling = otherShape.zoomScaling;
-        this.permanent = otherShape.permanent;
-        this.posStatic = otherShape.posStatic;
-        //this.symbol = otherShape.symbol;
     }
 
-    public void Draw(GraphicsContext gc)
+    public void DrawCanvas(GraphicsContext gc)
     {
         // Checking whether our drawing elements are valid
         if (this.id == null)
@@ -204,7 +217,7 @@ public class RenderShape
         this.boundingBox.right = pointsWidthsY.get(maxYIdx) / 2 + pointsY.get(maxYIdx) - pointsY.get(minYIdx) + pointsWidthsY.get(minYIdx) / 2;
     }
 
-    public void DrawBoundingBox(GraphicsContext gc, Color color, Double opacity)
+    public void DrawBoundingBoxCanvas(GraphicsContext gc, Color color, Double opacity)
     {
         if (opacity > 0.0)
         {

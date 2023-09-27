@@ -48,41 +48,7 @@ public class SymbolEditor extends Editor
         SymbolEditor editor = fxmlLoader.getController();
         editor.editorName = "SymbolEditor";
         editor.dissect(0, scene);
-
-        /*// Loading the basic shapes
-        {
-            // Loading the point grid
-            CanvasRenderShape gridPointBlueprint = EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridPoint"));
-
-            Double posX = -2500.0;
-            Double posY = -2500.0;
-
-            for (int i = 0; i < 50; i++)
-            {
-                for (int j = 0; j < 50; j++)
-                {
-                    CanvasRenderShape gridPoint = new CanvasRenderShape(gridPointBlueprint);
-                    gridPoint.posReal = new PairMutable(posX, posY);
-
-                    editor.renderSystem.AddShape(-1, gridPoint);
-                    posX += 100.0;
-                }
-
-                posX = -2500.0;
-                posY += 100.0;
-                //System.out.println(posY);
-            }
-
-            // Loading the grid box
-            CanvasRenderShape gridBox = new CanvasRenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridBox")));
-            gridBox.posReal = new PairMutable(0.0, 0.0);
-            editor.renderSystem.AddShape(-1, gridBox);
-
-            // Loading the center crosshair
-            CanvasRenderShape crosshair = new CanvasRenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "Crosshair")));
-            crosshair.posDraw = new PairMutable(editor.renderSystem.canvas.getWidth() / 2, editor.renderSystem.canvas.getHeight() / 2);
-            editor.renderSystem.AddShape(-1, crosshair);
-        }*/
+        editor.Editor_RenderSystem.CanvasRenderGrid();
 
         return editor;
     }

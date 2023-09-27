@@ -6,6 +6,7 @@
  */
 
 // TODO:
+// Ask about dropped shape callback
 // Implement stack-pane rendering
 // Refactor dissect editor function searching for canvas
 // REFACTOR ALL COMMENTS
@@ -66,6 +67,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
+import javafx.animation.Animation;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.util.Duration;
+
 /**
  * Main Controller for the {@link EDAmame} Application.<p>
  *
@@ -80,10 +86,10 @@ public class EDAmameController implements Initializable
     //// GLOBAL VARIABLES ////
 
     final static public String[] Editor_Names = {"Symbol Editor"};
-    //final static public Double Editor_HeartbeatDelay = 0.01;
+    final static public Double Editor_HeartbeatDelay = 0.01;
 
     final static public PairMutable Editor_TheaterSize = new PairMutable(1000.0, 1000.0);
-    final static public Color Editor_BackgroundColor = Color.DARKBLUE;
+    final static public Color Editor_BackgroundColor = Color.BEIGE;
     final static public Integer Editor_MaxShapes = 10000;
     final static public PairMutable Editor_ZoomLimits = new PairMutable(0.5, 5.0);
     final static public Double Editor_ZoomFactor = 1.5;
@@ -116,7 +122,7 @@ public class EDAmameController implements Initializable
     private final Stage stage;                                                              // The stage hosting this controller.
     private final ObservableMap<Tab, Editor> editors = FXCollections.observableHashMap();   // All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.
 
-    //public Timeline Editor_HeartbeatTimeline;
+    public Timeline Editor_HeartbeatTimeline;
 
     static public LinkedList<KeyCode> Global_PressedKeys = new LinkedList<KeyCode>();
 
@@ -169,9 +175,9 @@ public class EDAmameController implements Initializable
         restoreWindowContext();
 
         // Initializing editor heartbeat loops
-        //this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Editor_Heartbeat()));
-        //this.Editor_HeartbeatTimeline.setCycleCount(Animation.INDEFINITE);
-        //this.Editor_HeartbeatTimeline.playFromStart();
+        this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Editor_Heartbeat()));
+        this.Editor_HeartbeatTimeline.setCycleCount(Animation.INDEFINITE);
+        this.Editor_HeartbeatTimeline.playFromStart();
 
         // correct the text in the show log menu item
         correctViewLogItemText();
@@ -209,7 +215,7 @@ public class EDAmameController implements Initializable
 
     //// EDITOR FUNCTIONS ////
 
-    /*public void Editor_Heartbeat()
+    public void Editor_Heartbeat()
     {
         ObservableList<Tab> tabs = mainTabPane.getTabs();
 
@@ -226,10 +232,21 @@ public class EDAmameController implements Initializable
                 if (!editor.Editor_Visible)
                     continue;
 
-                //editor.renderSystem.Render();
+                // Adjusting the position of the canvas relative to the stack pane size
+                {
+                    PairMutable offset = new PairMutable(editor.Editor_RenderSystem.center);
+                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
+                                                             editor.Editor_RenderSystem.canvas.getHeight());
+                    PairMutable stackPaneSize = new PairMutable(editor.Editor_RenderSystem.stackPane.getWidth(),
+                                                                editor.Editor_RenderSystem.stackPane.getHeight());
+                    PairMutable newCanvasPos = new PairMutable(stackPaneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2 + offset.GetLeftDouble(),
+                                                               stackPaneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2 + offset.GetRightDouble());
+
+                    editor.Editor_RenderSystem.CanvasSetPos(newCanvasPos);
+                }
             }
         }
-    }*/
+    }
 
     /**
      * Enables to controller logic for switching between editor tabs.
@@ -292,7 +309,7 @@ public class EDAmameController implements Initializable
 
             editor.Editor_Visible = true;
 
-            editor.Editor_RenderSystem.Clear();
+            //editor.Editor_RenderSystem.Clear();
         }
     }
 
@@ -622,15 +639,13 @@ public class EDAmameController implements Initializable
 
     static public void CreateBasicCanvasShapes()
     {
-        RenderShape gridPoint = new RenderShape();
-        gridPoint.name = "GridPoint";
+        RenderShape gridPoint = new RenderShape("GridPoint", 1);
         gridPoint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
-        gridPoint.permanent = true;
+        //gridPoint.permanent = true;
 
         Global_BasicShapes.add(gridPoint);
 
-        RenderShape gridBox = new RenderShape();
-        gridBox.name = "GridBox";
+        RenderShape gridBox = new RenderShape("GridBox", 1);
         gridBox.AddPoint(-Editor_TheaterSize.GetLeftDouble() / 2, -Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
         gridBox.AddPoint(Editor_TheaterSize.GetLeftDouble() / 2, -Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
         gridBox.AddPoint(Editor_TheaterSize.GetLeftDouble() / 2, Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
@@ -639,21 +654,20 @@ public class EDAmameController implements Initializable
         gridBox.AddLine(1, 2, 1.5, Color.BLACK, 1.0);
         gridBox.AddLine(2, 3, 1.5, Color.BLACK, 1.0);
         gridBox.AddLine(3, 0, 1.5, Color.BLACK, 1.0);
-        gridBox.permanent = true;
+        //gridBox.permanent = true;
 
         Global_BasicShapes.add(gridBox);
 
-        RenderShape crosshair = new RenderShape();
-        crosshair.name = "Crosshair";
+        RenderShape crosshair = new RenderShape("Crosshair", 1);
         crosshair.AddPoint(0.0, -5.0, 0.0, Color.RED, 1.0);
         crosshair.AddPoint(0.0, 5.0, 0.0, Color.RED, 1.0);
         crosshair.AddPoint(-5.0, 0.0, 0.0, Color.RED, 1.0);
         crosshair.AddPoint(5.0, 0.0, 0.0, Color.RED, 1.0);
         crosshair.AddLine(0, 1, 0.5, Color.RED, 1.0);
         crosshair.AddLine(2, 3, 0.5, Color.RED, 1.0);
-        crosshair.zoomScaling = false;
-        crosshair.permanent = true;
-        crosshair.posStatic = true;
+        //crosshair.zoomScaling = false;
+        //crosshair.permanent = true;
+        //crosshair.posStatic = true;
 
         Global_BasicShapes.add(crosshair);
     }

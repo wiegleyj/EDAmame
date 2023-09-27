@@ -33,11 +33,11 @@
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab fx:id="etab" text="EditorTab">
             <HBox>
-            <StackPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="ALWAYS">
+            <StackPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES">
                <children>
                   <Pane>
                      <children>
-                        <Canvas height="100.0" width="100.0" />
+                        <Canvas height="1000.0" width="1000.0" />
                      </children>
                   </Pane>
                </children>

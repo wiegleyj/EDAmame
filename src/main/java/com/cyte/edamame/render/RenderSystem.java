@@ -9,6 +9,7 @@ package com.cyte.edamame.render;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.util.Utils;
 
 import java.util.LinkedList;
 import java.util.UUID;
@@ -37,14 +38,16 @@ public class RenderSystem
     public Double mouseDragFactor;
     public Double mouseDragCheckTimeout;
 
-    //public LinkedList<RenderShape> shapes;
-    //public LinkedList<PairMutable> shapesPosReal;
+    // DO NOT EDIT
+
+    public LinkedList<RenderShape> shapes;
     public PairMutable center;
     public Double zoom;
     public PairMutable mouseDragFirstPos;
     public Long mouseDragLastTime;
     public PairMutable mouseDragFirstCenter;
     public boolean mouseDragReachedEdge;
+    public PairMutable mouseDragCanvasFirstPos;
 
     public Editor editor;
 
@@ -63,78 +66,68 @@ public class RenderSystem
         this.mouseDragFactor = mouseDragFactorValue;
         this.mouseDragCheckTimeout = mouseDragCheckTimeoutValue;
 
-        //this.shapes = new LinkedList<RenderShape>();
-        //this.shapesPosReal = new LinkedList<PairMutable>();
+        this.shapes = new LinkedList<RenderShape>();
         this.center = new PairMutable(0.0, 0.0);
         this.zoom = 1.0;
         this.mouseDragFirstPos = null;
         this.mouseDragLastTime = System.nanoTime();
         this.mouseDragFirstCenter = null;
         this.mouseDragReachedEdge = false;
+        this.mouseDragCanvasFirstPos = null;
 
         this.editor = editorValue;
         //this.canvas.widthProperty().bind(this.stackPane.widthProperty());
         //this.canvas.heightProperty().bind(this.stackPane.heightProperty());
-        this.InitListeners();
+        this.ListenersInit();
     }
 
     //// RENDERING FUNCTIONS ////
 
-    public void Render()
+    public void CanvasRenderGrid()
     {
-        // TODO
+        this.CanvasClear();
 
-        /*// Clearing the viewport of all existing shapes
-        this.Clear();
+        // Centering the canvas
+        //System.out.println(this.stackPane.getWidth());
+        //System.out.println(this.stackPane.getHeight());
 
-        long time = System.nanoTime();
+        //this.canvas.setLayoutX(-this.stackPane.getWidth() / 2);
+        //this.canvas.setLayoutY(-this.stackPane.getHeight() / 2);
 
-        // Drawing all the shapes in the drawing queue
-        for (int i = 0; i < this.shapes.size(); i++)
+        // Loading the point grid
+        RenderShape gridPointBlueprint = EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridPoint"));
+
+        Double posX = -2500.0;
+        Double posY = -2500.0;
+
+        for (int i = 0; i < 50; i++)
         {
-            RenderShape shape = this.shapes.get(i);
-
-            shape.posDraw = this.CalculatePosDraw(shape, shape.posReal);
-
-            // Draw the shape only if it's within the viewing bounds of the viewport
-            if (((shape.posDraw.GetLeftDouble() + shape.boundingBox.GetLeftDouble() / 2) > 0) && ((shape.posDraw.GetLeftDouble() - shape.boundingBox.GetLeftDouble() / 2) < this.canvas.getWidth()) &&
-                ((shape.posDraw.GetRightDouble() + shape.boundingBox.GetRightDouble() / 2) > 0) && ((shape.posDraw.GetRightDouble() - shape.boundingBox.GetRightDouble() / 2) < this.canvas.getHeight()))
+            for (int j = 0; j < 50; j++)
             {
-                if (shape.zoomScaling) {
-                    for (int j = 0; j < shape.points.size(); j++) {
-                        shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() * this.zoom, shape.points.get(j).GetRightDouble() * this.zoom));
-                        shape.pointWidths.set(j, shape.pointWidths.get(j) * this.zoom);
-                    }
+                RenderShape gridPoint = new RenderShape(gridPointBlueprint);
+                gridPoint.posDraw = new PairMutable(posX, posY);
 
-                    //for (int j = 0; j < symbol.wirePoints.size(); j++)
-                    //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() * this.zoom, symbol.wirePoints.get(j).GetRightDouble() * this.zoom));
-                }
-
-                shape.Draw(this.gc);
-
-                if (shape.zoomScaling) {
-                    for (int j = 0; j < shape.points.size(); j++) {
-                        shape.points.set(j, new PairMutable(shape.points.get(j).GetLeftDouble() / this.zoom, shape.points.get(j).GetRightDouble() / this.zoom));
-                        shape.pointWidths.set(j, shape.pointWidths.get(j) / this.zoom);
-                    }
-
-                    //for (int j = 0; j < symbol.wirePoints.size(); j++)
-                    //    symbol.wirePoints.set(j, new PairMutable(symbol.wirePoints.get(j).GetLeftDouble() / this.zoom, symbol.wirePoints.get(j).GetRightDouble() / this.zoom));
-                }
+                this.CanvasDrawShape(gridPoint);
+                posX += 100.0;
             }
 
-            // Remove the shape from the drawing queue if it's not permanent
-            if (!shape.permanent)
-            {
-                this.shapes.remove(shape);
-                i--;
-            }
+            posX = -2500.0;
+            posY += 100.0;
+            //System.out.println(posY);
         }
 
-        System.out.println((double)(System.nanoTime() - time) / 1e9);*/
+        // Loading the grid box
+        RenderShape gridBox = new RenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridBox")));
+        gridBox.posDraw = new PairMutable(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
+        this.CanvasDrawShape(gridBox);
+
+        // Loading the center crosshair
+        RenderShape crosshair = new RenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "Crosshair")));
+        crosshair.posDraw = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth() / 2, editor.Editor_RenderSystem.canvas.getHeight() / 2);
+        this.CanvasDrawShape(crosshair);
     }
 
-    public void Clear()
+    public void CanvasClear()
     {
         this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
         this.gc.setFill(this.backgroundColor);
@@ -142,6 +135,12 @@ public class RenderSystem
     }
 
     //// CANVAS FUNCTIONS ////
+
+    public void CanvasSetPos(PairMutable pos)
+    {
+        this.canvas.setLayoutX(pos.GetLeftDouble());
+        this.canvas.setLayoutY(pos.GetRightDouble());
+    }
 
     /*public void BindSize(Node node)
     {
@@ -172,7 +171,7 @@ public class RenderSystem
         this.canvas.heightProperty().unbind();
     }*/
 
-    public void SetSize(PairMutable sizeValue)
+    /*public void SetSize(PairMutable sizeValue)
     {
         //this.UnbindSize();
 
@@ -183,18 +182,26 @@ public class RenderSystem
     public PairMutable GetSize()
     {
         return new PairMutable(canvas.getWidth(), canvas.getHeight());
-    }
+    }*/
 
     //// SHAPE FUNCTIONS ////
 
-    public PairMutable CalculatePosDraw(RenderShape shape, PairMutable posReal)
+    public PairMutable CalculatePosDraw(RenderShape shape)
     {
-        PairMutable posDraw = new PairMutable(posReal);
+        PairMutable posDraw = new PairMutable(shape.posReal);
 
         posDraw.left = posDraw.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
         posDraw.right = posDraw.GetRightDouble() * this.zoom + this.canvas.getHeight() / 2;
 
         return posDraw;
+    }
+
+    public void CanvasDrawShape(RenderShape shape)
+    {
+        if (shape.posReal != null)
+            this.CalculatePosDraw(shape);
+
+        shape.DrawCanvas(this.gc);
     }
 
     /*public void AddShape(Integer idx, RenderShape shape)
@@ -222,7 +229,7 @@ public class RenderSystem
 
     //// CALLBACK FUNCTIONS ////
 
-    public void InitListeners()
+    public void ListenersInit()
     {
         // When we drag the mouse (from outside the viewport)...
         this.stackPane.setOnDragOver(event -> {
@@ -277,6 +284,7 @@ public class RenderSystem
                 {}
 
                 this.mouseDragFirstPos = null;
+                this.mouseDragCanvasFirstPos = null;
             }
 
             // Handling editor-specific callback actions
@@ -342,6 +350,8 @@ public class RenderSystem
                 this.mouseDragFirstPos = new PairMutable(posMouse);
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
+                this.mouseDragCanvasFirstPos = new PairMutable(this.canvas.getLayoutX(),
+                                                               this.canvas.getLayoutY());
 
                 /*for (int i = 0; i < this.shapes.size(); i++)
                 {
@@ -408,11 +418,11 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.canvas.setLayoutX(this.center.GetLeftDouble());
-                        this.canvas.setLayoutY(this.center.GetRightDouble());
+                        this.canvas.setLayoutX(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble());
+                        this.canvas.setLayoutY(this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble());
 
-                        System.out.println(this.canvas.getLayoutX());
-                        System.out.println(this.canvas.getLayoutY());
+                        //System.out.println(this.stackPane.getWidth());
+                        //System.out.println(this.stackPane.getHeight());
                     }
                 }
             }

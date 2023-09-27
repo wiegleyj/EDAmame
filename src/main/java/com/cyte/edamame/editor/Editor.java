@@ -63,8 +63,6 @@ public abstract class Editor
     protected ObservableMap<String, ObservableList<MenuItem>> menus = FXCollections.observableHashMap();
 
     public RenderSystem Editor_RenderSystem;
-    //public StackPane Editor_StackPane;
-    //public Canvas Editor_Canvas;
 
     // DO NOT EDIT
 
