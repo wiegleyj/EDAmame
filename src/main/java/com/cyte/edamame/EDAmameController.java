@@ -9,7 +9,7 @@
 // Ask about canvas zooming
 // Ask about dropped shape callback
 // Ask about comment & name refactoring
-// Fix canvas zooming
+// Refactor the stupid canvas zooming mouse diff pos thing
 // Implement stack-pane rendering
 // Refactor dissect editor function searching for canvas
 // REFACTOR ALL COMMENTS

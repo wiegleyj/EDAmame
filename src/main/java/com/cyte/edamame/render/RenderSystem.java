@@ -148,10 +148,29 @@ public class RenderSystem
         this.canvas.setTranslateY(pos.GetRightDouble());
     }
 
-    public void CanvasSetScale(Double scale)
+    public void CanvasSetScale(PairMutable scale)
     {
-        this.canvas.setScaleX(scale);
-        this.canvas.setScaleY(scale);
+        PairMutable prevScale = this.CanvasGetScale();
+
+        this.canvas.setScaleX(scale.GetLeftDouble());
+        this.canvas.setScaleY(scale.GetRightDouble());
+
+        PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
+                                                 scale.GetRightDouble() - prevScale.GetRightDouble());
+        PairMutable newPos = this.CanvasGetTranslate();
+
+        newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
+        newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
+
+        this.CanvasSetTranslate(newPos);
+
+        //System.out.println(scaleDelta.ToStringDouble());
+        //System.out.println(newPos.ToStringDouble());
+    }
+
+    public PairMutable CanvasGetScale()
+    {
+        return new PairMutable(this.canvas.getScaleX(), this.canvas.getScaleY());
     }
 
     public PairMutable CanvasGetLayout()
@@ -193,7 +212,7 @@ public class RenderSystem
         this.canvas.heightProperty().unbind();
     }*/
 
-    /*public void SetSize(PairMutable sizeValue)
+    public void CanvasSetSize(PairMutable sizeValue)
     {
         //this.UnbindSize();
 
@@ -201,10 +220,10 @@ public class RenderSystem
         this.canvas.setHeight(sizeValue.GetRightDouble());
     }
 
-    public PairMutable GetSize()
+    public PairMutable CanvasGetSize()
     {
         return new PairMutable(canvas.getWidth(), canvas.getHeight());
-    }*/
+    }
 
     //// SHAPE FUNCTIONS ////
 
@@ -337,7 +356,7 @@ public class RenderSystem
                         }*/
 
                         this.CanvasSetTranslate(new PairMutable(0.0, 0.0));
-                        this.CanvasSetScale(1.0);
+                        this.CanvasSetScale(new PairMutable(1.0, 1.0));
 
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
@@ -438,11 +457,12 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.CanvasSetTranslate(new PairMutable(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble(),
-                                                                this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble()));
+                        this.CanvasSetTranslate(new PairMutable(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
+                                                                this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
 
                         //System.out.println(new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY()).ToStringDouble());
                         //System.out.println(new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY()).ToStringDouble());
+                        //System.out.println(this.center.ToStringDouble());
                     }
                 }
             }
@@ -500,7 +520,7 @@ public class RenderSystem
                         //newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * this.zoom;
                     }
 
-                    this.CanvasSetScale(this.zoom);
+                    this.CanvasSetScale(new PairMutable(this.zoom, this.zoom));
                     //this.CanvasSetTranslate(newPos);
 
                     //if (canMove)
