@@ -143,7 +143,7 @@ public abstract class Editor
         // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
         String prefix = editorID.toString();
-        StackPane foundStackPane = null;
+        Pane foundPane = null;
         Canvas foundCanvas = null;
 
         while (nodeIterator.hasNext())
@@ -209,9 +209,9 @@ public abstract class Editor
 
                             if (nextNodeA.getClass() == StackPane.class)
                             {
-                                foundStackPane = (StackPane)nextNodeA;
+                                foundPane = (StackPane)nextNodeA;
 
-                                Iterator<Node> nodeIteratorB = foundStackPane.getChildren().iterator();
+                                Iterator<Node> nodeIteratorB = foundPane.getChildren().iterator();
 
                                 // Searching for the pane...
                                 while (nodeIteratorB.hasNext())
@@ -245,7 +245,7 @@ public abstract class Editor
                             }
                         }
 
-                        if (foundStackPane == null)
+                        if (foundPane == null)
                             throw new InvalidClassException("Unable to locate stack pane for an editor with name \"" + this.editorName + "\"!");
                         if (foundCanvas == null)
                             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.editorName + "\"!");
@@ -263,7 +263,7 @@ public abstract class Editor
         }
 
         this.Editor_RenderSystem = new RenderSystem(this,
-                                                    foundStackPane,
+                                                    foundPane,
                                                     foundCanvas,
                                                     EDAmameController.Editor_TheaterSize,
                                                     EDAmameController.Editor_BackgroundColor,

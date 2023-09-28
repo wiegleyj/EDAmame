@@ -20,6 +20,7 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.input.*;
+import javafx.scene.shape.*;
 
 public class RenderSystem
 {
@@ -27,7 +28,7 @@ public class RenderSystem
 
     final UUID id = UUID.randomUUID();
 
-    public StackPane stackPane;
+    public Pane pane;
     public Canvas canvas;
     public GraphicsContext gc;
     public PairMutable theaterSize;
@@ -53,9 +54,9 @@ public class RenderSystem
 
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Editor editorValue, StackPane stackPaneValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, Pane paneValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
-        this.stackPane = stackPaneValue;
+        this.pane = paneValue;
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
         this.theaterSize = theaterSizeValue;
@@ -227,6 +228,14 @@ public class RenderSystem
 
     //// SHAPE FUNCTIONS ////
 
+    public void ShapeAdd(Integer idx, Shape shape)
+    {
+        if (idx < 0)
+            this.pane.getChildren().add(shape);
+        else
+            this.pane.getChildren().add(idx, shape);
+    }
+
     public void ShapeCalculatePosDraw(RenderShape shape)
     {
         shape.posDraw.left = shape.posReal.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
@@ -269,7 +278,7 @@ public class RenderSystem
     public void ListenersInit()
     {
         // When we drag the mouse (from outside the viewport)...
-        this.stackPane.setOnDragOver(event -> {
+        this.pane.setOnDragOver(event -> {
             // Handling global callback actions
             {}
 
@@ -280,7 +289,7 @@ public class RenderSystem
         });
 
         // When we drop something with the cursor (from outside the viewport)...
-        this.stackPane.setOnDragDropped(event -> {
+        this.pane.setOnDragDropped(event -> {
             // Handling global callback actions
             {}
 
@@ -292,7 +301,7 @@ public class RenderSystem
         });
 
         // When we move the mouse (without clicking)...
-        this.stackPane.setOnMouseMoved(event -> {
+        this.pane.setOnMouseMoved(event -> {
             // Handling global callback actions
             {}
 
@@ -303,7 +312,7 @@ public class RenderSystem
         });
 
         // When we press down the mouse...
-        this.stackPane.setOnMousePressed(event -> {
+        this.pane.setOnMousePressed(event -> {
             // Updating mouse pressed flags
             {
                 if (event.isPrimaryButtonDown())
@@ -327,15 +336,29 @@ public class RenderSystem
             // Handling editor-specific callback actions
             this.editor.Editor_ViewportOnMousePressed();
 
+            //Circle testShape = new Circle(50, Color.BLUE);
+            //testShape.setLayoutX(50.0);
+            //testShape.setLayoutY(50.0);
+            //this.ShapeAdd(0, testShape);
+            //System.out.println("Hi");
+
             event.consume();
         });
 
         // When we release the mouse...
-        this.stackPane.setOnMouseReleased(event -> {
+        this.pane.setOnMouseReleased(event -> {
             // Handling global callback actions
             {
                 if (this.editor.Editor_PressedLMB)
-                {}
+                {
+                    PairMutable mousePos = new PairMutable(event.getX(), event.getY());
+
+                    // CHECKING FOR POSITION CONFLICTS
+                    Circle circle = new Circle(50, Color.BLUE);
+                    circle.setTranslateX(mousePos.GetLeftDouble());
+                    circle.setTranslateY(mousePos.GetRightDouble());
+                    this.ShapeAdd(-1, circle);
+                }
 
                 if (this.editor.Editor_PressedRMB)
                 {
@@ -377,7 +400,7 @@ public class RenderSystem
         });
 
         // When we drag the mouse (from inside the viewport)...
-        this.stackPane.setOnMouseDragged(event -> {
+        this.pane.setOnMouseDragged(event -> {
             // Only callback if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
                 return;
@@ -476,7 +499,7 @@ public class RenderSystem
         });
 
         // When we scroll the mouse...
-        this.stackPane.setOnScroll(event -> {
+        this.pane.setOnScroll(event -> {
             // Handling editor-specific callback actions
             this.editor.Editor_ViewportOnScroll();
 

@@ -6,9 +6,6 @@
  */
 
 // TODO:
-// Ask about canvas zooming
-// Ask about dropped shape callback
-// Ask about comment & name refactoring
 // Refactor the stupid canvas zooming mouse diff pos thing
 // Implement stack-pane rendering
 // Refactor dissect editor function searching for canvas
@@ -236,16 +233,16 @@ public class EDAmameController implements Initializable
                     continue;
 
                 // Adjusting the central layout of the canvas relative to the stack pane size
-                {
+                /*{
                     PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
                                                              editor.Editor_RenderSystem.canvas.getHeight());
-                    PairMutable stackPaneSize = new PairMutable(editor.Editor_RenderSystem.stackPane.getWidth(),
-                                                                editor.Editor_RenderSystem.stackPane.getHeight());
-                    PairMutable newCanvasPos = new PairMutable(stackPaneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
-                                                               stackPaneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
+                    PairMutable paneSize = new PairMutable(editor.Editor_RenderSystem.pane.getWidth(),
+                                                                editor.Editor_RenderSystem.pane.getHeight());
+                    PairMutable newCanvasPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
+                                                               paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
                     editor.Editor_RenderSystem.CanvasSetLayout(newCanvasPos);
-                }
+                }*/
             }
         }
     }
