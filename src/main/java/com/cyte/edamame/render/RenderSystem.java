@@ -76,8 +76,8 @@ public class RenderSystem
         this.mouseDragCanvasFirstPos = null;
 
         this.editor = editorValue;
-        //this.canvas.widthProperty().bind(this.stackPane.widthProperty());
-        //this.canvas.heightProperty().bind(this.stackPane.heightProperty());
+
+        this.CanvasSetTranslate(new PairMutable(0.0, 0.0));
         this.ListenersInit();
     }
 
@@ -136,10 +136,32 @@ public class RenderSystem
 
     //// CANVAS FUNCTIONS ////
 
-    public void CanvasSetPos(PairMutable pos)
+    public void CanvasSetLayout(PairMutable pos)
     {
         this.canvas.setLayoutX(pos.GetLeftDouble());
         this.canvas.setLayoutY(pos.GetRightDouble());
+    }
+
+    public void CanvasSetTranslate(PairMutable pos)
+    {
+        this.canvas.setTranslateX(pos.GetLeftDouble());
+        this.canvas.setTranslateY(pos.GetRightDouble());
+    }
+
+    public void CanvasSetScale(Double scale)
+    {
+        this.canvas.setScaleX(scale);
+        this.canvas.setScaleY(scale);
+    }
+
+    public PairMutable CanvasGetLayout()
+    {
+        return new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY());
+    }
+
+    public PairMutable CanvasGetTranslate()
+    {
+        return new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY());
     }
 
     /*public void BindSize(Node node)
@@ -186,20 +208,16 @@ public class RenderSystem
 
     //// SHAPE FUNCTIONS ////
 
-    public PairMutable CalculatePosDraw(RenderShape shape)
+    public void ShapeCalculatePosDraw(RenderShape shape)
     {
-        PairMutable posDraw = new PairMutable(shape.posReal);
-
-        posDraw.left = posDraw.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
-        posDraw.right = posDraw.GetRightDouble() * this.zoom + this.canvas.getHeight() / 2;
-
-        return posDraw;
+        shape.posDraw.left = shape.posReal.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
+        shape.posDraw.right = shape.posReal.GetRightDouble() * this.zoom + this.canvas.getHeight() / 2;
     }
 
     public void CanvasDrawShape(RenderShape shape)
     {
         if (shape.posReal != null)
-            this.CalculatePosDraw(shape);
+            this.ShapeCalculatePosDraw(shape);
 
         shape.DrawCanvas(this.gc);
     }
@@ -318,6 +336,9 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
+                        this.CanvasSetTranslate(new PairMutable(0.0, 0.0));
+                        this.CanvasSetScale(1.0);
+
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
                     }
@@ -350,8 +371,7 @@ public class RenderSystem
                 this.mouseDragFirstPos = new PairMutable(posMouse);
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
-                this.mouseDragCanvasFirstPos = new PairMutable(this.canvas.getLayoutX(),
-                                                               this.canvas.getLayoutY());
+                this.mouseDragCanvasFirstPos = new PairMutable(this.CanvasGetTranslate());
 
                 /*for (int i = 0; i < this.shapes.size(); i++)
                 {
@@ -418,11 +438,11 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.canvas.setLayoutX(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble());
-                        this.canvas.setLayoutY(this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble());
+                        this.CanvasSetTranslate(new PairMutable(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble(),
+                                                                this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble()));
 
-                        //System.out.println(this.stackPane.getWidth());
-                        //System.out.println(this.stackPane.getHeight());
+                        //System.out.println(new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY()).ToStringDouble());
+                        //System.out.println(new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY()).ToStringDouble());
                     }
                 }
             }
@@ -443,6 +463,8 @@ public class RenderSystem
             // Handling global callback actions
             {
                 // Handling zoom scaling (only if we're not rotating anything)
+                PairMutable newPos = this.CanvasGetTranslate();
+
                 if (!this.editor.Editor_Rotating)
                 {
                     //boolean canMove = true;
@@ -458,6 +480,9 @@ public class RenderSystem
                         {
                             this.zoom /= this.zoomFactor;
                         }
+
+                        //newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() / this.zoom;
+                        //newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() / this.zoom;
                     }
                     else
                     {
@@ -470,7 +495,13 @@ public class RenderSystem
                         {
                             this.zoom *= this.zoomFactor;
                         }
+
+                        //newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * this.zoom;
+                        //newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * this.zoom;
                     }
+
+                    this.CanvasSetScale(this.zoom);
+                    //this.CanvasSetTranslate(newPos);
 
                     //if (canMove)
                     //    this.EditorSchematic_ViewportCenter = new PairMutable(this.EditorSchematic_ViewportCenter.GetLeftDouble() + (event.getX() - this.EditorSchematic_ViewportCenter.GetLeftDouble()) / 2,
