@@ -28,7 +28,8 @@ public class RenderSystem
 
     final UUID id = UUID.randomUUID();
 
-    public Pane pane;
+    public Pane paneListener;
+    public Pane paneHolder;
     public Canvas canvas;
     public GraphicsContext gc;
     public PairMutable theaterSize;
@@ -48,15 +49,16 @@ public class RenderSystem
     public Long mouseDragLastTime;
     public PairMutable mouseDragFirstCenter;
     public boolean mouseDragReachedEdge;
-    public PairMutable mouseDragCanvasFirstPos;
+    public PairMutable mouseDragPaneFirstPos;
 
     public Editor editor;
 
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Editor editorValue, Pane paneValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
-        this.pane = paneValue;
+        this.paneListener = paneListenerValue;
+        this.paneHolder = paneHolderValue;
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
         this.theaterSize = theaterSizeValue;
@@ -74,11 +76,11 @@ public class RenderSystem
         this.mouseDragLastTime = System.nanoTime();
         this.mouseDragFirstCenter = null;
         this.mouseDragReachedEdge = false;
-        this.mouseDragCanvasFirstPos = null;
+        this.mouseDragPaneFirstPos = null;
 
         this.editor = editorValue;
 
-        this.CanvasSetTranslate(new PairMutable(0.0, 0.0));
+        this.PaneSetTranslate(new PairMutable(0.0, 0.0));
         this.ListenersInit();
     }
 
@@ -135,9 +137,58 @@ public class RenderSystem
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
     }
 
+    //// PANE FUNCTIONS ////
+
+    public void PaneSetLayout(PairMutable pos)
+    {
+        this.paneHolder.setLayoutX(pos.GetLeftDouble());
+        this.paneHolder.setLayoutY(pos.GetRightDouble());
+    }
+
+    public void PaneSetTranslate(PairMutable pos)
+    {
+        this.paneHolder.setTranslateX(pos.GetLeftDouble());
+        this.paneHolder.setTranslateY(pos.GetRightDouble());
+    }
+
+    public void PaneSetScale(PairMutable scale, boolean compensate)
+    {
+        PairMutable prevScale = this.PaneGetScale();
+
+        this.paneHolder.setScaleX(scale.GetLeftDouble());
+        this.paneHolder.setScaleY(scale.GetRightDouble());
+
+        if (compensate)
+        {
+            PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
+                                                     scale.GetRightDouble() - prevScale.GetRightDouble());
+            PairMutable newPos = this.PaneGetTranslate();
+
+            newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
+            newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
+
+            this.PaneSetTranslate(newPos);
+        }
+    }
+
+    public PairMutable PaneGetScale()
+    {
+        return new PairMutable(this.paneHolder.getScaleX(), this.paneHolder.getScaleY());
+    }
+
+    public PairMutable PaneGetLayout()
+    {
+        return new PairMutable(this.paneHolder.getLayoutX(), this.paneHolder.getLayoutY());
+    }
+
+    public PairMutable PaneGetTranslate()
+    {
+        return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
+    }
+
     //// CANVAS FUNCTIONS ////
 
-    public void CanvasSetLayout(PairMutable pos)
+    /*public void CanvasSetLayout(PairMutable pos)
     {
         this.canvas.setLayoutX(pos.GetLeftDouble());
         this.canvas.setLayoutY(pos.GetRightDouble());
@@ -182,7 +233,7 @@ public class RenderSystem
     public PairMutable CanvasGetTranslate()
     {
         return new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY());
-    }
+    }*/
 
     /*public void BindSize(Node node)
     {
@@ -231,9 +282,9 @@ public class RenderSystem
     public void ShapeAdd(Integer idx, Shape shape)
     {
         if (idx < 0)
-            this.pane.getChildren().add(shape);
+            this.paneHolder.getChildren().add(shape);
         else
-            this.pane.getChildren().add(idx, shape);
+            this.paneHolder.getChildren().add(idx, shape);
     }
 
     public void ShapeCalculatePosDraw(RenderShape shape)
@@ -278,7 +329,7 @@ public class RenderSystem
     public void ListenersInit()
     {
         // When we drag the mouse (from outside the viewport)...
-        this.pane.setOnDragOver(event -> {
+        this.paneListener.setOnDragOver(event -> {
             // Handling global callback actions
             {}
 
@@ -289,7 +340,7 @@ public class RenderSystem
         });
 
         // When we drop something with the cursor (from outside the viewport)...
-        this.pane.setOnDragDropped(event -> {
+        this.paneListener.setOnDragDropped(event -> {
             // Handling global callback actions
             {}
 
@@ -301,7 +352,7 @@ public class RenderSystem
         });
 
         // When we move the mouse (without clicking)...
-        this.pane.setOnMouseMoved(event -> {
+        this.paneListener.setOnMouseMoved(event -> {
             // Handling global callback actions
             {}
 
@@ -312,7 +363,7 @@ public class RenderSystem
         });
 
         // When we press down the mouse...
-        this.pane.setOnMousePressed(event -> {
+        this.paneListener.setOnMousePressed(event -> {
             // Updating mouse pressed flags
             {
                 if (event.isPrimaryButtonDown())
@@ -330,7 +381,7 @@ public class RenderSystem
                 {}
 
                 this.mouseDragFirstPos = null;
-                this.mouseDragCanvasFirstPos = null;
+                this.mouseDragPaneFirstPos = null;
             }
 
             // Handling editor-specific callback actions
@@ -346,7 +397,7 @@ public class RenderSystem
         });
 
         // When we release the mouse...
-        this.pane.setOnMouseReleased(event -> {
+        this.paneListener.setOnMouseReleased(event -> {
             // Handling global callback actions
             {
                 if (this.editor.Editor_PressedLMB)
@@ -378,8 +429,8 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.CanvasSetTranslate(new PairMutable(0.0, 0.0));
-                        this.CanvasSetScale(new PairMutable(1.0, 1.0));
+                        this.PaneSetTranslate(new PairMutable(0.0, 0.0));
+                        this.PaneSetScale(new PairMutable(1.0, 1.0), false);
 
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
@@ -400,7 +451,7 @@ public class RenderSystem
         });
 
         // When we drag the mouse (from inside the viewport)...
-        this.pane.setOnMouseDragged(event -> {
+        this.paneListener.setOnMouseDragged(event -> {
             // Only callback if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
                 return;
@@ -413,7 +464,7 @@ public class RenderSystem
                 this.mouseDragFirstPos = new PairMutable(posMouse);
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
-                this.mouseDragCanvasFirstPos = new PairMutable(this.CanvasGetTranslate());
+                this.mouseDragPaneFirstPos = new PairMutable(this.PaneGetTranslate());
 
                 /*for (int i = 0; i < this.shapes.size(); i++)
                 {
@@ -480,8 +531,8 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.CanvasSetTranslate(new PairMutable(this.mouseDragCanvasFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
-                                                                this.mouseDragCanvasFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
+                        this.PaneSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
+                                                              this.mouseDragPaneFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
 
                         //System.out.println(new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY()).ToStringDouble());
                         //System.out.println(new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY()).ToStringDouble());
@@ -499,14 +550,14 @@ public class RenderSystem
         });
 
         // When we scroll the mouse...
-        this.pane.setOnScroll(event -> {
+        this.paneListener.setOnScroll(event -> {
             // Handling editor-specific callback actions
             this.editor.Editor_ViewportOnScroll();
 
             // Handling global callback actions
             {
                 // Handling zoom scaling (only if we're not rotating anything)
-                PairMutable newPos = this.CanvasGetTranslate();
+                PairMutable newPos = this.PaneGetTranslate();
 
                 if (!this.editor.Editor_Rotating)
                 {
@@ -543,7 +594,7 @@ public class RenderSystem
                         //newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * this.zoom;
                     }
 
-                    this.CanvasSetScale(new PairMutable(this.zoom, this.zoom));
+                    this.PaneSetScale(new PairMutable(this.zoom, this.zoom), true);
                     //this.CanvasSetTranslate(newPos);
 
                     //if (canMove)

@@ -37,7 +37,11 @@
                <children>
                   <Pane>
                      <children>
-                        <Canvas height="1000.0" width="1000.0" />
+                        <Pane>
+                           <children>
+                              <Canvas height="1000.0" width="1000.0" />
+                           </children>
+                        </Pane>
                      </children>
                   </Pane>
                   <ToolBar>

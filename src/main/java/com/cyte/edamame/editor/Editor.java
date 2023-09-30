@@ -22,6 +22,7 @@ import javafx.scene.canvas.*;
 import java.io.InvalidClassException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Stack;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -143,7 +144,8 @@ public abstract class Editor
         // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
         String prefix = editorID.toString();
-        Pane foundPane = null;
+        Pane foundPaneListener = null;
+        Pane foundPaneHolder = null;
         Canvas foundCanvas = null;
 
         while (nodeIterator.hasNext())
@@ -200,38 +202,48 @@ public abstract class Editor
                     {
                         // Searching the editor tab for the stack pane and the canvas
                         HBox editorBox = (HBox)item.getContent();
-                        Iterator<Node> nodeIteratorA = editorBox.getChildren().iterator();
 
                         // Searching for the stack pane...
-                        while (nodeIteratorA.hasNext())
+                        for (int i = 0; i < editorBox.getChildren().size(); i++)
                         {
-                            Node nextNodeA = nodeIteratorA.next();
+                            Node nextNodeA = editorBox.getChildren().get(i);
 
                             if (nextNodeA.getClass() == StackPane.class)
                             {
-                                foundPane = (StackPane)nextNodeA;
+                                StackPane foundStackPane = (StackPane)nextNodeA;
 
-                                Iterator<Node> nodeIteratorB = foundPane.getChildren().iterator();
-
-                                // Searching for the pane...
-                                while (nodeIteratorB.hasNext())
+                                // Searching for the listener pane...
+                                for (int j = 0; j < foundStackPane.getChildren().size(); j++)
                                 {
-                                    Node nextNodeB = nodeIteratorB.next();
+                                    Node nextNodeB = foundStackPane.getChildren().get(j);
 
                                     if (nextNodeB.getClass() == Pane.class)
                                     {
-                                        Iterator<Node> nodeIteratorC = ((Pane)nextNodeB).getChildren().iterator();
+                                        foundPaneListener = (Pane)nextNodeB;
 
-                                        // Searching for the canvas...
-                                        while (nodeIteratorC.hasNext())
+                                        // Searching for the holder pane...
+                                        for (int k = 0; k < foundPaneListener.getChildren().size(); k++)
                                         {
-                                            Node nextNodeC = nodeIteratorC.next();
+                                            Node nextNodeC = foundPaneListener.getChildren().get(k);
 
-                                            if (nextNodeC.getClass() == Canvas.class) {
+                                            if (nextNodeC.getClass() == Pane.class)
+                                            {
+                                                foundPaneHolder = (Pane)nextNodeC;
 
-                                                foundCanvas = (Canvas)nextNodeC;
+                                                // Searching for the canvas...
+                                                for (int l = 0; l < foundPaneHolder.getChildren().size(); l++)
+                                                {
+                                                    Node nextNodeD = foundPaneHolder.getChildren().get(l);
 
-                                                EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                                                    if (nextNodeD.getClass() == Canvas.class)
+                                                    {
+                                                        foundCanvas = (Canvas)nextNodeD;
+
+                                                        EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+
+                                                        break;
+                                                    }
+                                                }
 
                                                 break;
                                             }
@@ -245,8 +257,10 @@ public abstract class Editor
                             }
                         }
 
-                        if (foundPane == null)
-                            throw new InvalidClassException("Unable to locate stack pane for an editor with name \"" + this.editorName + "\"!");
+                        if (foundPaneListener == null)
+                            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.editorName + "\"!");
+                        if (foundPaneHolder == null)
+                            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.editorName + "\"!");
                         if (foundCanvas == null)
                             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.editorName + "\"!");
 
@@ -263,7 +277,8 @@ public abstract class Editor
         }
 
         this.Editor_RenderSystem = new RenderSystem(this,
-                                                    foundPane,
+                                                    foundPaneListener,
+                                                    foundPaneHolder,
                                                     foundCanvas,
                                                     EDAmameController.Editor_TheaterSize,
                                                     EDAmameController.Editor_BackgroundColor,
