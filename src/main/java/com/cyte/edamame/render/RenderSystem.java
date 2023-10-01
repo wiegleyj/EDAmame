@@ -21,6 +21,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.input.*;
 import javafx.scene.shape.*;
+import javafx.geometry.*;
 
 public class RenderSystem
 {
@@ -138,6 +139,13 @@ public class RenderSystem
     }
 
     //// PANE FUNCTIONS ////
+
+    public PairMutable PaneConvertListenerPos(PairMutable listenerPos)
+    {
+        Point2D pos = paneHolder.parentToLocal(listenerPos.GetLeftDouble(), listenerPos.GetRightDouble());
+
+        return new PairMutable(pos.getX(), pos.getY());
+    }
 
     public void PaneSetLayout(PairMutable pos)
     {
@@ -402,12 +410,15 @@ public class RenderSystem
             {
                 if (this.editor.Editor_PressedLMB)
                 {
-                    PairMutable mousePos = new PairMutable(event.getX(), event.getY());
+                    PairMutable dropPos = this.PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
 
                     // CHECKING FOR POSITION CONFLICTS
+
+                    //System.out.println(dropPos.ToStringDouble());
+
                     Circle circle = new Circle(50, Color.BLUE);
-                    circle.setTranslateX(mousePos.GetLeftDouble());
-                    circle.setTranslateY(mousePos.GetRightDouble());
+                    circle.setTranslateX(dropPos.GetLeftDouble());
+                    circle.setTranslateY(dropPos.GetRightDouble());
                     this.ShapeAdd(-1, circle);
                 }
 

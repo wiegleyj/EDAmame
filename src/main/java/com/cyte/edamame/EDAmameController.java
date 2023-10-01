@@ -233,16 +233,16 @@ public class EDAmameController implements Initializable
                     continue;
 
                 // Adjusting the central layout of the canvas relative to the stack pane size
-                /*{
-                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
-                                                             editor.Editor_RenderSystem.canvas.getHeight());
-                    PairMutable paneSize = new PairMutable(editor.Editor_RenderSystem.pane.getWidth(),
-                                                                editor.Editor_RenderSystem.pane.getHeight());
+                {
+                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.paneHolder.getWidth(),
+                                                             editor.Editor_RenderSystem.paneHolder.getHeight());
+                    PairMutable paneSize = new PairMutable(editor.Editor_RenderSystem.paneListener.getWidth(),
+                                                           editor.Editor_RenderSystem.paneListener.getHeight());
                     PairMutable newCanvasPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
                                                                paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
-                    editor.Editor_RenderSystem.CanvasSetLayout(newCanvasPos);
-                }*/
+                    editor.Editor_RenderSystem.PaneSetLayout(newCanvasPos);
+                }
             }
         }
     }
