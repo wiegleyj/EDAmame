@@ -18,8 +18,8 @@
 <body class="class-declaration-page">
 <script type="text/javascript">var evenRowColor = "even-row-color";
 var oddRowColor = "odd-row-color";
-var tableTab = "table-tab";
-var activeTableTab = "active-table-tab";
+var tableTab = "table-Editor_Tab";
+var activeTableTab = "active-table-Editor_Tab";
 var pathtoroot = "../../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
@@ -85,7 +85,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></span></div>
 <div class="block">Librarys and projects are all modified through the use of special purpose editor modules.<p>
 
- All editors are based on the abstract Editor class so that they conform with what the EDAmame main
+ All Controller_Editors are based on the abstract Editor class so that they conform with what the EDAmame main
  application expects and will attempt to obtain and display editor specific controls for.</div>
 <dl class="notes">
 <dt>Author:</dt>
@@ -104,27 +104,27 @@ loadScripts(document, 'script');</script>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>(package private) final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></code></div>
-<div class="col-second even-row-color"><code><a href="#editorID" class="member-name-link">editorID</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Editor_ID" class="member-name-link">Editor_ID</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">Every editor can be uniquely identified by a random UUID (which do not persist across application execution.</div>
 </div>
 <div class="col-first odd-row-color"><code>protected javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#menus" class="member-name-link">menus</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Editor_Menus" class="member-name-link">Editor_Menus</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">A structure of menu items to include in EDAmame's menus.</div>
+<div class="block">A structure of menu items to include in EDAmame's Editor_Menus.</div>
 </div>
 <div class="col-first even-row-color"><code>protected javafx.scene.control.Tab</code></div>
-<div class="col-second even-row-color"><code><a href="#tab" class="member-name-link">tab</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Editor_Tab" class="member-name-link">Editor_Tab</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The main tab for EDAmame to include in its main tab list.</div>
+<div class="block">The main Editor_Tab for EDAmame to include in its main Editor_Tab list.</div>
 </div>
 <div class="col-first odd-row-color"><code>protected javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</code></div>
-<div class="col-second odd-row-color"><code><a href="#tabs" class="member-name-link">tabs</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Editor_Tabs" class="member-name-link">Editor_Tabs</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">a list of tabs to include in the navigation tab pane when this editor is active.</div>
+<div class="block">a list of Editor_Tabs to include in the navigation Editor_Tab pane when this editor is active.</div>
 </div>
 <div class="col-first even-row-color"><code>protected javafx.scene.control.ToolBar</code></div>
-<div class="col-second even-row-color"><code><a href="#toolBar" class="member-name-link">toolBar</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Editor_ToolBar" class="member-name-link">Editor_ToolBar</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">An optional ToolBar to provide EDAmame to include/append to its toolbars.</div>
 </div>
@@ -149,7 +149,7 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-Editor_Tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="Editor_Tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-Editor_Tab">All Methods</button><button id="method-summary-table-tab2" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-Editor_Tab">Instance Methods</button><button id="method-summary-table-tab4" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-Editor_Tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
@@ -161,27 +161,27 @@ loadScripts(document, 'script');</script>
 <div class="block">Request an editor to close.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#dissect(javafx.scene.Scene)" class="member-name-link">dissect</a><wbr>(javafx.scene.Scene&nbsp;scene)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_Dissect(javafx.scene.Scene)" class="member-name-link">Editor_Dissect</a><wbr>(javafx.scene.Scene&nbsp;scene)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">dissect a controller into its component for delivery to EDAmame</div>
+<div class="block">Editor_Dissect a controller into its component for delivery to EDAmame</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getControlTabs()" class="member-name-link">getControlTabs</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_GetControlTabs()" class="member-name-link">Editor_GetControlTabs</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a list of control tabs for EDAmame to include in the main controls tab pane.</div>
+<div class="block">Returns a list of control Editor_Tabs for EDAmame to include in the main controls Editor_Tab pane.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>javafx.scene.control.Tab</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getEditorTab()" class="member-name-link">getEditorTab</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_GetTab()" class="member-name-link">Editor_GetTab</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the main editor Tab node for inclusion by EDAmame.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getMenus()" class="member-name-link">getMenus</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_GetMenus()" class="member-name-link">Editor_GetMenus</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Returns a (possibly empty) structure of menu items for EDAmame to include in its menus.</div>
+<div class="block">Returns a (possibly empty) structure of menu items for EDAmame to include in its Editor_Menus.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>javafx.scene.control.ToolBar</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#getToolBar()" class="member-name-link">getToolBar</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_GetToolBar()" class="member-name-link">Editor_GetToolBar</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Returns the optional ToolBar of this editor for inclusion by EDAmame.</div>
 </div>
@@ -203,40 +203,40 @@ loadScripts(document, 'script');</script>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="editorID">
-<h3>editorID</h3>
-<div class="member-signature"><span class="modifiers">final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></span>&nbsp;<span class="element-name">editorID</span></div>
+<section class="detail" id="Editor_ID">
+<h3>Editor_ID</h3>
+<div class="member-signature"><span class="modifiers">final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/UUID.html" title="class or interface in java.util" class="external-link">UUID</a></span>&nbsp;<span class="element-name">Editor_ID</span></div>
 <div class="block">Every editor can be uniquely identified by a random UUID (which do not persist across application execution.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="tab">
-<h3>tab</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">tab</span></div>
-<div class="block">The main tab for EDAmame to include in its main tab list.</div>
+<section class="detail" id="Editor_Tab">
+<h3>Editor_Tab</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">Editor_Tab</span></div>
+<div class="block">The main Editor_Tab for EDAmame to include in its main Editor_Tab list.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="toolBar">
-<h3>toolBar</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">toolBar</span></div>
+<section class="detail" id="Editor_ToolBar">
+<h3>Editor_ToolBar</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">Editor_ToolBar</span></div>
 <div class="block">An optional ToolBar to provide EDAmame to include/append to its toolbars.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="tabs">
-<h3>tabs</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</span>&nbsp;<span class="element-name">tabs</span></div>
-<div class="block">a list of tabs to include in the navigation tab pane when this editor is active. (can be empty)</div>
+<section class="detail" id="Editor_Tabs">
+<h3>Editor_Tabs</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</span>&nbsp;<span class="element-name">Editor_Tabs</span></div>
+<div class="block">a list of Editor_Tabs to include in the navigation Editor_Tab pane when this editor is active. (can be empty)</div>
 </section>
 </li>
 <li>
-<section class="detail" id="menus">
-<h3>menus</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</span>&nbsp;<span class="element-name">menus</span></div>
-<div class="block">A structure of menu items to include in EDAmame's menus. Any menuitems associated with a string will
+<section class="detail" id="Editor_Menus">
+<h3>Editor_Menus</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</span>&nbsp;<span class="element-name">Editor_Menus</span></div>
+<div class="block">A structure of menu items to include in EDAmame's Editor_Menus. Any menuitems associated with a string will
  be inserted/visible under the menu with the same name in the EDAmame main menubar. The string must
- match exactly including mneumonic underscores and such. Missing menus at the EDAmame level are not created.</div>
+ match exactly including mneumonic underscores and such. Missing Editor_Menus at the EDAmame level are not created.</div>
 </section>
 </li>
 </ul>
@@ -262,20 +262,20 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="getEditorTab()">
-<h3>getEditorTab</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">getEditorTab</span>()</div>
+<section class="detail" id="Editor_GetTab()">
+<h3>Editor_GetTab</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">Editor_GetTab</span>()</div>
 <div class="block">Returns the main editor Tab node for inclusion by EDAmame.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>the main tab for this editor.</dd>
+<dd>the main Editor_Tab for this editor.</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getToolBar()">
-<h3>getToolBar</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">getToolBar</span>()</div>
+<section class="detail" id="Editor_GetToolBar()">
+<h3>Editor_GetToolBar</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">Editor_GetToolBar</span>()</div>
 <div class="block">Returns the optional ToolBar of this editor for inclusion by EDAmame.</div>
 <dl class="notes">
 <dt>Returns:</dt>
@@ -284,21 +284,21 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="getControlTabs()">
-<h3>getControlTabs</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</span>&nbsp;<span class="element-name">getControlTabs</span>()</div>
-<div class="block">Returns a list of control tabs for EDAmame to include in the main controls tab pane.</div>
+<section class="detail" id="Editor_GetControlTabs()">
+<h3>Editor_GetControlTabs</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.collections.ObservableList&lt;javafx.scene.control.Tab&gt;</span>&nbsp;<span class="element-name">Editor_GetControlTabs</span>()</div>
+<div class="block">Returns a list of control Editor_Tabs for EDAmame to include in the main controls Editor_Tab pane.</div>
 <dl class="notes">
 <dt>Returns:</dt>
-<dd>A (possibly empty) list of control tabs.</dd>
+<dd>A (possibly empty) list of control Editor_Tabs.</dd>
 </dl>
 </section>
 </li>
 <li>
-<section class="detail" id="getMenus()">
-<h3>getMenus</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</span>&nbsp;<span class="element-name">getMenus</span>()</div>
-<div class="block">Returns a (possibly empty) structure of menu items for EDAmame to include in its menus. The top Map maps
+<section class="detail" id="Editor_GetMenus()">
+<h3>Editor_GetMenus</h3>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/String.html" title="class or interface in java.lang" class="external-link">String</a>,<wbr>javafx.collections.ObservableList&lt;javafx.scene.control.MenuItem&gt;&gt;</span>&nbsp;<span class="element-name">Editor_GetMenus</span>()</div>
+<div class="block">Returns a (possibly empty) structure of menu items for EDAmame to include in its Editor_Menus. The top Map maps
  menu names to a list of items to include in a menu with that name. The values of this map are a list of
  MenuItems that EDAmame should include/insert into any menu it has with a matching name.</div>
 <dl class="notes">
@@ -308,18 +308,18 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="dissect(javafx.scene.Scene)">
-<h3>dissect</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">dissect</span><wbr><span class="parameters">(javafx.scene.Scene&nbsp;scene)</span>
+<section class="detail" id="Editor_Dissect(javafx.scene.Scene)">
+<h3>Editor_Dissect</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_Dissect</span><wbr><span class="parameters">(javafx.scene.Scene&nbsp;scene)</span>
                 throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/InvalidClassException.html" title="class or interface in java.io" class="external-link">InvalidClassException</a></span></div>
-<div class="block">dissect a controller into its component for delivery to EDAmame<p>
+<div class="block">Editor_Dissect a controller into its component for delivery to EDAmame<p>
 
- The design of editors is intended to be done through FXML and SceneBuilder. SceneBuilder doesn't
+ The design of Controller_Editors is intended to be done through FXML and SceneBuilder. SceneBuilder doesn't
  support multiple scenes in a single FXML. So, all required components are boxed into a single VBOX.
  Once an editor factory has loaded an FXML file which</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>scene</code> - The scene to dissect for expected UI elements.</dd>
+<dd><code>scene</code> - The scene to Editor_Dissect for expected UI elements.</dd>
 <dt>Throws:</dt>
 <dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/InvalidClassException.html" title="class or interface in java.io" class="external-link">InvalidClassException</a></code> - if the expected UI scene organization is not found as expected.</dd>
 </dl>

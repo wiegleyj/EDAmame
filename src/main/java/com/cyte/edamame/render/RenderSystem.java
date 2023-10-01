@@ -81,15 +81,15 @@ public class RenderSystem
 
         this.editor = editorValue;
 
-        this.PaneSetTranslate(new PairMutable(0.0, 0.0));
-        this.ListenersInit();
+        this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
+        this.RenderSystem_ListenersInit();
     }
 
     //// RENDERING FUNCTIONS ////
 
-    public void CanvasRenderGrid()
+    public void RenderSystem_CanvasRenderGrid()
     {
-        this.CanvasClear();
+        this.RenderSystem_CanvasClear();
 
         // Centering the canvas
         //System.out.println(this.stackPane.getWidth());
@@ -99,7 +99,7 @@ public class RenderSystem
         //this.canvas.setLayoutY(-this.stackPane.getHeight() / 2);
 
         // Loading the point grid
-        RenderShape gridPointBlueprint = EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridPoint"));
+        RenderShape gridPointBlueprint = EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "GridPoint"));
 
         Double posX = -2500.0;
         Double posY = -2500.0;
@@ -111,7 +111,7 @@ public class RenderSystem
                 RenderShape gridPoint = new RenderShape(gridPointBlueprint);
                 gridPoint.posDraw = new PairMutable(posX, posY);
 
-                this.CanvasDrawShape(gridPoint);
+                this.RenderSystem_CanvasDrawShape(gridPoint);
                 posX += 100.0;
             }
 
@@ -121,17 +121,17 @@ public class RenderSystem
         }
 
         // Loading the grid box
-        RenderShape gridBox = new RenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "GridBox")));
+        RenderShape gridBox = new RenderShape(EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "GridBox")));
         gridBox.posDraw = new PairMutable(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
-        this.CanvasDrawShape(gridBox);
+        this.RenderSystem_CanvasDrawShape(gridBox);
 
         // Loading the center crosshair
-        RenderShape crosshair = new RenderShape(EDAmameController.Global_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Global_BasicShapes, "Crosshair")));
+        RenderShape crosshair = new RenderShape(EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "Crosshair")));
         crosshair.posDraw = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth() / 2, editor.Editor_RenderSystem.canvas.getHeight() / 2);
-        this.CanvasDrawShape(crosshair);
+        this.RenderSystem_CanvasDrawShape(crosshair);
     }
 
-    public void CanvasClear()
+    public void RenderSystem_CanvasClear()
     {
         this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
         this.gc.setFill(this.backgroundColor);
@@ -140,28 +140,28 @@ public class RenderSystem
 
     //// PANE FUNCTIONS ////
 
-    public PairMutable PaneConvertListenerPos(PairMutable listenerPos)
+    public PairMutable RenderSystem_PaneConvertListenerPos(PairMutable listenerPos)
     {
         Point2D pos = paneHolder.parentToLocal(listenerPos.GetLeftDouble(), listenerPos.GetRightDouble());
 
         return new PairMutable(pos.getX(), pos.getY());
     }
 
-    public void PaneSetLayout(PairMutable pos)
+    public void RenderSystem_PaneSetLayout(PairMutable pos)
     {
         this.paneHolder.setLayoutX(pos.GetLeftDouble());
         this.paneHolder.setLayoutY(pos.GetRightDouble());
     }
 
-    public void PaneSetTranslate(PairMutable pos)
+    public void RenderSystem_PaneSetTranslate(PairMutable pos)
     {
         this.paneHolder.setTranslateX(pos.GetLeftDouble());
         this.paneHolder.setTranslateY(pos.GetRightDouble());
     }
 
-    public void PaneSetScale(PairMutable scale, boolean compensate)
+    public void RenderSystem_PaneSetScale(PairMutable scale, boolean compensate)
     {
-        PairMutable prevScale = this.PaneGetScale();
+        PairMutable prevScale = this.RenderSystem_PaneGetScale();
 
         this.paneHolder.setScaleX(scale.GetLeftDouble());
         this.paneHolder.setScaleY(scale.GetRightDouble());
@@ -170,26 +170,26 @@ public class RenderSystem
         {
             PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
                                                      scale.GetRightDouble() - prevScale.GetRightDouble());
-            PairMutable newPos = this.PaneGetTranslate();
+            PairMutable newPos = this.RenderSystem_PaneGetTranslate();
 
             newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
             newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
 
-            this.PaneSetTranslate(newPos);
+            this.RenderSystem_PaneSetTranslate(newPos);
         }
     }
 
-    public PairMutable PaneGetScale()
+    public PairMutable RenderSystem_PaneGetScale()
     {
         return new PairMutable(this.paneHolder.getScaleX(), this.paneHolder.getScaleY());
     }
 
-    public PairMutable PaneGetLayout()
+    public PairMutable RenderSystem_PaneGetLayout()
     {
         return new PairMutable(this.paneHolder.getLayoutX(), this.paneHolder.getLayoutY());
     }
 
-    public PairMutable PaneGetTranslate()
+    public PairMutable RenderSystem_PaneGetTranslate()
     {
         return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
     }
@@ -272,7 +272,7 @@ public class RenderSystem
         this.canvas.heightProperty().unbind();
     }*/
 
-    public void CanvasSetSize(PairMutable sizeValue)
+    public void RenderSystem_CanvasSetSize(PairMutable sizeValue)
     {
         //this.UnbindSize();
 
@@ -280,14 +280,14 @@ public class RenderSystem
         this.canvas.setHeight(sizeValue.GetRightDouble());
     }
 
-    public PairMutable CanvasGetSize()
+    public PairMutable RenderSystem_CanvasGetSize()
     {
         return new PairMutable(canvas.getWidth(), canvas.getHeight());
     }
 
     //// SHAPE FUNCTIONS ////
 
-    public void ShapeAdd(Integer idx, Shape shape)
+    public void RenderSystem_ShapeAdd(Integer idx, Shape shape)
     {
         if (idx < 0)
             this.paneHolder.getChildren().add(shape);
@@ -295,16 +295,16 @@ public class RenderSystem
             this.paneHolder.getChildren().add(idx, shape);
     }
 
-    public void ShapeCalculatePosDraw(RenderShape shape)
+    public void RenderSystem_ShapeCalculatePosDraw(RenderShape shape)
     {
         shape.posDraw.left = shape.posReal.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
         shape.posDraw.right = shape.posReal.GetRightDouble() * this.zoom + this.canvas.getHeight() / 2;
     }
 
-    public void CanvasDrawShape(RenderShape shape)
+    public void RenderSystem_CanvasDrawShape(RenderShape shape)
     {
         if (shape.posReal != null)
-            this.ShapeCalculatePosDraw(shape);
+            this.RenderSystem_ShapeCalculatePosDraw(shape);
 
         shape.DrawCanvas(this.gc);
     }
@@ -334,7 +334,7 @@ public class RenderSystem
 
     //// CALLBACK FUNCTIONS ////
 
-    public void ListenersInit()
+    public void RenderSystem_ListenersInit()
     {
         // When we drag the mouse (from outside the viewport)...
         this.paneListener.setOnDragOver(event -> {
@@ -342,7 +342,7 @@ public class RenderSystem
             {}
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnDragOver();
+            this.editor.Editor_ViewportOnDragOver(event);
 
             event.consume();
         });
@@ -353,7 +353,7 @@ public class RenderSystem
             {}
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnDragDropped();
+            this.editor.Editor_ViewportOnDragDropped(event);
 
             event.setDropCompleted(true);
             event.consume();
@@ -365,7 +365,7 @@ public class RenderSystem
             {}
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnMouseMoved();
+            this.editor.Editor_ViewportOnMouseMoved(event);
 
             event.consume();
         });
@@ -393,12 +393,12 @@ public class RenderSystem
             }
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnMousePressed();
+            this.editor.Editor_ViewportOnMousePressed(event);
 
             //Circle testShape = new Circle(50, Color.BLUE);
             //testShape.setLayoutX(50.0);
             //testShape.setLayoutY(50.0);
-            //this.ShapeAdd(0, testShape);
+            //this.RenderSystem_ShapeAdd(0, testShape);
             //System.out.println("Hi");
 
             event.consume();
@@ -409,23 +409,12 @@ public class RenderSystem
             // Handling global callback actions
             {
                 if (this.editor.Editor_PressedLMB)
-                {
-                    PairMutable dropPos = this.PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
-
-                    // CHECKING FOR POSITION CONFLICTS
-
-                    //System.out.println(dropPos.ToStringDouble());
-
-                    Circle circle = new Circle(50, Color.BLUE);
-                    circle.setTranslateX(dropPos.GetLeftDouble());
-                    circle.setTranslateY(dropPos.GetRightDouble());
-                    this.ShapeAdd(-1, circle);
-                }
+                {}
 
                 if (this.editor.Editor_PressedRMB)
                 {
                     // Handling auto-zoom
-                    if (EDAmameController.isGlobalKeyPressed(KeyCode.ALT))
+                    if (EDAmameController.Controller_IsKeyPressed(KeyCode.ALT))
                     {
                         /*for (int i = 0; i < this.shapes.size(); i++)
                         {
@@ -440,8 +429,8 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.PaneSetTranslate(new PairMutable(0.0, 0.0));
-                        this.PaneSetScale(new PairMutable(1.0, 1.0), false);
+                        this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
+                        this.RenderSystem_PaneSetScale(new PairMutable(1.0, 1.0), false);
 
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
@@ -450,7 +439,7 @@ public class RenderSystem
             }
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnMouseReleased();
+            this.editor.Editor_ViewportOnMouseReleased(event);
 
             // Updating mouse pressed flags
             {
@@ -475,7 +464,7 @@ public class RenderSystem
                 this.mouseDragFirstPos = new PairMutable(posMouse);
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
-                this.mouseDragPaneFirstPos = new PairMutable(this.PaneGetTranslate());
+                this.mouseDragPaneFirstPos = new PairMutable(this.RenderSystem_PaneGetTranslate());
 
                 /*for (int i = 0; i < this.shapes.size(); i++)
                 {
@@ -542,7 +531,7 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        this.PaneSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
+                        this.RenderSystem_PaneSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
                                                               this.mouseDragPaneFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
 
                         //System.out.println(new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY()).ToStringDouble());
@@ -553,7 +542,7 @@ public class RenderSystem
             }
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnMouseDragged(mouseDiffPos);
+            this.editor.Editor_ViewportOnMouseDragged(event);
 
             this.mouseDragLastTime = System.nanoTime();
 
@@ -563,12 +552,12 @@ public class RenderSystem
         // When we scroll the mouse...
         this.paneListener.setOnScroll(event -> {
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnScroll();
+            this.editor.Editor_ViewportOnScroll(event);
 
             // Handling global callback actions
             {
                 // Handling zoom scaling (only if we're not rotating anything)
-                PairMutable newPos = this.PaneGetTranslate();
+                PairMutable newPos = this.RenderSystem_PaneGetTranslate();
 
                 if (!this.editor.Editor_Rotating)
                 {
@@ -605,7 +594,7 @@ public class RenderSystem
                         //newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * this.zoom;
                     }
 
-                    this.PaneSetScale(new PairMutable(this.zoom, this.zoom), true);
+                    this.RenderSystem_PaneSetScale(new PairMutable(this.zoom, this.zoom), true);
                     //this.CanvasSetTranslate(newPos);
 
                     //if (canMove)

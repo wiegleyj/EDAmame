@@ -10,26 +10,25 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderSystem;
 import com.cyte.edamame.util.PairMutable;
 
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.canvas.*;
-
-import java.io.InvalidClassException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Stack;
 import java.util.UUID;
 import java.util.logging.Level;
 
+import javafx.collections.*;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+import javafx.scene.canvas.*;
+
+import java.io.InvalidClassException;
+
 /**
  * Librarys and projects are all modified through the use of special purpose editor modules.<p>
  *
- * All editors are based on the abstract Editor class so that they conform with what the EDAmame main
+ * All Controller_Editors are based on the abstract Editor class so that they conform with what the EDAmame main
  * application expects and will attempt to obtain and display editor specific controls for.
  *
  * @author Jeff Wiegley, Ph.D.
@@ -40,28 +39,28 @@ public abstract class Editor
     //// GLOBAL VARIABLES ////
 
     /** Every editor can be uniquely identified by a random UUID (which do not persist across application execution. */
-    final UUID editorID = UUID.randomUUID();
-    String editorName = null;
+    final UUID Editor_ID = UUID.randomUUID();
+    String Editor_Name = null;
 
     // DO NOT EDIT
 
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
     // The individual elements are extracted to these for use by the EDAmame Application.
-    /** The main tab for EDAmame to include in its main tab list. */
-    protected Tab tab = null;
+    /** The main Editor_Tab for EDAmame to include in its main Editor_Tab list. */
+    protected Tab Editor_Tab = null;
 
     /** An optional ToolBar to provide EDAmame to include/append to its toolbars. */
-    protected ToolBar toolBar = null;
+    protected ToolBar Editor_ToolBar = null;
 
-    /** a list of tabs to include in the navigation tab pane when this editor is active. (can be empty) */
-    protected ObservableList<Tab> tabs = FXCollections.observableArrayList();
+    /** a list of Editor_Tabs to include in the navigation Editor_Tab pane when this editor is active. (can be empty) */
+    protected ObservableList<Tab> Editor_Tabs = FXCollections.observableArrayList();
 
     /**
-     * A structure of menu items to include in EDAmame's menus. Any menuitems associated with a string will
+     * A structure of menu items to include in EDAmame's Editor_Menus. Any menuitems associated with a string will
      * be inserted/visible under the menu with the same name in the EDAmame main menubar. The string must
-     * match exactly including mneumonic underscores and such. Missing menus at the EDAmame level are not created.
+     * match exactly including mneumonic underscores and such. Missing Editor_Menus at the EDAmame level are not created.
      */
-    protected ObservableMap<String, ObservableList<MenuItem>> menus = FXCollections.observableHashMap();
+    protected ObservableMap<String, ObservableList<MenuItem>> Editor_Menus = FXCollections.observableHashMap();
 
     public RenderSystem Editor_RenderSystem;
 
@@ -88,51 +87,51 @@ public abstract class Editor
 
     /**
      * Returns the main editor Tab node for inclusion by EDAmame.
-     * @return the main tab for this editor.
+     * @return the main Editor_Tab for this editor.
      */
-    public Tab getEditorTab() { return tab; }
+    public Tab Editor_GetTab() { return Editor_Tab; }
 
     /**
      * Returns the optional ToolBar of this editor for inclusion by EDAmame.
      * @return The ToolBar if available, null otherwise.
      */
-    public ToolBar getToolBar() { return toolBar; }
+    public ToolBar Editor_GetToolBar() { return Editor_ToolBar; }
 
     /**
-     * Returns a list of control tabs for EDAmame to include in the main controls tab pane.
-     * @return A (possibly empty) list of control tabs.
+     * Returns a list of control Editor_Tabs for EDAmame to include in the main controls Editor_Tab pane.
+     * @return A (possibly empty) list of control Editor_Tabs.
      */
-    public ObservableList<Tab> getControlTabs() { return tabs; }
+    public ObservableList<Tab> Editor_GetControlTabs() { return Editor_Tabs; }
 
     /**
-     * Returns a (possibly empty) structure of menu items for EDAmame to include in its menus. The top Map maps
+     * Returns a (possibly empty) structure of menu items for EDAmame to include in its Editor_Menus. The top Map maps
      * menu names to a list of items to include in a menu with that name. The values of this map are a list of
      * MenuItems that EDAmame should include/insert into any menu it has with a matching name.
      * @return a (possibly empty) structure of menu items
      */
-    public ObservableMap<String, ObservableList<MenuItem>> getMenus() { return menus; }
+    public ObservableMap<String, ObservableList<MenuItem>> Editor_GetMenus() { return Editor_Menus; }
 
     //// CALLBACK FUNCTIONS ////
 
-    abstract public void Editor_ViewportOnDragOver();
-    abstract public void Editor_ViewportOnDragDropped();
-    abstract public void Editor_ViewportOnMouseMoved();
-    abstract public void Editor_ViewportOnMousePressed();
-    abstract public void Editor_ViewportOnMouseReleased();
-    abstract public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos);
-    abstract public void Editor_ViewportOnScroll();
+    abstract public void Editor_ViewportOnDragOver(DragEvent event);
+    abstract public void Editor_ViewportOnDragDropped(DragEvent event);
+    abstract public void Editor_ViewportOnMouseMoved(MouseEvent event);
+    abstract public void Editor_ViewportOnMousePressed(MouseEvent event);
+    abstract public void Editor_ViewportOnMouseReleased(MouseEvent event);
+    abstract public void Editor_ViewportOnMouseDragged(MouseEvent event);
+    abstract public void Editor_ViewportOnScroll(ScrollEvent event);
 
     //// SUPPORT FUNCTIONS ////
 
-    /** dissect a controller into its component for delivery to EDAmame<p>
+    /** Editor_Dissect a controller into its component for delivery to EDAmame<p>
      *
-     * The design of editors is intended to be done through FXML and SceneBuilder. SceneBuilder doesn't
+     * The design of Controller_Editors is intended to be done through FXML and SceneBuilder. SceneBuilder doesn't
      * support multiple scenes in a single FXML. So, all required components are boxed into a single VBOX.
      * Once an editor factory has loaded an FXML file which
-     * @param scene The scene to dissect for expected UI elements.
+     * @param scene The scene to Editor_Dissect for expected UI elements.
      * @throws InvalidClassException if the expected UI scene organization is not found as expected.
      */
-    protected void dissect(Integer editorType, Scene scene) throws InvalidClassException
+    protected void Editor_Dissect(Integer editorType, Scene scene) throws InvalidClassException
     {
         Node root = scene.getRoot();
 
@@ -143,7 +142,7 @@ public abstract class Editor
 
         // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
-        String prefix = editorID.toString();
+        String prefix = Editor_ID.toString();
         Pane foundPaneListener = null;
         Pane foundPaneHolder = null;
         Canvas foundCanvas = null;
@@ -154,15 +153,15 @@ public abstract class Editor
 
             if (node.getClass() == ToolBar.class)
             {
-                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a ToolBar in Editor \"" + editorID + "\"...\n");
+                EDAmameController.Controller_Logger.log(Level.INFO, "Dissecting a ToolBar in Editor \"" + Editor_ID + "\"...\n");
 
-                toolBar = (ToolBar) node;
-                toolBar.setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
-                toolBar.setId(prefix + "_TOOLBAR");
+                Editor_ToolBar = (ToolBar) node;
+                Editor_ToolBar.setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
+                Editor_ToolBar.setId(prefix + "_TOOLBAR");
             }
             else if (node.getClass() == MenuBar.class)
             {
-                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + editorID + "\"...\n");
+                EDAmameController.Controller_Logger.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + Editor_ID + "\"...\n");
 
                 Iterator<Menu> menuIterator = ((MenuBar)node).getMenus().iterator();
 
@@ -170,10 +169,10 @@ public abstract class Editor
                 {
                     Menu menu = menuIterator.next();
 
-                    if (!menus.containsKey(menu.getText()))
-                        menus.put(menu.getText(), FXCollections.observableArrayList());
+                    if (!Editor_Menus.containsKey(menu.getText()))
+                        Editor_Menus.put(menu.getText(), FXCollections.observableArrayList());
 
-                    List<MenuItem> itemlist = menus.get(menu.getText());
+                    List<MenuItem> itemlist = Editor_Menus.get(menu.getText());
                     Iterator<MenuItem> itemIterator = menu.getItems().iterator();
 
                     while (itemIterator.hasNext())
@@ -188,7 +187,7 @@ public abstract class Editor
             }
             else if (node.getClass() == TabPane.class)
             {
-                EDAmameController.LOGGER.log(Level.INFO, "Dissecting a TabPane in Editor \"" + editorID + "\"...\n");
+                EDAmameController.Controller_Logger.log(Level.INFO, "Dissecting a TabPane in Editor \"" + Editor_ID + "\"...\n");
 
                 TabPane paneNode = (TabPane)node;
                 Iterator<Tab> tabIterator = paneNode.getTabs().iterator();
@@ -197,10 +196,10 @@ public abstract class Editor
                 {
                     Tab item = tabIterator.next();
 
-                    // Processing the editor tab
+                    // Processing the editor Editor_Tab
                     if (item.getText().equals("EditorTab"))
                     {
-                        // Searching the editor tab for the stack pane and the canvas
+                        // Searching the editor Editor_Tab for the stack pane and the canvas
                         HBox editorBox = (HBox)item.getContent();
 
                         // Searching for the stack pane...
@@ -239,7 +238,7 @@ public abstract class Editor
                                                     {
                                                         foundCanvas = (Canvas)nextNodeD;
 
-                                                        EDAmameController.LOGGER.log(Level.INFO, "Found canvas of an editor with name \"" + this.editorName + "\".\n");
+                                                        EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
 
                                                         break;
                                                     }
@@ -258,19 +257,19 @@ public abstract class Editor
                         }
 
                         if (foundPaneListener == null)
-                            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.editorName + "\"!");
+                            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.Editor_Name + "\"!");
                         if (foundPaneHolder == null)
-                            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.editorName + "\"!");
+                            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.Editor_Name + "\"!");
                         if (foundCanvas == null)
-                            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.editorName + "\"!");
+                            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
 
-                        // Setting the pointers to the editor tab
+                        // Setting the pointers to the editor Editor_Tab
                         item.setText(EDAmameController.Editor_Names[editorType]);
-                        tab = item;
+                        Editor_Tab = item;
                     }
                     else
                     {
-                        tabs.add(item);
+                        Editor_Tabs.add(item);
                     }
                 }
             }

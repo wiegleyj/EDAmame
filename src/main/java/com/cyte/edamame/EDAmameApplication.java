@@ -21,7 +21,7 @@ import java.util.ResourceBundle;
 /**
  * EDAmame JavaFX {@link Application}
  *
- * The head JavaFX class that loads the initial stage, main scene, and UI controller.
+ * The head JavaFX class that loads the initial Controller_Stage, main scene, and UI controller.
  *
  *  @author Jeff Wiegley, Ph.D.
  *  @author jeffrey.wiegley@gmail.com
@@ -31,7 +31,7 @@ public class EDAmameApplication extends Application
     /**
      * Override for {@link Application} start method that is called as a result of the launch method.
      *
-     * @param stage the primary stage for this application, onto which
+     * @param Controller_Stage the primary Controller_Stage for this application, onto which
      * the application scene can be set.
      * Applications may create other stages, if needed, but they will not be
      * primary stages.
@@ -40,23 +40,23 @@ public class EDAmameApplication extends Application
      * into the controller.
      */
     @Override
-    public void start(Stage stage) throws IOException
+    public void start(Stage Controller_Stage) throws IOException
     {
         Locale locale = new Locale("en", "US");
         ResourceBundle bundle = ResourceBundle.getBundle("com.cyte.edamame.strings", locale);
         FXMLLoader loader = new FXMLLoader(EDAmame.class.getResource("fxml/EDAmame.fxml"));
         loader.setResources(bundle); // Internationalization is a priority but not well understood.
-        loader.setControllerFactory(c -> new EDAmameController(stage));
+        loader.setControllerFactory(c -> new EDAmameController(Controller_Stage));
 
         Scene scene = new Scene(loader.load());
         URL url = EDAmame.class.getResource("css/EDAmame.css");
         if (url != null)
             scene.getStylesheets().add(url.toExternalForm());
 
-        stage.setTitle("\u679d\u8c46 EDAmame");
-        stage.setScene(scene);
+        Controller_Stage.setTitle("\u679d\u8c46 EDAmame");
+        Controller_Stage.setScene(scene);
 
-        stage.show();
+        Controller_Stage.show();
     }
 
     /**

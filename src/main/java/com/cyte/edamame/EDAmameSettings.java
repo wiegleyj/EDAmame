@@ -9,7 +9,7 @@ package com.cyte.edamame;
 
 /**
  * Class to represent, specify, serialize, store, and deserialize user settings and preferences for the EDAmame
- * Applications. Settings for specific modules/editors are provided with similar classes specific to those
+ * Applications. Settings for specific modules/Controller_Editors are provided with similar classes specific to those
  * subsystems.
  *
  * @author Jeff Wiegley, Ph.D.

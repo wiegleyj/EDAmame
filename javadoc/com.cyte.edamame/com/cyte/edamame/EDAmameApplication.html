@@ -18,8 +18,8 @@
 <body class="class-declaration-page">
 <script type="text/javascript">var evenRowColor = "even-row-color";
 var oddRowColor = "odd-row-color";
-var tableTab = "table-tab";
-var activeTableTab = "active-table-tab";
+var tableTab = "table-Editor_Tab";
+var activeTableTab = "active-table-Editor_Tab";
 var pathtoroot = "../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
@@ -83,7 +83,7 @@ loadScripts(document, 'script');</script>
 <span class="extends-implements">extends javafx.application.Application</span></div>
 <div class="block">EDAmame JavaFX <code>Application</code>
 
- The head JavaFX class that loads the initial stage, main scene, and UI controller.</div>
+ The head JavaFX class that loads the initial Controller_Stage, main scene, and UI controller.</div>
 <dl class="notes">
 <dt>Author:</dt>
 <dd>Jeff Wiegley, Ph.D., jeffrey.wiegley@gmail.com</dd>
@@ -127,7 +127,7 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-Editor_Tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="Editor_Tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-Editor_Tab">All Methods</button><button id="method-summary-table-tab1" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-Editor_Tab">Static Methods</button><button id="method-summary-table-tab2" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-Editor_Tab">Instance Methods</button><button id="method-summary-table-tab4" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-Editor_Tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
@@ -139,7 +139,7 @@ loadScripts(document, 'script');</script>
 <div class="block">The <code>Application</code> main start point.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start(javafx.stage.Stage)" class="member-name-link">start</a><wbr>(javafx.stage.Stage&nbsp;stage)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#start(javafx.Controller_Stage.Stage)" class="member-name-link">start</a><wbr>(javafx.Controller_Stage.Stage&nbsp;Controller_Stage)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Override for <code>Application</code> start method that is called as a result of the launch method.</div>
 </div>
@@ -178,16 +178,16 @@ loadScripts(document, 'script');</script>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="start(javafx.stage.Stage)">
+<section class="detail" id="start(javafx.Controller_Stage.Stage)">
 <h3>start</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(javafx.stage.Stage&nbsp;stage)</span>
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">start</span><wbr><span class="parameters">(javafx.Controller_Stage.Stage&nbsp;Controller_Stage)</span>
            throws <span class="exceptions"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/io/IOException.html" title="class or interface in java.io" class="external-link">IOException</a></span></div>
 <div class="block">Override for <code>Application</code> start method that is called as a result of the launch method.</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>start</code>&nbsp;in class&nbsp;<code>javafx.application.Application</code></dd>
 <dt>Parameters:</dt>
-<dd><code>stage</code> - the primary stage for this application, onto which
+<dd><code>Controller_Stage</code> - the primary Controller_Stage for this application, onto which
  the application scene can be set.
  Applications may create other stages, if needed, but they will not be
  primary stages.</dd>

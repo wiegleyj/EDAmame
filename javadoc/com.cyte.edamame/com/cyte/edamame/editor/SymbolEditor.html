@@ -18,8 +18,8 @@
 <body class="class-declaration-page">
 <script type="text/javascript">var evenRowColor = "even-row-color";
 var oddRowColor = "odd-row-color";
-var tableTab = "table-tab";
-var activeTableTab = "active-table-tab";
+var tableTab = "table-Editor_Tab";
+var activeTableTab = "active-table-Editor_Tab";
 var pathtoroot = "../../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
@@ -74,7 +74,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="inheritance" title="Inheritance Tree"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">java.lang.Object</a>
 <div class="inheritance"><a href="Editor.html" title="class in com.cyte.edamame.editor">com.cyte.edamame.editor.Editor</a>
-<div class="inheritance">com.cyte.edamame.editor.SymbolEditor</div>
+<div class="inheritance">com.cyte.edamame.editor.EditorSymbol</div>
 </div>
 </div>
 <section class="class-description" id="class-description">
@@ -101,15 +101,15 @@ loadScripts(document, 'script');</script>
 <div class="col-second odd-row-color"><code><a href="#etab" class="member-name-link">etab</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 <div class="col-first even-row-color"><code>private javafx.scene.control.Button</code></div>
-<div class="col-second even-row-color"><code><a href="#innerButton" class="member-name-link">innerButton</a></code></div>
+<div class="col-second even-row-color"><code><a href="#EditorSymbol_InnerButton" class="member-name-link">EditorSymbol_InnerButton</a></code></div>
 <div class="col-last even-row-color">&nbsp;</div>
 <div class="col-first odd-row-color"><code>private javafx.scene.control.ToolBar</code></div>
-<div class="col-second odd-row-color"><code><a href="#toolBar" class="member-name-link">toolBar</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Editor_ToolBar" class="member-name-link">Editor_ToolBar</a></code></div>
 <div class="col-last odd-row-color">&nbsp;</div>
 </div>
 <div class="inherited-list">
 <h3 id="fields-inherited-from-class-com.cyte.edamame.editor.Editor">Fields inherited from class&nbsp;com.cyte.edamame.editor.<a href="Editor.html" title="class in com.cyte.edamame.editor">Editor</a></h3>
-<code><a href="Editor.html#editorID">editorID</a>, <a href="Editor.html#menus">menus</a>, <a href="Editor.html#tab">tab</a>, <a href="Editor.html#tabs">tabs</a></code></div>
+<code><a href="Editor.html#Editor_ID">Editor_ID</a>, <a href="Editor.html#Editor_Menus">Editor_Menus</a>, <a href="Editor.html#Editor_Tab">Editor_Tab</a>, <a href="Editor.html#Editor_Tabs">Editor_Tabs</a></code></div>
 </section>
 </li>
 <!-- ======== CONSTRUCTOR SUMMARY ======== -->
@@ -130,7 +130,7 @@ loadScripts(document, 'script');</script>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab1" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-tab">Static Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-Editor_Tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="Editor_Tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-Editor_Tab">All Methods</button><button id="method-summary-table-tab1" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab1', 3)" class="table-Editor_Tab">Static Methods</button><button id="method-summary-table-tab2" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-Editor_Tab">Instance Methods</button><button id="method-summary-table-tab4" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-Editor_Tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
@@ -156,7 +156,7 @@ loadScripts(document, 'script');</script>
 </div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-com.cyte.edamame.editor.Editor">Methods inherited from class&nbsp;com.cyte.edamame.editor.<a href="Editor.html" title="class in com.cyte.edamame.editor">Editor</a></h3>
-<code><a href="Editor.html#close()">close</a>, <a href="Editor.html#dissect(javafx.scene.Scene)">dissect</a>, <a href="Editor.html#getControlTabs()">getControlTabs</a>, <a href="Editor.html#getEditorTab()">getEditorTab</a>, <a href="Editor.html#getMenus()">getMenus</a>, <a href="Editor.html#getToolBar()">getToolBar</a></code></div>
+<code><a href="Editor.html#close()">close</a>, <a href="Editor.html#Editor_Dissect(javafx.scene.Scene)">Editor_Dissect</a>, <a href="Editor.html#Editor_GetControlTabs()">Editor_GetControlTabs</a>, <a href="Editor.html#Editor_GetTab()">Editor_GetTab</a>, <a href="Editor.html#Editor_GetMenus()">Editor_GetMenus</a>, <a href="Editor.html#Editor_GetToolBar()">Editor_GetToolBar</a></code></div>
 <div class="inherited-list">
 <h3 id="methods-inherited-from-class-java.lang.Object">Methods inherited from class&nbsp;java.lang.<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html" title="class or interface in java.lang" class="external-link">Object</a></h3>
 <code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#clone()" title="class or interface in java.lang" class="external-link">clone</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#equals(java.lang.Object)" title="class or interface in java.lang" class="external-link">equals</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#finalize()" title="class or interface in java.lang" class="external-link">finalize</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#getClass()" title="class or interface in java.lang" class="external-link">getClass</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#hashCode()" title="class or interface in java.lang" class="external-link">hashCode</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notify()" title="class or interface in java.lang" class="external-link">notify</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#notifyAll()" title="class or interface in java.lang" class="external-link">notifyAll</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#toString()" title="class or interface in java.lang" class="external-link">toString</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait()" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long)" title="class or interface in java.lang" class="external-link">wait</a>, <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html#wait(long,int)" title="class or interface in java.lang" class="external-link">wait</a></code></div>
@@ -184,15 +184,15 @@ loadScripts(document, 'script');</script>
 </section>
 </li>
 <li>
-<section class="detail" id="toolBar">
-<h3>toolBar</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">toolBar</span></div>
+<section class="detail" id="Editor_ToolBar">
+<h3>Editor_ToolBar</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.ToolBar</span>&nbsp;<span class="element-name">Editor_ToolBar</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="innerButton">
-<h3>innerButton</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.Button</span>&nbsp;<span class="element-name">innerButton</span></div>
+<section class="detail" id="EditorSymbol_InnerButton">
+<h3>EditorSymbol_InnerButton</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.Button</span>&nbsp;<span class="element-name">EditorSymbol_InnerButton</span></div>
 </section>
 </li>
 </ul>

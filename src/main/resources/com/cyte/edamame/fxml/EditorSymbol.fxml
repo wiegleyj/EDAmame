@@ -6,8 +6,11 @@
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
@@ -15,7 +18,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.SymbolEditor">
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorSymbol">
     <MenuBar>
         <Menu text="_File">
             <MenuItem mnemonicParsing="false" text="EditorClose" />
@@ -31,7 +34,7 @@
         <Button mnemonicParsing="false" text="Button" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-        <Tab fx:id="etab" text="EditorTab">
+        <Tab text="EditorTab">
             <HBox>
             <StackPane alignment="TOP_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES">
                <children>
@@ -58,8 +61,34 @@
                 </VBox>
             </HBox>
         </Tab>
-        <Tab fx:id="ctab1" text="ControlTab1">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        <Tab text="Shapes">
+         <content>
+            <VBox>
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <RadioButton mnemonicParsing="false" text="Circle">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="EditorSymbol_ShapeToggleGroup" />
+                           </toggleGroup>
+                        </RadioButton>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Square" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Triangle" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                     </children>
+                  </VBox>
+               </children>
+            </VBox>
+         </content>
         </Tab>
         <Tab text="ControlTab2">
             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />

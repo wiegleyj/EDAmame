@@ -8,54 +8,50 @@
 package com.cyte.edamame.editor;
 
 import com.cyte.edamame.util.PairMutable;
-
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.Tab;
-import javafx.scene.control.ToolBar;
-
-import java.util.List;
-import java.util.Map;
+import javafx.scene.input.DragEvent;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 
 /**
  * Editor for developing schematics
  */
-public class SchematicEditor extends Editor
+public class EditorSchematic extends Editor
 {
 
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver()
+    public void Editor_ViewportOnDragOver(DragEvent event)
     {
         System.out.println("Schematic dragged over!");
     }
 
-    public void Editor_ViewportOnDragDropped()
+    public void Editor_ViewportOnDragDropped(DragEvent event)
     {
         System.out.println("Schematic drag dropped!");
     }
 
-    public void Editor_ViewportOnMouseMoved()
+    public void Editor_ViewportOnMouseMoved(MouseEvent event)
     {
         System.out.println("Schematic mouse moved!");
     }
 
-    public void Editor_ViewportOnMousePressed()
+    public void Editor_ViewportOnMousePressed(MouseEvent event)
     {
         System.out.println("Schematic mouse pressed!");
     }
 
-    public void Editor_ViewportOnMouseReleased()
+    public void Editor_ViewportOnMouseReleased(MouseEvent event)
     {
         System.out.println("Schematic mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event)
     {
         System.out.println("Schematic mouse dragged!");
     }
 
-    public void Editor_ViewportOnScroll()
+    public void Editor_ViewportOnScroll(ScrollEvent event)
     {
         System.out.println("Schematic mouse scrolled!");
     }

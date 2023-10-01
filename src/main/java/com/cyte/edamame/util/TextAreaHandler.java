@@ -16,7 +16,7 @@ import javafx.scene.control.TextArea;
 /**
  * Logging in {@link EDAmame} is performed primarily through a specific {@link javafx.scene.control.TabPane}
  * {@link javafx.scene.control.Tab} named "Log". Any information logged is directed to a {@link TextArea} in
- * the log tab instead of to stdout. {@link TextAreaHandler} is the class that provides the necessary
+ * the log Editor_Tab instead of to stdout. {@link TextAreaHandler} is the class that provides the necessary
  * functionality for a given {@link TextArea}.
  *
  * @author Jeff Wiegley, Ph.D.

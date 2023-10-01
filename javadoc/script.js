@@ -66,15 +66,15 @@ function updateTabs(tableId, selected) {
     document.querySelector('div#' + tableId +' .summary-table')
         .setAttribute('aria-labelledby', selected);
     document.querySelectorAll('button[id^="' + tableId + '"]')
-        .forEach(function(tab, index) {
-            if (selected === tab.id || (tableId === selected && index === 0)) {
-                tab.className = activeTableTab;
-                tab.setAttribute('aria-selected', true);
-                tab.setAttribute('tabindex',0);
+        .forEach(function(Editor_Tab, index) {
+            if (selected === Editor_Tab.id || (tableId === selected && index === 0)) {
+                Editor_Tab.className = activeTableTab;
+                Editor_Tab.setAttribute('aria-selected', true);
+                Editor_Tab.setAttribute('tabindex',0);
             } else {
-                tab.className = tableTab;
-                tab.setAttribute('aria-selected', false);
-                tab.setAttribute('tabindex',-1);
+                Editor_Tab.className = tableTab;
+                Editor_Tab.setAttribute('aria-selected', false);
+                Editor_Tab.setAttribute('tabindex',-1);
             }
         });
 }
@@ -83,12 +83,12 @@ function switchTab(e) {
     var selected = document.querySelector('[aria-selected=true]');
     if (selected) {
         if ((e.keyCode === 37 || e.keyCode === 38) && selected.previousSibling) {
-            // left or up arrow key pressed: move focus to previous tab
+            // left or up arrow key pressed: move focus to previous Editor_Tab
             selected.previousSibling.click();
             selected.previousSibling.focus();
             e.preventDefault();
         } else if ((e.keyCode === 39 || e.keyCode === 40) && selected.nextSibling) {
-            // right or down arrow key pressed: move focus to next tab
+            // right or down arrow key pressed: move focus to next Editor_Tab
             selected.nextSibling.click();
             selected.nextSibling.focus();
             e.preventDefault();

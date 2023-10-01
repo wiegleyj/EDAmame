@@ -64,7 +64,7 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">EDAmame JavaFX <code>Application</code>
 
- The head JavaFX class that loads the initial stage, main scene, and UI controller.</div>
+ The head JavaFX class that loads the initial Controller_Stage, main scene, and UI controller.</div>
 </dd>
 <dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameApplication.html#%3Cinit%3E()" class="member-name-link">EDAmameApplication()</a> - Constructor for class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameApplication.html" title="class in com.cyte.edamame">EDAmameApplication</a></dt>
 <dd>&nbsp;</dd>
@@ -72,9 +72,9 @@ loadScripts(document, 'script');</script>
 <dd>
 <div class="block">Main Controller for the <a href="../com.cyte.edamame/com/cyte/edamame/EDAmame.html" title="class in com.cyte.edamame"><code>EDAmame</code></a> Application.</div>
 </dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#%3Cinit%3E(javafx.stage.Stage)" class="member-name-link">EDAmameController(Stage)</a> - Constructor for class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#%3Cinit%3E(javafx.Controller_Stage.Stage)" class="member-name-link">EDAmameController(Stage)</a> - Constructor for class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
 <dd>
-<div class="block">Constructs an instance of this controller with knowledge of the stage that it is attached to.</div>
+<div class="block">Constructs an instance of this controller with knowledge of the Controller_Stage that it is attached to.</div>
 </dd>
 <dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameSettings.html" class="type-name-link" title="class in com.cyte.edamame">EDAmameSettings</a> - Class in <a href="../com.cyte.edamame/com/cyte/edamame/package-summary.html">com.cyte.edamame</a></dt>
 <dd>
@@ -89,27 +89,27 @@ loadScripts(document, 'script');</script>
 </dd>
 <dt><a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html#%3Cinit%3E()" class="member-name-link">Editor()</a> - Constructor for class com.cyte.edamame.editor.<a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html#editorID" class="member-name-link">editorID</a> - Variable in class com.cyte.edamame.editor.<a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html#Editor_ID" class="member-name-link">Editor_ID</a> - Variable in class com.cyte.edamame.editor.<a href="../com.cyte.edamame/com/cyte/edamame/editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a></dt>
 <dd>
 <div class="block">Every editor can be uniquely identified by a random UUID (which do not persist across application execution.</div>
 </dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#editors" class="member-name-link">editors</a> - Variable in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#Controller_Editors" class="member-name-link">Controller_Editors</a> - Variable in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
 <dd>
-<div class="block">All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.</div>
+<div class="block">All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.</div>
 </dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#editorToolBarStack" class="member-name-link">editorToolBarStack</a> - Variable in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#Controller_StackPaneEditorToolBars" class="member-name-link">Controller_StackPaneEditorToolBars</a> - Variable in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
 <dd>
 <div class="block">A stack of toolbars to the right of the main EDAmame toolbar.</div>
 </dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#enableEditorTabSelectionLogic()" class="member-name-link">enableEditorTabSelectionLogic()</a> - Method in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#Editor_EnableSelect()" class="member-name-link">Editor_EnableSelect()</a> - Method in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
 <dd>
-<div class="block">Enables to controller logic for switching between editor tabs.</div>
+<div class="block">Enables to controller logic for switching between editor Editor_Tabs.</div>
 </dd>
 <dt><a href="../com.cyte.edamame/com/cyte/edamame/editor/SymbolEditor.html#etab" class="member-name-link">etab</a> - Variable in class com.cyte.edamame.editor.<a href="../com.cyte.edamame/com/cyte/edamame/editor/SymbolEditor.html" title="class in com.cyte.edamame.editor">SymbolEditor</a></dt>
 <dd>&nbsp;</dd>
-<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#executeOnShown()" class="member-name-link">executeOnShown()</a> - Method in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
+<dt><a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html#Controller_ExecuteOnShown()" class="member-name-link">Controller_ExecuteOnShown()</a> - Method in class com.cyte.edamame.<a href="../com.cyte.edamame/com/cyte/edamame/EDAmameController.html" title="class in com.cyte.edamame">EDAmameController</a></dt>
 <dd>
-<div class="block">Execute activites required to be done once the main Application stage is finally shown.</div>
+<div class="block">Execute activites required to be done once the main Application Controller_Stage is finally shown.</div>
 </dd>
 </dl>
 <a href="index-1.html">A</a>&nbsp;<a href="index-2.html">C</a>&nbsp;<a href="index-3.html">D</a>&nbsp;<a href="index-4.html">E</a>&nbsp;<a href="index-5.html">F</a>&nbsp;<a href="index-6.html">G</a>&nbsp;<a href="index-7.html">I</a>&nbsp;<a href="index-8.html">L</a>&nbsp;<a href="index-9.html">M</a>&nbsp;<a href="index-10.html">O</a>&nbsp;<a href="index-11.html">P</a>&nbsp;<a href="index-12.html">R</a>&nbsp;<a href="index-13.html">S</a>&nbsp;<a href="index-14.html">T</a>&nbsp;<a href="index-15.html">V</a>&nbsp;<br><a href="../allclasses-index.html">All&nbsp;Classes&nbsp;and&nbsp;Interfaces</a><span class="vertical-separator">|</span><a href="../allpackages-index.html">All&nbsp;Packages</a></main>

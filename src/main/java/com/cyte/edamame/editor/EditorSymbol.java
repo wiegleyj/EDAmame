@@ -13,42 +13,41 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.*;
 import javafx.scene.control.*;
+import javafx.scene.paint.*;
+import javafx.scene.shape.*;
+import javafx.scene.input.*;
 
 import java.io.IOException;
 
 /**
  * Editor for maintaining Symbol libraries.
  */
-public class SymbolEditor extends Editor
+public class EditorSymbol extends Editor
 {
     //// GLOBAL VARIABLES ////
 
     @FXML
-    private Tab etab;
+    private Button EditorSymbol_InnerButton;
     @FXML
-    private Tab ctab1;
-    @FXML
-    private ToolBar toolBar;
-    @FXML
-    private Button innerButton;
+    public ToggleGroup EditorSymbol_ShapeToggleGroup;
 
     //// MAIN FUNCTIONS ////
 
     /**
-     * Factory to create a single SymbolEditor and its UI attached to a particular symbol library.
+     * Factory to create a single EditorSymbol and its UI attached to a particular symbol library.
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
     public static Editor create() throws IOException
     {
         // Loading FXML file for the symbol editor
-        FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/SymbolEditor.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
-        SymbolEditor editor = fxmlLoader.getController();
-        editor.editorName = "SymbolEditor";
-        editor.dissect(0, scene);
-        editor.Editor_RenderSystem.CanvasRenderGrid();
+        EditorSymbol editor = fxmlLoader.getController();
+        editor.Editor_Name = "EditorSymbol";
+        editor.Editor_Dissect(0, scene);
+        editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
 
         return editor;
     }
@@ -56,14 +55,15 @@ public class SymbolEditor extends Editor
     /**
      * Provides initialization of the Controller
      */
+    @FXML
     public void initialize()
     {
-        System.out.println("I was initialized, the button was " + innerButton);
+        System.out.println("I was initialized, the button was " + this.EditorSymbol_InnerButton);
     }
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver()
+    public void Editor_ViewportOnDragOver(DragEvent event)
     {
         //System.out.println("Symbol dragged over!");
 
@@ -112,7 +112,7 @@ public class SymbolEditor extends Editor
         this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));*/
     }
 
-    public void Editor_ViewportOnDragDropped()
+    public void Editor_ViewportOnDragDropped(DragEvent event)
     {
         //System.out.println("Symbol drag dropped!");
 
@@ -166,14 +166,14 @@ public class SymbolEditor extends Editor
         event.setDropCompleted(success);*/
     }
 
-    public void Editor_ViewportOnMouseMoved()
+    public void Editor_ViewportOnMouseMoved(MouseEvent event)
     {
         //System.out.println("Symbol mouse moved!");
 
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void Editor_ViewportOnMousePressed()
+    public void Editor_ViewportOnMousePressed(MouseEvent event)
     {
         //System.out.println("Symbol mouse pressed!");
 
@@ -207,12 +207,39 @@ public class SymbolEditor extends Editor
         {}
     }
 
-    public void Editor_ViewportOnMouseReleased()
+    public void Editor_ViewportOnMouseReleased(MouseEvent event)
     {
         //System.out.println("Symbol mouse released!");
 
         if (this.Editor_PressedLMB)
         {
+            // Handling shape dropping
+            PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
+
+            // CHECKING FOR POSITION CONFLICTS
+
+            RadioButton selectedShapeButton = (RadioButton)EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+
+            if (selectedShapeButton != null)
+            {
+                if (selectedShapeButton.getText().equals("Circle"))
+                {
+                    double width = 10;
+                    Color color = Color.ORANGE;
+
+                    Circle circle = new Circle(width, color);
+
+                    circle.setTranslateX(dropPos.GetLeftDouble());
+                    circle.setTranslateY(dropPos.GetRightDouble());
+
+                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, circle);
+                }
+                else
+                {
+                    throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
+                }
+            }
+
             /*// Handling wire drawing
             this.EditorSchematic_WireDrawingType = this.EditorSchematic_GetSelectedWire();
 
@@ -270,7 +297,7 @@ public class SymbolEditor extends Editor
         {}
     }
 
-    public void Editor_ViewportOnMouseDragged(PairMutable mouseDiffPos)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event)
     {
         //System.out.println("Symbol mouse dragged!");
 
@@ -382,7 +409,7 @@ public class SymbolEditor extends Editor
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void Editor_ViewportOnScroll()
+    public void Editor_ViewportOnScroll(ScrollEvent event)
     {
         //System.out.println("Symbol mouse scrolled!");
 
@@ -444,6 +471,6 @@ public class SymbolEditor extends Editor
     /*@FXML
     private void thisButton()
     {
-        System.out.println("Button clicked on " + editorID);
+        System.out.println("Button clicked on " + Editor_ID);
     }*/
 }

@@ -117,7 +117,7 @@ button {
 .legal-copy {
     margin-left:.5em;
 }
-.tab {
+.Editor_Tab {
     background-color:#0066FF;
     color:#ffffff;
     padding:8px;
@@ -391,22 +391,22 @@ ul.see-list-long li:not(:last-child):after {
     border: none;
     height:16px;
 }
-div.table-tabs {
+div.table-Editor_Tabs {
     padding:10px 0 0 1px;
     margin:0;
 }
-div.table-tabs > button {
+div.table-Editor_Tabs > button {
    border: none;
    cursor: pointer;
    padding: 5px 12px 7px 12px;
    font-weight: bold;
    margin-right: 3px;
 }
-div.table-tabs > button.active-table-tab {
+div.table-Editor_Tabs > button.active-table-Editor_Tab {
    background: #F8981D;
    color: #253441;
 }
-div.table-tabs > button.table-tab {
+div.table-Editor_Tabs > button.table-Editor_Tab {
    background: #4D7A97;
    color: #FFFFFF;
 }

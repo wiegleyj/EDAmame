@@ -6,60 +6,36 @@
  */
 
 // TODO:
+// Implement shape dropping in symbol editor
+// Implement line drawing in symbol editor
+// Implement wire connection points into symbols
 // Refactor the stupid canvas zooming mouse diff pos thing
-// Implement stack-pane rendering
 // Refactor dissect editor function searching for canvas
-// REFACTOR ALL COMMENTS
-// REFACTOR ALL FUNCTIONS & FUNCTION NAMES
 // Fix mouse-specific release callback function
 
-// Implement wire connection edges (into symbols)
-// Implement wires
-// Implement save & load features
-// Implement symbol editor
-// Implement undo-redo functions
-// Fix symbols not moving when viewport center on theater edges
-// Fix symbols pushing away from theater edges when zooming
-// Add zooming into cursor
-// Add symbol rotation while dropping
-// Fix symbol edge moving
-// Add symbol selection box blending
-// Fix symbol highlights only triggering when cursor moved
-// Fix symbol highlights not appearing instantly
-// Fix symbol highlights top-only not triggering instantly
-// Fix symbols remaining highlighted for a single frame when zooming
-// Implement transition to PCB
-
 package com.cyte.edamame;
+import com.cyte.edamame.editor.EditorSymbol;
 import com.cyte.edamame.render.RenderShape;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.editor.SymbolEditor;
 import com.cyte.edamame.util.TextAreaHandler;
 
 import java.util.LinkedList;
 
-import javafx.application.Platform;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
-import javafx.fxml.FXML;
-import javafx.fxml.Initializable;
-import javafx.geometry.Rectangle2D;
+import javafx.collections.*;
+import javafx.fxml.*;
+import javafx.stage.*;
 import javafx.scene.control.*;
-import javafx.scene.layout.StackPane;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
+import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.input.*;
+import javafx.application.*;
+import javafx.geometry.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ListIterator;
 import java.util.ResourceBundle;
 import java.util.logging.Handler;
@@ -96,58 +72,58 @@ public class EDAmameController implements Initializable
     final static public Double Editor_MouseDragFactor = 1.0;
     final static public Double Editor_MouseCheckTimeout = 0.0001;
 
-    final static public Logger LOGGER = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
+    final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
     @FXML
-    private Tab logTab;                     // The tab used to hold the TextArea used for application logging.
+    private Tab Controller_TabLog;                          // The Editor_Tab used to hold the TextArea used for application logging.
     @FXML
-    private TextArea logArea;               // The TextArea to display logged information on.
+    private TextArea Controller_LogText;                    // The TextArea to display logged information on.
     @FXML
-    private SplitPane splitPane;            // The main split pane separating always available global controls on the left from editor tabs on right.
+    private SplitPane Controller_SplitPane;                 // The main split pane separating always available global controls on the left from editor Editor_Tabs on right.
     @FXML
-    private StackPane controlsStackPane;    // The stack pane on left of split used to contain different control setups.
+    private StackPane Controller_StackPaneControls;         // The stack pane on left of split used to contain different control setups.
     @FXML
-    private TabPane controlTabPane;         // The TabPane used to hold all the main controls. Displayed in the "navigation" pane of the controls stack.
+    private TabPane Controller_TabPaneControls;             // The TabPane used to hold all the main controls. Displayed in the "navigation" pane of the controls stack.
     @FXML
-    private TabPane mainTabPane;            // Primary TabPane displayed on the right of split used by EDAmame to present editors and information.
+    private TabPane Controller_TabPane;                     // Primary TabPane displayed on the right of split used by EDAmame to present Controller_Editors and information.
     @FXML
-    private StackPane editorToolBarStack;   // A stack of toolbars to the right of the main EDAmame toolbar. Editors can provide own toolbars for here.
+    private StackPane Controller_StackPaneEditorToolBars;   // A stack of toolbars to the right of the main EDAmame toolbar. Editors can provide own toolbars for here.
     @FXML
-    private MenuBar menuBar;                // The main EDAmame menu bar.
+    private MenuBar Controller_MenuBar;                     // The main EDAmame menu bar.
     @FXML
-    private MenuItem viewLogItem;           // The menu item for toggling log visibility.
+    private MenuItem Controller_MenuLogItem;                // The menu item for toggling log visibility.
 
     // DO NOT EDIT
 
-    private final Stage stage;                                                              // The stage hosting this controller.
-    private final ObservableMap<Tab, Editor> editors = FXCollections.observableHashMap();   // All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.
+    private final Stage Controller_Stage;                                                              // The Controller_Stage hosting this controller.
+    private final ObservableMap<Tab, Editor> Controller_Editors = FXCollections.observableHashMap();   // All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
 
     public Timeline Editor_HeartbeatTimeline;
 
-    static public LinkedList<KeyCode> Global_PressedKeys = new LinkedList<KeyCode>();
+    static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
 
-    static public LinkedList<RenderShape> Global_BasicShapes = new LinkedList<RenderShape>();
+    static public LinkedList<RenderShape> Controller_BasicShapes = new LinkedList<RenderShape>();
 
     //// MAIN FUNCTIONS ////
 
     /**
-     * Constructs an instance of this controller with knowledge of the stage that it is attached to. Knowledge of
-     * the stage allows the controller to entirely take control of proper closing activities even when its an
+     * Constructs an instance of this controller with knowledge of the Controller_Stage that it is attached to. Knowledge of
+     * the Controller_Stage allows the controller to entirely take control of proper closing activities even when its an
      * onCloseRequest generated by a user killing the application of an operating system's "close" window
      * decoration.
      *
-     * @param stage The stage that is hosting/using this controller.
+     * @param Controller_Stage The Controller_Stage that is hosting/using this controller.
      */
-    public EDAmameController(Stage stage)
+    public EDAmameController(Stage Controller_Stage)
     {
-        this.stage = stage;
-        stage.setOnShown((event) -> executeOnShown());
+        this.Controller_Stage = Controller_Stage;
+        Controller_Stage.setOnShown((event) -> Controller_ExecuteOnShown());
 
         CreateBasicCanvasShapes();
     }
 
     /**
-     * JavaFX stage initialization procedures
+     * JavaFX Controller_Stage initialization procedures
      *
      * @param url
      * The location used to resolve relative paths for the root object, or
@@ -157,22 +133,23 @@ public class EDAmameController implements Initializable
      * The resources used to localize the root object, or {@code null} if
      * the root object was not localized.
      */
+    @FXML
     public void initialize(URL url, ResourceBundle rb)
     {
-        changeLoggingToTab();
-        LOGGER.log(Level.INFO, "Initialization Commenced...\n");
+        Controller_LoggingChangeToTab();
+        Controller_Logger.log(Level.INFO, "Initialization Commenced...\n");
 
-        // Set the stage to close gracefully.
-        stage.setOnCloseRequest(evt -> { evt.consume(); performExit(); });
-        LOGGER.log(Level.INFO, "Stage configured to close gracefully.\n");
+        // Set the Controller_Stage to close gracefully.
+        Controller_Stage.setOnCloseRequest(evt -> { evt.consume(); Controller_Exit(); });
+        Controller_Logger.log(Level.INFO, "Stage configured to close gracefully.\n");
 
-        // Changing tabs in the main tab pane is a significant task for changing
-        // between editors and modules. This logic is handled through tab change events.
-        enableEditorTabSelectionLogic();
+        // Changing Editor_Tabs in the main Editor_Tab pane is a significant task for changing
+        // between Controller_Editors and modules. This logic is handled through Editor_Tab change events.
+        Editor_EnableSelect();
 
         // Restore the previous location and size of windows. (Location of split pane dividers needs
         // to be handled elsewhere since layout of nodes isn't completed at time of initialization.
-        restoreWindowContext();
+        Controller_WindowContextLoad();
 
         // Initializing editor heartbeat loops
         this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Editor_Heartbeat()));
@@ -180,19 +157,19 @@ public class EDAmameController implements Initializable
         this.Editor_HeartbeatTimeline.playFromStart();
 
         // correct the text in the show log menu item
-        correctViewLogItemText();
-        LOGGER.log(Level.INFO, "Initialization Complete\n");
+        Controller_LogToggleItemText();
+        Controller_Logger.log(Level.INFO, "Initialization Complete\n");
     }
 
     /**
-     * Execute activites required to be done once the main Application stage is finally shown. (Activities
+     * Execute activites required to be done once the main Application Controller_Stage is finally shown. (Activities
      * performed in the {@link EDAmameController#initialize(URL, ResourceBundle)} happen before the various
      * scene nodes have been sized, laid out, and rendered. This provides a location to perform all
      * startup tasks required but unsuitable for standard initialization.
      */
-    private void executeOnShown()
+    private void Controller_ExecuteOnShown()
     {
-        restoreDividerPosition();
+        Controller_DividerRestore();
     }
 
     //// LOGGING FUNCTIONS ////
@@ -200,109 +177,109 @@ public class EDAmameController implements Initializable
     /**
      * Change the log handler for the package wide logger from stdout to a TextArea node.
      *
-     * EDAmame has a dedicated tab for displaying log information. changeLoggingToTab
+     * EDAmame has a dedicated Editor_Tab for displaying log information. Controller_LoggingChangeToTab
      * removes all log handlers from the logger and replaces them with a handler that
-     * appends requested logging information to a TextArea in the dedicated log tab.
+     * appends requested logging information to a TextArea in the dedicated log Editor_Tab.
      */
-    private void changeLoggingToTab()
+    private void Controller_LoggingChangeToTab()
     {
-        for (Handler handler : LOGGER.getHandlers())
-            LOGGER.removeHandler(handler);
+        for (Handler handler : Controller_Logger.getHandlers())
+            Controller_Logger.removeHandler(handler);
 
-        LOGGER.setUseParentHandlers(false);
-        LOGGER.addHandler(new TextAreaHandler(logArea));
+        Controller_Logger.setUseParentHandlers(false);
+        Controller_Logger.addHandler(new TextAreaHandler(Controller_LogText));
     }
 
     //// EDITOR FUNCTIONS ////
 
     public void Editor_Heartbeat()
     {
-        ObservableList<Tab> tabs = mainTabPane.getTabs();
+        ObservableList<Tab> Editor_Tabs = Controller_TabPane.getTabs();
 
-        // Checking all tabs in the main tab pane...
-        for (int i = 0; i < tabs.size(); i++)
+        // Checking all Editor_Tabs in the main Editor_Tab pane...
+        for (int i = 0; i < Editor_Tabs.size(); i++)
         {
-            Tab tab = tabs.get(i);
+            Tab Editor_Tab = Editor_Tabs.get(i);
 
-            // Handling symbol editors
-            if (tab.getText().equals("Symbol Editor"))
+            // Handling symbol Controller_Editors
+            if (Editor_Tab.getText().equals("Symbol Editor"))
             {
-                Editor editor = this.editors.get(tab);
+                Editor editor = this.Controller_Editors.get(Editor_Tab);
 
                 if (!editor.Editor_Visible)
                     continue;
 
                 // Adjusting the central layout of the canvas relative to the stack pane size
                 {
-                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.paneHolder.getWidth(),
-                                                             editor.Editor_RenderSystem.paneHolder.getHeight());
+                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
+                                                             editor.Editor_RenderSystem.canvas.getHeight());
                     PairMutable paneSize = new PairMutable(editor.Editor_RenderSystem.paneListener.getWidth(),
                                                            editor.Editor_RenderSystem.paneListener.getHeight());
                     PairMutable newCanvasPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
                                                                paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
-                    editor.Editor_RenderSystem.PaneSetLayout(newCanvasPos);
+                    editor.Editor_RenderSystem.RenderSystem_PaneSetLayout(newCanvasPos);
                 }
             }
         }
     }
 
     /**
-     * Enables to controller logic for switching between editor tabs.
+     * Enables to controller logic for switching between editor Editor_Tabs.
      *
      * Editors are composed of several nodes.
-     *     A single main editor tab that is always visible in editorTabPane.
-     *     A set of control tabs that are only present/visible in the controlTabPane when the editor is selected.
-     *     A toolBar that is only visible in the toolBar area when the editor is selected.
-     *     A set of menus and items that are only present in the menus when the editor is selected.
+     *     A single main editor Editor_Tab that is always visible in editorTabPane.
+     *     A set of control Editor_Tabs that are only present/visible in the Controller_TabPaneControls when the editor is selected.
+     *     A Editor_ToolBar that is only visible in the Editor_ToolBar area when the editor is selected.
+     *     A set of Editor_Menus and items that are only present in the Editor_Menus when the editor is selected.
      *
-     * enableEditorTabSelectionLogic provides the control for the presence and visibility of these items
-     * based on tab selection. When a tab is selected the UI components for the previously selected editor
+     * Editor_EnableSelect provides the control for the presence and visibility of these items
+     * based on Editor_Tab selection. When a Editor_Tab is selected the UI components for the previously selected editor
      * are removed/hidden and the components for the newly selected editor are enabled/shown.
      */
-    private void enableEditorTabSelectionLogic()
+    private void Editor_EnableSelect()
     {
-        mainTabPane.getSelectionModel().selectedItemProperty().addListener(
+        Controller_TabPane.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
-                    // if switching away from an editor tab, then deactivate the controls/visibility for it.
-                    Editor editor = editors.get(oldValue);
+                    // if switching away from an editor Editor_Tab, then deactivate the controls/visibility for it.
+                    Editor editor = Controller_Editors.get(oldValue);
 
-                    if (editor != null) // if the old tab was an editor then deactivate it.
-                        deactivateEditor(editor);
+                    if (editor != null) // if the old Editor_Tab was an editor then deactivate it.
+                        Editor_Deactivate(editor);
 
-                    editor = editors.get(newValue);
+                    editor = Controller_Editors.get(newValue);
 
-                    if (newValue != null) // if the new tab selected is an editor then activate it.
-                        activateEditor(editor);
+                    if (newValue != null) // if the new Editor_Tab selected is an editor then activate it.
+                        Editor_Activate(editor);
                 }
         );
     }
 
     /**
-     * Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own editors. Editors
+     * Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own Controller_Editors. Editors
      * supply their own controllers and controls. The EDAmameController folds these controls into its own
-     * menus, toolbars and windows by obtaining, reparenting and controlling the visibility of those controls.
+     * Editor_Menus, toolbars and windows by obtaining, reparenting and controlling the visibility of those controls.
      *
-     * Editors are activated by EDAmame by making sure that only the selected tab's controls are visible and
+     * Editors are activated by EDAmame by making sure that only the selected Editor_Tab's controls are visible and
      * accessible.
      *
      * @param editor Which editor to make controls visible for.
      */
-    private void activateEditor(Editor editor)
+    private void Editor_Activate(Editor editor)
     {
         // Select this editor in the panes and make all it's controls available.
         if (editor != null) {
             // set the editor ToolBars to not visible
-            ToolBar bar = editor.getToolBar();
+            ToolBar bar = editor.Editor_GetToolBar();
 
             if (bar != null)
-                editor.getToolBar().setVisible(true);
+                editor.Editor_GetToolBar().setVisible(true);
 
-            // add all the control tabs for the editor
-            controlTabPane.getTabs().addAll(editor.getControlTabs());
+            // add all the control Editor_Tabs for the editor
+            Controller_TabPaneControls.getTabs().addAll(editor.Editor_GetControlTabs());
 
             // change all of this editor's menu items to be visible.
-            for (ObservableList<MenuItem> items : editor.getMenus().values())
+            for (ObservableList<MenuItem> items : editor.Editor_GetMenus().values())
                 for (MenuItem menuitem : items)
                     menuitem.setVisible(true);
 
@@ -313,21 +290,21 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Editors are deactivated by EDAmame by making sure that unselected editor tabs' controls are invisible and
+     * Editors are deactivated by EDAmame by making sure that unselected editor Editor_Tabs' controls are invisible and
      * inaccessible.
      *
      * @param editor Which editor to make controls invisible for.
      */
-    private void deactivateEditor(Editor editor)
+    private void Editor_Deactivate(Editor editor)
     {
         // set the editor ToolBars to not visible
-        editor.getToolBar().setVisible(false);
+        editor.Editor_GetToolBar().setVisible(false);
 
-        // remove all control tabs from the controls tab pane
-        controlTabPane.getTabs().removeAll(editor.getControlTabs());
+        // remove all control Editor_Tabs from the controls Editor_Tab pane
+        Controller_TabPaneControls.getTabs().removeAll(editor.Editor_GetControlTabs());
 
         // change all the menu items to not visible
-        for (ObservableList<MenuItem> items : editor.getMenus().values())
+        for (ObservableList<MenuItem> items : editor.Editor_GetMenus().values())
             for (MenuItem menuitem : items)
                 menuitem.setVisible(false);
 
@@ -335,15 +312,15 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Editors are added by EDAmame by including their menu items and toolbars in its menus and toolbar areas.
+     * Editors are added by EDAmame by including their menu items and toolbars in its Editor_Menus and toolbar areas.
      *
      * @param editor Which editor to setup and add controls for. They all start out invisible/unavailable.
      */
-    private void addEditor(Editor editor)
+    private void Editor_Add(Editor editor)
     {
-        Tab editorTab = editor.getEditorTab();
+        Tab editorTab = editor.Editor_GetTab();
 
-        editors.put(editorTab, editor);
+        Controller_Editors.put(editorTab, editor);
 
         // Place the main editor window in the TabPane
         if (editorTab != null)
@@ -353,8 +330,8 @@ public class EDAmameController implements Initializable
                 // attempt to close the editor
                 if (editor.close())
                 {
-                    deactivateEditor(editor);
-                    removeEditor(editor);
+                    Editor_Deactivate(editor);
+                    Editor_Remove(editor);
                 }
                 else
                 {
@@ -362,27 +339,27 @@ public class EDAmameController implements Initializable
                 }
             });
 
-            // Adding all the tabs
-            mainTabPane.getTabs().add(editorTab);
+            // Adding all the Editor_Tabs
+            Controller_TabPane.getTabs().add(editorTab);
 
             // Preparing the canvas
-            //editor.renderSystem.BindSize((Node)logArea);
+            //editor.renderSystem.BindSize((Node)Controller_LogText);
         }
 
         // Make sure the toolbar is invisible
-        editor.getToolBar().setVisible(false);
+        editor.Editor_GetToolBar().setVisible(false);
         // add the editor's toolbar to the toolbar stack. The
-        editorToolBarStack.getChildren().add(editor.getToolBar());
+        Controller_StackPaneEditorToolBars.getChildren().add(editor.Editor_GetToolBar());
 
-        // The control tabs don't need to be handled. Control of their
+        // The control Editor_Tabs don't need to be handled. Control of their
         // visibility done through addition and removal from the children
         // of the control TabPane.
 
-        // add all the menus of the editor to the EDAmame MenuBar
-        for (Menu menu : menuBar.getMenus())
+        // add all the Editor_Menus of the editor to the EDAmame MenuBar
+        for (Menu menu : Controller_MenuBar.getMenus())
         {
             // get all the editor's menu items for this menu name.
-            ObservableList<MenuItem> editoritems = editor.getMenus().get(menu.getText());
+            ObservableList<MenuItem> editoritems = editor.Editor_GetMenus().get(menu.getText());
 
             if (editoritems != null)
             {
@@ -408,42 +385,44 @@ public class EDAmameController implements Initializable
             }
         }
 
-        // move the log tab to the end.
-        if (mainTabPane.getTabs().contains(logTab))
+        // move the log Editor_Tab to the end.
+        if (Controller_TabPane.getTabs().contains(Controller_TabLog))
         {
-            mainTabPane.getTabs().remove(logTab);
-            mainTabPane.getTabs().add(logTab);
+            Controller_TabPane.getTabs().remove(Controller_TabLog);
+            Controller_TabPane.getTabs().add(Controller_TabLog);
         }
 
-        // Select the new tab
-        mainTabPane.getSelectionModel().select(editorTab);
+        // Select the new Editor_Tab
+        Controller_TabPane.getSelectionModel().select(editorTab);
     }
 
     /**
-     * Editors are removed by EDAmame by removing their menu items and toolbars in its menus and toolbar areas.
+     * Editors are removed by EDAmame by removing their menu items and toolbars in its Editor_Menus and toolbar areas.
      * This should really only be done once an editor has been closed and has no need to save data.
      *
      * @param editor Which editor to remove controls for.
      */
-    private void removeEditor(Editor editor)
+    private void Editor_Remove(Editor editor)
     {
-        deactivateEditor(editor); // make sure the editor is not visible/active.
+        Editor_Deactivate(editor); // make sure the editor is not visible/active.
 
         // remove the toolbar
-        editorToolBarStack.getChildren().remove(editor.getToolBar());
+        Controller_StackPaneEditorToolBars.getChildren().remove(editor.Editor_GetToolBar());
 
-        // remove control tabs
-        controlTabPane.getTabs().removeAll(editor.getControlTabs());
+        // remove control Editor_Tabs
+        Controller_TabPaneControls.getTabs().removeAll(editor.Editor_GetControlTabs());
 
         // remove all menu items
-        for (Menu menu: menuBar.getMenus())
-            for (ObservableList<MenuItem> itemlist: editor.getMenus().values())
+        for (Menu menu: Controller_MenuBar.getMenus())
+            for (ObservableList<MenuItem> itemlist: editor.Editor_GetMenus().values())
                 menu.getItems().removeAll(itemlist);
 
-        // remove the main editor tab itself.
-        mainTabPane.getTabs().remove(editor.getEditorTab());
+        // remove the main editor Editor_Tab itself.
+        Controller_TabPane.getTabs().remove(editor.Editor_GetTab());
     }
 
+    //// SAVING & LOADING FUNCTIONS ////
+    
     /**
      * Saves the window position and size of the application as Java Preferences.
      *
@@ -451,14 +430,14 @@ public class EDAmameController implements Initializable
      * User preferences and settings for application behavior are stored in YAML files to avoid overly
      * complicating platform dependent stores such as registries.
      */
-    private void saveWindowContext()
+    private void Controller_WindowContextSave()
     {
         Preferences prefs = Preferences.userRoot().node("EDAmame");
-        prefs.putDouble("WINDOW_POSITION_X", stage.getX());
-        prefs.putDouble("WINDOW_POSITION_Y", stage.getY());
-        prefs.putDouble("WINDOW_WIDTH", stage.getWidth());
-        prefs.putDouble("WINDOW_HEIGHT", stage.getHeight());
-        double pos = splitPane.getDividerPositions()[0];
+        prefs.putDouble("WINDOW_POSITION_X", Controller_Stage.getX());
+        prefs.putDouble("WINDOW_POSITION_Y", Controller_Stage.getY());
+        prefs.putDouble("WINDOW_WIDTH", Controller_Stage.getWidth());
+        prefs.putDouble("WINDOW_HEIGHT", Controller_Stage.getHeight());
+        double pos = Controller_SplitPane.getDividerPositions()[0];
         prefs.putDouble("DIVIDER_POSITION", pos);
     }
 
@@ -468,29 +447,29 @@ public class EDAmameController implements Initializable
      * The values of the size and position of the application when this context was last saved is restored.
      * Context is typically saved when the application exits gracefully.
      */
-    private void restoreWindowContext()
+    private void Controller_WindowContextLoad()
     {
         Preferences prefs = Preferences.userRoot().node("EDAmame");
 
         // Save the application's current size
-        stage.setWidth(prefs.getDouble("WINDOW_WIDTH",800));
-        stage.setHeight(prefs.getDouble("WINDOW_HEIGHT",1000));
+        Controller_Stage.setWidth(prefs.getDouble("WINDOW_WIDTH",800));
+        Controller_Stage.setHeight(prefs.getDouble("WINDOW_HEIGHT",1000));
 
         // Save the current position of the application
         Rectangle2D bounds = Screen.getPrimary().getBounds();
-        double x = prefs.getDouble("WINDOW_POSITION_X", (bounds.getWidth()-stage.getWidth())/2);
-        double y = prefs.getDouble("WINDOW_POSITION_Y", (bounds.getHeight()-stage.getHeight())/2);
+        double x = prefs.getDouble("WINDOW_POSITION_X", (bounds.getWidth()-Controller_Stage.getWidth())/2);
+        double y = prefs.getDouble("WINDOW_POSITION_Y", (bounds.getHeight()-Controller_Stage.getHeight())/2);
         // If the application is off the screen then adjust it so that it lies within the screen's boundaries.
-        if (x>bounds.getWidth()-stage.getWidth()) x=bounds.getWidth()-stage.getWidth();
+        if (x>bounds.getWidth()-Controller_Stage.getWidth()) x=bounds.getWidth()-Controller_Stage.getWidth();
         if (x<0) x=0;
-        if (y>bounds.getHeight()-stage.getHeight()) y=bounds.getHeight()-stage.getHeight();
+        if (y>bounds.getHeight()-Controller_Stage.getHeight()) y=bounds.getHeight()-Controller_Stage.getHeight();
         if (y<0) y=0;
 
-        stage.setX(x);
-        stage.setY(y);
+        Controller_Stage.setX(x);
+        Controller_Stage.setY(y);
 
         //String home = System.getProperty("user.home");
-        LOGGER.log(Level.INFO, "EDAmame window context restored.\n");
+        Controller_Logger.log(Level.INFO, "EDAmame window context restored.\n");
     }
 
     /**
@@ -498,21 +477,21 @@ public class EDAmameController implements Initializable
      *
      * The application establishes a main look and feel that consists of a split pane containing two nodes.
      * The left node is used to contain to level controls specific to the entire EDAmame application. The
-     * right pane is a tab pane that provides tabbed locations for editors and other sub-modules to place
+     * right pane is a Editor_Tab pane that provides tabbed locations for Controller_Editors and other sub-modules to place
      * their controls. The user's selection of divider position is maintained between runs of the application.
      */
-    private void restoreDividerPosition()
+    private void Controller_DividerRestore()
     {
         Preferences prefs = Preferences.userRoot().node("EDAmame");
 
-        // Ugh. The windows/stage is supposedly "shown" at this point but the children are not
+        // Ugh. The windows/Controller_Stage is supposedly "shown" at this point but the children are not
         // yet *really* shown. So really... what you probably need to work on here hasn't been rendered and its
         // layout hasn't been finalized despite being "shown". So we need the horrid "runLater" which is
         // *wildly* undefined as to "when".
         try {
             double value = prefs.getDouble("DIVIDER_POSITION",Double.MAX_VALUE);
             if (value != Double.MAX_VALUE)
-                Platform.runLater(() -> splitPane.setDividerPositions(value));
+                Platform.runLater(() -> Controller_SplitPane.setDividerPositions(value));
         } catch (Throwable ignored) {
         }
     }
@@ -520,16 +499,16 @@ public class EDAmameController implements Initializable
     //// CALLBACK FUNCTIONS ////
 
     /**
-     * performExit() implements graceful and intelligent shutdown of the EDAmame application.
+     * Controller_Exit() implements graceful and intelligent shutdown of the EDAmame application.
      *
-     * All open editors will be requested to perform their close/save/shutdown activities and the EDAmame
+     * All open Controller_Editors will be requested to perform their close/save/shutdown activities and the EDAmame
      * application will exit gracefully. This action is triggered by menu items or On Close Request.
      */
     @FXML
-    private void performExit()
+    private void Controller_Exit()
     {
-        saveWindowContext();
-        LOGGER.log(Level.INFO, "EDAmame exited gracefully.\n");
+        Controller_WindowContextSave();
+        Controller_Logger.log(Level.INFO, "EDAmame exited gracefully.\n");
         Platform.exit();
     }
 
@@ -537,29 +516,29 @@ public class EDAmameController implements Initializable
      * A simple event handle to clear the TextArea/Pane where logging happens.
      */
     @FXML
-    protected void clearLogAction()
+    protected void Controller_LogClear()
     {
-        logArea.clear();
+        Controller_LogText.clear();
     }
 
     /**
-     * The log tab can be made visible or not. It is always the right most tab of all tabs. When explicitly added
-     * the log tab is automatically selected.
+     * The log Editor_Tab can be made visible or not. It is always the right most Editor_Tab of all Editor_Tabs. When explicitly added
+     * the log Editor_Tab is automatically selected.
      */
     @FXML
-    private void toggleLogTabVisibility()
+    private void Controller_LogToggleVisibility()
     {
-        if (mainTabPane.getTabs().contains(logTab))
+        if (Controller_TabPane.getTabs().contains(Controller_TabLog))
         {
-            mainTabPane.getTabs().remove(logTab);
+            Controller_TabPane.getTabs().remove(Controller_TabLog);
         }
         else
         {
-            mainTabPane.getTabs().add(logTab);
-            mainTabPane.getSelectionModel().select(logTab);
+            Controller_TabPane.getTabs().add(Controller_TabLog);
+            Controller_TabPane.getSelectionModel().select(Controller_TabLog);
         }
 
-        correctViewLogItemText();
+        Controller_LogToggleItemText();
     }
 
     /**
@@ -567,12 +546,12 @@ public class EDAmameController implements Initializable
      * the log window.
      */
     @FXML
-    private void correctViewLogItemText()
+    private void Controller_LogToggleItemText()
     {
-        if (mainTabPane.getTabs().contains(logTab))
-            viewLogItem.setText("Hide Log Tab");
+        if (Controller_TabPane.getTabs().contains(Controller_TabLog))
+            Controller_MenuLogItem.setText("Hide Log Tab");
         else
-            viewLogItem.setText("Show Log Tab");
+            Controller_MenuLogItem.setText("Show Log Tab");
     }
 
     /**
@@ -580,21 +559,21 @@ public class EDAmameController implements Initializable
      *
      * The left element of the main split pane is a global controls area and is designed to support future
      * features. It is a stacked pane containing as many controls as needed by EDAmame development. The primary
-     * control is a tab pane. Editors add their controls into this tab pane as additional tabs. This primary
-     * tab pane control is called the "Navigation" Pane.
+     * control is a Editor_Tab pane. Editors add their controls into this Editor_Tab pane as additional Editor_Tabs. This primary
+     * Editor_Tab pane control is called the "Navigation" Pane.
      */
     @FXML
-    private void selectNavigationTabPane()
+    private void Controller_NavigationTabPaneSelect()
     {
-        controlsStackPane.getChildren().forEach(e -> e.setVisible(e==controlTabPane));
+        Controller_StackPaneControls.getChildren().forEach(e -> e.setVisible(e==Controller_TabPaneControls));
     }
 
     @FXML
-    public void globalKeyPress(KeyEvent event)
+    public void Controller_KeyPress(KeyEvent event)
     {
         // Adding pressed key to the pressed keys list
-        if (!isGlobalKeyPressed(event.getCode()))
-            Global_PressedKeys.add(event.getCode());
+        if (!Controller_IsKeyPressed(event.getCode()))
+            Controller_PressedKeys.add(event.getCode());
 
         // Handling symbol deletion
         /*if (this.EditorSchematic_IsKeyPressed(KeyCode.BACK_SPACE) || this.EditorSchematic_IsKeyPressed(KeyCode.DELETE))
@@ -619,19 +598,19 @@ public class EDAmameController implements Initializable
     }
 
     @FXML
-    public void globalKeyRelease(KeyEvent event)
+    public void Controller_KeyRelease(KeyEvent event)
     {
-        if (isGlobalKeyPressed(event.getCode()))
-            Global_PressedKeys.remove(event.getCode());
+        if (Controller_IsKeyPressed(event.getCode()))
+            Controller_PressedKeys.remove(event.getCode());
 
         event.consume();
     }
 
     //// SUPPORT FUNCTIONS ////
 
-    static public boolean isGlobalKeyPressed(KeyCode key)
+    static public boolean Controller_IsKeyPressed(KeyCode key)
     {
-        return Global_PressedKeys.contains(key);
+        return Controller_PressedKeys.contains(key);
     }
 
     //// TESTING FUNCTIONS ////
@@ -642,7 +621,7 @@ public class EDAmameController implements Initializable
         gridPoint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
         //gridPoint.permanent = true;
 
-        Global_BasicShapes.add(gridPoint);
+        Controller_BasicShapes.add(gridPoint);
 
         RenderShape gridBox = new RenderShape("GridBox", 1);
         gridBox.AddPoint(-Editor_TheaterSize.GetLeftDouble() / 2, -Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
@@ -655,7 +634,7 @@ public class EDAmameController implements Initializable
         gridBox.AddLine(3, 0, 1.5, Color.BLACK, 1.0);
         //gridBox.permanent = true;
 
-        Global_BasicShapes.add(gridBox);
+        Controller_BasicShapes.add(gridBox);
 
         RenderShape crosshair = new RenderShape("Crosshair", 1);
         crosshair.AddPoint(0.0, -5.0, 0.0, Color.RED, 1.0);
@@ -668,7 +647,7 @@ public class EDAmameController implements Initializable
         //crosshair.permanent = true;
         //crosshair.posStatic = true;
 
-        Global_BasicShapes.add(crosshair);
+        Controller_BasicShapes.add(crosshair);
     }
 
     /**
@@ -680,7 +659,7 @@ public class EDAmameController implements Initializable
         try
         {
             // create and add a new editor
-            addEditor(SymbolEditor.create());
+            Editor_Add(EditorSymbol.create());
         }
         catch (IOException e)
         {

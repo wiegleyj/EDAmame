@@ -20,24 +20,24 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#globalKeyPress" onKeyReleased="#globalKeyRelease" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#Controller_KeyPress" onKeyReleased="#Controller_KeyRelease" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
    <top>
        <VBox BorderPane.alignment="CENTER">
-           <MenuBar fx:id="menuBar">
+           <MenuBar fx:id="Controller_MenuBar">
                <Menu text="_File">
                    <SeparatorMenuItem id="editorItemsBegin" mnemonicParsing="false" />
                    <SeparatorMenuItem id="editorItemsEnd" mnemonicParsing="false" />
-                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="one" />
-                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="two" />
-                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="three" />
-                   <MenuItem mnemonicParsing="false" onAction="#performExit" text="four" />
-                   <MenuItem onAction="#performExit" text="E_xit" />
+                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="one" />
+                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="two" />
+                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="three" />
+                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="four" />
+                   <MenuItem onAction="#Controller_Exit" text="E_xit" />
                </Menu>
                <Menu text="_Edit">
                    <MenuItem mnemonicParsing="false" text="Delete" />
                </Menu>
                <Menu text="_View">
-                   <MenuItem fx:id="viewLogItem" mnemonicParsing="false" onAction="#toggleLogTabVisibility" text="Hide Log Window" />
+                   <MenuItem fx:id="Controller_MenuLogItem" mnemonicParsing="false" onAction="#Controller_LogToggleVisibility" text="Hide Log Window" />
                </Menu>
                <Menu text="Proje_ct">
                    <MenuItem mnemonicParsing="false" text="Close" />
@@ -71,7 +71,7 @@
                    <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
                    <Button mnemonicParsing="false" text="%key.unspecified" />
                </ToolBar>
-               <StackPane fx:id="editorToolBarStack" HBox.hgrow="ALWAYS" />
+               <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS" />
            </HBox>
        </VBox>
    </top>
@@ -84,14 +84,14 @@
        </VBox>
    </bottom>
    <center>
-       <SplitPane fx:id="splitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
+       <SplitPane fx:id="Controller_SplitPane" dividerPositions="0.5" BorderPane.alignment="CENTER">
            <HBox SplitPane.resizableWithParent="false">
                <VBox spacing="10.0" style="-fx-background-color: #dcdcdc;">
                    <padding>
                        <Insets top="10.0" />
                    </padding>
                    <Group>
-                       <Label onMouseClicked="#selectNavigationTabPane" rotate="-90.0" text="Navigation" />
+                       <Label onMouseClicked="#Controller_NavigationTabPaneSelect" rotate="-90.0" text="Navigation" />
                    </Group>
                    <Group>
                        <Label rotate="-90.0" text="Label" />
@@ -100,8 +100,8 @@
                        <Label rotate="-90.0" text="Label" />
                    </Group>
                </VBox>
-               <StackPane fx:id="controlsStackPane" HBox.hgrow="ALWAYS">
-                   <TabPane id="navigationTabPane" fx:id="controlTabPane" side="BOTTOM" style="-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;" tabClosingPolicy="UNAVAILABLE">
+               <StackPane fx:id="Controller_StackPaneControls" HBox.hgrow="ALWAYS">
+                   <TabPane id="navigationTabPane" fx:id="Controller_TabPaneControls" side="BOTTOM" style="-fx-open-Editor_Tab-animation: NONE; -fx-close-Editor_Tab-animation: NONE;" tabClosingPolicy="UNAVAILABLE">
                        <Tab id="projectsNavigationTab" text="Projects">
                            <AnchorPane />
                        </Tab>
@@ -109,13 +109,13 @@
                </StackPane>
            </HBox>
            <VBox>
-               <TabPane fx:id="mainTabPane" style="-fx-open-tab-animation: NONE; -fx-close-tab-animation: NONE;" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
-                   <Tab fx:id="logTab" onClosed="#correctViewLogItemText" text="log">
+               <TabPane fx:id="Controller_TabPane" style="-fx-open-Editor_Tab-animation: NONE; -fx-close-Editor_Tab-animation: NONE;" tabClosingPolicy="ALL_TABS" VBox.vgrow="ALWAYS">
+                   <Tab fx:id="Controller_TabLog" onClosed="#Controller_LogToggleItemText" text="log">
                        <HBox>
-                           <TextArea fx:id="logArea" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
+                           <TextArea fx:id="Controller_LogText" editable="false" focusTraversable="false" HBox.hgrow="ALWAYS" />
                            <VBox fx:id="logSettings" style="-fx-background-color: #dcdcdc;">
                                <Group>
-                                   <Button mnemonicParsing="false" onAction="#clearLogAction" rotate="90.0" text="Clear Log" />
+                                   <Button mnemonicParsing="false" onAction="#Controller_LogClear" rotate="90.0" text="Clear Log" />
                                </Group>
                            </VBox>
                        </HBox>

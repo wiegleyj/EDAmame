@@ -18,8 +18,8 @@
 <body class="class-declaration-page">
 <script type="text/javascript">var evenRowColor = "even-row-color";
 var oddRowColor = "odd-row-color";
-var tableTab = "table-tab";
-var activeTableTab = "active-table-tab";
+var tableTab = "table-Editor_Tab";
+var activeTableTab = "active-table-Editor_Tab";
 var pathtoroot = "../../../../";
 loadScripts(document, 'script');</script>
 <noscript>
@@ -105,62 +105,62 @@ implements javafx.fxml.Initializable</span></div>
 <div class="table-header col-second">Field</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color"><code>private javafx.scene.layout.StackPane</code></div>
-<div class="col-second even-row-color"><code><a href="#controlsStackPane" class="member-name-link">controlsStackPane</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_StackPaneControls" class="member-name-link">Controller_StackPaneControls</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">The stack pane on left of split used to contain different control setups.</div>
 </div>
 <div class="col-first odd-row-color"><code>private javafx.scene.control.TabPane</code></div>
-<div class="col-second odd-row-color"><code><a href="#controlTabPane" class="member-name-link">controlTabPane</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_TabPaneControls" class="member-name-link">Controller_TabPaneControls</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">the TabPane used to hold all the main controls.</div>
 </div>
 <div class="col-first even-row-color"><code>private final javafx.collections.ObservableMap&lt;javafx.scene.control.Tab,<wbr><a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&gt;</code></div>
-<div class="col-second even-row-color"><code><a href="#editors" class="member-name-link">editors</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_Editors" class="member-name-link">Controller_Editors</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.</div>
+<div class="block">All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.</div>
 </div>
 <div class="col-first odd-row-color"><code>private javafx.scene.layout.StackPane</code></div>
-<div class="col-second odd-row-color"><code><a href="#editorToolBarStack" class="member-name-link">editorToolBarStack</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_StackPaneEditorToolBars" class="member-name-link">Controller_StackPaneEditorToolBars</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">A stack of toolbars to the right of the main EDAmame toolbar.</div>
 </div>
 <div class="col-first even-row-color"><code>private javafx.scene.control.TextArea</code></div>
-<div class="col-second even-row-color"><code><a href="#logArea" class="member-name-link">logArea</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_LogText" class="member-name-link">Controller_LogText</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">The TextArea to display logged information on</div>
 </div>
 <div class="col-first odd-row-color"><code>private static final <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.logging/java/util/logging/Logger.html" title="class or interface in java.util.logging" class="external-link">Logger</a></code></div>
-<div class="col-second odd-row-color"><code><a href="#LOGGER" class="member-name-link">LOGGER</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_Logger" class="member-name-link">Controller_Logger</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">The logger for the entire application.</div>
 </div>
 <div class="col-first even-row-color"><code>private javafx.scene.control.Tab</code></div>
-<div class="col-second even-row-color"><code><a href="#logTab" class="member-name-link">logTab</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_TabLog" class="member-name-link">Controller_TabLog</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The tab used to hold the TextArea used for application logging.</div>
+<div class="block">The Editor_Tab used to hold the TextArea used for application logging.</div>
 </div>
 <div class="col-first odd-row-color"><code>private javafx.scene.control.TabPane</code></div>
-<div class="col-second odd-row-color"><code><a href="#mainTabPane" class="member-name-link">mainTabPane</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_TabPane" class="member-name-link">Controller_TabPane</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">primary TabPane displayed on the right of split used by EDAmame to present editors and information.</div>
+<div class="block">primary TabPane displayed on the right of split used by EDAmame to present Controller_Editors and information.</div>
 </div>
 <div class="col-first even-row-color"><code>private javafx.scene.control.MenuBar</code></div>
-<div class="col-second even-row-color"><code><a href="#menuBar" class="member-name-link">menuBar</a></code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_MenuBar" class="member-name-link">Controller_MenuBar</a></code></div>
 <div class="col-last even-row-color">
 <div class="block">The main EDAmame menu bar</div>
 </div>
 <div class="col-first odd-row-color"><code>private javafx.scene.control.SplitPane</code></div>
-<div class="col-second odd-row-color"><code><a href="#splitPane" class="member-name-link">splitPane</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_SplitPane" class="member-name-link">Controller_SplitPane</a></code></div>
 <div class="col-last odd-row-color">
-<div class="block">The main split pane separating always available global controls on the left from editor tabs on right.</div>
+<div class="block">The main split pane separating always available global controls on the left from editor Editor_Tabs on right.</div>
 </div>
-<div class="col-first even-row-color"><code>private final javafx.stage.Stage</code></div>
-<div class="col-second even-row-color"><code><a href="#stage" class="member-name-link">stage</a></code></div>
+<div class="col-first even-row-color"><code>private final javafx.Controller_Stage.Stage</code></div>
+<div class="col-second even-row-color"><code><a href="#Controller_Stage" class="member-name-link">Controller_Stage</a></code></div>
 <div class="col-last even-row-color">
-<div class="block">The stage hosting this controller.</div>
+<div class="block">The Controller_Stage hosting this controller.</div>
 </div>
 <div class="col-first odd-row-color"><code>private javafx.scene.control.MenuItem</code></div>
-<div class="col-second odd-row-color"><code><a href="#viewLogItem" class="member-name-link">viewLogItem</a></code></div>
+<div class="col-second odd-row-color"><code><a href="#Controller_MenuLogItem" class="member-name-link">Controller_MenuLogItem</a></code></div>
 <div class="col-last odd-row-color">
 <div class="block">the menu item for toggling log visibility.</div>
 </div>
@@ -175,9 +175,9 @@ implements javafx.fxml.Initializable</span></div>
 <div class="summary-table two-column-summary">
 <div class="table-header col-first">Constructor</div>
 <div class="table-header col-last">Description</div>
-<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(javafx.stage.Stage)" class="member-name-link">EDAmameController</a><wbr>(javafx.stage.Stage&nbsp;stage)</code></div>
+<div class="col-constructor-name even-row-color"><code><a href="#%3Cinit%3E(javafx.Controller_Stage.Stage)" class="member-name-link">EDAmameController</a><wbr>(javafx.Controller_Stage.Stage&nbsp;Controller_Stage)</code></div>
 <div class="col-last even-row-color">
-<div class="block">Constructs an instance of this controller with knowledge of the stage that it is attached to.</div>
+<div class="block">Constructs an instance of this controller with knowledge of the Controller_Stage that it is attached to.</div>
 </div>
 </div>
 </section>
@@ -187,59 +187,59 @@ implements javafx.fxml.Initializable</span></div>
 <section class="method-summary" id="method-summary">
 <h2>Method Summary</h2>
 <div id="method-summary-table">
-<div class="table-tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-tab">All Methods</button><button id="method-summary-table-tab2" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-tab">Instance Methods</button><button id="method-summary-table-tab4" role="tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-tab">Concrete Methods</button></div>
+<div class="table-Editor_Tabs" role="tablist" aria-orientation="horizontal"><button id="method-summary-table-tab0" role="Editor_Tab" aria-selected="true" aria-controls="method-summary-table.tabpanel" tabindex="0" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table', 3)" class="active-table-Editor_Tab">All Methods</button><button id="method-summary-table-tab2" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab2', 3)" class="table-Editor_Tab">Instance Methods</button><button id="method-summary-table-tab4" role="Editor_Tab" aria-selected="false" aria-controls="method-summary-table.tabpanel" tabindex="-1" onkeydown="switchTab(event)" onclick="show('method-summary-table', 'method-summary-table-tab4', 3)" class="table-Editor_Tab">Concrete Methods</button></div>
 <div id="method-summary-table.tabpanel" role="tabpanel">
 <div class="summary-table three-column-summary" aria-labelledby="method-summary-table-tab0">
 <div class="table-header col-first">Modifier and Type</div>
 <div class="table-header col-second">Method</div>
 <div class="table-header col-last">Description</div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#activateEditor(com.cyte.edamame.editor.Editor)" class="member-name-link">activateEditor</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_Activate(com.cyte.edamame.editor.Editor)" class="member-name-link">Editor_Activate</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own editors.</div>
+<div class="block">Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own Controller_Editors.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#addEditor(com.cyte.edamame.editor.Editor)" class="member-name-link">addEditor</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_Add(com.cyte.edamame.editor.Editor)" class="member-name-link">Editor_Add</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Editors are added by EDAmame by including their menu items and toolbars in its menus and toolbar areas.</div>
+<div class="block">Editors are added by EDAmame by including their menu items and toolbars in its Editor_Menus and toolbar areas.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#changeLoggingToTab()" class="member-name-link">changeLoggingToTab</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_LoggingChangeToTab()" class="member-name-link">Controller_LoggingChangeToTab</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Change the log handler for the package wide logger from stdout to a TextArea node.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#clearLogAction()" class="member-name-link">clearLogAction</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_LogClear()" class="member-name-link">Controller_LogClear</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">A simple event handle to clear the TextArea/Pane where logging happens.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#correctViewLogItemText()" class="member-name-link">correctViewLogItemText</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_LogToggleItemText()" class="member-name-link">Controller_LogToggleItemText</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Simple function to correct the textual information present on the menu item for toggling the state of
  the log window.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#deactivateEditor(com.cyte.edamame.editor.Editor)" class="member-name-link">deactivateEditor</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_Deactivate(com.cyte.edamame.editor.Editor)" class="member-name-link">Editor_Deactivate</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Editors are deactivated by EDAmame by making sure that unselected editor tabs' controls are invisible and
+<div class="block">Editors are deactivated by EDAmame by making sure that unselected editor Editor_Tabs' controls are invisible and
  inaccessible.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#enableEditorTabSelectionLogic()" class="member-name-link">enableEditorTabSelectionLogic</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_EnableSelect()" class="member-name-link">Editor_EnableSelect</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Enables to controller logic for switching between editor tabs.</div>
+<div class="block">Enables to controller logic for switching between editor Editor_Tabs.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#executeOnShown()" class="member-name-link">executeOnShown</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_ExecuteOnShown()" class="member-name-link">Controller_ExecuteOnShown</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Execute activites required to be done once the main Application stage is finally shown.</div>
+<div class="block">Execute activites required to be done once the main Application Controller_Stage is finally shown.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>void</code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#initialize(java.net.URL,java.util.ResourceBundle)" class="member-name-link">initialize</a><wbr>(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html" title="class or interface in java.net" class="external-link">URL</a>&nbsp;url,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ResourceBundle.html" title="class or interface in java.util" class="external-link">ResourceBundle</a>&nbsp;rb)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">JavaFX stage initialization procedures</div>
+<div class="block">JavaFX Controller_Stage initialization procedures</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>protected void</code></div>
 <div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#onTestButtonClick()" class="member-name-link">onTestButtonClick</a>()</code></div>
@@ -252,39 +252,39 @@ implements javafx.fxml.Initializable</span></div>
 <div class="block">A test method for checking database connectivity.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#performExit()" class="member-name-link">performExit</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_Exit()" class="member-name-link">Controller_Exit</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">performExit() implements graceful and intelligent shutdown of the EDAmame application.</div>
+<div class="block">Controller_Exit() implements graceful and intelligent shutdown of the EDAmame application.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#removeEditor(com.cyte.edamame.editor.Editor)" class="member-name-link">removeEditor</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Editor_Remove(com.cyte.edamame.editor.Editor)" class="member-name-link">Editor_Remove</a><wbr>(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">Editors are removed by EDAmame by removing their menu items and toolbars in its menus and toolbar areas.</div>
+<div class="block">Editors are removed by EDAmame by removing their menu items and toolbars in its Editor_Menus and toolbar areas.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#restoreDividerPosition()" class="member-name-link">restoreDividerPosition</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_DividerRestore()" class="member-name-link">Controller_DividerRestore</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Restores the main split pane's divider position between runs of the application.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#restoreWindowContext()" class="member-name-link">restoreWindowContext</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_WindowContextLoad()" class="member-name-link">Controller_WindowContextLoad</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Restores the window position and size of the application.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#saveWindowContext()" class="member-name-link">saveWindowContext</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_WindowContextSave()" class="member-name-link">Controller_WindowContextSave</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Saves the window position and size of the application as Java Preferences.</div>
 </div>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#selectNavigationTabPane()" class="member-name-link">selectNavigationTabPane</a>()</code></div>
+<div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_NavigationTabPaneSelect()" class="member-name-link">Controller_NavigationTabPaneSelect</a>()</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
 <div class="block">Select the "navigation" pane is the main controls to show.</div>
 </div>
 <div class="col-first odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code>private void</code></div>
-<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#toggleLogTabVisibility()" class="member-name-link">toggleLogTabVisibility</a>()</code></div>
+<div class="col-second odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4"><code><a href="#Controller_LogToggleVisibility()" class="member-name-link">Controller_LogToggleVisibility</a>()</code></div>
 <div class="col-last odd-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab4">
-<div class="block">The log tab can be made visible or not.</div>
+<div class="block">The log Editor_Tab can be made visible or not.</div>
 </div>
 </div>
 </div>
@@ -304,86 +304,86 @@ implements javafx.fxml.Initializable</span></div>
 <h2>Field Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="LOGGER">
-<h3>LOGGER</h3>
-<div class="member-signature"><span class="modifiers">private static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.logging/java/util/logging/Logger.html" title="class or interface in java.util.logging" class="external-link">Logger</a></span>&nbsp;<span class="element-name">LOGGER</span></div>
+<section class="detail" id="Controller_Logger">
+<h3>Controller_Logger</h3>
+<div class="member-signature"><span class="modifiers">private static final</span>&nbsp;<span class="return-type"><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.logging/java/util/logging/Logger.html" title="class or interface in java.util.logging" class="external-link">Logger</a></span>&nbsp;<span class="element-name">Controller_Logger</span></div>
 <div class="block">The logger for the entire application. All classes/modules should obtain and use this static logger.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="stage">
-<h3>stage</h3>
-<div class="member-signature"><span class="modifiers">private final</span>&nbsp;<span class="return-type">javafx.stage.Stage</span>&nbsp;<span class="element-name">stage</span></div>
-<div class="block">The stage hosting this controller.</div>
+<section class="detail" id="Controller_Stage">
+<h3>Controller_Stage</h3>
+<div class="member-signature"><span class="modifiers">private final</span>&nbsp;<span class="return-type">javafx.Controller_Stage.Stage</span>&nbsp;<span class="element-name">Controller_Stage</span></div>
+<div class="block">The Controller_Stage hosting this controller.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="editors">
-<h3>editors</h3>
-<div class="member-signature"><span class="modifiers">private final</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;javafx.scene.control.Tab,<wbr><a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&gt;</span>&nbsp;<span class="element-name">editors</span></div>
-<div class="block">All editors instantiated are remembered in a HashMap for fast lookup keyed by their main tab.</div>
+<section class="detail" id="Controller_Editors">
+<h3>Controller_Editors</h3>
+<div class="member-signature"><span class="modifiers">private final</span>&nbsp;<span class="return-type">javafx.collections.ObservableMap&lt;javafx.scene.control.Tab,<wbr><a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&gt;</span>&nbsp;<span class="element-name">Controller_Editors</span></div>
+<div class="block">All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="logTab">
-<h3>logTab</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">logTab</span></div>
-<div class="block">The tab used to hold the TextArea used for application logging.</div>
+<section class="detail" id="Controller_TabLog">
+<h3>Controller_TabLog</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.Tab</span>&nbsp;<span class="element-name">Controller_TabLog</span></div>
+<div class="block">The Editor_Tab used to hold the TextArea used for application logging.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="logArea">
-<h3>logArea</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TextArea</span>&nbsp;<span class="element-name">logArea</span></div>
+<section class="detail" id="Controller_LogText">
+<h3>Controller_LogText</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TextArea</span>&nbsp;<span class="element-name">Controller_LogText</span></div>
 <div class="block">The TextArea to display logged information on</div>
 </section>
 </li>
 <li>
-<section class="detail" id="splitPane">
-<h3>splitPane</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.SplitPane</span>&nbsp;<span class="element-name">splitPane</span></div>
-<div class="block">The main split pane separating always available global controls on the left from editor tabs on right.</div>
+<section class="detail" id="Controller_SplitPane">
+<h3>Controller_SplitPane</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.SplitPane</span>&nbsp;<span class="element-name">Controller_SplitPane</span></div>
+<div class="block">The main split pane separating always available global controls on the left from editor Editor_Tabs on right.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="controlsStackPane">
-<h3>controlsStackPane</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.layout.StackPane</span>&nbsp;<span class="element-name">controlsStackPane</span></div>
+<section class="detail" id="Controller_StackPaneControls">
+<h3>Controller_StackPaneControls</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.layout.StackPane</span>&nbsp;<span class="element-name">Controller_StackPaneControls</span></div>
 <div class="block">The stack pane on left of split used to contain different control setups.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="controlTabPane">
-<h3>controlTabPane</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TabPane</span>&nbsp;<span class="element-name">controlTabPane</span></div>
+<section class="detail" id="Controller_TabPaneControls">
+<h3>Controller_TabPaneControls</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TabPane</span>&nbsp;<span class="element-name">Controller_TabPaneControls</span></div>
 <div class="block">the TabPane used to hold all the main controls. Displayed in the "navigation" pane of the controls stack.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="mainTabPane">
-<h3>mainTabPane</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TabPane</span>&nbsp;<span class="element-name">mainTabPane</span></div>
-<div class="block">primary TabPane displayed on the right of split used by EDAmame to present editors and information.</div>
+<section class="detail" id="Controller_TabPane">
+<h3>Controller_TabPane</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.TabPane</span>&nbsp;<span class="element-name">Controller_TabPane</span></div>
+<div class="block">primary TabPane displayed on the right of split used by EDAmame to present Controller_Editors and information.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="editorToolBarStack">
-<h3>editorToolBarStack</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.layout.StackPane</span>&nbsp;<span class="element-name">editorToolBarStack</span></div>
+<section class="detail" id="Controller_StackPaneEditorToolBars">
+<h3>Controller_StackPaneEditorToolBars</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.layout.StackPane</span>&nbsp;<span class="element-name">Controller_StackPaneEditorToolBars</span></div>
 <div class="block">A stack of toolbars to the right of the main EDAmame toolbar. Editors can provide own toolbars for here.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="menuBar">
-<h3>menuBar</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.MenuBar</span>&nbsp;<span class="element-name">menuBar</span></div>
+<section class="detail" id="Controller_MenuBar">
+<h3>Controller_MenuBar</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.MenuBar</span>&nbsp;<span class="element-name">Controller_MenuBar</span></div>
 <div class="block">The main EDAmame menu bar</div>
 </section>
 </li>
 <li>
-<section class="detail" id="viewLogItem">
-<h3>viewLogItem</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.MenuItem</span>&nbsp;<span class="element-name">viewLogItem</span></div>
+<section class="detail" id="Controller_MenuLogItem">
+<h3>Controller_MenuLogItem</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">javafx.scene.control.MenuItem</span>&nbsp;<span class="element-name">Controller_MenuLogItem</span></div>
 <div class="block">the menu item for toggling log visibility.</div>
 </section>
 </li>
@@ -396,16 +396,16 @@ implements javafx.fxml.Initializable</span></div>
 <h2>Constructor Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="&lt;init&gt;(javafx.stage.Stage)">
+<section class="detail" id="&lt;init&gt;(javafx.Controller_Stage.Stage)">
 <h3>EDAmameController</h3>
-<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EDAmameController</span><wbr><span class="parameters">(javafx.stage.Stage&nbsp;stage)</span></div>
-<div class="block">Constructs an instance of this controller with knowledge of the stage that it is attached to. Knowledge of
- the stage allows the controller to entirely take control of proper closing activities even when its an
+<div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="element-name">EDAmameController</span><wbr><span class="parameters">(javafx.Controller_Stage.Stage&nbsp;Controller_Stage)</span></div>
+<div class="block">Constructs an instance of this controller with knowledge of the Controller_Stage that it is attached to. Knowledge of
+ the Controller_Stage allows the controller to entirely take control of proper closing activities even when its an
  onCloseRequest generated by a user killing the application of an operating system's "close" window
  decoration.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
-<dd><code>stage</code> - The stage that is hosting/using this controller.</dd>
+<dd><code>Controller_Stage</code> - The Controller_Stage that is hosting/using this controller.</dd>
 </dl>
 </section>
 </li>
@@ -418,24 +418,24 @@ implements javafx.fxml.Initializable</span></div>
 <h2>Method Details</h2>
 <ul class="member-list">
 <li>
-<section class="detail" id="executeOnShown()">
-<h3>executeOnShown</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">executeOnShown</span>()</div>
-<div class="block">Execute activites required to be done once the main Application stage is finally shown. (Activities
+<section class="detail" id="Controller_ExecuteOnShown()">
+<h3>Controller_ExecuteOnShown</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_ExecuteOnShown</span>()</div>
+<div class="block">Execute activites required to be done once the main Application Controller_Stage is finally shown. (Activities
  performed in the <a href="#initialize(java.net.URL,java.util.ResourceBundle)"><code>initialize(URL, ResourceBundle)</code></a> happen before the various
  scene nodes have been sized, laid out, and rendered. This provides a location to perform all
  startup tasks required but unsuitable for standard initialization.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="restoreDividerPosition()">
-<h3>restoreDividerPosition</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">restoreDividerPosition</span>()</div>
+<section class="detail" id="Controller_DividerRestore()">
+<h3>Controller_DividerRestore</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_DividerRestore</span>()</div>
 <div class="block">Restores the main split pane's divider position between runs of the application.<p>
 
  The application establishes a main look and feel that consists of a split pane containing two nodes.
  The left node is used to contain to level controls specific to the entire EDAmame application. The
- right pane is a tab pane that provides tabbed locations for editors and other sub-modules to place
+ right pane is a Editor_Tab pane that provides tabbed locations for Controller_Editors and other sub-modules to place
  their controls. The user's selection of divider position is maintained between runs of the application.</div>
 </section>
 </li>
@@ -444,7 +444,7 @@ implements javafx.fxml.Initializable</span></div>
 <h3>initialize</h3>
 <div class="member-signature"><span class="modifiers">public</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">initialize</span><wbr><span class="parameters">(<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/net/URL.html" title="class or interface in java.net" class="external-link">URL</a>&nbsp;url,
  <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/ResourceBundle.html" title="class or interface in java.util" class="external-link">ResourceBundle</a>&nbsp;rb)</span></div>
-<div class="block">JavaFX stage initialization procedures</div>
+<div class="block">JavaFX Controller_Stage initialization procedures</div>
 <dl class="notes">
 <dt>Specified by:</dt>
 <dd><code>initialize</code>&nbsp;in interface&nbsp;<code>javafx.fxml.Initializable</code></dd>
@@ -457,30 +457,30 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="changeLoggingToTab()">
-<h3>changeLoggingToTab</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">changeLoggingToTab</span>()</div>
+<section class="detail" id="Controller_LoggingChangeToTab()">
+<h3>Controller_LoggingChangeToTab</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_LoggingChangeToTab</span>()</div>
 <div class="block">Change the log handler for the package wide logger from stdout to a TextArea node.
 
- EDAmame has a dedicated tab for displaying log information. changeLoggingToTab
+ EDAmame has a dedicated Editor_Tab for displaying log information. Controller_LoggingChangeToTab
  removes all log handlers from the logger and replaces them with a handler that
- appends requested logging information to a TextArea in the dedicated log tab.</div>
+ appends requested logging information to a TextArea in the dedicated log Editor_Tab.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="performExit()">
-<h3>performExit</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">performExit</span>()</div>
-<div class="block">performExit() implements graceful and intelligent shutdown of the EDAmame application.
+<section class="detail" id="Controller_Exit()">
+<h3>Controller_Exit</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_Exit</span>()</div>
+<div class="block">Controller_Exit() implements graceful and intelligent shutdown of the EDAmame application.
 
- All open editors will be requested to perform their close/save/shutdown activities and the EDAmame
+ All open Controller_Editors will be requested to perform their close/save/shutdown activities and the EDAmame
  application will exit gracefully. This action is triggered by menu items or On Close Request.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="saveWindowContext()">
-<h3>saveWindowContext</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">saveWindowContext</span>()</div>
+<section class="detail" id="Controller_WindowContextSave()">
+<h3>Controller_WindowContextSave</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_WindowContextSave</span>()</div>
 <div class="block">Saves the window position and size of the application as Java Preferences.
 
  The values of the size and position of the application are saved to the Java Preference storage.
@@ -489,9 +489,9 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="restoreWindowContext()">
-<h3>restoreWindowContext</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">restoreWindowContext</span>()</div>
+<section class="detail" id="Controller_WindowContextLoad()">
+<h3>Controller_WindowContextLoad</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_WindowContextLoad</span>()</div>
 <div class="block">Restores the window position and size of the application.
 
  The values of the size and position of the application when this context was last saved is restored.
@@ -499,31 +499,31 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="enableEditorTabSelectionLogic()">
-<h3>enableEditorTabSelectionLogic</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">enableEditorTabSelectionLogic</span>()</div>
-<div class="block">Enables to controller logic for switching between editor tabs.
+<section class="detail" id="Editor_EnableSelect()">
+<h3>Editor_EnableSelect</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_EnableSelect</span>()</div>
+<div class="block">Enables to controller logic for switching between editor Editor_Tabs.
 
  Editors are composed of several nodes.
-     A single main editor tab that is always visible in editorTabPane.
-     A set of control tabs that are only present/visible in the controlTabPane when the editor is selected.
-     A toolBar that is only visible in the toolBar area when the editor is selected.
-     A set of menus and items that are only present in the menus when the editor is selected.
+     A single main editor Editor_Tab that is always visible in editorTabPane.
+     A set of control Editor_Tabs that are only present/visible in the Controller_TabPaneControls when the editor is selected.
+     A Editor_ToolBar that is only visible in the Editor_ToolBar area when the editor is selected.
+     A set of Editor_Menus and items that are only present in the Editor_Menus when the editor is selected.
 
- enableEditorTabSelectionLogic provides the control for the presence and visibility of these items
- based on tab selection. When a tab is selected the UI components for the previously selected editor
+ Editor_EnableSelect provides the control for the presence and visibility of these items
+ based on Editor_Tab selection. When a Editor_Tab is selected the UI components for the previously selected editor
  are removed/hidden and the components for the newly selected editor are enabled/shown.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="activateEditor(com.cyte.edamame.editor.Editor)">
-<h3>activateEditor</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">activateEditor</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
-<div class="block">Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own editors. Editors
+<section class="detail" id="Editor_Activate(com.cyte.edamame.editor.Editor)">
+<h3>Editor_Activate</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_Activate</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
+<div class="block">Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own Controller_Editors. Editors
  supply their own controllers and controls. The EDAmameController folds these controls into its own
- menus, toolbars and windows by obtaining, reparenting and controlling the visibility of those controls.
+ Editor_Menus, toolbars and windows by obtaining, reparenting and controlling the visibility of those controls.
 
- Editors are activated by EDAmame by making sure that only the selected tab's controls are visible and
+ Editors are activated by EDAmame by making sure that only the selected Editor_Tab's controls are visible and
  accessible.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -532,10 +532,10 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="deactivateEditor(com.cyte.edamame.editor.Editor)">
-<h3>deactivateEditor</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">deactivateEditor</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
-<div class="block">Editors are deactivated by EDAmame by making sure that unselected editor tabs' controls are invisible and
+<section class="detail" id="Editor_Deactivate(com.cyte.edamame.editor.Editor)">
+<h3>Editor_Deactivate</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_Deactivate</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
+<div class="block">Editors are deactivated by EDAmame by making sure that unselected editor Editor_Tabs' controls are invisible and
  inaccessible.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -544,10 +544,10 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="addEditor(com.cyte.edamame.editor.Editor)">
-<h3>addEditor</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">addEditor</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
-<div class="block">Editors are added by EDAmame by including their menu items and toolbars in its menus and toolbar areas.</div>
+<section class="detail" id="Editor_Add(com.cyte.edamame.editor.Editor)">
+<h3>Editor_Add</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_Add</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
+<div class="block">Editors are added by EDAmame by including their menu items and toolbars in its Editor_Menus and toolbar areas.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>editor</code> - Which editor to setup and add controls for. They all start out invisible/unavailable.</dd>
@@ -555,10 +555,10 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="removeEditor(com.cyte.edamame.editor.Editor)">
-<h3>removeEditor</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">removeEditor</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
-<div class="block">Editors are removed by EDAmame by removing their menu items and toolbars in its menus and toolbar areas.
+<section class="detail" id="Editor_Remove(com.cyte.edamame.editor.Editor)">
+<h3>Editor_Remove</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Editor_Remove</span><wbr><span class="parameters">(<a href="editor/Editor.html" title="class in com.cyte.edamame.editor">Editor</a>&nbsp;editor)</span></div>
+<div class="block">Editors are removed by EDAmame by removing their menu items and toolbars in its Editor_Menus and toolbar areas.
  This should really only be done once an editor has been closed and has no need to save data.</div>
 <dl class="notes">
 <dt>Parameters:</dt>
@@ -567,38 +567,38 @@ implements javafx.fxml.Initializable</span></div>
 </section>
 </li>
 <li>
-<section class="detail" id="clearLogAction()">
-<h3>clearLogAction</h3>
-<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">clearLogAction</span>()</div>
+<section class="detail" id="Controller_LogClear()">
+<h3>Controller_LogClear</h3>
+<div class="member-signature"><span class="modifiers">protected</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_LogClear</span>()</div>
 <div class="block">A simple event handle to clear the TextArea/Pane where logging happens.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="toggleLogTabVisibility()">
-<h3>toggleLogTabVisibility</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">toggleLogTabVisibility</span>()</div>
-<div class="block">The log tab can be made visible or not. It is always the right most tab of all tabs. When explicitly added
- the log tab is automatically selected.</div>
+<section class="detail" id="Controller_LogToggleVisibility()">
+<h3>Controller_LogToggleVisibility</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_LogToggleVisibility</span>()</div>
+<div class="block">The log Editor_Tab can be made visible or not. It is always the right most Editor_Tab of all Editor_Tabs. When explicitly added
+ the log Editor_Tab is automatically selected.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="correctViewLogItemText()">
-<h3>correctViewLogItemText</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">correctViewLogItemText</span>()</div>
+<section class="detail" id="Controller_LogToggleItemText()">
+<h3>Controller_LogToggleItemText</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_LogToggleItemText</span>()</div>
 <div class="block">Simple function to correct the textual information present on the menu item for toggling the state of
  the log window.</div>
 </section>
 </li>
 <li>
-<section class="detail" id="selectNavigationTabPane()">
-<h3>selectNavigationTabPane</h3>
-<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">selectNavigationTabPane</span>()</div>
+<section class="detail" id="Controller_NavigationTabPaneSelect()">
+<h3>Controller_NavigationTabPaneSelect</h3>
+<div class="member-signature"><span class="modifiers">private</span>&nbsp;<span class="return-type">void</span>&nbsp;<span class="element-name">Controller_NavigationTabPaneSelect</span>()</div>
 <div class="block">Select the "navigation" pane is the main controls to show.
 
  The left element of the main split pane is a global controls area and is designed to support future
  features. It is a stacked pane containing as many controls as needed by EDAmame development. The primary
- control is a tab pane. Editors add their controls into this tab pane as additional tabs. This primary
- tab pane control is called the "Navigation" Pane.</div>
+ control is a Editor_Tab pane. Editors add their controls into this Editor_Tab pane as additional Editor_Tabs. This primary
+ Editor_Tab pane control is called the "Navigation" Pane.</div>
 </section>
 </li>
 <li>
