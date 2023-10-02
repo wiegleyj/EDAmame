@@ -12,7 +12,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
@@ -40,13 +39,10 @@
                <children>
                   <Pane>
                      <children>
-                        <Pane>
-                           <children>
-                              <Canvas height="1000.0" width="1000.0" />
-                           </children>
-                        </Pane>
+                        <Canvas height="1000.0" width="1000.0" />
                      </children>
                   </Pane>
+                  <Pane />
                   <ToolBar>
                     <items>
                       <Button mnemonicParsing="false" text="Button" />
@@ -67,7 +63,7 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <RadioButton mnemonicParsing="false" text="Circle">
+                        <RadioButton mnemonicParsing="false" selected="true" text="Circle">
                            <toggleGroup>
                               <ToggleGroup fx:id="EditorSymbol_ShapeToggleGroup" />
                            </toggleGroup>
@@ -77,7 +73,7 @@
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Separator prefWidth="200.0" />
-                        <RadioButton mnemonicParsing="false" text="Square" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                        <RadioButton mnemonicParsing="false" text="Rectangle" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
                      </children>
                   </VBox>
                   <VBox prefHeight="200.0" prefWidth="100.0">
@@ -90,8 +86,15 @@
             </VBox>
          </content>
         </Tab>
-        <Tab text="ControlTab2">
-            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
+        <Tab text="Lines">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0" />
+         </content>
         </Tab>
+      <Tab text="Text">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0" />
+         </content>
+      </Tab>
     </TabPane>
 </VBox>

@@ -234,6 +234,35 @@ public class EditorSymbol extends Editor
 
                     this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, circle);
                 }
+                else if (selectedShapeButton.getText().equals("Rectangle"))
+                {
+                    double width = 10;
+                    double height = 10;
+                    Color color = Color.ORANGE;
+
+                    Rectangle rectangle = new Rectangle(width, height, color);
+
+                    rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                    rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+
+                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, rectangle);
+                }
+                else if (selectedShapeButton.getText().equals("Triangle"))
+                {
+                    double middleLength = 10;
+                    Color color = Color.ORANGE;
+
+                    Polygon triangle = new Polygon();
+                    triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                                middleLength / 2, middleLength / 2,
+                                                0.0, -middleLength / 2);
+                    triangle.setFill(color);
+
+                    triangle.setTranslateX(dropPos.GetLeftDouble());
+                    triangle.setTranslateY(dropPos.GetRightDouble());
+
+                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, triangle);
+                }
                 else
                 {
                     throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");

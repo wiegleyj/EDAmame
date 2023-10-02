@@ -6,9 +6,16 @@
  */
 
 // TODO:
+// Fix viewport viewing...
+// Refactor viewport moving so it's only affected by this.center
 // Implement shape dropping in symbol editor
 // Implement line drawing in symbol editor
 // Implement wire connection points into symbols
+// Implement shape selection
+// Implement shape moving
+// Implement shape deletion
+// Implement shape properties window
+// Implement text dropping
 // Refactor the stupid canvas zooming mouse diff pos thing
 // Refactor dissect editor function searching for canvas
 // Fix mouse-specific release callback function
@@ -62,7 +69,7 @@ public class EDAmameController implements Initializable
     //// GLOBAL VARIABLES ////
 
     final static public String[] Editor_Names = {"Symbol Editor"};
-    final static public Double Editor_HeartbeatDelay = 0.01;
+    final static public Double Editor_HeartbeatDelay = 0.0001;
 
     final static public PairMutable Editor_TheaterSize = new PairMutable(1000.0, 1000.0);
     final static public Color Editor_BackgroundColor = Color.BEIGE;
@@ -209,7 +216,7 @@ public class EDAmameController implements Initializable
                 if (!editor.Editor_Visible)
                     continue;
 
-                // Adjusting the central layout of the canvas relative to the stack pane size
+                // Updating the holder pane window center offset
                 {
                     PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
                                                              editor.Editor_RenderSystem.canvas.getHeight());
@@ -218,8 +225,19 @@ public class EDAmameController implements Initializable
                     PairMutable newCanvasPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
                                                                paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
-                    editor.Editor_RenderSystem.RenderSystem_PaneSetLayout(newCanvasPos);
+                    //System.out.println(newCanvasPos.ToStringDouble());
+
+                    //editor.Editor_RenderSystem.RenderSystem_PaneSetLayout(newCanvasPos);
+                    editor.Editor_RenderSystem.windowCenterOffset = newCanvasPos;
                 }
+
+                // Updating the holder pane's rendered position
+                editor.Editor_RenderSystem.RenderSystem_PaneUpdateTranslate();
+
+                //System.out.println(editor.Editor_RenderSystem.paneHolder.getTranslateX());
+                //System.out.println(editor.Editor_RenderSystem.paneHolder.getTranslateY());
+
+                System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
             }
         }
     }
