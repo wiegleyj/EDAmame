@@ -6,6 +6,7 @@
  */
 
 package com.cyte.edamame.editor;
+import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 
@@ -30,6 +31,20 @@ public class EditorSymbol extends Editor
     private Button EditorSymbol_InnerButton;
     @FXML
     public ToggleGroup EditorSymbol_ShapeToggleGroup;
+    @FXML
+    public ColorPicker EditorSymbol_CircleColor;
+    @FXML
+    public TextField EditorSymbol_CircleRadius;
+    @FXML
+    public ColorPicker EditorSymbol_RectangleColor;
+    @FXML
+    public TextField EditorSymbol_RectangleWidth;
+    @FXML
+    public TextField EditorSymbol_RectangleHeight;
+    @FXML
+    public ColorPicker EditorSymbol_TriangleColor;
+    @FXML
+    public TextField EditorSymbol_TriangleHeight;
 
     //// MAIN FUNCTIONS ////
 
@@ -224,44 +239,59 @@ public class EditorSymbol extends Editor
             {
                 if (selectedShapeButton.getText().equals("Circle"))
                 {
-                    double width = 10;
-                    Color color = Color.ORANGE;
+                    String stringRadius = this.EditorSymbol_CircleRadius.getText();
 
-                    Circle circle = new Circle(width, color);
+                    if (EDAmameController.Controller_IsStringNum(stringRadius))
+                    {
+                        double width = Double.parseDouble(stringRadius) * 2;
+                        Color color = this.EditorSymbol_CircleColor.getValue();
 
-                    circle.setTranslateX(dropPos.GetLeftDouble());
-                    circle.setTranslateY(dropPos.GetRightDouble());
+                        Circle circle = new Circle(width, color);
 
-                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, circle);
+                        circle.setTranslateX(dropPos.GetLeftDouble());
+                        circle.setTranslateY(dropPos.GetRightDouble());
+
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, circle);
+                    }
                 }
                 else if (selectedShapeButton.getText().equals("Rectangle"))
                 {
-                    double width = 10;
-                    double height = 10;
-                    Color color = Color.ORANGE;
+                    String stringWidth = this.EditorSymbol_RectangleWidth.getText();
+                    String stringHeight = this.EditorSymbol_RectangleHeight.getText();
 
-                    Rectangle rectangle = new Rectangle(width, height, color);
+                    if (EDAmameController.Controller_IsStringNum(stringWidth)
+                            && EDAmameController.Controller_IsStringNum(stringHeight)) {
+                        double width = Double.parseDouble(stringWidth);
+                        double height = Double.parseDouble(stringHeight);
+                        Color color = this.EditorSymbol_RectangleColor.getValue();
+                        Rectangle rectangle = new Rectangle(width, height, color);
 
-                    rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                    rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+                        rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                        rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
 
-                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, rectangle);
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, rectangle);
+                    }
+
                 }
                 else if (selectedShapeButton.getText().equals("Triangle"))
                 {
-                    double middleLength = 10;
-                    Color color = Color.ORANGE;
+                    String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
 
-                    Polygon triangle = new Polygon();
-                    triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                            middleLength / 2, middleLength / 2,
-                            0.0, -middleLength / 2);
-                    triangle.setFill(color);
+                    if (EDAmameController.Controller_IsStringNum(stringMiddleHeight)) {
+                        double middleLength = Double.parseDouble(stringMiddleHeight);
+                        Color color = this.EditorSymbol_TriangleColor.getValue();
+                        Polygon triangle = new Polygon();
+                        triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                middleLength / 2, middleLength / 2,
+                                0.0, -middleLength / 2);
+                        triangle.setFill(color);
 
-                    triangle.setTranslateX(dropPos.GetLeftDouble());
-                    triangle.setTranslateY(dropPos.GetRightDouble());
+                        triangle.setTranslateX(dropPos.GetLeftDouble());
+                        triangle.setTranslateY(dropPos.GetRightDouble());
 
-                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, triangle);
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, triangle);
+                    }
+
                 }
                 else
                 {

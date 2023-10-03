@@ -615,6 +615,15 @@ public class EDAmameController implements Initializable
 
     //// SUPPORT FUNCTIONS ////
 
+    static public boolean Controller_IsStringNum(String str) {
+        try {
+            Double.parseDouble(str);
+            return true;
+        } catch(NumberFormatException e) {
+            return false;
+        }
+    }
+
     static public boolean Controller_IsKeyPressed(KeyCode key)
     {
         return Controller_PressedKeys.contains(key);
