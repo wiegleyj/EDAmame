@@ -185,12 +185,15 @@ public class RenderSystem
 
     //// SHAPE FUNCTIONS ////
 
-    public void RenderSystem_ShapeAdd(Integer idx, Shape shape)
+    public void RenderSystem_ShapeAdd(Integer idx, RenderShape shape)
     {
-        if (idx < 0)
-            this.paneHolder.getChildren().add(shape);
-        else
-            this.paneHolder.getChildren().add(idx, shape);
+        if (idx < 0) {
+            this.shapes.add(shape);
+            this.paneHolder.getChildren().add(shape.shape);
+        } else {
+            this.shapes.add(idx, shape);
+            this.paneHolder.getChildren().add(idx, shape.shape);
+        }
     }
 
     public void RenderSystem_ShapeCalculatePosDraw(RenderShape shape)

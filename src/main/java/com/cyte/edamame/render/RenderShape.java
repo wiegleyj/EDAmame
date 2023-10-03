@@ -217,19 +217,6 @@ public class RenderShape
         this.boundingBox.right = pointsWidthsY.get(maxYIdx) / 2 + pointsY.get(maxYIdx) - pointsY.get(minYIdx) + pointsWidthsY.get(minYIdx) / 2;
     }
 
-    public void DrawBoundingBoxCanvas(GraphicsContext gc, Color color, Double opacity)
-    {
-        if (opacity > 0.0)
-        {
-            gc.setGlobalAlpha(opacity);
-            gc.setFill(color);
-            gc.fillRect(this.posDraw.GetLeftDouble() - this.boundingBox.GetLeftDouble() / 2,
-                        this.posDraw.GetRightDouble() - this.boundingBox.GetRightDouble() / 2,
-                        this.boundingBox.GetLeftDouble(),
-                        this.boundingBox.GetRightDouble());
-        }
-    }
-
     public void AddPoint(Double posX, Double posY, Double width, Color color, Double opacity)
     {
         this.points.add(new PairMutable(posX, posY));

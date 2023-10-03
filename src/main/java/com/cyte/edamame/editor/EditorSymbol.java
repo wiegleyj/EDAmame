@@ -9,6 +9,7 @@ package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.render.RenderShape;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -251,7 +252,9 @@ public class EditorSymbol extends Editor
                         circle.setTranslateX(dropPos.GetLeftDouble());
                         circle.setTranslateY(dropPos.GetRightDouble());
 
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, circle);
+                        RenderShape shape = new RenderShape("Circle", 0);
+                        shape.shape = circle;
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
                 }
                 else if (selectedShapeButton.getText().equals("Rectangle"))
@@ -269,7 +272,9 @@ public class EditorSymbol extends Editor
                         rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
                         rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
 
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, rectangle);
+                        RenderShape shape = new RenderShape("Rectangle", 0);
+                        shape.shape = rectangle;
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
 
                 }
@@ -289,7 +294,9 @@ public class EditorSymbol extends Editor
                         triangle.setTranslateX(dropPos.GetLeftDouble());
                         triangle.setTranslateY(dropPos.GetRightDouble());
 
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, triangle);
+                        RenderShape shape = new RenderShape("Triangle", 0);
+                        shape.shape = triangle;
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
 
                 }
