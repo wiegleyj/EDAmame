@@ -211,44 +211,44 @@ public abstract class Editor
                             {
                                 StackPane foundStackPane = (StackPane)nextNodeA;
 
-                                // Searching for the listener & holder panes...
+                                // Searching for the listener pane...
                                 for (int j = 0; j < foundStackPane.getChildren().size(); j++)
                                 {
                                     Node nextNodeB = foundStackPane.getChildren().get(j);
 
                                     if (nextNodeB.getClass() == Pane.class)
                                     {
-                                        if (foundPaneHolder == null)
+                                        foundPaneListener = (Pane)nextNodeB;
+
+                                        // Searching for the holder pane...
+                                        for (int k = 0; k < foundPaneListener.getChildren().size(); k++)
                                         {
-                                            System.out.println("found holder");
+                                            Node nextNodeC = foundPaneListener.getChildren().get(k);
 
-                                            foundPaneHolder = (Pane)nextNodeB;
-
-                                            // Searching for the canvas...
-                                            for (int k = 0; k < foundPaneHolder.getChildren().size(); k++)
+                                            if (nextNodeC.getClass() == Pane.class)
                                             {
-                                                Node nextNodeC = foundPaneHolder.getChildren().get(k);
+                                                foundPaneHolder = (Pane)nextNodeC;
 
-                                                if (nextNodeC.getClass() == Canvas.class)
+                                                // Searching for the canvas...
+                                                for (int l = 0; l < foundPaneHolder.getChildren().size(); l++)
                                                 {
-                                                    System.out.println("found canvas");
+                                                    Node nextNodeD = foundPaneHolder.getChildren().get(l);
 
-                                                    foundCanvas = (Canvas)nextNodeC;
+                                                    if (nextNodeD.getClass() == Canvas.class)
+                                                    {
+                                                        foundCanvas = (Canvas)nextNodeD;
 
-                                                    EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                        EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
 
-                                                    break;
+                                                        break;
+                                                    }
                                                 }
+
+                                                break;
                                             }
                                         }
-                                        else
-                                        {
-                                            System.out.println("found listener");
 
-                                            foundPaneListener = (Pane)nextNodeB;
-
-                                            break;
-                                        }
+                                        break;
                                     }
                                 }
 

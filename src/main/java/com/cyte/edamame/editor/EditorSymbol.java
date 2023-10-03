@@ -254,8 +254,8 @@ public class EditorSymbol extends Editor
 
                     Polygon triangle = new Polygon();
                     triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                middleLength / 2, middleLength / 2,
-                                                0.0, -middleLength / 2);
+                            middleLength / 2, middleLength / 2,
+                            0.0, -middleLength / 2);
                     triangle.setFill(color);
 
                     triangle.setTranslateX(dropPos.GetLeftDouble());

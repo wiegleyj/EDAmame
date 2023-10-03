@@ -39,10 +39,13 @@
                <children>
                   <Pane>
                      <children>
-                        <Canvas height="1000.0" width="1000.0" />
+                        <Pane>
+                           <children>
+                              <Canvas height="1000.0" width="1000.0" />
+                           </children>
+                        </Pane>
                      </children>
                   </Pane>
-                  <Pane />
                   <ToolBar>
                     <items>
                       <Button mnemonicParsing="false" text="Button" />
@@ -63,7 +66,7 @@
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <RadioButton mnemonicParsing="false" selected="true" text="Circle">
+                        <RadioButton mnemonicParsing="false" text="Circle">
                            <toggleGroup>
                               <ToggleGroup fx:id="EditorSymbol_ShapeToggleGroup" />
                            </toggleGroup>
@@ -86,15 +89,7 @@
             </VBox>
          </content>
         </Tab>
-        <Tab text="Lines">
-         <content>
-            <VBox prefHeight="200.0" prefWidth="100.0" />
-         </content>
-        </Tab>
-      <Tab text="Text">
-         <content>
-            <VBox prefHeight="200.0" prefWidth="100.0" />
-         </content>
-      </Tab>
+        <Tab text="Lines" />
+      <Tab text="Text" />
     </TabPane>
 </VBox>

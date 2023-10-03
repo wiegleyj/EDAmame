@@ -46,12 +46,11 @@ public class RenderSystem
     public LinkedList<RenderShape> shapes;
     public PairMutable center;
     public Double zoom;
-    public PairMutable windowCenterOffset;
     public PairMutable mouseDragFirstPos;
     public Long mouseDragLastTime;
     public PairMutable mouseDragFirstCenter;
     public boolean mouseDragReachedEdge;
-    //public PairMutable mouseDragPaneFirstPos;
+    public PairMutable mouseDragPaneFirstPos;
 
     public Editor editor;
 
@@ -74,17 +73,15 @@ public class RenderSystem
         this.shapes = new LinkedList<RenderShape>();
         this.center = new PairMutable(0.0, 0.0);
         this.zoom = 1.0;
-        this.windowCenterOffset = new PairMutable(0.0, 0.0);
         this.mouseDragFirstPos = null;
         this.mouseDragLastTime = System.nanoTime();
         this.mouseDragFirstCenter = null;
         this.mouseDragReachedEdge = false;
-        //this.mouseDragPaneFirstPos = null;
+        this.mouseDragPaneFirstPos = null;
 
-        this.paneHolder.setTranslateX(0);
-        this.paneHolder.setTranslateY(0);
         this.editor = editorValue;
 
+        this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
         this.RenderSystem_ListenersInit();
     }
 
@@ -150,10 +147,10 @@ public class RenderSystem
         return new PairMutable(pos.getX(), pos.getY());
     }
 
-    public void RenderSystem_PaneUpdateTranslate()
+    public void RenderSystem_PaneSetTranslate(PairMutable pos)
     {
-        this.paneHolder.setTranslateX(this.windowCenterOffset.GetLeftDouble() + this.center.GetLeftDouble());
-        this.paneHolder.setTranslateY(this.windowCenterOffset.GetRightDouble() + this.center.GetRightDouble());
+        this.paneHolder.setTranslateX(pos.GetLeftDouble());
+        this.paneHolder.setTranslateY(pos.GetRightDouble());
     }
 
     public void RenderSystem_PaneSetScale(PairMutable scale, boolean compensate)
@@ -169,13 +166,10 @@ public class RenderSystem
                                                      scale.GetRightDouble() - prevScale.GetRightDouble());
             PairMutable newPos = this.RenderSystem_PaneGetTranslate();
 
-            newPos.left = (newPos.GetLeftDouble() + newPos.GetLeftDouble() * scaleDelta.GetLeftDouble()) - this.windowCenterOffset.GetLeftDouble();
-            newPos.right = (newPos.GetRightDouble() + newPos.GetRightDouble() * scaleDelta.GetRightDouble()) - this.windowCenterOffset.GetRightDouble();
+            newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
+            newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
 
-            //System.out.println(scaleDelta.ToStringDouble());
-
-            //this.RenderSystem_PaneSetTranslate(newPos);
-            //this.center = newPos;
+            this.RenderSystem_PaneSetTranslate(newPos);
         }
     }
 
@@ -184,105 +178,9 @@ public class RenderSystem
         return new PairMutable(this.paneHolder.getScaleX(), this.paneHolder.getScaleY());
     }
 
-    public PairMutable RenderSystem_PaneGetLayout()
-    {
-        return new PairMutable(this.paneHolder.getLayoutX(), this.paneHolder.getLayoutY());
-    }
-
     public PairMutable RenderSystem_PaneGetTranslate()
     {
         return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
-    }
-
-    //// CANVAS FUNCTIONS ////
-
-    /*public void CanvasSetLayout(PairMutable pos)
-    {
-        this.canvas.setLayoutX(pos.GetLeftDouble());
-        this.canvas.setLayoutY(pos.GetRightDouble());
-    }
-
-    public void CanvasSetTranslate(PairMutable pos)
-    {
-        this.canvas.setTranslateX(pos.GetLeftDouble());
-        this.canvas.setTranslateY(pos.GetRightDouble());
-    }
-
-    public void CanvasSetScale(PairMutable scale)
-    {
-        PairMutable prevScale = this.CanvasGetScale();
-
-        this.canvas.setScaleX(scale.GetLeftDouble());
-        this.canvas.setScaleY(scale.GetRightDouble());
-
-        PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
-                                                 scale.GetRightDouble() - prevScale.GetRightDouble());
-        PairMutable newPos = this.CanvasGetTranslate();
-
-        newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
-        newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
-
-        this.CanvasSetTranslate(newPos);
-
-        //System.out.println(scaleDelta.ToStringDouble());
-        //System.out.println(newPos.ToStringDouble());
-    }
-
-    public PairMutable CanvasGetScale()
-    {
-        return new PairMutable(this.canvas.getScaleX(), this.canvas.getScaleY());
-    }
-
-    public PairMutable CanvasGetLayout()
-    {
-        return new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY());
-    }
-
-    public PairMutable CanvasGetTranslate()
-    {
-        return new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY());
-    }*/
-
-    /*public void BindSize(Node node)
-    {
-        if (node.getClass() == TabPane.class)
-        {
-            this.canvas.widthProperty().bind(((TabPane)node).widthProperty());
-            this.canvas.heightProperty().bind(((TabPane)node).heightProperty());
-        }
-        else if (node.getClass() == TextArea.class)
-        {
-            this.canvas.widthProperty().bind(((TextArea)node).widthProperty());
-            this.canvas.heightProperty().bind(((TextArea)node).heightProperty());
-        }
-        else if (node.getClass() == VBox.class)
-        {
-            this.canvas.widthProperty().bind(((VBox)node).widthProperty());
-            this.canvas.heightProperty().bind(((VBox)node).heightProperty());
-        }
-        else
-        {
-            throw new java.lang.Error("ERROR: Unsupported node type supplied to size binding function of canvas!");
-        }
-    }
-
-    public void UnbindSize()
-    {
-        this.canvas.widthProperty().unbind();
-        this.canvas.heightProperty().unbind();
-    }*/
-
-    public void RenderSystem_CanvasSetSize(PairMutable sizeValue)
-    {
-        //this.UnbindSize();
-
-        this.canvas.setWidth(sizeValue.GetLeftDouble());
-        this.canvas.setHeight(sizeValue.GetRightDouble());
-    }
-
-    public PairMutable RenderSystem_CanvasGetSize()
-    {
-        return new PairMutable(canvas.getWidth(), canvas.getHeight());
     }
 
     //// SHAPE FUNCTIONS ////
@@ -308,29 +206,6 @@ public class RenderSystem
 
         shape.DrawCanvas(this.gc);
     }
-
-    /*public void AddShape(Integer idx, RenderShape shape)
-    {
-        if (this.shapes.size() >= this.maxShapes)
-            return;
-
-        if (idx < 0)
-        {
-            this.shapes.add(shape);
-            //this.shapesPosReal.add(posReal);
-        }
-        else
-        {
-            this.shapes.add(idx, shape);
-            //this.shapesPosReal.add(idx, posReal);
-        }
-    }
-
-    public void RemoveShape(Integer idx)
-    {
-        this.shapes.remove(this.shapes.get(idx));
-        //this.shapesPosReal.remove(this.shapesPosReal.get(idx));
-    }*/
 
     //// CALLBACK FUNCTIONS ////
 
@@ -389,7 +264,7 @@ public class RenderSystem
                 {}
 
                 this.mouseDragFirstPos = null;
-                //this.mouseDragPaneFirstPos = null;
+                this.mouseDragPaneFirstPos = null;
             }
 
             // Handling editor-specific callback actions
@@ -429,6 +304,7 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
+                        this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
                         this.RenderSystem_PaneSetScale(new PairMutable(1.0, 1.0), false);
 
                         this.center = new PairMutable(0.0, 0.0);
@@ -463,7 +339,7 @@ public class RenderSystem
                 this.mouseDragFirstPos = new PairMutable(posMouse);
                 this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
                                                             this.center.GetRightDouble());
-                //this.mouseDragPaneFirstPos = new PairMutable(this.center);
+                this.mouseDragPaneFirstPos = new PairMutable(this.RenderSystem_PaneGetTranslate());
 
                 /*for (int i = 0; i < this.shapes.size(); i++)
                 {
@@ -514,8 +390,8 @@ public class RenderSystem
                             this.mouseDragReachedEdge = true;
                         }
 
-                        this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom;
-                        this.center.right = this.mouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom;
+                        this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble();
+                        this.center.right = this.mouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble();
 
                         /*for (int i = 0; i < this.shapes.size(); i++)
                         {
@@ -530,8 +406,8 @@ public class RenderSystem
                             this.shapes.set(i, shape);
                         }*/
 
-                        //this.RenderSystem_PaneSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
-                        //                                      this.mouseDragPaneFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
+                        this.RenderSystem_PaneSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom,
+                                                              this.mouseDragPaneFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom));
 
                         //System.out.println(new PairMutable(this.canvas.getLayoutX(), this.canvas.getLayoutY()).ToStringDouble());
                         //System.out.println(new PairMutable(this.canvas.getTranslateX(), this.canvas.getTranslateY()).ToStringDouble());
