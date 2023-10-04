@@ -10,10 +10,7 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderSystem;
 import com.cyte.edamame.util.PairMutable;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Stack;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 import javafx.collections.*;
@@ -71,6 +68,8 @@ public abstract class Editor
     public boolean Editor_PressedRMB = false;
     public boolean Editor_Rotating = false;
 
+    protected List<Menu> dynamicMenus = new ArrayList<>();
+
     //// MAIN FUNCTIONS ////
 
     // ????
@@ -109,7 +108,19 @@ public abstract class Editor
      * MenuItems that EDAmame should include/insert into any menu it has with a matching name.
      * @return a (possibly empty) structure of menu items
      */
-    public ObservableMap<String, ObservableList<MenuItem>> Editor_GetMenus() { return Editor_Menus; }
+    public ObservableMap<String, ObservableList<MenuItem>> Editor_GetMenus() {
+        for (Menu menu : dynamicMenus) {
+            String menuName = menu.getText();
+            ObservableList<MenuItem> items = menu.getItems();
+
+            if(!Editor_Menus.containsKey(menuName)) {
+                Editor_Menus.put(menuName, items);
+            } else {
+                Editor_Menus.get(menuName).addAll(items);
+            }
+        }
+        return Editor_Menus;
+    }
 
     //// CALLBACK FUNCTIONS ////
 
@@ -286,5 +297,17 @@ public abstract class Editor
                                                     EDAmameController.Editor_ZoomFactor,
                                                     EDAmameController.Editor_MouseDragFactor,
                                                     EDAmameController.Editor_MouseCheckTimeout);
+    }
+
+    public List<Menu> getDynamicMenus() {
+        return this.dynamicMenus;
+    }
+
+    public void setDynamicMenus(List<Menu> menus) {
+        this.dynamicMenus = menus;
+    }
+
+    public String getEditor_Name() {
+        return this.Editor_Name;
     }
 }

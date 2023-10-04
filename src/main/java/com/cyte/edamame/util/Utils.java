@@ -7,9 +7,12 @@
 
 package com.cyte.edamame.util;
 
+import com.cyte.edamame.editor.MenuBarPriority;
+import com.cyte.edamame.editor.MenuPriority;
 import com.cyte.edamame.render.RenderShape;
+import javafx.scene.control.Menu;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class Utils
 {
@@ -88,5 +91,17 @@ public class Utils
         }
 
         return list.get(minIdx);
+    }
+
+    public static List<Menu> createMenusFromConfig(MenuBarPriority menuBarPriority) {
+        List<Menu> menus = new ArrayList<>();
+
+        menuBarPriority.getMenuPriorities().entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparing(MenuPriority::getPriority)))
+                .forEach(x -> {
+                    Menu menu = new Menu(x.getKey());
+                    menus.add(menu);
+                });
+        return menus;
     }
 }

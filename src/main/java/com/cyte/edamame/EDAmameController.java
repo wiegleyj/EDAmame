@@ -21,12 +21,14 @@
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.EditorSymbol;
+import com.cyte.edamame.editor.MenuBarPriority;
 import com.cyte.edamame.render.RenderShape;
+import com.cyte.edamame.util.MenuConfigLoader;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.TextAreaHandler;
 
-import java.util.LinkedList;
+import java.util.*;
 
 import javafx.collections.*;
 import javafx.fxml.*;
@@ -42,8 +44,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
-import java.util.ListIterator;
-import java.util.ResourceBundle;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -53,6 +53,8 @@ import javafx.animation.Animation;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
+
+import static com.cyte.edamame.util.Utils.createMenusFromConfig;
 
 /**
  * Main Controller for the {@link EDAmame} Application.<p>
@@ -358,6 +360,16 @@ public class EDAmameController implements Initializable
         // add the editor's toolbar to the toolbar stack. The
         Controller_StackPaneEditorToolBars.getChildren().add(editor.Editor_GetToolBar());
 
+        try {
+            Map<String, MenuBarPriority> editorsConfig = MenuConfigLoader.loadMenuConfig();
+            MenuBarPriority editorConfig = editorsConfig.get(editor.getEditor_Name());
+            List<Menu> dynamicMenus = createMenusFromConfig(editorConfig);
+            editor.setDynamicMenus(dynamicMenus);
+        } catch (Exception exception) {
+            System.err.println("Error with dynamic menu loading");
+            // Catch FileNotFound, JsonParseException, IOException, Missing or incorrect Data.
+        }
+
         // The control Editor_Tabs don't need to be handled. Control of their
         // visibility done through addition and removal from the children
         // of the control TabPane.
@@ -390,6 +402,10 @@ public class EDAmameController implements Initializable
                     iterator.add(item);
                 }
             }
+        }
+
+        for (Menu dynamicMenu : editor.getDynamicMenus()) {
+            Controller_MenuBar.getMenus().add(dynamicMenu);
         }
 
         // move the log Editor_Tab to the end.
