@@ -1,0 +1,58 @@
+{
+  "EDAmame" : {
+    "menuPriorities" : {
+      "File" : {
+        "priority" : 5,
+        "itemPriorities" : {
+          "New" : 10,
+          "Exit" : 30,
+          "Open" : 20
+        }
+      },
+      "Edit" : {
+        "priority" : 10,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Help" : {
+        "priority" : 30,
+        "itemPriorities" : {
+          "Fake Item" : 3,
+          "About" : 6
+        }
+      }
+    }
+  },
+  "SymbolEditor" : {
+    "menuPriorities" : {
+      "File" : {
+        "priority" : 5,
+        "itemPriorities" : {
+          "New" : 10,
+          "Exit" : 30,
+          "Open" : 20
+        }
+      },
+      "Edit" : {
+        "priority" : 10,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Help" : {
+        "priority" : 30,
+        "itemPriorities" : {
+          "Fake Item" : 3,
+          "About" : 6
+        }
+      }
+    }
+  }
+}
