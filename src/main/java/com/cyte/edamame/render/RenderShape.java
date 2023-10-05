@@ -20,7 +20,7 @@ import javafx.geometry.*;
 
 public class RenderShape
 {
-    final UUID id = UUID.randomUUID();
+    final String id = UUID.randomUUID().toString();
 
     public String name;
     public Shape shape;
@@ -31,16 +31,18 @@ public class RenderShape
     {
         this.name = nameValue;
         this.shape = shapeValue;
-        this.shapeHighlighted = null;
-        this.shapeSelected = null;
+        this.shape.setId(id);
     }
 
     public RenderShape(String nameValue, Shape shapeValue, Shape shapeHighlightedValue, Shape shapeSelectedValue)
     {
         this.name = nameValue;
         this.shape = shapeValue;
+        this.shape.setId(id);
         this.shapeHighlighted = shapeHighlightedValue;
+        this.shapeHighlighted.setId(id);
         this.shapeSelected = shapeSelectedValue;
+        this.shapeSelected.setId(id);
     }
 
     public boolean PosOnShape(PairMutable pos)

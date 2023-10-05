@@ -145,6 +145,7 @@ public abstract class Editor
         String prefix = Editor_ID.toString();
         Pane foundPaneListener = null;
         Pane foundPaneHolder = null;
+        Pane foundPaneHighlights = null;
         Canvas foundCanvas = null;
 
         while (nodeIterator.hasNext())
@@ -229,18 +230,22 @@ public abstract class Editor
                                             {
                                                 foundPaneHolder = (Pane)nextNodeC;
 
-                                                // Searching for the canvas...
+                                                // Searching for the highlight pane and the canvas...
                                                 for (int l = 0; l < foundPaneHolder.getChildren().size(); l++)
                                                 {
                                                     Node nextNodeD = foundPaneHolder.getChildren().get(l);
 
-                                                    if (nextNodeD.getClass() == Canvas.class)
+                                                    if (nextNodeD.getClass() == Pane.class)
+                                                    {
+                                                        foundPaneHighlights = (Pane)nextNodeD;
+
+                                                        EDAmameController.Controller_Logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                    }
+                                                    else if (nextNodeD.getClass() == Canvas.class)
                                                     {
                                                         foundCanvas = (Canvas)nextNodeD;
 
                                                         EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
-
-                                                        break;
                                                     }
                                                 }
 
@@ -278,6 +283,7 @@ public abstract class Editor
         this.Editor_RenderSystem = new RenderSystem(this,
                                                     foundPaneListener,
                                                     foundPaneHolder,
+                                                    foundPaneHighlights,
                                                     foundCanvas,
                                                     EDAmameController.Editor_TheaterSize,
                                                     EDAmameController.Editor_BackgroundColor,

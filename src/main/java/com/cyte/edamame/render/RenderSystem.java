@@ -32,6 +32,7 @@ public class RenderSystem
 
     public Pane paneListener;
     public Pane paneHolder;
+    public Pane paneHighlights;
     public Canvas canvas;
     public GraphicsContext gc;
     public PairMutable theaterSize;
@@ -57,10 +58,11 @@ public class RenderSystem
 
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
         this.paneListener = paneListenerValue;
         this.paneHolder = paneHolderValue;
+        this.paneHighlights = paneHighlightsValue;
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
         this.theaterSize = theaterSizeValue;
