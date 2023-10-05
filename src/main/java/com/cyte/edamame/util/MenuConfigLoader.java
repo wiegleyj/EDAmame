@@ -28,7 +28,7 @@ public class MenuConfigLoader {
             });
         } catch (FileNotFoundException exception) {
             throw exception;
-            // Need to make a popup of some sort to let the user know that that the json file does not exist.
+            // Need to make a popup of some sort to let the user know that the json file does not exist.
         } catch (Exception exception) {
             throw new InvalidConfigurationException("Error parsing or processing configuration JSON file.", exception);
         }

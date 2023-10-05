@@ -367,7 +367,7 @@ public class EDAmameController implements Initializable
             editor.setDynamicMenus(dynamicMenus);
         } catch (Exception exception) {
             System.err.println("Error with dynamic menu loading");
-            // Catch FileNotFound, JsonParseException, IOException, Missing or incorrect Data.
+            // Catch FileNotFound, JsonParseException, IOException, Missing or Incorrect Data.
         }
 
         // The control Editor_Tabs don't need to be handled. Control of their
