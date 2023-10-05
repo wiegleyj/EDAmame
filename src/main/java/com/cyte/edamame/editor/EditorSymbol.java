@@ -253,7 +253,7 @@ public class EditorSymbol extends Editor
                         circle.setTranslateY(dropPos.GetRightDouble());
 
                         RenderShape shape = new RenderShape("Circle", circle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
                     }
                 }
                 else if (selectedShapeButton.getText().equals("Rectangle"))
@@ -272,7 +272,7 @@ public class EditorSymbol extends Editor
                         rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
 
                         RenderShape shape = new RenderShape("Rectangle", rectangle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
                     }
 
                 }
@@ -294,9 +294,8 @@ public class EditorSymbol extends Editor
                         triangle.setTranslateY(dropPos.GetRightDouble());
 
                         RenderShape shape = new RenderShape("Triangle", triangle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
+                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
                     }
-
                 }
                 else
                 {

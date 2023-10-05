@@ -23,6 +23,7 @@ import javafx.scene.paint.*;
 import javafx.scene.input.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
+import javafx.util.Pair;
 
 public class RenderSystem
 {
@@ -169,18 +170,11 @@ public class RenderSystem
 
     //// SHAPE FUNCTIONS ////
 
-    public void RenderSystem_ShapeAdd(Integer idx, RenderShape shape)
+    public void RenderSystem_ShapeAdd(RenderShape shape)
     {
-        if (idx < 0)
-        {
-            this.shapes.add(shape);
-            this.paneHolder.getChildren().add(shape.shape);
-        }
-        else
-        {
-            this.shapes.add(idx, shape);
-            this.paneHolder.getChildren().add(idx, shape.shape);
-        }
+        this.shapes.add(shape);
+        this.paneHolder.getChildren().add(1, shape.shape);
+
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -213,7 +207,32 @@ public class RenderSystem
         // When we move the mouse (without clicking)...
         this.paneListener.setOnMouseMoved(event -> {
             // Handling global callback actions
-            {}
+            {
+                for (int i = 0; i < this.shapes.size(); i++)
+                {
+                    PairMutable posMouse = this.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
+                    RenderShape shape = this.shapes.get(i);
+                    boolean onShape = shape.PosOnShape(posMouse);
+
+                    if (onShape && !shape.highlighted)
+                    {
+                        // Adding highlight for shape
+                        shape.CalculateShapeHighlighted();
+                        this.paneHighlights.getChildren().add(shape.shapeHighlighted);
+
+                        shape.highlighted = true;
+                    }
+                    else if (!onShape && shape.highlighted)
+                    {
+                        // Remove highlight for shape
+                        this.RenderSystem_ShapeHighlightRemove(shape.id);
+
+                        shape.highlighted = false;
+                    }
+
+                    this.shapes.set(i, shape);
+                }
+            }
 
             // Handling editor-specific callback actions
             this.editor.Editor_ViewportOnMouseMoved(event);
@@ -467,5 +486,20 @@ public class RenderSystem
 
             event.consume();
         });
+    }
+
+    //// SUPPORT FUNCTIONS ////
+
+    public void RenderSystem_ShapeHighlightRemove(String id)
+    {
+        for (int i = 0; i < this.paneHighlights.getChildren().size(); i++)
+        {
+            Shape shape = (Shape)this.paneHighlights.getChildren().get(i);
+
+            if (shape.getId().equals(id))
+            {
+                this.paneHighlights.getChildren().remove(shape);
+            }
+        }
     }
 }

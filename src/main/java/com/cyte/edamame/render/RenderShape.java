@@ -26,27 +26,41 @@ public class RenderShape
     public Shape shape;
     public Shape shapeHighlighted;
     public Shape shapeSelected;
+    public boolean highlighted;
+    public boolean selected;
 
     public RenderShape(String nameValue, Shape shapeValue)
     {
         this.name = nameValue;
         this.shape = shapeValue;
         this.shape.setId(id);
-    }
-
-    public RenderShape(String nameValue, Shape shapeValue, Shape shapeHighlightedValue, Shape shapeSelectedValue)
-    {
-        this.name = nameValue;
-        this.shape = shapeValue;
-        this.shape.setId(id);
-        this.shapeHighlighted = shapeHighlightedValue;
-        this.shapeHighlighted.setId(id);
-        this.shapeSelected = shapeSelectedValue;
-        this.shapeSelected.setId(id);
+        this.shapeHighlighted = null;
+        this.shapeSelected = null;
+        this.highlighted = false;
+        this.selected = false;
     }
 
     public boolean PosOnShape(PairMutable pos)
     {
         return this.shape.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
+    }
+
+    public void CalculateShapeHighlighted()
+    {
+        Bounds bounds = this.shape.getBoundsInParent();
+
+        if (this.shape.getClass() == Rectangle.class)
+            this.shapeHighlighted = new Rectangle(0, 0, bounds.getWidth(), bounds.getHeight());
+        else
+            this.shapeHighlighted = new Rectangle(-bounds.getWidth() / 2, -bounds.getHeight() / 2, bounds.getWidth(), bounds.getHeight());
+
+
+        this.shapeHighlighted.setFill(Color.GRAY);
+        this.shapeHighlighted.setOpacity(0.5);
+        this.shapeHighlighted.setId(this.id);
+        //this.shapeHighlighted.setTranslateX(this.shape.getTranslateX());
+        //this.shapeHighlighted.setTranslateY(this.shape.getTranslateY());
+        this.shapeHighlighted.translateXProperty().bind(this.shape.translateXProperty());
+        this.shapeHighlighted.translateYProperty().bind(this.shape.translateYProperty());
     }
 }
