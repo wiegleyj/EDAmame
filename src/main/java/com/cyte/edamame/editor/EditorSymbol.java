@@ -252,8 +252,7 @@ public class EditorSymbol extends Editor
                         circle.setTranslateX(dropPos.GetLeftDouble());
                         circle.setTranslateY(dropPos.GetRightDouble());
 
-                        RenderShape shape = new RenderShape("Circle", 0);
-                        shape.shape = circle;
+                        RenderShape shape = new RenderShape("Circle", circle);
                         this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
                 }
@@ -262,8 +261,8 @@ public class EditorSymbol extends Editor
                     String stringWidth = this.EditorSymbol_RectangleWidth.getText();
                     String stringHeight = this.EditorSymbol_RectangleHeight.getText();
 
-                    if (EDAmameController.Controller_IsStringNum(stringWidth)
-                            && EDAmameController.Controller_IsStringNum(stringHeight)) {
+                    if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
+                    {
                         double width = Double.parseDouble(stringWidth);
                         double height = Double.parseDouble(stringHeight);
                         Color color = this.EditorSymbol_RectangleColor.getValue();
@@ -272,8 +271,7 @@ public class EditorSymbol extends Editor
                         rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
                         rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
 
-                        RenderShape shape = new RenderShape("Rectangle", 0);
-                        shape.shape = rectangle;
+                        RenderShape shape = new RenderShape("Rectangle", rectangle);
                         this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
 
@@ -282,20 +280,20 @@ public class EditorSymbol extends Editor
                 {
                     String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
 
-                    if (EDAmameController.Controller_IsStringNum(stringMiddleHeight)) {
+                    if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                    {
                         double middleLength = Double.parseDouble(stringMiddleHeight);
                         Color color = this.EditorSymbol_TriangleColor.getValue();
                         Polygon triangle = new Polygon();
                         triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                middleLength / 2, middleLength / 2,
-                                0.0, -middleLength / 2);
+                                                    middleLength / 2, middleLength / 2,
+                                                    0.0, -middleLength / 2);
                         triangle.setFill(color);
 
                         triangle.setTranslateX(dropPos.GetLeftDouble());
                         triangle.setTranslateY(dropPos.GetRightDouble());
 
-                        RenderShape shape = new RenderShape("Triangle", 0);
-                        shape.shape = triangle;
+                        RenderShape shape = new RenderShape("Triangle", triangle);
                         this.Editor_RenderSystem.RenderSystem_ShapeAdd(-1, shape);
                     }
 

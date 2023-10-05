@@ -6,15 +6,15 @@
  */
 
 // TODO:
-// Fix viewport jolting when dropping first shape
-// Implement shape dropping in symbol editor
-// Implement line drawing in symbol editor
-// Implement wire connection points into symbols
+// Implement shape highlighting
 // Implement shape selection
 // Implement shape moving
 // Implement shape deletion
 // Implement shape properties window
 // Implement text dropping
+// Implement line drawing in symbol editor
+// Implement wire connection points into symbols
+// Fix viewport jolting when dropping first shape
 // Refactor the stupid canvas zooming mouse diff pos thing
 // Refactor dissect editor function searching for canvas
 // Fix mouse-specific release callback function
@@ -108,8 +108,6 @@ public class EDAmameController implements Initializable
 
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
 
-    static public LinkedList<RenderShape> Controller_BasicShapes = new LinkedList<RenderShape>();
-
     //// MAIN FUNCTIONS ////
 
     /**
@@ -124,8 +122,6 @@ public class EDAmameController implements Initializable
     {
         this.Controller_Stage = Controller_Stage;
         Controller_Stage.setOnShown((event) -> Controller_ExecuteOnShown());
-
-        CreateBasicCanvasShapes();
     }
 
     /**
@@ -630,41 +626,6 @@ public class EDAmameController implements Initializable
     }
 
     //// TESTING FUNCTIONS ////
-
-    static public void CreateBasicCanvasShapes()
-    {
-        RenderShape gridPoint = new RenderShape("GridPoint", 1);
-        gridPoint.AddPoint(0.0, 0.0, 5.0, Color.GRAY, 0.5);
-        //gridPoint.permanent = true;
-
-        Controller_BasicShapes.add(gridPoint);
-
-        RenderShape gridBox = new RenderShape("GridBox", 1);
-        gridBox.AddPoint(-Editor_TheaterSize.GetLeftDouble() / 2, -Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
-        gridBox.AddPoint(Editor_TheaterSize.GetLeftDouble() / 2, -Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
-        gridBox.AddPoint(Editor_TheaterSize.GetLeftDouble() / 2, Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
-        gridBox.AddPoint(-Editor_TheaterSize.GetLeftDouble() / 2, Editor_TheaterSize.GetRightDouble() / 2, 0.0, Color.BLACK, 1.0);
-        gridBox.AddLine(0, 1, 1.5, Color.BLACK, 1.0);
-        gridBox.AddLine(1, 2, 1.5, Color.BLACK, 1.0);
-        gridBox.AddLine(2, 3, 1.5, Color.BLACK, 1.0);
-        gridBox.AddLine(3, 0, 1.5, Color.BLACK, 1.0);
-        //gridBox.permanent = true;
-
-        Controller_BasicShapes.add(gridBox);
-
-        RenderShape crosshair = new RenderShape("Crosshair", 1);
-        crosshair.AddPoint(0.0, -5.0, 0.0, Color.RED, 1.0);
-        crosshair.AddPoint(0.0, 5.0, 0.0, Color.RED, 1.0);
-        crosshair.AddPoint(-5.0, 0.0, 0.0, Color.RED, 1.0);
-        crosshair.AddPoint(5.0, 0.0, 0.0, Color.RED, 1.0);
-        crosshair.AddLine(0, 1, 0.5, Color.RED, 1.0);
-        crosshair.AddLine(2, 3, 0.5, Color.RED, 1.0);
-        //crosshair.zoomScaling = false;
-        //crosshair.permanent = true;
-        //crosshair.posStatic = true;
-
-        Controller_BasicShapes.add(crosshair);
-    }
 
     /**
      * A test method for a test button to add a fake editor to the page to verify concept.

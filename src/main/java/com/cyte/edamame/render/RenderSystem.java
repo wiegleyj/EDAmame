@@ -11,6 +11,7 @@ import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.Utils;
 
+import java.sql.SQLOutput;
 import java.util.LinkedList;
 import java.util.UUID;
 
@@ -91,15 +92,9 @@ public class RenderSystem
     {
         this.RenderSystem_CanvasClear();
 
-        // Centering the canvas
-        //System.out.println(this.stackPane.getWidth());
-        //System.out.println(this.stackPane.getHeight());
-
-        //this.canvas.setLayoutX(-this.stackPane.getWidth() / 2);
-        //this.canvas.setLayoutY(-this.stackPane.getHeight() / 2);
-
-        // Loading the point grid
-        RenderShape gridPointBlueprint = EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "GridPoint"));
+        gc.setFill(Color.GRAY);
+        gc.setGlobalAlpha(0.5);
+        Double width = 5.0;
 
         Double posX = -2500.0;
         Double posY = -2500.0;
@@ -108,27 +103,14 @@ public class RenderSystem
         {
             for (int j = 0; j < 50; j++)
             {
-                RenderShape gridPoint = new RenderShape(gridPointBlueprint);
-                gridPoint.posDraw = new PairMutable(posX, posY);
+                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
 
-                this.RenderSystem_CanvasDrawShape(gridPoint);
                 posX += 100.0;
             }
 
             posX = -2500.0;
             posY += 100.0;
-            //System.out.println(posY);
         }
-
-        // Loading the grid box
-        RenderShape gridBox = new RenderShape(EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "GridBox")));
-        gridBox.posDraw = new PairMutable(this.canvas.getWidth() / 2, this.canvas.getHeight() / 2);
-        this.RenderSystem_CanvasDrawShape(gridBox);
-
-        // Loading the center crosshair
-        RenderShape crosshair = new RenderShape(EDAmameController.Controller_BasicShapes.get(Utils.FindCanvasShape(EDAmameController.Controller_BasicShapes, "Crosshair")));
-        crosshair.posDraw = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth() / 2, editor.Editor_RenderSystem.canvas.getHeight() / 2);
-        this.RenderSystem_CanvasDrawShape(crosshair);
     }
 
     public void RenderSystem_CanvasClear()
@@ -187,27 +169,16 @@ public class RenderSystem
 
     public void RenderSystem_ShapeAdd(Integer idx, RenderShape shape)
     {
-        if (idx < 0) {
+        if (idx < 0)
+        {
             this.shapes.add(shape);
             this.paneHolder.getChildren().add(shape.shape);
-        } else {
+        }
+        else
+        {
             this.shapes.add(idx, shape);
             this.paneHolder.getChildren().add(idx, shape.shape);
         }
-    }
-
-    public void RenderSystem_ShapeCalculatePosDraw(RenderShape shape)
-    {
-        shape.posDraw.left = shape.posReal.GetLeftDouble() * this.zoom + this.canvas.getWidth() / 2;
-        shape.posDraw.right = shape.posReal.GetRightDouble() * this.zoom + this.canvas.getHeight() / 2;
-    }
-
-    public void RenderSystem_CanvasDrawShape(RenderShape shape)
-    {
-        if (shape.posReal != null)
-            this.RenderSystem_ShapeCalculatePosDraw(shape);
-
-        shape.DrawCanvas(this.gc);
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -312,6 +283,14 @@ public class RenderSystem
 
                         this.center = new PairMutable(0.0, 0.0);
                         this.zoom = 1.0;
+                    }
+
+                    for (int i = 0; i < this.shapes.size(); i++)
+                    {
+                        PairMutable posMouse = this.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
+
+                        boolean onShape = this.shapes.get(i).PosOnShape(posMouse);
+                        System.out.println(onShape);
                     }
                 }
             }
