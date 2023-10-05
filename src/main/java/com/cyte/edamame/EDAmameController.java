@@ -363,7 +363,7 @@ public class EDAmameController implements Initializable
         try {
             Map<String, MenuBarPriority> editorsConfig = MenuConfigLoader.loadMenuConfig();
             MenuBarPriority editorConfig = editorsConfig.get(editor.getEditor_Name());
-            List<Menu> dynamicMenus = createMenusFromConfig(editorConfig);
+            List<Menu> dynamicMenus = createMenusFromConfig(editorConfig, editor, Controller_TabPane);
             editor.setDynamicMenus(dynamicMenus);
         } catch (Exception exception) {
             System.err.println("Error with dynamic menu loading");

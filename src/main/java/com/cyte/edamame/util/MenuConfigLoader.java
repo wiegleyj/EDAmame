@@ -24,7 +24,8 @@ public class MenuConfigLoader {
             if (inputStream == null) {
                 throw new FileNotFoundException("menu_config.json note found");
             }
-            return objectMapper.readValue(inputStream, new TypeReference<Map<String, MenuBarPriority>>() {});
+            return objectMapper.readValue(inputStream, new TypeReference<>() {
+            });
         } catch (FileNotFoundException exception) {
             throw exception;
             // Need to make a popup of some sort to let the user know that that the json file does not exist.
