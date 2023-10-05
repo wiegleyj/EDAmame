@@ -18,8 +18,71 @@
           "Move" : 15
         }
       },
-      "Help" : {
+      "View" : {
+        "priority" : 15,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Project" : {
+        "priority" : 20,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Place" : {
+        "priority" : 25,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Design" : {
         "priority" : 30,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Tools" : {
+        "priority" : 35,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Reports" : {
+        "priority" : 40,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Window" : {
+        "priority" : 45,
+        "itemPriorities" : {
+          "Delete" : 40,
+          "Select" : 5,
+          "Adjust" : 50,
+          "Move" : 15
+        }
+      },
+      "Help" : {
+        "priority" : 50,
         "itemPriorities" : {
           "Fake Item" : 3,
           "About" : 6
