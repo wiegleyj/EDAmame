@@ -46,6 +46,7 @@
                            <children>
                               <Canvas height="1000.0" width="1000.0" />
                               <Pane />
+                              <Pane />
                            </children>
                         </Pane>
                      </children>

@@ -6,15 +6,14 @@
  */
 
 // TODO:
-// Implement shape highlighting
-// Implement shape selection
-// Implement shape moving
-// Implement shape deletion
+// Fix shape deletion
+// Fix viewport jolting when dropping first shape
+// Implement symbol press-release selection check
+// Implement shape rotation
 // Implement shape properties window
 // Implement text dropping
 // Implement line drawing in symbol editor
 // Implement wire connection points into symbols
-// Fix viewport jolting when dropping first shape
 // Refactor the stupid canvas zooming mouse diff pos thing
 // Refactor dissect editor function searching for canvas
 // Fix mouse-specific release callback function
@@ -196,20 +195,24 @@ public class EDAmameController implements Initializable
 
     public void Editor_Heartbeat()
     {
-        ObservableList<Tab> Editor_Tabs = Controller_TabPane.getTabs();
+        ObservableList<Tab> tabs = Controller_TabPane.getTabs();
 
         // Checking all Editor_Tabs in the main Editor_Tab pane...
-        for (int i = 0; i < Editor_Tabs.size(); i++)
+        for (int i = 0; i < tabs.size(); i++)
         {
-            Tab Editor_Tab = Editor_Tabs.get(i);
+            Tab tab = tabs.get(i);
 
             // Handling symbol Controller_Editors
-            if (Editor_Tab.getText().equals("Symbol Editor"))
+            if (!tab.getText().equals("Log"))
             {
-                Editor editor = this.Controller_Editors.get(Editor_Tab);
+                Editor editor = this.Controller_Editors.get(tab);
 
-                if (!editor.Editor_Visible)
+                if ((editor == null) || !editor.Editor_Visible)
                     continue;
+
+                //System.out.println(editor.Editor_RenderSystem.shapesHighlighted);
+                //System.out.println(editor.Editor_RenderSystem.shapesSelected);
+                //System.out.println(editor.Editor_RenderSystem.shapesMoving);
 
                 // Adjusting the central layout of the canvas relative to the stack pane size
                 {
@@ -572,39 +575,52 @@ public class EDAmameController implements Initializable
     }
 
     @FXML
-    public void Controller_KeyPress(KeyEvent event)
+    public void Controller_OnKeyPressed(KeyEvent event)
     {
         // Adding pressed key to the pressed keys list
         if (!Controller_IsKeyPressed(event.getCode()))
             Controller_PressedKeys.add(event.getCode());
 
-        // Handling symbol deletion
-        /*if (this.EditorSchematic_IsKeyPressed(KeyCode.BACK_SPACE) || this.EditorSchematic_IsKeyPressed(KeyCode.DELETE))
+        // Calling editor callbacks
+        ObservableList<Tab> tabs = Controller_TabPane.getTabs();
+
+        for (int i = 0; i < tabs.size(); i++)
         {
-            Integer i = 0;
+            Tab tab = tabs.get(i);
 
-            while (i < this.EditorSchematic_ViewportSymbolsDropped.size())
+            if (!tab.getText().equals("Log"))
             {
-                EditorSchematic_Symbol symbol = this.EditorSchematic_ViewportSymbolsDropped.get(i);
+                Editor editor = this.Controller_Editors.get(tab);
 
-                if (symbol.selected)
-                {
-                    this.EditorSchematic_ViewportSymbolsDropped.remove(symbol);
-                    i--;
-                }
-
-                i++;
+                if ((editor != null) && editor.Editor_Visible)
+                    editor.Editor_RenderSystem.RenderSystem_OnKeyPressed(event);
             }
-        }*/
+        }
 
         event.consume();
     }
 
     @FXML
-    public void Controller_KeyRelease(KeyEvent event)
+    public void Controller_OnKeyReleased(KeyEvent event)
     {
         if (Controller_IsKeyPressed(event.getCode()))
             Controller_PressedKeys.remove(event.getCode());
+
+        // Calling editor callbacks
+        ObservableList<Tab> tabs = Controller_TabPane.getTabs();
+
+        for (int i = 0; i < tabs.size(); i++)
+        {
+            Tab tab = tabs.get(i);
+
+            if (!tab.getText().equals("Log"))
+            {
+                Editor editor = this.Controller_Editors.get(tab);
+
+                if ((editor != null) && editor.Editor_Visible)
+                    editor.Editor_RenderSystem.RenderSystem_OnKeyReleased(event);
+            }
+        }
 
         event.consume();
     }

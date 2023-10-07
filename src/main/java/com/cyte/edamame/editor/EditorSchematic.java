@@ -9,6 +9,7 @@ package com.cyte.edamame.editor;
 
 import com.cyte.edamame.util.PairMutable;
 import javafx.scene.input.DragEvent;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 
@@ -54,5 +55,15 @@ public class EditorSchematic extends Editor
     public void Editor_ViewportOnScroll(ScrollEvent event)
     {
         System.out.println("Schematic mouse scrolled!");
+    }
+
+    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    {
+        System.out.println("Schematic key pressed!");
+    }
+
+    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    {
+        System.out.println("Schematic key released!");
     }
 }

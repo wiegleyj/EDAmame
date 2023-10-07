@@ -28,6 +28,7 @@ public class RenderShape
     public Shape shapeSelected;
     public boolean highlighted;
     public boolean selected;
+    public PairMutable mousePressPos;
 
     public RenderShape(String nameValue, Shape shapeValue)
     {
@@ -38,11 +39,28 @@ public class RenderShape
         this.shapeSelected = null;
         this.highlighted = false;
         this.selected = false;
+        this.mousePressPos = null;
     }
 
     public boolean PosOnShape(PairMutable pos)
     {
         return this.shape.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
+    }
+
+    public void CalculateShapeSelected()
+    {
+        Bounds bounds = this.shape.getBoundsInParent();
+
+        if (this.shape.getClass() == Rectangle.class)
+            this.shapeSelected = new Rectangle(0, 0, bounds.getWidth(), bounds.getHeight());
+        else
+            this.shapeSelected = new Rectangle(-bounds.getWidth() / 2, -bounds.getHeight() / 2, bounds.getWidth(), bounds.getHeight());
+
+        this.shapeSelected.setFill(Color.GRAY);
+        this.shapeSelected.setOpacity(0.5);
+        this.shapeSelected.setId(this.id);
+        this.shapeSelected.translateXProperty().bind(this.shape.translateXProperty());
+        this.shapeSelected.translateYProperty().bind(this.shape.translateYProperty());
     }
 
     public void CalculateShapeHighlighted()
@@ -54,12 +72,9 @@ public class RenderShape
         else
             this.shapeHighlighted = new Rectangle(-bounds.getWidth() / 2, -bounds.getHeight() / 2, bounds.getWidth(), bounds.getHeight());
 
-
         this.shapeHighlighted.setFill(Color.GRAY);
         this.shapeHighlighted.setOpacity(0.5);
         this.shapeHighlighted.setId(this.id);
-        //this.shapeHighlighted.setTranslateX(this.shape.getTranslateX());
-        //this.shapeHighlighted.setTranslateY(this.shape.getTranslateY());
         this.shapeHighlighted.translateXProperty().bind(this.shape.translateXProperty());
         this.shapeHighlighted.translateYProperty().bind(this.shape.translateYProperty());
     }

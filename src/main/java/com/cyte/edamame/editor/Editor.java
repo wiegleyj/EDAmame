@@ -12,7 +12,7 @@ import com.cyte.edamame.util.PairMutable;
 
 import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
+import java.util.LinkedList;
 import java.util.UUID;
 import java.util.logging.Level;
 
@@ -66,6 +66,7 @@ public abstract class Editor
 
     // DO NOT EDIT
 
+    public LinkedList<KeyCode> Editor_PressedKeys = new LinkedList<KeyCode>();
     public boolean Editor_Visible = false;
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
@@ -120,6 +121,8 @@ public abstract class Editor
     abstract public void Editor_ViewportOnMouseReleased(MouseEvent event);
     abstract public void Editor_ViewportOnMouseDragged(MouseEvent event);
     abstract public void Editor_ViewportOnScroll(ScrollEvent event);
+    abstract public void Editor_ViewportOnKeyPressed(KeyEvent event);
+    abstract public void Editor_ViewportOnKeyReleased(KeyEvent event);
 
     //// SUPPORT FUNCTIONS ////
 
@@ -146,6 +149,7 @@ public abstract class Editor
         Pane foundPaneListener = null;
         Pane foundPaneHolder = null;
         Pane foundPaneHighlights = null;
+        Pane foundPaneSelections = null;
         Canvas foundCanvas = null;
 
         while (nodeIterator.hasNext())
@@ -237,9 +241,18 @@ public abstract class Editor
 
                                                     if (nextNodeD.getClass() == Pane.class)
                                                     {
-                                                        foundPaneHighlights = (Pane)nextNodeD;
+                                                        if (foundPaneSelections == null)
+                                                        {
+                                                            foundPaneSelections = (Pane)nextNodeD;
 
-                                                        EDAmameController.Controller_Logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                            EDAmameController.Controller_Logger.log(Level.INFO, "Found selections pane of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                        }
+                                                        else if (foundPaneHighlights == null)
+                                                        {
+                                                            foundPaneHighlights = (Pane)nextNodeD;
+
+                                                            EDAmameController.Controller_Logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                        }
                                                     }
                                                     else if (nextNodeD.getClass() == Canvas.class)
                                                     {
@@ -265,6 +278,10 @@ public abstract class Editor
                             throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.Editor_Name + "\"!");
                         if (foundPaneHolder == null)
                             throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.Editor_Name + "\"!");
+                        if (foundPaneHighlights == null)
+                            throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.Editor_Name + "\"!");
+                        if (foundPaneSelections == null)
+                            throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.Editor_Name + "\"!");
                         if (foundCanvas == null)
                             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
 
@@ -284,6 +301,7 @@ public abstract class Editor
                                                     foundPaneListener,
                                                     foundPaneHolder,
                                                     foundPaneHighlights,
+                                                    foundPaneSelections,
                                                     foundCanvas,
                                                     EDAmameController.Editor_TheaterSize,
                                                     EDAmameController.Editor_BackgroundColor,

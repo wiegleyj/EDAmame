@@ -229,77 +229,80 @@ public class EditorSymbol extends Editor
 
         if (this.Editor_PressedLMB)
         {
-            // Handling shape dropping
-            PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
-
-            // CHECKING FOR POSITION CONFLICTS
-
-            RadioButton selectedShapeButton = (RadioButton)EditorSymbol_ShapeToggleGroup.getSelectedToggle();
-
-            if (selectedShapeButton != null)
+            // Handling shape dropping (only if we're not hovering over, selecting or moving any shapes)
+            if ((this.Editor_RenderSystem.shapesHighlighted == 0) &&
+                (this.Editor_RenderSystem.shapesSelected == 0) &&
+                !this.Editor_RenderSystem.shapesMoving)
             {
-                if (selectedShapeButton.getText().equals("Circle"))
-                {
-                    String stringRadius = this.EditorSymbol_CircleRadius.getText();
+                PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
+                RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
-                    if (EDAmameController.Controller_IsStringNum(stringRadius))
+                if (selectedShapeButton != null)
+                {
+                    if (selectedShapeButton.getText().equals("Circle"))
                     {
-                        double width = Double.parseDouble(stringRadius) * 2;
-                        Color color = this.EditorSymbol_CircleColor.getValue();
+                        String stringRadius = this.EditorSymbol_CircleRadius.getText();
 
-                        Circle circle = new Circle(width, color);
+                        if (EDAmameController.Controller_IsStringNum(stringRadius))
+                        {
+                            double width = Double.parseDouble(stringRadius) * 2;
+                            Color color = this.EditorSymbol_CircleColor.getValue();
 
-                        circle.setTranslateX(dropPos.GetLeftDouble());
-                        circle.setTranslateY(dropPos.GetRightDouble());
+                            Circle circle = new Circle(width, color);
 
-                        RenderShape shape = new RenderShape("Circle", circle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            circle.setTranslateX(dropPos.GetLeftDouble());
+                            circle.setTranslateY(dropPos.GetRightDouble());
+
+                            RenderShape shape = new RenderShape("Circle", circle);
+                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                        }
                     }
-                }
-                else if (selectedShapeButton.getText().equals("Rectangle"))
-                {
-                    String stringWidth = this.EditorSymbol_RectangleWidth.getText();
-                    String stringHeight = this.EditorSymbol_RectangleHeight.getText();
-
-                    if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
+                    else if (selectedShapeButton.getText().equals("Rectangle"))
                     {
-                        double width = Double.parseDouble(stringWidth);
-                        double height = Double.parseDouble(stringHeight);
-                        Color color = this.EditorSymbol_RectangleColor.getValue();
-                        Rectangle rectangle = new Rectangle(width, height, color);
+                        String stringWidth = this.EditorSymbol_RectangleWidth.getText();
+                        String stringHeight = this.EditorSymbol_RectangleHeight.getText();
 
-                        rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                        rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+                        if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
+                        {
+                            double width = Double.parseDouble(stringWidth);
+                            double height = Double.parseDouble(stringHeight);
+                            Color color = this.EditorSymbol_RectangleColor.getValue();
+                            Rectangle rectangle = new Rectangle(width, height, color);
 
-                        RenderShape shape = new RenderShape("Rectangle", rectangle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                            rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+
+                            RenderShape shape = new RenderShape("Rectangle", rectangle);
+                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                        }
+
                     }
-
-                }
-                else if (selectedShapeButton.getText().equals("Triangle"))
-                {
-                    String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
-
-                    if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                    else if (selectedShapeButton.getText().equals("Triangle"))
                     {
-                        double middleLength = Double.parseDouble(stringMiddleHeight);
-                        Color color = this.EditorSymbol_TriangleColor.getValue();
-                        Polygon triangle = new Polygon();
-                        triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                    middleLength / 2, middleLength / 2,
-                                                    0.0, -middleLength / 2);
-                        triangle.setFill(color);
+                        String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
 
-                        triangle.setTranslateX(dropPos.GetLeftDouble());
-                        triangle.setTranslateY(dropPos.GetRightDouble());
+                        if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                        {
+                            double middleLength = Double.parseDouble(stringMiddleHeight);
+                            Color color = this.EditorSymbol_TriangleColor.getValue();
+                            Polygon triangle = new Polygon();
+                            triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                                        middleLength / 2, middleLength / 2,
+                                                        0.0,
+                                                        -middleLength / 2);
+                            triangle.setFill(color);
 
-                        RenderShape shape = new RenderShape("Triangle", triangle);
-                        this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            triangle.setTranslateX(dropPos.GetLeftDouble());
+                            triangle.setTranslateY(dropPos.GetRightDouble());
+
+                            RenderShape shape = new RenderShape("Triangle", triangle);
+                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                        }
                     }
-                }
-                else
-                {
-                    throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
+                    else
+                    {
+                        throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
+                    }
                 }
             }
 
@@ -524,6 +527,26 @@ public class EditorSymbol extends Editor
 
         // Handling symbol highlighting
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
+    }
+
+    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    {
+        //System.out.println("Symbol key pressed!");
+
+        KeyCode pressedKey = event.getCode();
+
+        if (!this.Editor_PressedKeys.contains(pressedKey))
+            this.Editor_PressedKeys.add(pressedKey);
+    }
+
+    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    {
+        //System.out.println("Symbol key released!");
+
+        KeyCode releasedKey = event.getCode();
+
+        if (this.Editor_PressedKeys.contains(releasedKey))
+            this.Editor_PressedKeys.remove(releasedKey);
     }
 
     //// TESTING FUNCTIONS ////
