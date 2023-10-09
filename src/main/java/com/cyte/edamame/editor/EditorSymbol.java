@@ -235,7 +235,7 @@ public class EditorSymbol extends Editor
                 !this.Editor_RenderSystem.shapesMoving)
             {
                 PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
-                RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+                RadioButton selectedShapeButton = (RadioButton)EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
                 if (selectedShapeButton != null)
                 {
@@ -248,13 +248,16 @@ public class EditorSymbol extends Editor
                             double width = Double.parseDouble(stringRadius) * 2;
                             Color color = this.EditorSymbol_CircleColor.getValue();
 
-                            Circle circle = new Circle(width, color);
+                            if (width >= 1.0)
+                            {
+                                Circle circle = new Circle(width, color);
 
-                            circle.setTranslateX(dropPos.GetLeftDouble());
-                            circle.setTranslateY(dropPos.GetRightDouble());
+                                circle.setTranslateX(dropPos.GetLeftDouble());
+                                circle.setTranslateY(dropPos.GetRightDouble());
 
-                            RenderShape shape = new RenderShape("Circle", circle);
-                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                RenderShape shape = new RenderShape("Circle", circle);
+                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            }
                         }
                     }
                     else if (selectedShapeButton.getText().equals("Rectangle"))
@@ -267,13 +270,17 @@ public class EditorSymbol extends Editor
                             double width = Double.parseDouble(stringWidth);
                             double height = Double.parseDouble(stringHeight);
                             Color color = this.EditorSymbol_RectangleColor.getValue();
-                            Rectangle rectangle = new Rectangle(width, height, color);
 
-                            rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                            rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+                            if ((width >= 1.0) && (height >= 1.0))
+                            {
+                                Rectangle rectangle = new Rectangle(width, height, color);
 
-                            RenderShape shape = new RenderShape("Rectangle", rectangle);
-                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                                rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+
+                                RenderShape shape = new RenderShape("Rectangle", rectangle);
+                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            }
                         }
 
                     }
@@ -285,18 +292,22 @@ public class EditorSymbol extends Editor
                         {
                             double middleLength = Double.parseDouble(stringMiddleHeight);
                             Color color = this.EditorSymbol_TriangleColor.getValue();
-                            Polygon triangle = new Polygon();
-                            triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                        middleLength / 2, middleLength / 2,
-                                                        0.0,
-                                                        -middleLength / 2);
-                            triangle.setFill(color);
 
-                            triangle.setTranslateX(dropPos.GetLeftDouble());
-                            triangle.setTranslateY(dropPos.GetRightDouble());
+                            if (middleLength >= 1.0)
+                            {
+                                Polygon triangle = new Polygon();
+                                triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                                            middleLength / 2, middleLength / 2,
+                                                            0.0,
+                                                            -middleLength / 2);
+                                triangle.setFill(color);
 
-                            RenderShape shape = new RenderShape("Triangle", triangle);
-                            this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                triangle.setTranslateX(dropPos.GetLeftDouble());
+                                triangle.setTranslateY(dropPos.GetRightDouble());
+
+                                RenderShape shape = new RenderShape("Triangle", triangle);
+                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                            }
                         }
                     }
                     else

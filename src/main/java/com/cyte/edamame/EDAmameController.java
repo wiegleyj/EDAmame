@@ -6,21 +6,22 @@
  */
 
 // TODO:
-// Fix shape deletion
-// Fix viewport jolting when dropping first shape
 // Implement symbol press-release selection check
+// Implement box select
 // Implement shape rotation
+// Refactor RenderShape display shape field
 // Implement shape properties window
 // Implement text dropping
 // Implement line drawing in symbol editor
 // Implement wire connection points into symbols
 // Refactor the stupid canvas zooming mouse diff pos thing
 // Refactor dissect editor function searching for canvas
+// Fix 3+ editors crashing
 // Fix mouse-specific release callback function
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.EditorSymbol;
-import com.cyte.edamame.render.RenderShape;
+import com.cyte.edamame.editor.EditorFootprint;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.TextAreaHandler;
@@ -66,11 +67,13 @@ public class EDAmameController implements Initializable
 {
     //// GLOBAL VARIABLES ////
 
-    final static public String[] Editor_Names = {"Symbol Editor"};
+    final static public String[] Editor_Names = {"Symbol Editor", "Footprint Editor"};
     final static public Double Editor_HeartbeatDelay = 0.01;
 
     final static public PairMutable Editor_TheaterSize = new PairMutable(1000.0, 1000.0);
-    final static public Color Editor_BackgroundColor = Color.BEIGE;
+    final static public Color[] Editor_BackgroundColors = {Color.BEIGE, Color.DARKBLUE};
+    final static public Color[] Editor_GridPointColors = {Color.GRAY, Color.YELLOW};
+    final static public Color[] Editor_GridBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Integer Editor_MaxShapes = 10000;
     final static public PairMutable Editor_ZoomLimits = new PairMutable(0.5, 5.0);
     final static public Double Editor_ZoomFactor = 1.5;
@@ -213,8 +216,11 @@ public class EDAmameController implements Initializable
                 //System.out.println(editor.Editor_RenderSystem.shapesHighlighted);
                 //System.out.println(editor.Editor_RenderSystem.shapesSelected);
                 //System.out.println(editor.Editor_RenderSystem.shapesMoving);
+                //System.out.println("(" + editor.Editor_RenderSystem.paneHighlights.getLayoutX() + ", " + editor.Editor_RenderSystem.paneHighlights.getLayoutY() + ")");
+                //System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
+                //System.out.println(editor.Editor_RenderSystem.paneHolder.getBoundsInLocal().toString());
 
-                // Adjusting the central layout of the canvas relative to the stack pane size
+                // Adjusting the central layout of the canvas and the crosshair relative to the stack pane size
                 {
                     PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
                                                              editor.Editor_RenderSystem.canvas.getHeight());
@@ -226,6 +232,10 @@ public class EDAmameController implements Initializable
                     editor.Editor_RenderSystem.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
                     editor.Editor_RenderSystem.paneHolder.setLayoutY(centeredPos.GetRightDouble());
                 }
+
+                // Adjusting the crosshair position to center of the listener pane
+                editor.Editor_RenderSystem.crosshair.setTranslateX(editor.Editor_RenderSystem.paneListener.getWidth() / 2);
+                editor.Editor_RenderSystem.crosshair.setTranslateY(editor.Editor_RenderSystem.paneListener.getHeight() / 2);
             }
         }
     }
@@ -647,12 +657,24 @@ public class EDAmameController implements Initializable
      * A test method for a test button to add a fake editor to the page to verify concept.
      */
     @FXML
-    protected void onTestButtonClick()
+    protected void EditorSymbolNewButton()
     {
         try
         {
-            // create and add a new editor
             Editor_Add(EditorSymbol.create());
+        }
+        catch (IOException e)
+        {
+            System.out.println("ERROR!");
+        }
+    }
+
+    @FXML
+    protected void EditorFootprintNewButton()
+    {
+        try
+        {
+            Editor_Add(EditorFootprint.create());
         }
         catch (IOException e)
         {

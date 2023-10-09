@@ -22,6 +22,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.canvas.*;
+import javafx.scene.shape.*;
 
 import java.io.InvalidClassException;
 
@@ -151,6 +152,7 @@ public abstract class Editor
         Pane foundPaneHighlights = null;
         Pane foundPaneSelections = null;
         Canvas foundCanvas = null;
+        Shape foundCrosshair = null;
 
         while (nodeIterator.hasNext())
         {
@@ -225,7 +227,7 @@ public abstract class Editor
                                     {
                                         foundPaneListener = (Pane)nextNodeB;
 
-                                        // Searching for the holder pane...
+                                        // Searching for the holder pane and the crosshair...
                                         for (int k = 0; k < foundPaneListener.getChildren().size(); k++)
                                         {
                                             Node nextNodeC = foundPaneListener.getChildren().get(k);
@@ -234,7 +236,7 @@ public abstract class Editor
                                             {
                                                 foundPaneHolder = (Pane)nextNodeC;
 
-                                                // Searching for the highlight pane and the canvas...
+                                                // Searching for the highlight pane, selections pane and the canvas...
                                                 for (int l = 0; l < foundPaneHolder.getChildren().size(); l++)
                                                 {
                                                     Node nextNodeD = foundPaneHolder.getChildren().get(l);
@@ -261,8 +263,10 @@ public abstract class Editor
                                                         EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
                                                     }
                                                 }
-
-                                                break;
+                                            }
+                                            else if (nextNodeC.getClass() == Circle.class)
+                                            {
+                                                foundCrosshair = (Circle)nextNodeC;
                                             }
                                         }
 
@@ -284,6 +288,8 @@ public abstract class Editor
                             throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.Editor_Name + "\"!");
                         if (foundCanvas == null)
                             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
+                        if (foundCrosshair == null)
+                            throw new InvalidClassException("Unable to locate crosshair shape for an editor with name \"" + this.Editor_Name + "\"!");
 
                         // Setting the pointers to the editor Editor_Tab
                         item.setText(EDAmameController.Editor_Names[editorType]);
@@ -303,8 +309,11 @@ public abstract class Editor
                                                     foundPaneHighlights,
                                                     foundPaneSelections,
                                                     foundCanvas,
+                                                    foundCrosshair,
                                                     EDAmameController.Editor_TheaterSize,
-                                                    EDAmameController.Editor_BackgroundColor,
+                                                    EDAmameController.Editor_BackgroundColors[editorType],
+                                                    EDAmameController.Editor_GridPointColors[editorType],
+                                                    EDAmameController.Editor_GridBoxColors[editorType],
                                                     EDAmameController.Editor_MaxShapes,
                                                     EDAmameController.Editor_ZoomLimits,
                                                     EDAmameController.Editor_ZoomFactor,

@@ -19,6 +19,7 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Circle?>
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorSymbol">
     <MenuBar>
@@ -33,22 +34,24 @@
         </Menu>
     </MenuBar>
     <ToolBar>
-        <Button mnemonicParsing="false" text="Button" />
+        <Button mnemonicParsing="false" text="Symbol Button 1" />
+      <Button mnemonicParsing="false" text="Symbol Button 2" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="EditorTab">
             <HBox>
-            <StackPane alignment="TOP_CENTER" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" HBox.hgrow="SOMETIMES">
+            <StackPane alignment="TOP_CENTER" cacheShape="false" centerShape="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" scaleShape="false" HBox.hgrow="SOMETIMES">
                <children>
-                  <Pane>
+                  <Pane StackPane.alignment="TOP_LEFT">
                      <children>
-                        <Pane>
+                        <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" pickOnBounds="false">
                            <children>
-                              <Canvas height="1000.0" width="1000.0" />
-                              <Pane />
-                              <Pane />
+                              <Canvas height="3000.0" width="3000.0" />
+                              <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
+                              <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                            </children>
                         </Pane>
+                        <Circle fill="#1f93ff00" radius="5.0" stroke="RED" strokeType="INSIDE" />
                      </children>
                   </Pane>
                   <ToolBar>

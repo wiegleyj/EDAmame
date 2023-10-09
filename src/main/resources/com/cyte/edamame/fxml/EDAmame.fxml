@@ -13,7 +13,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
@@ -63,13 +62,8 @@
            </MenuBar>
            <HBox>
                <ToolBar>
-                   <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#onTestButtonClick" text="test">
-                       <tooltip>
-                           <Tooltip text="Empty Tooltip" />
-                       </tooltip>
-                   </Button>
-                   <Button mnemonicParsing="false" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="EDAButton" />
-                   <Button mnemonicParsing="false" text="%key.unspecified" />
+                   <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />
+                   <Button mnemonicParsing="false" onAction="#EditorFootprintNewButton" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New Footprint Editor" />
                </ToolBar>
                <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS" />
            </HBox>

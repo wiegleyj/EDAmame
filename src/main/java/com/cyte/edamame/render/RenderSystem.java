@@ -37,8 +37,11 @@ public class RenderSystem
     public Pane paneSelections;
     public Canvas canvas;
     public GraphicsContext gc;
+    public Shape crosshair;
     public PairMutable theaterSize;
     public Color backgroundColor;
+    public Color gridPointColor;
+    public Color gridBoxColor;
     public Integer maxShapes;
     public PairMutable zoomLimits;
     public Double zoomFactor;
@@ -63,7 +66,7 @@ public class RenderSystem
 
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, PairMutable theaterSizeValue, Color backgroundColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
     {
         this.paneListener = paneListenerValue;
         this.paneHolder = paneHolderValue;
@@ -71,8 +74,11 @@ public class RenderSystem
         this.paneSelections = paneSelectionsValue;
         this.canvas = canvasValue;
         this.gc = this.canvas.getGraphicsContext2D();
+        this.crosshair = crosshairValue;
         this.theaterSize = theaterSizeValue;
         this.backgroundColor = backgroundColorValue;
+        this.gridPointColor = gridPointColorValue;
+        this.gridBoxColor = gridBoxColorValue;
         this.maxShapes = maxShapesValue;
         this.zoomLimits = zoomLimitsValue;
         this.zoomFactor = zoomFactorValue;
@@ -94,6 +100,9 @@ public class RenderSystem
         this.editor = editorValue;
 
         this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
+        this.paneHolder.prefWidthProperty().bind(this.canvas.widthProperty());
+        this.paneHolder.prefHeightProperty().bind(this.canvas.heightProperty());
+
         this.RenderSystem_ListenersInit();
     }
 
@@ -101,18 +110,20 @@ public class RenderSystem
 
     public void RenderSystem_CanvasRenderGrid()
     {
+        // Clearing the canvas
         this.RenderSystem_CanvasClear();
 
-        gc.setFill(Color.GRAY);
-        gc.setGlobalAlpha(0.5);
-        Double width = 5.0;
+        // Drawing the points
+        gc.setFill(this.gridPointColor);
+        gc.setGlobalAlpha(1.0);
+        Double width = 3.0;
 
         Double posX = -2500.0;
         Double posY = -2500.0;
 
-        for (int i = 0; i < 50; i++)
+        for (int i = 0; i < 70; i++)
         {
-            for (int j = 0; j < 50; j++)
+            for (int j = 0; j < 70; j++)
             {
                 gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
 
@@ -122,6 +133,27 @@ public class RenderSystem
             posX = -2500.0;
             posY += 100.0;
         }
+
+        // Drawing the grid box
+        gc.setStroke(this.gridBoxColor);
+        gc.setGlobalAlpha(1.0);
+        gc.setLineWidth(2.0);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
     }
 
     public void RenderSystem_CanvasClear()
@@ -278,7 +310,7 @@ public class RenderSystem
         // Handling global callback actions
         {
             // Handling shape deletion
-            if (EDAmameController.Controller_IsKeyPressed(KeyCode.BACK_SPACE))
+            if (EDAmameController.Controller_IsKeyPressed(KeyCode.BACK_SPACE) || EDAmameController.Controller_IsKeyPressed(KeyCode.DELETE))
             {
                 if (this.shapesSelected > 0)
                 {
@@ -300,6 +332,8 @@ public class RenderSystem
 
                         this.paneHolder.getChildren().remove(shape.shape);
                         this.shapes.remove(shape);
+
+                        i--;
                     }
                 }
             }
