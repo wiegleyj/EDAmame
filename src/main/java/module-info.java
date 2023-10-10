@@ -16,7 +16,7 @@ module com.cyte.edamame {
 
     opens com.cyte.edamame to javafx.fxml, javafx.graphics;
     //exports com.cyte.edamame;
-    opens com.cyte.edamame.editor to javafx.fxml, javafx.graphics;
+    opens com.cyte.edamame.editor to javafx.fxml, javafx.graphics, com.fasterxml.jackson.databind;
     opens com.cyte.edamame.util to javafx.fxml, javafx.graphics;
     //exports com.cyte.edamame.editor;
 }

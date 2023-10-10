@@ -20,7 +20,7 @@ public class MenuConfigLoader {
         ObjectMapper objectMapper = new ObjectMapper();
 
         try (InputStream inputStream = MenuConfigLoader.class.
-                getResourceAsStream("resources/com/cyte/edamame/menuconfig/menu_config.json")) {
+                getResourceAsStream("/com/cyte/edamame/menuconfig/menu_config.json")) {
             if (inputStream == null) {
                 throw new FileNotFoundException("menu_config.json note found");
             }
