@@ -7,13 +7,7 @@
 
 package com.cyte.edamame.util;
 
-import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.editor.MenuBarPriority;
-import com.cyte.edamame.editor.MenuPriority;
 import com.cyte.edamame.render.RenderShape;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.TabPane;
 
 import java.util.*;
 
@@ -94,46 +88,5 @@ public class Utils
         }
 
         return list.get(minIdx);
-    }
-
-    public static List<Menu> createMenusFromConfig(MenuBarPriority menuBarPriority, Editor editor, TabPane tabPane) {
-        List<Menu> menus = new ArrayList<>();
-
-        menuBarPriority.getMenuPriorities().entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.comparing(MenuPriority::getPriority)))
-                .forEach(menuEntry -> {
-                    Menu menu = new Menu(menuEntry.getKey());
-
-                    menuEntry.getValue().getItemPriorities().entrySet().stream()
-                                    .sorted(Map.Entry.comparingByValue())
-                                            .forEach(itemEntry -> {
-                                                MenuItem menuItem = new MenuItem(itemEntry.getKey());
-                                                menuItem.setOnAction(event -> setMenuItemActions(menuItem, editor, tabPane));
-                                                menu.getItems().add(menuItem);
-                                            });
-
-                    menus.add(menu);
-                });
-        return menus;
-    }
-
-    private static void setMenuItemActions(MenuItem menuItem, Editor editor, TabPane tabPane) {
-        String itemName = menuItem.getText();
-
-        switch(itemName) {
-            case "Exit":
-                menuItem.setOnAction(event -> {
-                    tabPane.getTabs().remove((editor.Editor_GetTab()));
-                });
-                break;
-            case "Open":
-                menuItem.setOnAction(event -> {
-                    // Open file
-                });
-                break;
-            default:
-                // Error Handling
-                break;
-        }
     }
 }

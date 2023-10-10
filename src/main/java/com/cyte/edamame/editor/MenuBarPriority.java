@@ -25,6 +25,11 @@ public class MenuBarPriority {
         return menuPriorities;
     }
 
+    public MenuPriority getMenuPriorityByName(String menuName) {
+        return menuPriorities.get(menuName);
+    }
+
+
     public void setMenuPriorities(Map<String, MenuPriority> menuPriorities) {
         this.menuPriorities = menuPriorities;
     }

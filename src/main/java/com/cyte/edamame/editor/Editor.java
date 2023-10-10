@@ -8,11 +8,11 @@
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderSystem;
-import com.cyte.edamame.util.PairMutable;
 
 import java.util.*;
 import java.util.logging.Level;
 
+import com.cyte.edamame.util.MenuConfigLoader;
 import javafx.collections.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -109,18 +109,15 @@ public abstract class Editor
      * @return a (possibly empty) structure of menu items
      */
     public ObservableMap<String, ObservableList<MenuItem>> Editor_GetMenus() {
+        ObservableMap<String, ObservableList<MenuItem>> combinedMenus = FXCollections.observableHashMap();
         for (Menu menu : dynamicMenus) {
             String menuName = menu.getText();
             ObservableList<MenuItem> items = menu.getItems();
-
-            if(!Editor_Menus.containsKey(menuName)) {
-                Editor_Menus.put(menuName, items);
-            } else {
-                Editor_Menus.get(menuName).addAll(items);
-            }
+            combinedMenus.put(menuName, items);
         }
-        return Editor_Menus;
+        return combinedMenus;
     }
+
 
     //// CALLBACK FUNCTIONS ////
 
@@ -301,13 +298,5 @@ public abstract class Editor
 
     public List<Menu> getDynamicMenus() {
         return this.dynamicMenus;
-    }
-
-    public void setDynamicMenus(List<Menu> menus) {
-        this.dynamicMenus = menus;
-    }
-
-    public String getEditor_Name() {
-        return this.Editor_Name;
     }
 }
