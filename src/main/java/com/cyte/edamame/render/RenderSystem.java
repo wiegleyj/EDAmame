@@ -14,6 +14,7 @@ import com.cyte.edamame.util.Utils;
 import java.sql.SQLOutput;
 import java.util.LinkedList;
 import java.util.UUID;
+import java.lang.Math;
 
 import javafx.scene.*;
 import javafx.scene.canvas.*;
@@ -47,6 +48,8 @@ public class RenderSystem
     public Double zoomFactor;
     public Double mouseDragFactor;
     public Double mouseDragCheckTimeout;
+    public Color selectionBoxColor;
+    public Double selectionBoxWidth;
 
     // DO NOT EDIT
 
@@ -61,12 +64,16 @@ public class RenderSystem
     public Integer shapesHighlighted;
     public Integer shapesSelected;
     public boolean shapesMoving;
+    public boolean pressedOnShape;
+    public Rectangle selectionBox;
 
     public Editor editor;
 
+    boolean bruh = false;
+
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue)
+    public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue, Color selectionBoxColorValue, Double selectionBoxWidthValue)
     {
         this.paneListener = paneListenerValue;
         this.paneHolder = paneHolderValue;
@@ -84,6 +91,8 @@ public class RenderSystem
         this.zoomFactor = zoomFactorValue;
         this.mouseDragFactor = mouseDragFactorValue;
         this.mouseDragCheckTimeout = mouseDragCheckTimeoutValue;
+        this.selectionBoxColor = selectionBoxColorValue;
+        this.selectionBoxWidth = selectionBoxWidthValue;
 
         this.shapes = new LinkedList<RenderShape>();
         this.center = new PairMutable(0.0, 0.0);
@@ -96,6 +105,8 @@ public class RenderSystem
         this.shapesHighlighted = 0;
         this.shapesSelected = 0;
         this.shapesMoving = false;
+        this.pressedOnShape = false;
+        this.selectionBox = null;
 
         this.editor = editorValue;
 
@@ -165,11 +176,18 @@ public class RenderSystem
 
     //// PANE FUNCTIONS ////
 
-    public PairMutable RenderSystem_PaneConvertListenerPos(PairMutable listenerPos)
+    public PairMutable RenderSystem_PanePosListenerToHolder(PairMutable pos)
     {
-        Point2D pos = paneHolder.parentToLocal(listenerPos.GetLeftDouble(), listenerPos.GetRightDouble());
+        Point2D newPos = this.paneHolder.parentToLocal(pos.GetLeftDouble(), pos.GetRightDouble());
 
-        return new PairMutable(pos.getX(), pos.getY());
+        return new PairMutable(newPos.getX(), newPos.getY());
+    }
+
+    public PairMutable RenderSystem_PanePosHolderToListener(PairMutable pos)
+    {
+        Point2D newPos = this.paneHolder.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+
+        return new PairMutable(newPos.getX(), newPos.getY());
     }
 
     public void RenderSystem_PaneSetTranslate(PairMutable pos)
@@ -212,51 +230,100 @@ public class RenderSystem
 
     public void RenderSystem_ShapeHighlightsCheck(PairMutable posEvent)
     {
+        /*for (int i = 0; i < this.paneHolder.getChildren().size(); i++)
+        {
+            if ((this.paneHolder.getChildren().get(i).getId() != null) && this.paneHolder.getChildren().get(i).getId().equals("TESTMARKER"))
+            {
+                this.paneHolder.getChildren().remove(this.paneHolder.getChildren().get(i));
+                i--;
+            }
+        }*/
+
         for (int i = 0; i < this.shapes.size(); i++)
         {
-            PairMutable posMouse = this.RenderSystem_PaneConvertListenerPos(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+            PairMutable posMouse = this.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
             RenderShape shape = this.shapes.get(i);
             boolean onShape = shape.PosOnShape(posMouse);
-            boolean canAdd = false;
-            boolean canRemove = false;
 
+            // Checking whether we are highlighting by cursor...
             if (onShape)
             {
                 if (EDAmameController.Controller_IsKeyPressed(KeyCode.Q))
                 {
-                    if ((this.shapesHighlighted > 1) && shape.highlighted)
-                    {
-                        canRemove = true;
-                    }
-                    else if ((this.shapesHighlighted == 0) && !shape.highlighted)
-                    {
-                        canAdd = true;
-                    }
+                    if ((this.shapesHighlighted > 1) && shape.highlightedMouse)
+                        shape.highlightedMouse = false;
+                    else if ((this.shapesHighlighted == 0) && !shape.highlightedMouse)
+                        shape.highlightedMouse = true;
                 }
                 else
                 {
-                    if (!shape.highlighted)
-                    {
-                        canAdd = true;
-                    }
+                    if (!shape.highlightedMouse)
+                        shape.highlightedMouse = true;
                 }
             }
             else
             {
-                if (shape.highlighted)
+                if (shape.highlightedMouse)
+                    shape.highlightedMouse = false;
+            }
+
+            // Checking whether we are highlighting by selection box...
+            if ((this.selectionBox != null))
+            {
+                Bounds shapeBounds = shape.shape.getBoundsInParent();
+                PairMutable selectionBoxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
+                PairMutable selectionBoxH = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
+
+                /*Circle testShapeL = new Circle(5, Color.RED);
+                testShapeL.setId("TESTMARKER");
+                testShapeL.setTranslateX(shapeBounds.getMinX());
+                testShapeL.setTranslateY(shapeBounds.getMinY());
+                this.paneHolder.getChildren().add(testShapeL);
+
+                Circle testShapeH = new Circle(5, Color.RED);
+                testShapeH.setId("TESTMARKER");
+                testShapeH.setTranslateX(shapeBounds.getMaxX());
+                testShapeH.setTranslateY(shapeBounds.getMaxY());
+                this.paneHolder.getChildren().add(testShapeH);
+
+                Circle testShapeBL = new Circle(5, Color.BLUE);
+                testShapeBL.setId("TESTMARKER");
+                PairMutable boxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
+                testShapeBL.setTranslateX(boxL.GetLeftDouble());
+                testShapeBL.setTranslateY(boxL.GetRightDouble());
+                this.paneHolder.getChildren().add(testShapeBL);
+
+                Circle testShapeBH = new Circle(5, Color.BLUE);
+                testShapeBH.setId("TESTMARKER");
+                PairMutable boxH = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
+                testShapeBH.setTranslateX(boxH.GetLeftDouble());
+                testShapeBH.setTranslateY(boxH.GetRightDouble());
+                this.paneHolder.getChildren().add(testShapeBH);*/
+
+                if ((selectionBoxL.GetLeftDouble() < shapeBounds.getMaxX()) &&
+                    (selectionBoxH.GetLeftDouble() > shapeBounds.getMinX()) &&
+                    (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
+                    (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
                 {
-                    canRemove = true;
+                    if (!shape.highlightedBox)
+                        shape.highlightedBox = true;
+                }
+                else
+                {
+                    if (shape.highlightedBox)
+                        shape.highlightedBox = false;
                 }
             }
 
-            if (canAdd)
+            // Adjusting highlights accordingly...
+            if ((shape.highlightedMouse || shape.highlightedBox) && !shape.highlighted)
             {
                 shape.CalculateShapeHighlighted();
                 this.paneHighlights.getChildren().add(shape.shapeHighlighted);
                 shape.highlighted = true;
                 this.shapesHighlighted++;
             }
-            if (canRemove)
+            else
             {
                 this.RenderSystem_ShapeHighlightRemove(shape.id);
                 shape.highlighted = false;
@@ -404,12 +471,14 @@ public class RenderSystem
             {
                 if (this.editor.Editor_PressedLMB)
                 {}
-
-                if (this.editor.Editor_PressedRMB)
+                else if (this.editor.Editor_PressedRMB)
                 {}
 
                 this.mouseDragFirstPos = null;
                 this.mouseDragPaneFirstPos = null;
+
+                if (this.shapesHighlighted > 0)
+                    this.pressedOnShape = true;
             }
 
             // Handling editor-specific callback actions
@@ -433,29 +502,15 @@ public class RenderSystem
                         for (int i = 0; i < this.shapes.size(); i++)
                         {
                             RenderShape shape = this.shapes.get(i);
-                            boolean canAdd = false;
-                            boolean canRemove = false;
 
-                            if (shape.highlighted && !shape.selected)
-                            {
-                                canAdd = true;
-                            }
-                            else if (!shape.highlighted && shape.selected)
-                            {
-                                if (!EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
-                                {
-                                    canRemove = true;
-                                }
-                            }
-
-                            if (canAdd)
+                            if (shape.highlighted || shape.highlightedBox)
                             {
                                 shape.selected = true;
                                 shape.CalculateShapeSelected();
                                 this.paneSelections.getChildren().add(shape.shapeSelected);
                                 this.shapesSelected++;
                             }
-                            if (canRemove)
+                            else
                             {
                                 shape.selected = false;
                                 this.RenderSystem_ShapeSelectionRemove(shape.id);
@@ -465,11 +520,14 @@ public class RenderSystem
                             shape.mousePressPos = null;
 
                             this.shapes.set(i, shape);
+                            this.RenderSystem_ShapeHighlightRemove(shape.id);
                         }
+
+                        this.paneListener.getChildren().remove(this.selectionBox);
+                        this.selectionBox = null;
                     }
                 }
-
-                if (this.editor.Editor_PressedRMB)
+                else if (this.editor.Editor_PressedRMB)
                 {
                     // Handling auto-zoom
                     if (EDAmameController.Controller_IsKeyPressed(KeyCode.ALT))
@@ -483,6 +541,7 @@ public class RenderSystem
                 }
 
                 this.shapesMoving = false;
+                this.pressedOnShape = false;
             }
 
             // Updating mouse pressed flags
@@ -555,9 +614,35 @@ public class RenderSystem
 
                         this.shapesMoving = true;
                     }
-                }
+                    // Handling the box selection (only if we have no shapes selected and we are not moving the viewport)
+                    else
+                    {
+                        if (this.selectionBox == null)
+                        {
+                            this.selectionBox = new Rectangle(0.0, 0.0);
+                            this.selectionBox.setFill(Color.TRANSPARENT);
+                            this.selectionBox.setStroke(this.selectionBoxColor);
+                            this.selectionBox.setStrokeWidth(this.selectionBoxWidth);
 
-                if (this.editor.Editor_PressedRMB)
+                            this.paneListener.getChildren().add(1, this.selectionBox);
+                        }
+
+                        // Adjusting if the width & height are negative...
+                        if (mouseDiffPos.GetLeftDouble() < 0)
+                            this.selectionBox.setTranslateX(this.mouseDragFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.zoom / this.mouseDragFactor);
+                        else
+                            this.selectionBox.setTranslateX(this.mouseDragFirstPos.GetLeftDouble());
+
+                        if (mouseDiffPos.GetRightDouble() < 0)
+                            this.selectionBox.setTranslateY(this.mouseDragFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.zoom / this.mouseDragFactor);
+                        else
+                            this.selectionBox.setTranslateY(this.mouseDragFirstPos.GetRightDouble());
+
+                        this.selectionBox.setWidth(Math.abs(mouseDiffPos.GetLeftDouble() * this.zoom / this.mouseDragFactor));
+                        this.selectionBox.setHeight(Math.abs(mouseDiffPos.GetRightDouble() * this.zoom / this.mouseDragFactor));
+                    }
+                }
+                else if (this.editor.Editor_PressedRMB)
                 {
                     // Handling moving of the viewport
                     {

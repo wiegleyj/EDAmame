@@ -318,6 +318,8 @@ public abstract class Editor
                                                     EDAmameController.Editor_ZoomLimits,
                                                     EDAmameController.Editor_ZoomFactor,
                                                     EDAmameController.Editor_MouseDragFactor,
-                                                    EDAmameController.Editor_MouseCheckTimeout);
+                                                    EDAmameController.Editor_MouseCheckTimeout,
+                                                    EDAmameController.Editor_SelectionBoxColors[editorType],
+                                                    EDAmameController.Editor_SelectionBoxWidth);
     }
 }

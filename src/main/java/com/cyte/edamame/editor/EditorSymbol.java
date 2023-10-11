@@ -218,8 +218,7 @@ public class EditorSymbol extends Editor
             // Updating left mouse button flag
             this.EditorSchematic_PressedMouseLeft = true;*/
         }
-
-        if (this.Editor_PressedRMB)
+        else if (this.Editor_PressedRMB)
         {}
     }
 
@@ -229,15 +228,16 @@ public class EditorSymbol extends Editor
 
         if (this.Editor_PressedLMB)
         {
-            // Handling shape dropping (only if we're not hovering over, selecting or moving any shapes)
+            // Handling shape dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
             if ((this.Editor_RenderSystem.shapesHighlighted == 0) &&
                 (this.Editor_RenderSystem.shapesSelected == 0) &&
-                !this.Editor_RenderSystem.shapesMoving)
+                !this.Editor_RenderSystem.shapesMoving &&
+                this.Editor_RenderSystem.selectionBox == null)
             {
-                PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneConvertListenerPos(new PairMutable(event.getX(), event.getY()));
+                PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
                 RadioButton selectedShapeButton = (RadioButton)EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
-                if (selectedShapeButton != null)
+                if ((selectedShapeButton != null) && (!this.Editor_RenderSystem.pressedOnShape))
                 {
                     if (selectedShapeButton.getText().equals("Circle"))
                     {
@@ -369,8 +369,7 @@ public class EditorSymbol extends Editor
                 this.EditorSchematic_RenderSystem.RemoveShape(idx);
             }*/
         }
-
-        if (this.Editor_PressedRMB)
+        else if (this.Editor_PressedRMB)
         {}
     }
 
@@ -478,8 +477,7 @@ public class EditorSymbol extends Editor
                 }
             }*/
         }
-
-        if (this.Editor_PressedRMB)
+        else if (this.Editor_PressedRMB)
         {}
 
         // Handling symbol highlighting

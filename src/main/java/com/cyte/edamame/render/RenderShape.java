@@ -27,6 +27,8 @@ public class RenderShape
     public Shape shapeHighlighted;
     public Shape shapeSelected;
     public boolean highlighted;
+    public boolean highlightedMouse;
+    public boolean highlightedBox;
     public boolean selected;
     public PairMutable mousePressPos;
 
@@ -38,6 +40,8 @@ public class RenderShape
         this.shapeHighlighted = null;
         this.shapeSelected = null;
         this.highlighted = false;
+        this.highlightedMouse = false;
+        this.highlightedBox = false;
         this.selected = false;
         this.mousePressPos = null;
     }

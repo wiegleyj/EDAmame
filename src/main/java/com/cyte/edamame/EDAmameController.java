@@ -8,13 +8,14 @@
 // TODO:
 // Implement symbol press-release selection check
 // Implement box select
+// Implement shape drag limits
 // Implement shape rotation
+// Refactor viewport mouse diff pos scaling
 // Refactor RenderShape display shape field
 // Implement shape properties window
 // Implement text dropping
 // Implement line drawing in symbol editor
 // Implement wire connection points into symbols
-// Refactor the stupid canvas zooming mouse diff pos thing
 // Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
@@ -79,6 +80,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_ZoomFactor = 1.5;
     final static public Double Editor_MouseDragFactor = 1.0;
     final static public Double Editor_MouseCheckTimeout = 0.0001;
+    final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
+    final static public Double Editor_SelectionBoxWidth = 1.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
