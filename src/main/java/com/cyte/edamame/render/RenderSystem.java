@@ -69,8 +69,6 @@ public class RenderSystem
 
     public Editor editor;
 
-    boolean bruh = false;
-
     //// CONSTRUCTORS ////
 
     public RenderSystem(Editor editorValue, Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue, PairMutable zoomLimitsValue, Double zoomFactorValue, Double mouseDragFactorValue, Double mouseDragCheckTimeoutValue, Color selectionBoxColorValue, Double selectionBoxWidthValue)
@@ -176,6 +174,12 @@ public class RenderSystem
 
     //// PANE FUNCTIONS ////
 
+    public PairMutable RenderSystem_PaneHolderGetRealPos(PairMutable pos)
+    {
+        return new PairMutable(pos.GetLeftDouble() - this.paneHolder.getWidth() / 2,
+                               pos.GetRightDouble() - this.paneHolder.getHeight() / 2);
+    }
+
     public PairMutable RenderSystem_PanePosListenerToHolder(PairMutable pos)
     {
         Point2D newPos = this.paneHolder.parentToLocal(pos.GetLeftDouble(), pos.GetRightDouble());
@@ -268,7 +272,7 @@ public class RenderSystem
             }
 
             // Checking whether we are highlighting by selection box...
-            if ((this.selectionBox != null))
+            if (this.selectionBox != null)
             {
                 Bounds shapeBounds = shape.shape.getBoundsInParent();
                 PairMutable selectionBoxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
@@ -314,6 +318,10 @@ public class RenderSystem
                         shape.highlightedBox = false;
                 }
             }
+            else if (shape.highlightedBox)
+            {
+                shape.highlightedBox = false;
+            }
 
             // Adjusting highlights accordingly...
             if ((shape.highlightedMouse || shape.highlightedBox) && !shape.highlighted)
@@ -323,7 +331,7 @@ public class RenderSystem
                 shape.highlighted = true;
                 this.shapesHighlighted++;
             }
-            else
+            else if ((!shape.highlightedMouse && !shape.highlightedBox) && shape.highlighted)
             {
                 this.RenderSystem_ShapeHighlightRemove(shape.id);
                 shape.highlighted = false;
@@ -503,28 +511,39 @@ public class RenderSystem
                         {
                             RenderShape shape = this.shapes.get(i);
 
-                            if (shape.highlighted || shape.highlightedBox)
+                            if (!shape.selected)
                             {
-                                shape.selected = true;
-                                shape.CalculateShapeSelected();
-                                this.paneSelections.getChildren().add(shape.shapeSelected);
-                                this.shapesSelected++;
+                                if (shape.highlightedMouse || shape.highlightedBox)
+                                {
+                                    shape.selected = true;
+                                    shape.CalculateShapeSelected();
+                                    this.paneSelections.getChildren().add(shape.shapeSelected);
+                                    this.shapesSelected++;
+                                }
                             }
                             else
                             {
-                                shape.selected = false;
-                                this.RenderSystem_ShapeSelectionRemove(shape.id);
-                                this.shapesSelected--;
+                                if ((!shape.highlightedMouse && !shape.highlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
+                                {
+                                    shape.selected = false;
+                                    this.RenderSystem_ShapeSelectionRemove(shape.id);
+                                    this.shapesSelected--;
+                                }
                             }
+
+                            if (shape.highlightedBox && !shape.highlightedMouse)
+                                this.RenderSystem_ShapeHighlightRemove(shape.id);
 
                             shape.mousePressPos = null;
 
                             this.shapes.set(i, shape);
-                            this.RenderSystem_ShapeHighlightRemove(shape.id);
                         }
 
-                        this.paneListener.getChildren().remove(this.selectionBox);
-                        this.selectionBox = null;
+                        if (this.selectionBox != null)
+                        {
+                            this.paneListener.getChildren().remove(this.selectionBox);
+                            this.selectionBox = null;
+                        }
                     }
                 }
                 else if (this.editor.Editor_PressedRMB)
@@ -596,8 +615,8 @@ public class RenderSystem
             {
                 if (this.editor.Editor_PressedLMB)
                 {
-                    // Handling moving of the shapes (only if we have some shapes selected)
-                    if (this.shapesSelected > 0)
+                    // Handling moving of the shapes (only if we have some shapes selected & we're not holding the box selection key)
+                    if ((this.shapesSelected > 0) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
                     {
                         for (int i = 0; i < this.shapes.size(); i++)
                         {
@@ -606,8 +625,20 @@ public class RenderSystem
                             if (!shape.selected)
                                 continue;
 
-                            shape.shape.setTranslateX(shape.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble());
-                            shape.shape.setTranslateY(shape.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble());
+                            PairMutable posPressReal = this.RenderSystem_PaneHolderGetRealPos(new PairMutable(shape.mousePressPos.GetLeftDouble(), shape.mousePressPos.GetRightDouble()));
+                            PairMutable edgeOffset = new PairMutable(0.0, 0.0);
+
+                            if ((posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
+                                edgeOffset.left = -(posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
+                            if ((posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble()) > EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
+                                edgeOffset.left = -(posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble() - EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
+                            if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) < -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
+                                edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+                            if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
+                                edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+
+                            shape.shape.setTranslateX(shape.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
+                            shape.shape.setTranslateY(shape.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
 
                             this.shapes.set(i, shape);
                         }

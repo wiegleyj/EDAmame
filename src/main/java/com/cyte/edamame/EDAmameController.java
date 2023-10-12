@@ -6,9 +6,6 @@
  */
 
 // TODO:
-// Implement symbol press-release selection check
-// Implement box select
-// Implement shape drag limits
 // Implement shape rotation
 // Refactor viewport mouse diff pos scaling
 // Refactor RenderShape display shape field
@@ -222,6 +219,7 @@ public class EDAmameController implements Initializable
                 //System.out.println("(" + editor.Editor_RenderSystem.paneHighlights.getLayoutX() + ", " + editor.Editor_RenderSystem.paneHighlights.getLayoutY() + ")");
                 //System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
                 //System.out.println(editor.Editor_RenderSystem.paneHolder.getBoundsInLocal().toString());
+                //System.out.println(editor.Editor_RenderSystem.shapesHighlighted + ", " + editor.Editor_RenderSystem.shapesSelected);
 
                 // Adjusting the central layout of the canvas and the crosshair relative to the stack pane size
                 {

@@ -235,84 +235,93 @@ public class EditorSymbol extends Editor
                 this.Editor_RenderSystem.selectionBox == null)
             {
                 PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-                RadioButton selectedShapeButton = (RadioButton)EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+                PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-                if ((selectedShapeButton != null) && (!this.Editor_RenderSystem.pressedOnShape))
+                // Only dropping the shape within the theater limits...
+                if ((realPos.GetLeftDouble() > -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                    (realPos.GetLeftDouble() < EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                    (realPos.GetRightDouble() > -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
+                    (realPos.GetRightDouble() < EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
                 {
-                    if (selectedShapeButton.getText().equals("Circle"))
+                    RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+
+                    if ((selectedShapeButton != null) && (!this.Editor_RenderSystem.pressedOnShape))
                     {
-                        String stringRadius = this.EditorSymbol_CircleRadius.getText();
-
-                        if (EDAmameController.Controller_IsStringNum(stringRadius))
+                        if (selectedShapeButton.getText().equals("Circle"))
                         {
-                            double width = Double.parseDouble(stringRadius) * 2;
-                            Color color = this.EditorSymbol_CircleColor.getValue();
+                            String stringRadius = this.EditorSymbol_CircleRadius.getText();
 
-                            if (width >= 1.0)
+                            if (EDAmameController.Controller_IsStringNum(stringRadius))
                             {
-                                Circle circle = new Circle(width, color);
+                                double width = Double.parseDouble(stringRadius) * 2;
+                                Color color = this.EditorSymbol_CircleColor.getValue();
 
-                                circle.setTranslateX(dropPos.GetLeftDouble());
-                                circle.setTranslateY(dropPos.GetRightDouble());
+                                if (width >= 1.0)
+                                {
+                                    Circle circle = new Circle(width, color);
 
-                                RenderShape shape = new RenderShape("Circle", circle);
-                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                    circle.setTranslateX(dropPos.GetLeftDouble());
+                                    circle.setTranslateY(dropPos.GetRightDouble());
+
+                                    RenderShape shape = new RenderShape("Circle", circle);
+                                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                }
                             }
                         }
-                    }
-                    else if (selectedShapeButton.getText().equals("Rectangle"))
-                    {
-                        String stringWidth = this.EditorSymbol_RectangleWidth.getText();
-                        String stringHeight = this.EditorSymbol_RectangleHeight.getText();
-
-                        if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
+                        else if (selectedShapeButton.getText().equals("Rectangle"))
                         {
-                            double width = Double.parseDouble(stringWidth);
-                            double height = Double.parseDouble(stringHeight);
-                            Color color = this.EditorSymbol_RectangleColor.getValue();
+                            String stringWidth = this.EditorSymbol_RectangleWidth.getText();
+                            String stringHeight = this.EditorSymbol_RectangleHeight.getText();
 
-                            if ((width >= 1.0) && (height >= 1.0))
+                            if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
                             {
-                                Rectangle rectangle = new Rectangle(width, height, color);
+                                double width = Double.parseDouble(stringWidth);
+                                double height = Double.parseDouble(stringHeight);
+                                Color color = this.EditorSymbol_RectangleColor.getValue();
 
-                                rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                                rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+                                if ((width >= 1.0) && (height >= 1.0))
+                                {
+                                    Rectangle rectangle = new Rectangle(width, height, color);
 
-                                RenderShape shape = new RenderShape("Rectangle", rectangle);
-                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                    rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                                    rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+
+                                    RenderShape shape = new RenderShape("Rectangle", rectangle);
+                                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                }
+                            }
+
+                        }
+                        else if (selectedShapeButton.getText().equals("Triangle"))
+                        {
+                            String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
+
+                            if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                            {
+                                double middleLength = Double.parseDouble(stringMiddleHeight);
+                                Color color = this.EditorSymbol_TriangleColor.getValue();
+
+                                if (middleLength >= 1.0)
+                                {
+                                    Polygon triangle = new Polygon();
+                                    triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                            middleLength / 2, middleLength / 2,
+                                            0.0,
+                                            -middleLength / 2);
+                                    triangle.setFill(color);
+
+                                    triangle.setTranslateX(dropPos.GetLeftDouble());
+                                    triangle.setTranslateY(dropPos.GetRightDouble());
+
+                                    RenderShape shape = new RenderShape("Triangle", triangle);
+                                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                }
                             }
                         }
-
-                    }
-                    else if (selectedShapeButton.getText().equals("Triangle"))
-                    {
-                        String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
-
-                        if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                        else
                         {
-                            double middleLength = Double.parseDouble(stringMiddleHeight);
-                            Color color = this.EditorSymbol_TriangleColor.getValue();
-
-                            if (middleLength >= 1.0)
-                            {
-                                Polygon triangle = new Polygon();
-                                triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                            middleLength / 2, middleLength / 2,
-                                                            0.0,
-                                                            -middleLength / 2);
-                                triangle.setFill(color);
-
-                                triangle.setTranslateX(dropPos.GetLeftDouble());
-                                triangle.setTranslateY(dropPos.GetRightDouble());
-
-                                RenderShape shape = new RenderShape("Triangle", triangle);
-                                this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
-                            }
+                            throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
                         }
-                    }
-                    else
-                    {
-                        throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
                     }
                 }
             }
