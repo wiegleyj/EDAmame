@@ -802,15 +802,30 @@ public class EDAmameController implements Initializable
     @FXML
     protected void EditorFootprintNewButton()
     {
-        try
-        {
+        try {
+            if (editorsConfig == null) {
+                System.out.println("editorsConfig is null!");
+                return;  // exit the method if editorsConfig is null
+            }
+
             MenuBarPriority menuBarPriorityForFootprintEditor = editorsConfig.get("FootprintEditor");
+
+            if (menuBarPriorityForFootprintEditor == null) {
+                System.out.println("menuBarPriorityForFootprintEditor is null!");
+                return;  // exit the method if menuBarPriorityForFootprintEditor is null
+            }
+
             Editor editorInstance = EditorFactory.createEditor("FootprintEditor");
+
+            if (editorInstance == null) {
+                System.out.println("editorInstance is null!");
+                return;  // exit the method if editorInstance is null
+            }
+
             Editor_Add(editorInstance, menuBarPriorityForFootprintEditor);
-        }
-        catch (IOException e)
-        {
-            System.out.println("ERROR!");
+        } catch (IOException exception) {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
         }
     }
 
