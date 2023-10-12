@@ -9,7 +9,7 @@ package com.cyte.edamame.util;
 
 import com.cyte.edamame.render.RenderShape;
 
-import java.util.LinkedList;
+import java.util.*;
 
 public class Utils
 {

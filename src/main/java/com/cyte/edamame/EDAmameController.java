@@ -20,11 +20,16 @@
 package com.cyte.edamame;
 import com.cyte.edamame.editor.EditorSymbol;
 import com.cyte.edamame.editor.EditorFootprint;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.editor.MenuBarPriority;
 import com.cyte.edamame.editor.Editor;
+import com.cyte.edamame.editor.EditorFactory;
+import com.cyte.edamame.editor.MenuPriority;
+import com.cyte.edamame.render.RenderShape;
+import com.cyte.edamame.util.MenuConfigLoader;
+import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.TextAreaHandler;
 
-import java.util.LinkedList;
+import java.util.*;
 
 import javafx.collections.*;
 import javafx.fxml.*;
@@ -40,8 +45,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
-import java.util.ListIterator;
-import java.util.ResourceBundle;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -110,6 +113,8 @@ public class EDAmameController implements Initializable
 
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
 
+    private Map<String, MenuBarPriority> editorsConfig;
+
     //// MAIN FUNCTIONS ////
 
     /**
@@ -142,6 +147,39 @@ public class EDAmameController implements Initializable
     {
         Controller_LoggingChangeToTab();
         Controller_Logger.log(Level.INFO, "Initialization Commenced...\n");
+
+        // Load the menu configuration
+        try {
+            editorsConfig = MenuConfigLoader.loadMenuConfig();
+        } catch (Exception exception) {
+            Controller_Logger.log(Level.SEVERE, "Failed to load menu configuration.", exception);
+            return;
+        }
+
+        // Load the static menu ("EDAmame")
+        MenuBarPriority staticMenuPriority = editorsConfig.get("EDAmame");
+        if (staticMenuPriority != null) {
+            List<Menu> staticMenus = createMenusFromConfig(staticMenuPriority, null);
+            Controller_MenuBar.getMenus().addAll(staticMenus);
+        }
+
+        for (String editorKey : editorsConfig.keySet()) {
+            if (!editorKey.equals("EDAmame")) {
+                Editor editor = null;
+                try {
+                    editor = EditorFactory.createEditor(editorKey);
+                } catch (IOException e) {
+                    Controller_Logger.log(Level.SEVERE, "Failed to create editor of type: " + editorKey, e);
+                    continue;
+                }
+
+                MenuBarPriority editorMenuPriority = editorsConfig.get(editorKey);
+                List<Menu> editorMenus = createMenusFromConfig(editorMenuPriority, editor);
+                Controller_MenuBar.getMenus().addAll(editorMenus);
+            }
+        }
+
+
 
         // Set the Controller_Stage to close gracefully.
         Controller_Stage.setOnCloseRequest(evt -> { evt.consume(); Controller_Exit(); });
@@ -300,6 +338,14 @@ public class EDAmameController implements Initializable
                 for (MenuItem menuitem : items)
                     menuitem.setVisible(true);
 
+            // Add dynamic menus to main MenuBar
+            for (Menu dynamicMenu : editor.getDynamicMenus()) {
+                dynamicMenu.setVisible(true);
+                if (!Controller_MenuBar.getMenus().contains(dynamicMenu)) {
+                    Controller_MenuBar.getMenus().add(dynamicMenu);
+                }
+            }
+
             editor.Editor_Visible = true;
 
             //editor.Editor_RenderSystem.Clear();
@@ -325,6 +371,14 @@ public class EDAmameController implements Initializable
             for (MenuItem menuitem : items)
                 menuitem.setVisible(false);
 
+        // Hide or Remove dynamic menus from the main MenuBar
+        for (Menu dynamicMenu : editor.getDynamicMenus()) {
+            dynamicMenu.setVisible(false);  // Ensure invisibility
+            if (Controller_MenuBar.getMenus().contains(dynamicMenu)) {
+                Controller_MenuBar.getMenus().remove(dynamicMenu);
+            }
+        }
+
         editor.Editor_Visible = false;
     }
 
@@ -333,7 +387,7 @@ public class EDAmameController implements Initializable
      *
      * @param editor Which editor to setup and add controls for. They all start out invisible/unavailable.
      */
-    private void Editor_Add(Editor editor)
+    private void Editor_Add(Editor editor, MenuBarPriority menuBarPriority)
     {
         Tab editorTab = editor.Editor_GetTab();
 
@@ -372,35 +426,45 @@ public class EDAmameController implements Initializable
         // visibility done through addition and removal from the children
         // of the control TabPane.
 
-        // add all the Editor_Menus of the editor to the EDAmame MenuBar
+        // Add all the Editor_Menus of the editor to the EDAmame MenuBar
         for (Menu menu : Controller_MenuBar.getMenus())
         {
-            // get all the editor's menu items for this menu name.
-            ObservableList<MenuItem> editoritems = editor.Editor_GetMenus().get(menu.getText());
+            // Retrieve the menu priority configuration for the current menu name
+            MenuPriority menuPriority = menuBarPriority.getMenuPriorityByName(menu.getText());
 
-            if (editoritems != null)
+            if (menuPriority != null)
             {
-                // get an iterator for this menu's items
+                ObservableList<MenuItem> editorItems = FXCollections.observableArrayList();
+                menuPriority.getItemPriorities().forEach((itemName, itemPriority) -> {
+                    MenuItem menuItem = new MenuItem(itemName);
+                    setMenuItemActions(menuItem, editor); // Setting actions based on the JSON configuration
+                    editorItems.add(menuItem);
+                });
+
+                // Get an iterator for this menu's items
                 ListIterator<MenuItem> iterator = menu.getItems().listIterator();
 
-                // advance the iterator to the either the end of the menu or until a seperator with ID "editorItemsBegin"
+                // Advance the iterator to either the end of the menu or until a separator with ID "editorItemsBegin"
                 boolean found = false;
-
                 while (iterator.hasNext() && !found)
                 {
                     MenuItem item = iterator.next();
-
                     if (item.getId() != null && item.getId().equals("editorItemsBegin"))
                         found = true;
                 }
 
-                for (MenuItem item : editoritems)
+                for (MenuItem item : editorItems)
                 {
-                    item.setVisible(false);
+                    item.setVisible(false); // Or any other property setting based on your needs
                     iterator.add(item);
                 }
             }
         }
+
+
+        // Dynamically add the menus from the provided MenuBarPriority
+        List<Menu> dynamicMenus = createMenusFromConfig(menuBarPriority, editor);
+        Controller_MenuBar.getMenus().addAll(dynamicMenus);
 
         // move the log Editor_Tab to the end.
         if (Controller_TabPane.getTabs().contains(Controller_TabLog))
@@ -434,8 +498,57 @@ public class EDAmameController implements Initializable
             for (ObservableList<MenuItem> itemlist: editor.Editor_GetMenus().values())
                 menu.getItems().removeAll(itemlist);
 
+        // Remove dynamic menus from the main MenuBar
+        for (Menu dynamicMenu : editor.getDynamicMenus()) {
+            if (Controller_MenuBar.getMenus().contains(dynamicMenu)) {
+                Controller_MenuBar.getMenus().remove(dynamicMenu);
+            }
+        }
+
         // remove the main editor Editor_Tab itself.
         Controller_TabPane.getTabs().remove(editor.Editor_GetTab());
+    }
+
+    public List<Menu> createMenusFromConfig(MenuBarPriority menuBarPriority, Editor editor) {
+        List<Menu> menus = new ArrayList<>();
+
+        menuBarPriority.getMenuPriorities().entrySet().stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.comparing(MenuPriority::getPriority)))
+                .forEach(menuEntry -> {
+                    Menu menu = new Menu(menuEntry.getKey());
+
+                    menuEntry.getValue().getItemPriorities().entrySet().stream()
+                            .sorted(Map.Entry.comparingByValue())
+                            .forEach(itemEntry -> {
+                                MenuItem menuItem = new MenuItem(itemEntry.getKey());
+                                menuItem.setOnAction(event -> setMenuItemActions(menuItem, editor));
+                                menu.getItems().add(menuItem);
+                            });
+
+                    menus.add(menu);
+                });
+        return menus;
+    }
+
+    // TODO: All menu item actions need to be added here
+    private void setMenuItemActions(MenuItem menuItem, Editor editor) {
+        String itemName = menuItem.getText();
+
+        switch(itemName) {
+            case "Exit":
+                menuItem.setOnAction(event -> {
+                    Editor_Remove(editor);
+                });
+                break;
+            case "Open":
+                menuItem.setOnAction(event -> {
+                    // Open file
+                });
+                break;
+            default:
+                // Error Handling
+                break;
+        }
     }
 
     //// SAVING & LOADING FUNCTIONS ////
@@ -661,12 +774,29 @@ public class EDAmameController implements Initializable
     protected void EditorSymbolNewButton()
     {
         try
-        {
-            Editor_Add(EditorSymbol.create());
-        }
-        catch (IOException e)
-        {
-            System.out.println("ERROR!");
+            if (editorsConfig == null) {
+                System.out.println("editorsConfig is null!");
+                return;  // exit the method if editorsConfig is null
+            }
+
+            MenuBarPriority menuBarPriorityForSymbolEditor = editorsConfig.get("SymbolEditor");
+
+            if (menuBarPriorityForSymbolEditor == null) {
+                System.out.println("menuBarPriorityForSymbolEditor is null!");
+                return;  // exit the method if menuBarPriorityForSymbolEditor is null
+            }
+
+            Editor editorInstance = EditorFactory.createEditor("SymbolEditor");
+
+            if (editorInstance == null) {
+                System.out.println("editorInstance is null!");
+                return;  // exit the method if editorInstance is null
+            }
+
+            Editor_Add(editorInstance, menuBarPriorityForSymbolEditor);
+        } catch (IOException e) {
+            System.out.println("ERROR: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 

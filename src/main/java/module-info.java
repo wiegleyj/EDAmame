@@ -10,11 +10,13 @@ module com.cyte.edamame {
     requires java.sql;
     requires com.h2database;
     requires java.prefs;
+    requires com.fasterxml.jackson.annotation;
+    requires com.fasterxml.jackson.databind;
 
 
     opens com.cyte.edamame to javafx.fxml, javafx.graphics;
     //exports com.cyte.edamame;
-    opens com.cyte.edamame.editor to javafx.fxml, javafx.graphics;
+    opens com.cyte.edamame.editor to javafx.fxml, javafx.graphics, com.fasterxml.jackson.databind;
     opens com.cyte.edamame.util to javafx.fxml, javafx.graphics;
     //exports com.cyte.edamame.editor;
 }
