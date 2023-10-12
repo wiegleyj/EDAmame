@@ -326,7 +326,7 @@ public class RenderSystem
             // Adjusting highlights accordingly...
             if ((shape.highlightedMouse || shape.highlightedBox) && !shape.highlighted)
             {
-                shape.CalculateShapeHighlighted();
+                //shape.CalculateShapeHighlighted();
                 this.paneHighlights.getChildren().add(shape.shapeHighlighted);
                 shape.highlighted = true;
                 this.shapesHighlighted++;
@@ -516,7 +516,7 @@ public class RenderSystem
                                 if (shape.highlightedMouse || shape.highlightedBox)
                                 {
                                     shape.selected = true;
-                                    shape.CalculateShapeSelected();
+                                    //shape.CalculateShapeSelected();
                                     this.paneSelections.getChildren().add(shape.shapeSelected);
                                     this.shapesSelected++;
                                 }
@@ -724,8 +724,31 @@ public class RenderSystem
                 // Handling shape highlights
                 this.RenderSystem_ShapeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
 
+                // Handling shape rotation (only if we have shapes selected and R is pressed)
+                if ((this.shapesSelected > 0) && EDAmameController.Controller_IsKeyPressed(KeyCode.R))
+                {
+                    for (int i = 0; i < this.shapes.size(); i++)
+                    {
+                        RenderShape shape = this.shapes.get(i);
+
+                        if (!shape.selected)
+                            continue;
+
+                        double angle = 10;
+
+                        if (event.getDeltaY() < 0)
+                            angle = -10;
+
+                        shape.shape.setRotate(shape.shape.getRotate() + angle);
+
+                        //shape.CalculateShapeSelected();
+                        //shape.CalculateShapeHighlighted();
+
+                        this.shapes.set(i, shape);
+                    }
+                }
                 // Handling zoom scaling (only if we're not rotating anything)
-                if (!this.editor.Editor_Rotating)
+                else
                 {
                     if (event.getDeltaY() < 0)
                         if ((this.zoom / this.zoomFactor) <= this.zoomLimits.GetLeftDouble())

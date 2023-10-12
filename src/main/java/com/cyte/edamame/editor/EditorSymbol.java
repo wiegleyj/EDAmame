@@ -495,56 +495,7 @@ public class EditorSymbol extends Editor
 
     public void Editor_ViewportOnScroll(ScrollEvent event)
     {
-        //System.out.println("Symbol mouse scrolled!");
 
-        // Handling symbol rotation
-        this.Editor_Rotating = false;
-
-        /*if (this.EditorSchematic_IsKeyPressed(KeyCode.R))
-        {
-            for (int i = 0; i < this.EditorSchematic_ViewportSymbolsDropped.size(); i++)
-            {
-                EditorSchematic_Symbol symbol = this.EditorSchematic_ViewportSymbolsDropped.get(i);
-
-                if (!symbol.selected)
-                    continue;
-
-                Double angleInc = this.EditorSchematic_SymbolRotationStep;
-
-                if (event.getDeltaY() > 0)
-                    angleInc = -this.EditorSchematic_SymbolRotationStep;
-
-                symbol.angle += angleInc;
-
-                // Rotating shape points
-                for (int j = 0; j < symbol.shape.points.size(); j++)
-                {
-                    PairMutable point = symbol.shape.points.get(j);
-
-                    Double newX = point.GetLeftDouble() * Math.cos(Math.toRadians(angleInc)) - point.GetRightDouble() * Math.sin(Math.toRadians(angleInc));
-                    Double newY = point.GetLeftDouble() * Math.sin(Math.toRadians(angleInc)) + point.GetRightDouble() * Math.cos(Math.toRadians(angleInc));
-
-                    symbol.shape.points.set(j, new PairMutable(newX, newY));
-                }
-
-                // Rotating wire points
-                for (int j = 0; j < symbol.wirePoints.size(); j++)
-                {
-                    PairMutable point = symbol.wirePoints.get(j);
-
-                    Double newX = point.GetLeftDouble() * Math.cos(Math.toRadians(angleInc)) - point.GetRightDouble() * Math.sin(Math.toRadians(angleInc));
-                    Double newY = point.GetLeftDouble() * Math.sin(Math.toRadians(angleInc)) + point.GetRightDouble() * Math.cos(Math.toRadians(angleInc));
-
-                    symbol.wirePoints.set(j, new PairMutable(newX, newY));
-                }
-
-                this.EditorSchematic_ViewportSymbolsDropped.set(i, symbol);
-                rotating = true;
-            }
-        }*/
-
-        // Handling symbol highlighting
-        //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
     public void Editor_ViewportOnKeyPressed(KeyEvent event)

@@ -44,6 +44,9 @@ public class RenderShape
         this.highlightedBox = false;
         this.selected = false;
         this.mousePressPos = null;
+
+        this.CalculateShapeSelected();
+        this.CalculateShapeHighlighted();
     }
 
     public boolean PosOnShape(PairMutable pos)
@@ -65,6 +68,7 @@ public class RenderShape
         this.shapeSelected.setId(this.id);
         this.shapeSelected.translateXProperty().bind(this.shape.translateXProperty());
         this.shapeSelected.translateYProperty().bind(this.shape.translateYProperty());
+        this.shapeSelected.rotateProperty().bind(this.shape.rotateProperty());
     }
 
     public void CalculateShapeHighlighted()
@@ -81,5 +85,6 @@ public class RenderShape
         this.shapeHighlighted.setId(this.id);
         this.shapeHighlighted.translateXProperty().bind(this.shape.translateXProperty());
         this.shapeHighlighted.translateYProperty().bind(this.shape.translateYProperty());
+        this.shapeHighlighted.rotateProperty().bind(this.shape.rotateProperty());
     }
 }
