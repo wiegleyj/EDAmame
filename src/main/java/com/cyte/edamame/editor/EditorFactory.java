@@ -16,9 +16,9 @@ public class EditorFactory {
             case "SymbolEditor":
                 return EditorSymbol.create();
                 // TODO: All editors will need to be inserted here
-/*            case "PCBEditor":
-                return EditorPCB.create();
-            case "SchematicEditor":
+            case "FootprintEditor":
+                return EditorFootprint.create();
+/*            case "SchematicEditor":
                 return EditorSchematic.create();*/
             default:
                 throw new IllegalArgumentException("Invalid editor key: " + key);

@@ -163,13 +163,13 @@ public class EDAmameController implements Initializable
             Controller_MenuBar.getMenus().addAll(staticMenus);
         }
 
-        for (String editorKey : editorsConfig.keySet()) {
+        /*for (String editorKey : editorsConfig.keySet()) {
             if (!editorKey.equals("EDAmame")) {
                 Editor editor = null;
                 try {
                     editor = EditorFactory.createEditor(editorKey);
-                } catch (IOException e) {
-                    Controller_Logger.log(Level.SEVERE, "Failed to create editor of type: " + editorKey, e);
+                } catch (IOException exception) {
+                    Controller_Logger.log(Level.SEVERE, "Failed to create editor of type: " + editorKey, exception);
                     continue;
                 }
 
@@ -177,7 +177,7 @@ public class EDAmameController implements Initializable
                 List<Menu> editorMenus = createMenusFromConfig(editorMenuPriority, editor);
                 Controller_MenuBar.getMenus().addAll(editorMenus);
             }
-        }
+        }*/
 
 
 
@@ -460,7 +460,6 @@ public class EDAmameController implements Initializable
                 }
             }
         }
-
 
         // Dynamically add the menus from the provided MenuBarPriority
         List<Menu> dynamicMenus = createMenusFromConfig(menuBarPriority, editor);
@@ -773,7 +772,7 @@ public class EDAmameController implements Initializable
     @FXML
     protected void EditorSymbolNewButton()
     {
-        try
+        try {
             if (editorsConfig == null) {
                 System.out.println("editorsConfig is null!");
                 return;  // exit the method if editorsConfig is null
@@ -794,9 +793,9 @@ public class EDAmameController implements Initializable
             }
 
             Editor_Add(editorInstance, menuBarPriorityForSymbolEditor);
-        } catch (IOException e) {
-            System.out.println("ERROR: " + e.getMessage());
-            e.printStackTrace();
+        } catch (IOException exception) {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
         }
     }
 
@@ -805,7 +804,9 @@ public class EDAmameController implements Initializable
     {
         try
         {
-            Editor_Add(EditorFootprint.create());
+            MenuBarPriority menuBarPriorityForFootprintEditor = editorsConfig.get("FootprintEditor");
+            Editor editorInstance = EditorFactory.createEditor("FootprintEditor");
+            Editor_Add(editorInstance, menuBarPriorityForFootprintEditor);
         }
         catch (IOException e)
         {

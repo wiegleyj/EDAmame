@@ -38,7 +38,7 @@
                <Menu text="_View">
                    <MenuItem fx:id="Controller_MenuLogItem" mnemonicParsing="false" onAction="#Controller_LogToggleVisibility" text="Hide Log Window" />
                </Menu>
-               <Menu text="Proje_ct">
+               <Menu text="_Project">
                    <MenuItem mnemonicParsing="false" text="Close" />
                </Menu>
                <Menu text="_Place">
