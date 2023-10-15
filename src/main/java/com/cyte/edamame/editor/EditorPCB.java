@@ -66,4 +66,16 @@ public class EditorPCB extends Editor
     {
         System.out.println("PCB key released!");
     }
+
+    //// PROPERTIES WINDOW FUNCTIONS ////
+
+    public void Editor_ElemPropsLoad()
+    {
+        System.out.println("Loading props PCB!");
+    }
+
+    public void Editor_ElemPropsApply()
+    {
+        System.out.println("Applying props PCB!");
+    }
 }

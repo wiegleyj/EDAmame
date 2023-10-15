@@ -66,4 +66,16 @@ public class EditorSchematic extends Editor
     {
         System.out.println("Schematic key released!");
     }
+
+    //// PROPERTIES WINDOW FUNCTIONS ////
+
+    public void Editor_ElemPropsLoad()
+    {
+        System.out.println("Loading props schematic!");
+    }
+
+    public void Editor_ElemPropsApply()
+    {
+        System.out.println("Applying props schematic!");
+    }
 }

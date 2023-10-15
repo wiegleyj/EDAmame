@@ -96,4 +96,16 @@ public class EditorFootprint extends Editor
     {
         System.out.println("Footprint key released!");
     }
+
+    //// PROPERTIES WINDOW FUNCTIONS ////
+
+    public void Editor_ElemPropsLoad()
+    {
+        System.out.println("Loading props footprint!");
+    }
+
+    public void Editor_ElemPropsApply()
+    {
+        System.out.println("Applying props footprint!");
+    }
 }

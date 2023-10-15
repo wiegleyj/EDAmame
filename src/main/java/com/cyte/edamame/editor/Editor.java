@@ -64,11 +64,9 @@ public abstract class Editor
 
     // DO NOT EDIT
 
-    public LinkedList<KeyCode> Editor_PressedKeys = new LinkedList<KeyCode>();
     public boolean Editor_Visible = false;
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
-    public boolean Editor_Rotating = false;
 
     protected List<Menu> dynamicMenus = new ArrayList<>();
 
@@ -120,7 +118,6 @@ public abstract class Editor
         return combinedMenus;
     }
 
-
     //// CALLBACK FUNCTIONS ////
 
     abstract public void Editor_ViewportOnDragOver(DragEvent event);
@@ -132,6 +129,11 @@ public abstract class Editor
     abstract public void Editor_ViewportOnScroll(ScrollEvent event);
     abstract public void Editor_ViewportOnKeyPressed(KeyEvent event);
     abstract public void Editor_ViewportOnKeyReleased(KeyEvent event);
+
+    //// PROPERTIES WINDOW FUNCTIONS ////
+
+    abstract public void Editor_ElemPropsLoad();
+    abstract public void Editor_ElemPropsApply();
 
     //// SUPPORT FUNCTIONS ////
 
@@ -286,19 +288,6 @@ public abstract class Editor
                             }
                         }
 
-                        if (foundPaneListener == null)
-                            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.Editor_Name + "\"!");
-                        if (foundPaneHolder == null)
-                            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.Editor_Name + "\"!");
-                        if (foundPaneHighlights == null)
-                            throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.Editor_Name + "\"!");
-                        if (foundPaneSelections == null)
-                            throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.Editor_Name + "\"!");
-                        if (foundCanvas == null)
-                            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
-                        if (foundCrosshair == null)
-                            throw new InvalidClassException("Unable to locate crosshair shape for an editor with name \"" + this.Editor_Name + "\"!");
-
                         // Setting the pointers to the editor Editor_Tab
                         item.setText(EDAmameController.Editor_Names[editorType]);
                         Editor_Tab = item;
@@ -310,6 +299,19 @@ public abstract class Editor
                 }
             }
         }
+
+        if (foundPaneListener == null)
+            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundPaneHolder == null)
+            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundPaneHighlights == null)
+            throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundPaneSelections == null)
+            throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundCanvas == null)
+            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundCrosshair == null)
+            throw new InvalidClassException("Unable to locate crosshair shape for an editor with name \"" + this.Editor_Name + "\"!");
 
         this.Editor_RenderSystem = new RenderSystem(this,
                                                     foundPaneListener,

@@ -6,10 +6,12 @@
  */
 
 // TODO:
-// Implement shape rotation
 // Refactor viewport mouse diff pos scaling
 // Refactor RenderShape display shape field
 // Implement shape properties window
+// Refactor render shape to use nodes instead of shapes
+// Implement shape all-props loading & applying
+// Implement shape bounds highlight
 // Implement text dropping
 // Implement line drawing in symbol editor
 // Implement wire connection points into symbols
@@ -18,12 +20,7 @@
 // Fix mouse-specific release callback function
 
 package com.cyte.edamame;
-import com.cyte.edamame.editor.EditorSymbol;
-import com.cyte.edamame.editor.EditorFootprint;
-import com.cyte.edamame.editor.MenuBarPriority;
-import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.editor.EditorFactory;
-import com.cyte.edamame.editor.MenuPriority;
+import com.cyte.edamame.editor.*;
 import com.cyte.edamame.render.RenderShape;
 import com.cyte.edamame.util.MenuConfigLoader;
 import com.cyte.edamame.util.PairMutable;
@@ -34,6 +31,7 @@ import java.util.*;
 import javafx.collections.*;
 import javafx.fxml.*;
 import javafx.stage.*;
+import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
@@ -108,10 +106,10 @@ public class EDAmameController implements Initializable
 
     private final Stage Controller_Stage;                                                              // The Controller_Stage hosting this controller.
     private final ObservableMap<Tab, Editor> Controller_Editors = FXCollections.observableHashMap();   // All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
+    static public EditorProps Controller_EditorPropertiesWindow = null;
+    static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
 
     public Timeline Editor_HeartbeatTimeline;
-
-    static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
 
     private Map<String, MenuBarPriority> editorsConfig;
 
@@ -257,7 +255,7 @@ public class EDAmameController implements Initializable
                 //System.out.println("(" + editor.Editor_RenderSystem.paneHighlights.getLayoutX() + ", " + editor.Editor_RenderSystem.paneHighlights.getLayoutY() + ")");
                 //System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
                 //System.out.println(editor.Editor_RenderSystem.paneHolder.getBoundsInLocal().toString());
-                //System.out.println(editor.Editor_RenderSystem.shapesHighlighted + ", " + editor.Editor_RenderSystem.shapesSelected);
+                //System.out.println(EDAmameController.Controller_EditorPropertiesWindow);
 
                 // Adjusting the central layout of the canvas and the crosshair relative to the stack pane size
                 {
@@ -360,6 +358,10 @@ public class EDAmameController implements Initializable
      */
     private void Editor_Deactivate(Editor editor)
     {
+        // Removing any active property windows for the active editor...
+        if (EDAmameController.Controller_EditorPropertiesWindow != null)
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_Stage.close();
+
         // set the editor ToolBars to not visible
         editor.Editor_GetToolBar().setVisible(false);
 
@@ -750,11 +752,25 @@ public class EDAmameController implements Initializable
 
     //// SUPPORT FUNCTIONS ////
 
-    static public boolean Controller_IsStringNum(String str) {
-        try {
+    static public Node Controller_GetNodeById(ObservableList<Node> nodes, String id)
+    {
+        for (int i = 0; i < nodes.size(); i++)
+            if (nodes.get(i).getId().equals(id))
+                return nodes.get(i);
+
+        return null;
+    }
+
+    static public boolean Controller_IsStringNum(String str)
+    {
+        try
+        {
             Double.parseDouble(str);
+
             return true;
-        } catch(NumberFormatException e) {
+        }
+        catch(NumberFormatException e)
+        {
             return false;
         }
     }
@@ -772,28 +788,34 @@ public class EDAmameController implements Initializable
     @FXML
     protected void EditorSymbolNewButton()
     {
-        try {
-            if (editorsConfig == null) {
+        try
+        {
+            if (editorsConfig == null)
+            {
                 System.out.println("editorsConfig is null!");
                 return;  // exit the method if editorsConfig is null
             }
 
             MenuBarPriority menuBarPriorityForSymbolEditor = editorsConfig.get("SymbolEditor");
 
-            if (menuBarPriorityForSymbolEditor == null) {
+            if (menuBarPriorityForSymbolEditor == null)
+            {
                 System.out.println("menuBarPriorityForSymbolEditor is null!");
                 return;  // exit the method if menuBarPriorityForSymbolEditor is null
             }
 
             Editor editorInstance = EditorFactory.createEditor("SymbolEditor");
 
-            if (editorInstance == null) {
+            if (editorInstance == null)
+            {
                 System.out.println("editorInstance is null!");
                 return;  // exit the method if editorInstance is null
             }
 
             Editor_Add(editorInstance, menuBarPriorityForSymbolEditor);
-        } catch (IOException exception) {
+        }
+        catch (IOException exception)
+        {
             System.out.println("ERROR: " + exception.getMessage());
             exception.printStackTrace();
         }
@@ -810,20 +832,24 @@ public class EDAmameController implements Initializable
 
             MenuBarPriority menuBarPriorityForFootprintEditor = editorsConfig.get("FootprintEditor");
 
-            if (menuBarPriorityForFootprintEditor == null) {
+            if (menuBarPriorityForFootprintEditor == null)
+            {
                 System.out.println("menuBarPriorityForFootprintEditor is null!");
                 return;  // exit the method if menuBarPriorityForFootprintEditor is null
             }
 
             Editor editorInstance = EditorFactory.createEditor("FootprintEditor");
 
-            if (editorInstance == null) {
+            if (editorInstance == null)
+            {
                 System.out.println("editorInstance is null!");
                 return;  // exit the method if editorInstance is null
             }
 
             Editor_Add(editorInstance, menuBarPriorityForFootprintEditor);
-        } catch (IOException exception) {
+        }
+        catch (IOException exception)
+        {
             System.out.println("ERROR: " + exception.getMessage());
             exception.printStackTrace();
         }

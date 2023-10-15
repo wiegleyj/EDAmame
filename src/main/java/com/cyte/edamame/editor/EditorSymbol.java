@@ -11,13 +11,14 @@ import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.render.RenderShape;
 
-import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
+import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.scene.input.*;
+import javafx.scene.control.*;
+import javafx.scene.layout.*;
 
 import java.io.IOException;
 
@@ -54,7 +55,7 @@ public class EditorSymbol extends Editor
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    public static Editor create() throws IOException
+    static public Editor create() throws IOException
     {
         // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
@@ -502,20 +503,147 @@ public class EditorSymbol extends Editor
     {
         //System.out.println("Symbol key pressed!");
 
-        KeyCode pressedKey = event.getCode();
+        // Handling the shape properties window (only if there's not another properties window already open)...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.E) && (EDAmameController.Controller_EditorPropertiesWindow == null))
+        {
+            // Attempting to create the properties window...
+            EditorProps propsWindow = EditorProps.EditorProps_Create();
 
-        if (!this.Editor_PressedKeys.contains(pressedKey))
-            this.Editor_PressedKeys.add(pressedKey);
+            if ((propsWindow != null))
+            {
+                propsWindow.EditorProps_Stage.setOnHidden(e -> {
+                    EDAmameController.Controller_EditorPropertiesWindow = null;
+                });
+                propsWindow.EditorProps_Editor = this;
+                propsWindow.EditorProps_Stage.setTitle("Symbol Properties");
+                propsWindow.EditorProps_Stage.show();
+
+                EDAmameController.Controller_EditorPropertiesWindow = propsWindow;
+            }
+        }
     }
 
     public void Editor_ViewportOnKeyReleased(KeyEvent event)
     {
         //System.out.println("Symbol key released!");
 
-        KeyCode releasedKey = event.getCode();
+        //KeyCode releasedKey = event.getCode();
+    }
 
-        if (this.Editor_PressedKeys.contains(releasedKey))
-            this.Editor_PressedKeys.remove(releasedKey);
+    //// PROPERTIES WINDOW FUNCTIONS ////
+
+    public void Editor_ElemPropsLoad()
+    {
+        // Populating properties window with all selected shape properties...
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().clear();
+
+        for (int i = 0; i < this.Editor_RenderSystem.shapes.size(); i++)
+        {
+            RenderShape shape = this.Editor_RenderSystem.shapes.get(i);
+
+            if (!shape.selected)
+                continue;
+
+            // Creating shape section boxes...
+            HBox shapeHBox = new HBox();
+            shapeHBox.setId("shape_" + i + "_box");
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(shapeHBox);
+            VBox shapeVBox = new VBox();
+            shapeHBox.getChildren().add(shapeVBox);
+
+            // Creating position box...
+            HBox posHBox = new HBox();
+            posHBox.getChildren().add(new Label("Position X: "));
+            TextField posXText = new TextField(Double.toString(shape.shape.getTranslateX()));
+            posXText.setMinWidth(100);
+            posXText.setPrefWidth(100);
+            posXText.setMaxWidth(100);
+            posXText.setId("shape_" + i + "_posX");
+            posHBox.getChildren().add(posXText);
+            posHBox.getChildren().add(new Label("Position Y: "));
+            TextField posYText = new TextField(Double.toString(shape.shape.getTranslateY()));
+            posYText.setId("shape_" + i + "_posY");
+            posYText.setMinWidth(100);
+            posYText.setPrefWidth(100);
+            posYText.setMaxWidth(100);
+            posHBox.getChildren().add(posYText);
+            shapeVBox.getChildren().add(posHBox);
+
+            // Creating rotation box...
+            HBox rotHBox = new HBox();
+            rotHBox.getChildren().add(new Label("Rotation: "));
+            TextField rotText = new TextField(Double.toString(shape.shape.getRotate()));
+            rotText.setMinWidth(100);
+            rotText.setPrefWidth(100);
+            rotText.setMaxWidth(100);
+            rotText.setId("shape_" + i + "_rotX");
+            rotHBox.getChildren().add(rotText);
+            shapeVBox.getChildren().add(rotHBox);
+
+            // Creating color box...
+            HBox colorHBox = new HBox();
+            colorHBox.getChildren().add(new Label("Color: "));
+            ColorPicker colorPicker = new ColorPicker();
+            colorPicker.setId("shape_" + i + "_color");
+            colorPicker.setValue((Color)shape.shape.getFill());
+            colorHBox.getChildren().add(colorPicker);
+            shapeVBox.getChildren().add(colorHBox);
+
+            if (shape.shape.getClass() == Circle.class)
+            {
+                // Creating radius box...
+                HBox radiusHBox = new HBox();
+                radiusHBox.getChildren().add(new Label("Radius: "));
+                TextField radiusText = new TextField(Double.toString(((Circle)shape.shape).getRadius()));
+                radiusText.setMinWidth(100);
+                radiusText.setPrefWidth(100);
+                radiusText.setMaxWidth(100);
+                radiusText.setId("shape_" + i + "_radius");
+                radiusHBox.getChildren().add(radiusText);
+                shapeVBox.getChildren().add(radiusHBox);
+            }
+            else if (shape.shape.getClass() == Rectangle.class)
+            {
+                // Creating width box...
+                HBox widthHBox = new HBox();
+                widthHBox.getChildren().add(new Label("Width: "));
+                widthHBox.getChildren().add(new Label("Rectangle!"));
+                shapeVBox.getChildren().add(widthHBox);
+
+                // Creating height box...
+                HBox heightHBox = new HBox();
+                heightHBox.getChildren().add(new Label("Height: "));
+                heightHBox.getChildren().add(new Label("Rectangle!"));
+                shapeVBox.getChildren().add(heightHBox);
+            }
+            else if (shape.shape.getClass() == Polygon.class)
+            {
+                // Creating height box...
+                HBox heightHBox = new HBox();
+                heightHBox.getChildren().add(new Label("Height: "));
+                heightHBox.getChildren().add(new Label("Triangle!"));
+                shapeVBox.getChildren().add(heightHBox);
+            }
+
+            shapeVBox.getChildren().add(new Separator());
+        }
+    }
+
+    public void Editor_ElemPropsApply()
+    {
+        // Reading all data from each shape's property entry & applying them...
+        for (int i = 0; i < this.Editor_RenderSystem.shapes.size(); i++)
+        {
+            RenderShape shape = this.Editor_RenderSystem.shapes.get(i);
+
+            if (!shape.selected)
+                continue;
+
+            // Acquiring the current shape's properties box...
+            HBox shapeBox = (HBox)EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().get(i);
+
+            // TODO
+        }
     }
 
     //// TESTING FUNCTIONS ////
