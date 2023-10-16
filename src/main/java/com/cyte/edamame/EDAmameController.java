@@ -8,7 +8,6 @@
 // TODO:
 // Refactor viewport mouse diff pos scaling
 // Refactor RenderShape display shape field
-// Implement shape properties window
 // Refactor render shape to use nodes instead of shapes
 // Implement shape all-props loading & applying
 // Implement shape bounds highlight
@@ -18,6 +17,7 @@
 // Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
+// Implement undo-redo functionalities
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
@@ -80,6 +80,15 @@ public class EDAmameController implements Initializable
     final static public Double Editor_MouseCheckTimeout = 0.0001;
     final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Double Editor_SelectionBoxWidth = 1.0;
+
+    final static public Double Editor_CircleRadiusMin = 10.0;
+    final static public Double Editor_CircleRadiusMax = 100.0;
+    final static public Double Editor_RectWidthMin = 10.0;
+    final static public Double Editor_RectWidthMax = 500.0;
+    final static public Double Editor_RectHeightMin = 10.0;
+    final static public Double Editor_RectHeightMax = 500.0;
+    final static public Double Editor_TriLenMin = 10.0;
+    final static public Double Editor_TriLenMax = 500.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
@@ -255,7 +264,7 @@ public class EDAmameController implements Initializable
                 //System.out.println("(" + editor.Editor_RenderSystem.paneHighlights.getLayoutX() + ", " + editor.Editor_RenderSystem.paneHighlights.getLayoutY() + ")");
                 //System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
                 //System.out.println(editor.Editor_RenderSystem.paneHolder.getBoundsInLocal().toString());
-                //System.out.println(EDAmameController.Controller_EditorPropertiesWindow);
+                //System.out.println(EDAmameController.Controller_PressedKeys.toString());
 
                 // Adjusting the central layout of the canvas and the crosshair relative to the stack pane size
                 {
@@ -702,11 +711,10 @@ public class EDAmameController implements Initializable
     @FXML
     public void Controller_OnKeyPressed(KeyEvent event)
     {
-        // Adding pressed key to the pressed keys list
-        if (!Controller_IsKeyPressed(event.getCode()))
-            Controller_PressedKeys.add(event.getCode());
+        // Adding pressed key to the pressed keys list...
+        EDAmameController.Controller_KeyPressed(event.getCode());
 
-        // Calling editor callbacks
+        // Calling editor callbacks...
         ObservableList<Tab> tabs = Controller_TabPane.getTabs();
 
         for (int i = 0; i < tabs.size(); i++)
@@ -728,10 +736,10 @@ public class EDAmameController implements Initializable
     @FXML
     public void Controller_OnKeyReleased(KeyEvent event)
     {
-        if (Controller_IsKeyPressed(event.getCode()))
-            Controller_PressedKeys.remove(event.getCode());
+        // Removing pressed key from the pressed keys list...
+        EDAmameController.Controller_KeyReleased(event.getCode());
 
-        // Calling editor callbacks
+        // Calling editor callbacks...
         ObservableList<Tab> tabs = Controller_TabPane.getTabs();
 
         for (int i = 0; i < tabs.size(); i++)
@@ -752,10 +760,24 @@ public class EDAmameController implements Initializable
 
     //// SUPPORT FUNCTIONS ////
 
+    static public <T> boolean Controller_IsListAllEqual(LinkedList<T> list)
+    {
+        return list.stream().distinct().limit(2).count() <= 1;
+    }
+
+    static public Integer Controller_FindNodeById(ObservableList<Node> nodes, String id)
+    {
+        for (int i = 0; i < nodes.size(); i++)
+            if ((nodes.get(i).getId() != null) && nodes.get(i).getId().equals(id))
+                return i;
+
+        return -1;
+    }
+
     static public Node Controller_GetNodeById(ObservableList<Node> nodes, String id)
     {
         for (int i = 0; i < nodes.size(); i++)
-            if (nodes.get(i).getId().equals(id))
+            if ((nodes.get(i).getId() != null) && nodes.get(i).getId().equals(id))
                 return nodes.get(i);
 
         return null;
@@ -778,6 +800,18 @@ public class EDAmameController implements Initializable
     static public boolean Controller_IsKeyPressed(KeyCode key)
     {
         return Controller_PressedKeys.contains(key);
+    }
+
+    static public void Controller_KeyPressed(KeyCode key)
+    {
+        if (!Controller_IsKeyPressed(key))
+            Controller_PressedKeys.add(key);
+    }
+
+    static public void Controller_KeyReleased(KeyCode key)
+    {
+        if (Controller_IsKeyPressed(key))
+            Controller_PressedKeys.remove(key);
     }
 
     //// TESTING FUNCTIONS ////

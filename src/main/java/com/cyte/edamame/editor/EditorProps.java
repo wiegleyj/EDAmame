@@ -8,9 +8,11 @@
 package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderShape;
 import javafx.fxml.*;
 import javafx.scene.*;
+import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -41,7 +43,9 @@ public class EditorProps
             propsWindow.EditorProps_Stage = new Stage();
             propsWindow.EditorProps_Stage.setScene(scene);
             propsWindow.EditorProps_Stage.setAlwaysOnTop(true);
-            propsWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element properties from currently-active editor."));
+            propsWindow.EditorProps_Stage.setResizable(false);
+            propsWindow.EditorProps_PropsBox.setSpacing(10);
+            propsWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
 
             return propsWindow;
         }
@@ -72,5 +76,17 @@ public class EditorProps
             throw new java.lang.Error("ERROR: Attempting to apply from properties window with null editor reference!");
 
         this.EditorProps_Editor.Editor_ElemPropsApply();
+    }
+
+    @FXML
+    public void EditorProps_KeyPressed(KeyEvent event)
+    {
+        EDAmameController.Controller_KeyPressed(event.getCode());
+    }
+
+    @FXML
+    public void EditorProps_KeyReleased(KeyEvent event)
+    {
+        EDAmameController.Controller_KeyReleased(event.getCode());
     }
 }

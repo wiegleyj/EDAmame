@@ -20,7 +20,7 @@ import javafx.geometry.*;
 
 public class RenderShape
 {
-    final String id = UUID.randomUUID().toString();
+    final public String id = UUID.randomUUID().toString();
 
     public String name;
     public Shape shape;

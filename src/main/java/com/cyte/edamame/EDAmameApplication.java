@@ -67,10 +67,4 @@ public class EDAmameApplication extends Application
     {
         launch();
     }
-
-    /*public static Parent loadFXML(String fxml) throws IOException
-    {
-        FXMLLoader fxmlLoader = new FXMLLoader(EDAmameApplication.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }*/
 }

@@ -30,7 +30,7 @@ public class RenderSystem
 {
     //// GLOBAL VARIABLES ////
 
-    final UUID id = UUID.randomUUID();
+    final public UUID id = UUID.randomUUID();
 
     public Pane paneListener;
     public Pane paneHolder;
