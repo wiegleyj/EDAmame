@@ -69,12 +69,12 @@ public class EditorSchematic extends Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_ElemPropsLoad()
+    public void Editor_PropsSpecificLoad()
     {
         System.out.println("Loading props schematic!");
     }
 
-    public void Editor_ElemPropsApply()
+    public void Editor_PropsSpecificApply()
     {
         System.out.println("Applying props schematic!");
     }

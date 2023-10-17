@@ -12,6 +12,7 @@ import com.cyte.edamame.util.PairMutable;
 import java.util.LinkedList;
 import java.util.UUID;
 
+import javafx.scene.*;
 import javafx.scene.canvas.*;
 import javafx.scene.paint.*;
 import javafx.scene.effect.*;
@@ -23,20 +24,20 @@ public class RenderShape
     final public String id = UUID.randomUUID().toString();
 
     public String name;
-    public Shape shape;
-    public Shape shapeHighlighted;
-    public Shape shapeSelected;
+    public Node shapeMain;
+    public Rectangle shapeHighlighted;
+    public Rectangle shapeSelected;
     public boolean highlighted;
     public boolean highlightedMouse;
     public boolean highlightedBox;
     public boolean selected;
     public PairMutable mousePressPos;
 
-    public RenderShape(String nameValue, Shape shapeValue)
+    public RenderShape(String nameValue, Node shapeMainValue)
     {
         this.name = nameValue;
-        this.shape = shapeValue;
-        this.shape.setId(id);
+        this.shapeMain = shapeMainValue;
+        this.shapeMain.setId(id);
         this.shapeHighlighted = null;
         this.shapeSelected = null;
         this.highlighted = false;
@@ -51,14 +52,14 @@ public class RenderShape
 
     public boolean PosOnShape(PairMutable pos)
     {
-        return this.shape.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
+        return this.shapeMain.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
     }
 
     public void CalculateShapeSelected()
     {
-        Bounds bounds = this.shape.getBoundsInParent();
+        Bounds bounds = this.shapeMain.getBoundsInLocal();
 
-        if (this.shape.getClass() == Rectangle.class)
+        if (this.shapeMain.getClass() == Rectangle.class)
             this.shapeSelected = new Rectangle(0, 0, bounds.getWidth(), bounds.getHeight());
         else
             this.shapeSelected = new Rectangle(-bounds.getWidth() / 2, -bounds.getHeight() / 2, bounds.getWidth(), bounds.getHeight());
@@ -66,16 +67,16 @@ public class RenderShape
         this.shapeSelected.setFill(Color.GRAY);
         this.shapeSelected.setOpacity(0.5);
         this.shapeSelected.setId(this.id);
-        this.shapeSelected.translateXProperty().bind(this.shape.translateXProperty());
-        this.shapeSelected.translateYProperty().bind(this.shape.translateYProperty());
-        this.shapeSelected.rotateProperty().bind(this.shape.rotateProperty());
+        this.shapeSelected.translateXProperty().bind(this.shapeMain.translateXProperty());
+        this.shapeSelected.translateYProperty().bind(this.shapeMain.translateYProperty());
+        this.shapeSelected.rotateProperty().bind(this.shapeMain.rotateProperty());
     }
 
     public void CalculateShapeHighlighted()
     {
-        Bounds bounds = this.shape.getBoundsInParent();
+        Bounds bounds = this.shapeMain.getBoundsInLocal();
 
-        if (this.shape.getClass() == Rectangle.class)
+        if (this.shapeMain.getClass() == Rectangle.class)
             this.shapeHighlighted = new Rectangle(0, 0, bounds.getWidth(), bounds.getHeight());
         else
             this.shapeHighlighted = new Rectangle(-bounds.getWidth() / 2, -bounds.getHeight() / 2, bounds.getWidth(), bounds.getHeight());
@@ -83,8 +84,8 @@ public class RenderShape
         this.shapeHighlighted.setFill(Color.GRAY);
         this.shapeHighlighted.setOpacity(0.5);
         this.shapeHighlighted.setId(this.id);
-        this.shapeHighlighted.translateXProperty().bind(this.shape.translateXProperty());
-        this.shapeHighlighted.translateYProperty().bind(this.shape.translateYProperty());
-        this.shapeHighlighted.rotateProperty().bind(this.shape.rotateProperty());
+        this.shapeHighlighted.translateXProperty().bind(this.shapeMain.translateXProperty());
+        this.shapeHighlighted.translateYProperty().bind(this.shapeMain.translateYProperty());
+        this.shapeHighlighted.rotateProperty().bind(this.shapeMain.rotateProperty());
     }
 }

@@ -99,12 +99,12 @@ public class EditorFootprint extends Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_ElemPropsLoad()
+    public void Editor_PropsSpecificLoad()
     {
         System.out.println("Loading props footprint!");
     }
 
-    public void Editor_ElemPropsApply()
+    public void Editor_PropsSpecificApply()
     {
         System.out.println("Applying props footprint!");
     }

@@ -234,15 +234,6 @@ public class RenderSystem
 
     public void RenderSystem_ShapeHighlightsCheck(PairMutable posEvent)
     {
-        /*for (int i = 0; i < this.paneHolder.getChildren().size(); i++)
-        {
-            if ((this.paneHolder.getChildren().get(i).getId() != null) && this.paneHolder.getChildren().get(i).getId().equals("TESTMARKER"))
-            {
-                this.paneHolder.getChildren().remove(this.paneHolder.getChildren().get(i));
-                i--;
-            }
-        }*/
-
         for (int i = 0; i < this.shapes.size(); i++)
         {
             PairMutable posMouse = this.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
@@ -274,7 +265,7 @@ public class RenderSystem
             // Checking whether we are highlighting by selection box...
             if (this.selectionBox != null)
             {
-                Bounds shapeBounds = shape.shape.getBoundsInParent();
+                Bounds shapeBounds = shape.shapeMain.getBoundsInParent();
                 PairMutable selectionBoxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
                 PairMutable selectionBoxH = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
 
@@ -371,7 +362,7 @@ public class RenderSystem
     public void RenderSystem_ShapeAdd(RenderShape shape)
     {
         this.shapes.add(shape);
-        this.paneHolder.getChildren().add(1, shape.shape);
+        this.paneHolder.getChildren().add(1, shape.shapeMain);
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -405,7 +396,7 @@ public class RenderSystem
                         this.RenderSystem_ShapeSelectionRemove(shape.id);
                         this.shapesSelected--;
 
-                        this.paneHolder.getChildren().remove(shape.shape);
+                        this.paneHolder.getChildren().remove(shape.shapeMain);
                         this.shapes.remove(shape);
 
                         i--;
@@ -598,7 +589,7 @@ public class RenderSystem
                         if (!shape.selected)
                             continue;
 
-                        shape.mousePressPos = new PairMutable(new PairMutable(shape.shape.getTranslateX(), shape.shape.getTranslateY()));
+                        shape.mousePressPos = new PairMutable(new PairMutable(shape.shapeMain.getTranslateX(), shape.shapeMain.getTranslateY()));
 
                         this.shapes.set(i, shape);
                     }
@@ -637,8 +628,8 @@ public class RenderSystem
                             if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
                                 edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
 
-                            shape.shape.setTranslateX(shape.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
-                            shape.shape.setTranslateY(shape.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
+                            shape.shapeMain.setTranslateX(shape.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
+                            shape.shapeMain.setTranslateY(shape.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
 
                             this.shapes.set(i, shape);
                         }
@@ -739,7 +730,7 @@ public class RenderSystem
                         if (event.getDeltaY() < 0)
                             angle = -10;
 
-                        shape.shape.setRotate(shape.shape.getRotate() + angle);
+                        shape.shapeMain.setRotate(shape.shapeMain.getRotate() + angle);
 
                         //shape.CalculateShapeSelected();
                         //shape.CalculateShapeHighlighted();

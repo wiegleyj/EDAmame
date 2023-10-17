@@ -42,6 +42,7 @@ public class EditorProps
 
             propsWindow.EditorProps_Stage = new Stage();
             propsWindow.EditorProps_Stage.setScene(scene);
+            propsWindow.EditorProps_Stage.setTitle("Element Properties");
             propsWindow.EditorProps_Stage.setAlwaysOnTop(true);
             propsWindow.EditorProps_Stage.setResizable(false);
             propsWindow.EditorProps_PropsBox.setSpacing(10);
@@ -66,7 +67,21 @@ public class EditorProps
         if (this.EditorProps_Editor == null)
             throw new java.lang.Error("ERROR: Attempting to load into properties window with null editor reference!");
 
-        this.EditorProps_Editor.Editor_ElemPropsLoad();
+        // Clearing any existing properties...
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().clear();
+
+        // Only attempting to load node properties if we have some nodes selected...
+        if (this.EditorProps_Editor.Editor_RenderSystem.shapesSelected == 0)
+        {
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
+            EDAmameController.Controller_SetStatusBar("Unable to load element properties because no elements are selected!");
+
+            return;
+        }
+
+        // Loading both the global & editor-specific properties...
+        this.EditorProps_Editor.Editor_PropsGlobalLoad();
+        this.EditorProps_Editor.Editor_PropsSpecificLoad();
     }
 
     @FXML
@@ -75,7 +90,41 @@ public class EditorProps
         if (this.EditorProps_Editor == null)
             throw new java.lang.Error("ERROR: Attempting to apply from properties window with null editor reference!");
 
-        this.EditorProps_Editor.Editor_ElemPropsApply();
+        // Only attempting to apply node properties if we have some nodes selected...
+        if (this.EditorProps_Editor.Editor_RenderSystem.shapesSelected == 0)
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to apply element properties because no elements are selected!");
+
+            return;
+        }
+
+        // Applying both the global & editor-specific properties...
+        this.EditorProps_Editor.Editor_PropsGlobalApply();
+        this.EditorProps_Editor.Editor_PropsSpecificApply();
+
+        // Refreshing any highlighted or selected shapes...
+        for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.shapes.size(); i++)
+        {
+            RenderShape shape = this.EditorProps_Editor.Editor_RenderSystem.shapes.get(i);
+
+            shape.CalculateShapeHighlighted();
+            int shapeHighlightedIdx = EDAmameController.Controller_FindNodeById(this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren(), shape.id);
+
+            if (shapeHighlightedIdx != -1)
+            {
+                this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren().remove(shapeHighlightedIdx);
+                this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren().add(shapeHighlightedIdx, shape.shapeHighlighted);
+            }
+
+            shape.CalculateShapeSelected();
+            int shapeSelectedIdx = EDAmameController.Controller_FindNodeById(this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren(), shape.id);
+
+            if (shapeSelectedIdx != -1)
+            {
+                this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren().remove(shapeSelectedIdx);
+                this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren().add(shapeSelectedIdx, shape.shapeSelected);
+            }
+        }
     }
 
     @FXML

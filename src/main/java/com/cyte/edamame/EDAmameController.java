@@ -6,10 +6,9 @@
  */
 
 // TODO:
+// Fix occasional dragging not recognized
+// Bind highlighted & selected shapes sizes to main shape size
 // Refactor viewport mouse diff pos scaling
-// Refactor RenderShape display shape field
-// Refactor render shape to use nodes instead of shapes
-// Implement shape all-props loading & applying
 // Implement shape bounds highlight
 // Implement text dropping
 // Implement line drawing in symbol editor
@@ -74,7 +73,7 @@ public class EDAmameController implements Initializable
     final static public Color[] Editor_GridPointColors = {Color.GRAY, Color.YELLOW};
     final static public Color[] Editor_GridBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Integer Editor_MaxShapes = 10000;
-    final static public PairMutable Editor_ZoomLimits = new PairMutable(0.5, 5.0);
+    final static public PairMutable Editor_ZoomLimits = new PairMutable(0.35, 5.0);
     final static public Double Editor_ZoomFactor = 1.5;
     final static public Double Editor_MouseDragFactor = 1.0;
     final static public Double Editor_MouseCheckTimeout = 0.0001;
@@ -110,16 +109,17 @@ public class EDAmameController implements Initializable
     private MenuBar Controller_MenuBar;                     // The main EDAmame menu bar.
     @FXML
     private MenuItem Controller_MenuLogItem;                // The menu item for toggling log visibility.
+    @FXML
+    public Label Controller_StatusBar;
 
     // DO NOT EDIT
 
+    public Timeline Editor_HeartbeatTimeline;
     private final Stage Controller_Stage;                                                              // The Controller_Stage hosting this controller.
     private final ObservableMap<Tab, Editor> Controller_Editors = FXCollections.observableHashMap();   // All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
     static public EditorProps Controller_EditorPropertiesWindow = null;
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
-
-    public Timeline Editor_HeartbeatTimeline;
-
+    static public Label Controller_StatusBarGlobal;
     private Map<String, MenuBarPriority> editorsConfig;
 
     //// MAIN FUNCTIONS ////
@@ -186,8 +186,6 @@ public class EDAmameController implements Initializable
             }
         }*/
 
-
-
         // Set the Controller_Stage to close gracefully.
         Controller_Stage.setOnCloseRequest(evt -> { evt.consume(); Controller_Exit(); });
         Controller_Logger.log(Level.INFO, "Stage configured to close gracefully.\n");
@@ -204,6 +202,12 @@ public class EDAmameController implements Initializable
         this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Editor_Heartbeat()));
         this.Editor_HeartbeatTimeline.setCycleCount(Animation.INDEFINITE);
         this.Editor_HeartbeatTimeline.playFromStart();
+
+        // Setting the global status bar...
+        Controller_StatusBarGlobal = this.Controller_StatusBar;
+
+        System.out.println(this.Controller_StatusBar);
+        System.out.println(Controller_StatusBarGlobal);
 
         // correct the text in the show log menu item
         Controller_LogToggleItemText();
@@ -222,6 +226,11 @@ public class EDAmameController implements Initializable
     }
 
     //// LOGGING FUNCTIONS ////
+
+    static public void Controller_SetStatusBar(String msg)
+    {
+        Controller_StatusBarGlobal.setText(msg);
+    }
 
     /**
      * Change the log handler for the package wide logger from stdout to a TextArea node.

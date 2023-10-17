@@ -21,6 +21,7 @@ import javafx.scene.shape.*;
 import javafx.scene.input.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 
@@ -520,7 +521,6 @@ public class EditorSymbol extends Editor
                     EDAmameController.Controller_EditorPropertiesWindow = null;
                 });
                 propsWindow.EditorProps_Editor = this;
-                propsWindow.EditorProps_Stage.setTitle("Symbol Properties");
                 propsWindow.EditorProps_Stage.show();
 
                 EDAmameController.Controller_EditorPropertiesWindow = propsWindow;
@@ -537,18 +537,15 @@ public class EditorSymbol extends Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_ElemPropsLoad()
+    public void Editor_PropsSpecificLoad()
     {
-        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().clear();
-
-        // Only attempting to load properties if we have some shapes selected...
-        if (this.Editor_RenderSystem.shapesSelected == 0)
-            return;
+        Text shapeHeader = new Text("Shape Properties:");
+        shapeHeader.setStyle("-fx-font-weight: bold;");
+        shapeHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(shapeHeader);
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
 
         // Reading all shape type properties...
-        LinkedList<Double> shapesPosX = new LinkedList<Double>();
-        LinkedList<Double> shapesPosY = new LinkedList<Double>();
-        LinkedList<Double> shapesRots = new LinkedList<Double>();
         LinkedList<Color> shapesColor = new LinkedList<Color>();
         LinkedList<Double> circlesRadii = new LinkedList<Double>();
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
@@ -562,77 +559,25 @@ public class EditorSymbol extends Editor
             if (!shape.selected)
                 continue;
 
-            shapesPosX.add(shape.shape.getTranslateX() - this.Editor_RenderSystem.paneHolder.getWidth() / 2);
-            shapesPosY.add(shape.shape.getTranslateY() - this.Editor_RenderSystem.paneHolder.getHeight() / 2);
-            shapesRots.add(shape.shape.getRotate());
-            shapesColor.add((Color)shape.shape.getFill());
+            shapesColor.add((Color)((Shape)shape.shapeMain).getFill());
 
-            if (shape.shape.getClass() == Circle.class)
+            if (shape.shapeMain.getClass() == Circle.class)
             {
-                circlesRadii.add(((Circle)shape.shape).getRadius());
+                circlesRadii.add(((Circle)shape.shapeMain).getRadius());
             }
-            else if (shape.shape.getClass() == Rectangle.class)
+            else if (shape.shapeMain.getClass() == Rectangle.class)
             {
-                rectsWidths.add(((Rectangle)shape.shape).getWidth());
-                rectsHeights.add(((Rectangle)shape.shape).getHeight());
+                rectsWidths.add(((Rectangle)shape.shapeMain).getWidth());
+                rectsHeights.add(((Rectangle)shape.shapeMain).getHeight());
             }
-            else if (shape.shape.getClass() == Polygon.class)
+            else if (shape.shapeMain.getClass() == Polygon.class)
             {
-                trisLens.add(((Polygon)shape.shape).getPoints().get(2) - ((Polygon)shape.shape).getPoints().get(0));
+                trisLens.add(((Polygon)shape.shapeMain).getPoints().get(2) - ((Polygon)shape.shapeMain).getPoints().get(0));
             }
             else
             {
-                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to load shape properties window!");
+                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to load Symbol Editor properties window!");
             }
-        }
-
-        // Creating position box...
-        {
-            HBox posHBox = new HBox(10);
-            posHBox.setId("posBox");
-            posHBox.getChildren().add(new Label("Positions X: "));
-            TextField posXText = new TextField();
-            posXText.setMinWidth(100);
-            posXText.setPrefWidth(100);
-            posXText.setMaxWidth(100);
-            posXText.setId("posX");
-            posHBox.getChildren().add(posXText);
-            posHBox.getChildren().add(new Label("Positions Y: "));
-            TextField posYText = new TextField();
-            posYText.setId("posY");
-            posYText.setMinWidth(100);
-            posYText.setPrefWidth(100);
-            posYText.setMaxWidth(100);
-            posHBox.getChildren().add(posYText);
-
-            if (EDAmameController.Controller_IsListAllEqual(shapesPosX))
-                posXText.setText(Double.toString(shapesPosX.get(0)));
-            else
-                posXText.setText("<mixed>");
-
-            if (EDAmameController.Controller_IsListAllEqual(shapesPosY))
-                posYText.setText(Double.toString(shapesPosY.get(0)));
-            else
-                posYText.setText("<mixed>");
-
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(posHBox);
-        }
-
-        // Creating rotation box...
-        {
-            HBox rotHBox = new HBox(10);
-            rotHBox.setId("rotBox");
-            rotHBox.getChildren().add(new Label("Rotations: "));
-            TextField rotText = new TextField();
-            rotText.setId("rot");
-            rotHBox.getChildren().add(rotText);
-
-            if (EDAmameController.Controller_IsListAllEqual(shapesRots))
-                rotText.setText(Double.toString(shapesRots.get(0)));
-            else
-                rotText.setText("<mixed>");
-
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(rotHBox);
         }
 
         // Creating color box...
@@ -650,9 +595,8 @@ public class EditorSymbol extends Editor
                 colorPicker.setValue(Color.TRANSPARENT);
 
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(colorHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
         }
-
-        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
 
         // Creating circle radius box...
         if (!circlesRadii.isEmpty()) 
@@ -727,78 +671,17 @@ public class EditorSymbol extends Editor
         }
     }
 
-    public void Editor_ElemPropsApply()
+    public void Editor_PropsSpecificApply()
     {
-        // Only attempting to apply properties if we have some shapes selected...
-        if (this.Editor_RenderSystem.shapesSelected == 0)
-            return;
-
         VBox propsBox = EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox;
 
-        // Iterating over all the shapes & attempting to apply properties if selected...
+        // Iterating over all the shapes & attempting to apply shape properties if selected...
         for (int i = 0; i < this.Editor_RenderSystem.shapes.size(); i++)
         {
             RenderShape shape = this.Editor_RenderSystem.shapes.get(i);
 
             if (!shape.selected)
                 continue;
-
-            // Applying position...
-            {
-                Integer posBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "posBox");
-
-                if (posBoxIdx != -1)
-                {
-                    HBox posBox = (HBox)propsBox.getChildren().get(posBoxIdx);
-                    TextField posXText = (TextField)EDAmameController.Controller_GetNodeById(posBox.getChildren(), "posX");
-                    TextField posYText = (TextField)EDAmameController.Controller_GetNodeById(posBox.getChildren(), "posY");
-
-                    if (posXText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"posX\" node in properties window \"posBox\" entry!");
-                    if (posYText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"posY\" node in properties window \"posBox\" entry!");
-
-                    String posXStr = posXText.getText();
-                    String posYStr = posYText.getText();
-
-                    if (EDAmameController.Controller_IsStringNum(posXStr))
-                    {
-                        Double newPosX = Double.parseDouble(posXStr) + this.Editor_RenderSystem.paneHolder.getWidth() / 2;
-
-                        if ((newPosX > -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
-                            (newPosX < EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2))
-                            shape.shape.setTranslateX(newPosX);
-                    }
-
-                    if (EDAmameController.Controller_IsStringNum(posYStr))
-                    {
-                        Double newPosY = Double.parseDouble(posYStr) + this.Editor_RenderSystem.paneHolder.getHeight() / 2;
-
-                        if ((newPosY > -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
-                            (newPosY < EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
-                            shape.shape.setTranslateY(newPosY);
-                    }
-                }
-            }
-
-            // Applying rotation...
-            {
-                Integer rotBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rotBox");
-
-                if (rotBoxIdx != -1)
-                {
-                    HBox rotBox = (HBox)propsBox.getChildren().get(rotBoxIdx);
-                    TextField rotText = (TextField)EDAmameController.Controller_GetNodeById(rotBox.getChildren(), "rot");
-
-                    if (rotText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"rot\" node in properties window \"rotBox\" entry!");
-
-                    String rotStr = rotText.getText();
-
-                    if (EDAmameController.Controller_IsStringNum(rotStr))
-                        shape.shape.setRotate(Double.parseDouble(rotStr));
-                }
-            }
 
             // Applying color...
             {
@@ -810,17 +693,17 @@ public class EditorSymbol extends Editor
                     ColorPicker colorPicker = (ColorPicker)EDAmameController.Controller_GetNodeById(colorBox.getChildren(), "color");
 
                     if (colorPicker == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"color\" node in properties window \"colorBox\" entry!");
+                        throw new java.lang.Error("ERROR: Unable to find \"color\" node in Symbol Editor properties window \"colorBox\" entry!");
 
                     Color color = colorPicker.getValue();
 
-                    if (color != Color.TRANSPARENT)
-                        shape.shape.setFill(color);
+                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                        ((Shape)shape.shapeMain).setFill(color);
                 }
             }
 
             // Applying circle radius...
-            if (shape.shape.getClass() == Circle.class)
+            if (shape.shapeMain.getClass() == Circle.class)
             {
                 Integer circleBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "circleBox");
 
@@ -830,7 +713,7 @@ public class EditorSymbol extends Editor
                     TextField radiiText = (TextField)EDAmameController.Controller_GetNodeById(circleBox.getChildren(), "circleRadii");
 
                     if (radiiText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"circleRadii\" node in properties window \"circleBox\" entry!");
+                        throw new java.lang.Error("ERROR: Unable to find \"circleRadii\" node in Symbol Editor properties window \"circleBox\" entry!");
 
                     String rotStr = radiiText.getText();
 
@@ -839,12 +722,12 @@ public class EditorSymbol extends Editor
                         Double newRadius = Double.parseDouble(rotStr);
 
                         if ((newRadius >= EDAmameController.Editor_CircleRadiusMin) && (newRadius <= EDAmameController.Editor_CircleRadiusMax))
-                            ((Circle)shape.shape).setRadius(newRadius);
+                            ((Circle)shape.shapeMain).setRadius(newRadius);
                     }
                 }
             }
             // Applying rectangle width & height...
-            else if (shape.shape.getClass() == Rectangle.class)
+            else if (shape.shapeMain.getClass() == Rectangle.class)
             {
                 Integer rectBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rectBox");
 
@@ -855,9 +738,9 @@ public class EditorSymbol extends Editor
                     TextField heightText = (TextField)EDAmameController.Controller_GetNodeById(rectBox.getChildren(), "rectHeights");
 
                     if (widthText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"rectWidths\" node in properties window \"rectBox\" entry!");
+                        throw new java.lang.Error("ERROR: Unable to find \"rectWidths\" node in Symbol Editor properties window \"rectBox\" entry!");
                     if (heightText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"rectHeights\" node in properties window \"rectBox\" entry!");
+                        throw new java.lang.Error("ERROR: Unable to find \"rectHeights\" node in Symbol Editor properties window \"rectBox\" entry!");
 
                     String widthStr = widthText.getText();
                     String heightStr = heightText.getText();
@@ -867,20 +750,20 @@ public class EditorSymbol extends Editor
                         Double newWidth = Double.parseDouble(widthStr);
 
                         if ((newWidth >= EDAmameController.Editor_RectWidthMin) && (newWidth <= EDAmameController.Editor_RectWidthMax))
-                            ((Rectangle)shape.shape).setWidth(newWidth);
+                            ((Rectangle)shape.shapeMain).setWidth(newWidth);
                     }
 
                     if (EDAmameController.Controller_IsStringNum(heightStr))
                     {
-                        Double newHeight = Double.parseDouble(widthStr);
+                        Double newHeight = Double.parseDouble(heightStr);
 
                         if ((newHeight >= EDAmameController.Editor_RectHeightMin) && (newHeight <= EDAmameController.Editor_RectHeightMax))
-                            ((Rectangle)shape.shape).setHeight(newHeight);
+                            ((Rectangle)shape.shapeMain).setHeight(newHeight);
                     }
                 }
             }
             // Applying triangle length...
-            else if (shape.shape.getClass() == Polygon.class)
+            else if (shape.shapeMain.getClass() == Polygon.class)
             {
                 Integer triBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "triBox");
 
@@ -890,7 +773,7 @@ public class EditorSymbol extends Editor
                     TextField lensText = (TextField)EDAmameController.Controller_GetNodeById(triBox.getChildren(), "triLens");
 
                     if (lensText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"triLens\" node in properties window \"triBox\" entry!");
+                        throw new java.lang.Error("ERROR: Unable to find \"triLens\" node in Symbol Editor properties window \"triBox\" entry!");
 
                     String lenStr = lensText.getText();
 
@@ -899,7 +782,7 @@ public class EditorSymbol extends Editor
                         Double newLen = Double.parseDouble(lenStr);
 
                         if ((newLen >= EDAmameController.Editor_TriLenMin) && (newLen <= EDAmameController.Editor_TriLenMax))
-                            ((Polygon)shape.shape).getPoints().setAll(-newLen / 2, newLen / 2,
+                            ((Polygon)shape.shapeMain).getPoints().setAll(-newLen / 2, newLen / 2,
                                                                       newLen / 2, newLen / 2,
                                                                       0.0, -newLen / 2);
                     }
@@ -907,26 +790,7 @@ public class EditorSymbol extends Editor
             }
             else
             {
-                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply shape properties window!");
-            }
-
-            // Refreshing any highlighted or selected shapes...
-            shape.CalculateShapeHighlighted();
-            int shapeHighlightedIdx = EDAmameController.Controller_FindNodeById(this.Editor_RenderSystem.paneHighlights.getChildren(), shape.id);
-
-            if (shapeHighlightedIdx != -1)
-            {
-                this.Editor_RenderSystem.paneHighlights.getChildren().remove(shapeHighlightedIdx);
-                this.Editor_RenderSystem.paneHighlights.getChildren().add(shapeHighlightedIdx, shape.shapeHighlighted);
-            }
-
-            shape.CalculateShapeSelected();
-            int shapeSelectedIdx = EDAmameController.Controller_FindNodeById(this.Editor_RenderSystem.paneSelections.getChildren(), shape.id);
-
-            if (shapeSelectedIdx != -1)
-            {
-                this.Editor_RenderSystem.paneSelections.getChildren().remove(shapeSelectedIdx);
-                this.Editor_RenderSystem.paneSelections.getChildren().add(shapeSelectedIdx, shape.shapeSelected);
+                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply Symbol Editor properties window!");
             }
 
             this.Editor_RenderSystem.shapes.set(i, shape);

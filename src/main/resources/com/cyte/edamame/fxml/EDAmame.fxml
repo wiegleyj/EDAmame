@@ -73,7 +73,7 @@
        <VBox BorderPane.alignment="CENTER">
            <StackPane />
            <HBox style="-fx-background-color: #dcdcdc;">
-               <Label text="EDAmame Status Area" />
+               <Label fx:id="Controller_StatusBar" text="EDAmame Status Area" />
            </HBox>
        </VBox>
    </bottom>

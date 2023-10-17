@@ -7,6 +7,7 @@
 
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.render.RenderShape;
 import com.cyte.edamame.render.RenderSystem;
 
 import java.util.*;
@@ -19,7 +20,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.canvas.*;
+import javafx.scene.paint.*;
 import javafx.scene.shape.*;
+import javafx.scene.text.*;
 
 import java.io.InvalidClassException;
 
@@ -132,8 +135,158 @@ public abstract class Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    abstract public void Editor_ElemPropsLoad();
-    abstract public void Editor_ElemPropsApply();
+    public void Editor_PropsGlobalLoad()
+    {
+        Text globalHeader = new Text("Global Properties:");
+        globalHeader.setStyle("-fx-font-weight: bold;");
+        globalHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(globalHeader);
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+
+        // Reading all global node properties...
+        LinkedList<Double> shapesPosX = new LinkedList<Double>();
+        LinkedList<Double> shapesPosY = new LinkedList<Double>();
+        LinkedList<Double> shapesRots = new LinkedList<Double>();
+
+        for (int i = 0; i < this.Editor_RenderSystem.shapes.size(); i++)
+        {
+            RenderShape shape = this.Editor_RenderSystem.shapes.get(i);
+
+            if (!shape.selected)
+                continue;
+
+            shapesPosX.add(shape.shapeMain.getTranslateX() - this.Editor_RenderSystem.paneHolder.getWidth() / 2);
+            shapesPosY.add(shape.shapeMain.getTranslateY() - this.Editor_RenderSystem.paneHolder.getHeight() / 2);
+            shapesRots.add(shape.shapeMain.getRotate());
+        }
+
+        // Creating position box...
+        {
+            HBox posHBox = new HBox(10);
+            posHBox.setId("posBox");
+            posHBox.getChildren().add(new Label("Positions X: "));
+            TextField posXText = new TextField();
+            posXText.setMinWidth(100);
+            posXText.setPrefWidth(100);
+            posXText.setMaxWidth(100);
+            posXText.setId("posX");
+            posHBox.getChildren().add(posXText);
+            posHBox.getChildren().add(new Label("Positions Y: "));
+            TextField posYText = new TextField();
+            posYText.setId("posY");
+            posYText.setMinWidth(100);
+            posYText.setPrefWidth(100);
+            posYText.setMaxWidth(100);
+            posHBox.getChildren().add(posYText);
+
+            if (EDAmameController.Controller_IsListAllEqual(shapesPosX))
+                posXText.setText(Double.toString(shapesPosX.get(0)));
+            else
+                posXText.setText("<mixed>");
+
+            if (EDAmameController.Controller_IsListAllEqual(shapesPosY))
+                posYText.setText(Double.toString(shapesPosY.get(0)));
+            else
+                posYText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(posHBox);
+        }
+
+        // Creating rotation box...
+        {
+            HBox rotHBox = new HBox(10);
+            rotHBox.setId("rotBox");
+            rotHBox.getChildren().add(new Label("Rotations: "));
+            TextField rotText = new TextField();
+            rotText.setId("rot");
+            rotHBox.getChildren().add(rotText);
+
+            if (EDAmameController.Controller_IsListAllEqual(shapesRots))
+                rotText.setText(Double.toString(shapesRots.get(0)));
+            else
+                rotText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(rotHBox);
+        }
+
+        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+    }
+
+    public void Editor_PropsGlobalApply()
+    {
+        VBox propsBox = EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox;
+
+        // Iterating over all the nodes & attempting to apply global node properties if selected...
+        for (int i = 0; i < this.Editor_RenderSystem.shapes.size(); i++)
+        {
+            RenderShape shape = this.Editor_RenderSystem.shapes.get(i);
+
+            if (!shape.selected)
+                continue;
+
+            // Applying position...
+            {
+                Integer posBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "posBox");
+
+                if (posBoxIdx != -1)
+                {
+                    HBox posBox = (HBox)propsBox.getChildren().get(posBoxIdx);
+                    TextField posXText = (TextField)EDAmameController.Controller_GetNodeById(posBox.getChildren(), "posX");
+                    TextField posYText = (TextField)EDAmameController.Controller_GetNodeById(posBox.getChildren(), "posY");
+
+                    if (posXText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"posX\" node in global properties window \"posBox\" entry!");
+                    if (posYText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"posY\" node in global properties window \"posBox\" entry!");
+
+                    String posXStr = posXText.getText();
+                    String posYStr = posYText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(posXStr))
+                    {
+                        Double newPosX = Double.parseDouble(posXStr);
+
+                        if ((newPosX >= -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                                (newPosX <= EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2))
+                            shape.shapeMain.setTranslateX(newPosX + this.Editor_RenderSystem.paneHolder.getWidth() / 2);
+                    }
+
+                    if (EDAmameController.Controller_IsStringNum(posYStr))
+                    {
+                        Double newPosY = Double.parseDouble(posYStr);
+
+                        if ((newPosY >= -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
+                                (newPosY <= EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
+                            shape.shapeMain.setTranslateY(newPosY + this.Editor_RenderSystem.paneHolder.getHeight() / 2);
+                    }
+                }
+            }
+
+            // Applying rotation...
+            {
+                Integer rotBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rotBox");
+
+                if (rotBoxIdx != -1)
+                {
+                    HBox rotBox = (HBox)propsBox.getChildren().get(rotBoxIdx);
+                    TextField rotText = (TextField)EDAmameController.Controller_GetNodeById(rotBox.getChildren(), "rot");
+
+                    if (rotText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"rot\" node in global properties window \"rotBox\" entry!");
+
+                    String rotStr = rotText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(rotStr))
+                        shape.shapeMain.setRotate(Double.parseDouble(rotStr));
+                }
+            }
+
+            this.Editor_RenderSystem.shapes.set(i, shape);
+        }
+    }
+
+    abstract public void Editor_PropsSpecificLoad();
+    abstract public void Editor_PropsSpecificApply();
 
     //// SUPPORT FUNCTIONS ////
 
