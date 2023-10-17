@@ -51,6 +51,13 @@ public class EditorSymbol extends Editor
     @FXML
     public TextField EditorSymbol_TriangleHeight;
 
+    @FXML
+    public TextField EditorSymbol_Text;
+    @FXML
+    public TextField EditorSymbol_TextSize;
+    @FXML
+    public ColorPicker EditorSymbol_TextColor;
+
     //// MAIN FUNCTIONS ////
 
     /**
@@ -321,6 +328,29 @@ public class EditorSymbol extends Editor
                                     triangle.setTranslateY(dropPos.GetRightDouble());
 
                                     RenderShape shape = new RenderShape("Triangle", triangle);
+                                    this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
+                                }
+                            }
+                        }
+                        else if (selectedShapeButton.getText().equals("Text"))
+                        {
+                            String stringTextSize = this.EditorSymbol_TextSize.getText();
+
+                            if (EDAmameController.Controller_IsStringNum(stringTextSize))
+                            {
+                                double fontSize = Double.parseDouble(stringTextSize);
+                                Color color = this.EditorSymbol_TextColor.getValue();
+
+                                if (((fontSize >= EDAmameController.Editor_TextMin) && (fontSize <= EDAmameController.Editor_TextMax)) &&
+                                        (color != Color.TRANSPARENT))
+                                {
+                                    Label text = new Label(EditorSymbol_Text.getText());
+                                    text.setTextFill(color);
+
+                                    text.setTranslateX(dropPos.GetLeftDouble());
+                                    text.setTranslateY(dropPos.GetRightDouble());
+
+                                    RenderShape shape = new RenderShape("Text", text);
                                     this.Editor_RenderSystem.RenderSystem_ShapeAdd(shape);
                                 }
                             }

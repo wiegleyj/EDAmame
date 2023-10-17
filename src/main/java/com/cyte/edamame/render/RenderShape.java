@@ -13,6 +13,8 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 import javafx.scene.*;
+import javafx.application.*;
+import javafx.scene.control.*;
 import javafx.scene.canvas.*;
 import javafx.scene.paint.*;
 import javafx.scene.effect.*;
@@ -46,8 +48,22 @@ public class RenderShape
         this.selected = false;
         this.mousePressPos = null;
 
-        this.CalculateShapeSelected();
-        this.CalculateShapeHighlighted();
+        if (this.shapeMain.getClass() == Label.class)
+        {
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run()
+                {
+                    CalculateShapeSelected();
+                    CalculateShapeHighlighted();
+                }
+            });
+        }
+        else
+        {
+            this.CalculateShapeSelected();
+            this.CalculateShapeHighlighted();
+        }
     }
 
     public boolean PosOnShape(PairMutable pos)

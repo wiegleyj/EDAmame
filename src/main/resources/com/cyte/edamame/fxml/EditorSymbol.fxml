@@ -133,6 +133,7 @@
                               <TextField fx:id="EditorSymbol_TriangleHeight" />
                            </children>
                         </HBox>
+                        <Separator prefWidth="200.0" />
                      </children>
                   </VBox>
                </children>
@@ -140,6 +141,35 @@
          </content>
         </Tab>
         <Tab text="Lines" />
-      <Tab text="Text" />
+      <Tab text="Text">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <RadioButton mnemonicParsing="false" text="Text" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                  <Separator prefWidth="200.0" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Text to Enter: " />
+                        <TextField fx:id="EditorSymbol_Text" />
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Font Size: " />
+                        <TextField fx:id="EditorSymbol_TextSize" />
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Color: " />
+                        <ColorPicker fx:id="EditorSymbol_TextColor" />
+                     </children>
+                  </HBox>
+                  <Separator prefWidth="200.0" />
+               </children>
+            </VBox>
+         </content></Tab>
     </TabPane>
 </VBox>
