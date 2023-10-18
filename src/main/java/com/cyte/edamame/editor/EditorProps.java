@@ -9,14 +9,13 @@ package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.render.RenderShape;
+
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.input.KeyEvent;
 import javafx.stage.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
-import javafx.scene.shape.*;
 
 import java.io.IOException;
 
@@ -102,29 +101,9 @@ public class EditorProps
         this.EditorProps_Editor.Editor_PropsGlobalApply();
         this.EditorProps_Editor.Editor_PropsSpecificApply();
 
-        // Refreshing any highlighted or selected shapes...
-        for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.shapes.size(); i++)
-        {
-            RenderShape shape = this.EditorProps_Editor.Editor_RenderSystem.shapes.get(i);
-
-            shape.CalculateShapeHighlighted();
-            int shapeHighlightedIdx = EDAmameController.Controller_FindNodeById(this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren(), shape.id);
-
-            if (shapeHighlightedIdx != -1)
-            {
-                this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren().remove(shapeHighlightedIdx);
-                this.EditorProps_Editor.Editor_RenderSystem.paneHighlights.getChildren().add(shapeHighlightedIdx, shape.shapeHighlighted);
-            }
-
-            shape.CalculateShapeSelected();
-            int shapeSelectedIdx = EDAmameController.Controller_FindNodeById(this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren(), shape.id);
-
-            if (shapeSelectedIdx != -1)
-            {
-                this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren().remove(shapeSelectedIdx);
-                this.EditorProps_Editor.Editor_RenderSystem.paneSelections.getChildren().add(shapeSelectedIdx, shape.shapeSelected);
-            }
-        }
+        // Refreshing all highlighted & selected shapes...
+        for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.nodes.size(); i++)
+            this.EditorProps_Editor.Editor_RenderSystem.nodes.get(i).RenderNode_BoundsRefresh();
     }
 
     @FXML

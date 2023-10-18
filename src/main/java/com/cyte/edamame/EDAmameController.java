@@ -6,12 +6,13 @@
  */
 
 // TODO:
+// Fix priority menu
+// Finish renaming all variables
+// Implement line drawing in symbol editor
 // Fix occasional dragging not recognized
 // Bind highlighted & selected shapes sizes to main shape size
 // Refactor viewport mouse diff pos scaling
 // Implement shape bounds highlight
-// Implement text dropping
-// Implement line drawing in symbol editor
 // Implement wire connection points into symbols
 // Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
@@ -20,7 +21,7 @@
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
-import com.cyte.edamame.render.RenderShape;
+import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.MenuConfigLoader;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.TextAreaHandler;
@@ -88,8 +89,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_RectHeightMax = 500.0;
     final static public Double Editor_TriLenMin = 10.0;
     final static public Double Editor_TriLenMax = 500.0;
-    final static public Double Editor_TextMin = 0.0;
-    final static public Double Editor_TextMax = 500.0;
+    final static public Double Editor_TextFontSizeMin = 10.0;
+    final static public Double Editor_TextFontSizeMax = 100.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
@@ -123,6 +124,7 @@ public class EDAmameController implements Initializable
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
     static public Label Controller_StatusBarGlobal;
     private Map<String, MenuBarPriority> editorsConfig;
+    static public LinkedList<PairMutable> Controller_RenderShapesDelayedBoundsRefresh = new LinkedList<PairMutable>();
 
     //// MAIN FUNCTIONS ////
 
@@ -201,15 +203,12 @@ public class EDAmameController implements Initializable
         Controller_WindowContextLoad();
 
         // Initializing editor heartbeat loops
-        this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Editor_Heartbeat()));
+        this.Editor_HeartbeatTimeline = new Timeline(new KeyFrame(Duration.seconds(Editor_HeartbeatDelay), e -> this.Controller_EditorsHeartbeat()));
         this.Editor_HeartbeatTimeline.setCycleCount(Animation.INDEFINITE);
         this.Editor_HeartbeatTimeline.playFromStart();
 
         // Setting the global status bar...
         Controller_StatusBarGlobal = this.Controller_StatusBar;
-
-        System.out.println(this.Controller_StatusBar);
-        System.out.println(Controller_StatusBarGlobal);
 
         // correct the text in the show log menu item
         Controller_LogToggleItemText();
@@ -252,7 +251,7 @@ public class EDAmameController implements Initializable
 
     //// EDITOR FUNCTIONS ////
 
-    public void Editor_Heartbeat()
+    public void Controller_EditorsHeartbeat()
     {
         ObservableList<Tab> tabs = Controller_TabPane.getTabs();
 
@@ -269,6 +268,39 @@ public class EDAmameController implements Initializable
                 if ((editor == null) || !editor.Editor_Visible)
                     continue;
 
+                editor.Editor_Heartbeat();
+
+                // Handling delayed bound node setting...
+                if (!Controller_RenderShapesDelayedBoundsRefresh.isEmpty())
+                {
+                    if (Controller_RenderShapesDelayedBoundsRefresh.size() >= 100)
+                        throw new java.lang.Error("ERROR: Too many items in \"Controller_NodesDelayedCalcBounds\"!");
+
+                    for (int j = 0; j < Controller_RenderShapesDelayedBoundsRefresh.size(); j++)
+                    {
+                        PairMutable curr = Controller_RenderShapesDelayedBoundsRefresh.get(j);
+
+                        RenderNode renderNode = curr.GetLeftPair().GetLeftRenderShape();
+                        Integer loopsNum = curr.GetLeftPair().GetRightInteger();
+                        PairMutable oldSize = curr.GetRightPair();
+
+                        renderNode.RenderNode_ShapeSelectedRefresh();
+                        renderNode.RenderNode_ShapeHighlightedRefresh();
+                        Bounds bounds = renderNode.node.getBoundsInLocal();
+
+                        if ((bounds.getWidth() != oldSize.GetLeftDouble()) && (bounds.getHeight() != oldSize.GetRightDouble()) ||
+                            (loopsNum >= 5))
+                        {
+                            Controller_RenderShapesDelayedBoundsRefresh.remove(j);
+                            j--;
+                        }
+                        else
+                        {
+                            curr.GetLeftPair().right = loopsNum + 1;
+                        }
+                    }
+                }
+
                 //System.out.println(editor.Editor_RenderSystem.shapesHighlighted);
                 //System.out.println(editor.Editor_RenderSystem.shapesSelected);
                 //System.out.println(editor.Editor_RenderSystem.shapesMoving);
@@ -276,23 +308,6 @@ public class EDAmameController implements Initializable
                 //System.out.println(editor.Editor_RenderSystem.center.ToStringDouble());
                 //System.out.println(editor.Editor_RenderSystem.paneHolder.getBoundsInLocal().toString());
                 //System.out.println(EDAmameController.Controller_PressedKeys.toString());
-
-                // Adjusting the central layout of the canvas and the crosshair relative to the stack pane size
-                {
-                    PairMutable canvasSize = new PairMutable(editor.Editor_RenderSystem.canvas.getWidth(),
-                                                             editor.Editor_RenderSystem.canvas.getHeight());
-                    PairMutable paneSize = new PairMutable(editor.Editor_RenderSystem.paneListener.getWidth(),
-                                                           editor.Editor_RenderSystem.paneListener.getHeight());
-                    PairMutable centeredPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
-                                                              paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
-
-                    editor.Editor_RenderSystem.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
-                    editor.Editor_RenderSystem.paneHolder.setLayoutY(centeredPos.GetRightDouble());
-                }
-
-                // Adjusting the crosshair position to center of the listener pane
-                editor.Editor_RenderSystem.crosshair.setTranslateX(editor.Editor_RenderSystem.paneListener.getWidth() / 2);
-                editor.Editor_RenderSystem.crosshair.setTranslateY(editor.Editor_RenderSystem.paneListener.getHeight() / 2);
             }
         }
     }
@@ -530,7 +545,8 @@ public class EDAmameController implements Initializable
         Controller_TabPane.getTabs().remove(editor.Editor_GetTab());
     }
 
-    public List<Menu> createMenusFromConfig(MenuBarPriority menuBarPriority, Editor editor) {
+    public List<Menu> createMenusFromConfig(MenuBarPriority menuBarPriority, Editor editor)
+    {
         List<Menu> menus = new ArrayList<>();
 
         menuBarPriority.getMenuPriorities().entrySet().stream()
@@ -552,7 +568,8 @@ public class EDAmameController implements Initializable
     }
 
     // TODO: All menu item actions need to be added here
-    private void setMenuItemActions(MenuItem menuItem, Editor editor) {
+    private void setMenuItemActions(MenuItem menuItem, Editor editor)
+    {
         String itemName = menuItem.getText();
 
         switch(itemName) {

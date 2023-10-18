@@ -9,22 +9,17 @@ package com.cyte.edamame.render;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 
-import java.sql.SQLOutput;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.lang.Math;
 
-import javafx.scene.*;
 import javafx.scene.canvas.*;
-import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.input.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
-import javafx.util.Pair;
 
 public class RenderSystem
 {
@@ -53,7 +48,7 @@ public class RenderSystem
 
     // DO NOT EDIT
 
-    public LinkedList<RenderShape> shapes;
+    public LinkedList<RenderNode> nodes;
     public PairMutable center;
     public Double zoom;
     public PairMutable mouseDragFirstPos;
@@ -92,7 +87,7 @@ public class RenderSystem
         this.selectionBoxColor = selectionBoxColorValue;
         this.selectionBoxWidth = selectionBoxWidthValue;
 
-        this.shapes = new LinkedList<RenderShape>();
+        this.nodes = new LinkedList<RenderNode>();
         this.center = new PairMutable(0.0, 0.0);
         this.zoom = 1.0;
         this.mouseDragFirstPos = null;
@@ -232,40 +227,40 @@ public class RenderSystem
 
     //// SHAPE FUNCTIONS ////
 
-    public void RenderSystem_ShapeHighlightsCheck(PairMutable posEvent)
+    public void RenderSystem_HighlightsCheck(PairMutable posEvent)
     {
-        for (int i = 0; i < this.shapes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
             PairMutable posMouse = this.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
-            RenderShape shape = this.shapes.get(i);
-            boolean onShape = shape.PosOnShape(posMouse);
+            RenderNode renderNode = this.nodes.get(i);
+            boolean onShape = renderNode.RenderNode_PosOnNode(posMouse);
 
             // Checking whether we are highlighting by cursor...
             if (onShape)
             {
                 if (EDAmameController.Controller_IsKeyPressed(KeyCode.Q))
                 {
-                    if ((this.shapesHighlighted > 1) && shape.highlightedMouse)
-                        shape.highlightedMouse = false;
-                    else if ((this.shapesHighlighted == 0) && !shape.highlightedMouse)
-                        shape.highlightedMouse = true;
+                    if ((this.shapesHighlighted > 1) && renderNode.highlightedMouse)
+                        renderNode.highlightedMouse = false;
+                    else if ((this.shapesHighlighted == 0) && !renderNode.highlightedMouse)
+                        renderNode.highlightedMouse = true;
                 }
                 else
                 {
-                    if (!shape.highlightedMouse)
-                        shape.highlightedMouse = true;
+                    if (!renderNode.highlightedMouse)
+                        renderNode.highlightedMouse = true;
                 }
             }
             else
             {
-                if (shape.highlightedMouse)
-                    shape.highlightedMouse = false;
+                if (renderNode.highlightedMouse)
+                    renderNode.highlightedMouse = false;
             }
 
             // Checking whether we are highlighting by selection box...
             if (this.selectionBox != null)
             {
-                Bounds shapeBounds = shape.shapeMain.getBoundsInParent();
+                Bounds shapeBounds = renderNode.node.getBoundsInParent();
                 PairMutable selectionBoxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
                 PairMutable selectionBoxH = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
 
@@ -300,36 +295,36 @@ public class RenderSystem
                     (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
                     (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
                 {
-                    if (!shape.highlightedBox)
-                        shape.highlightedBox = true;
+                    if (!renderNode.highlightedBox)
+                        renderNode.highlightedBox = true;
                 }
                 else
                 {
-                    if (shape.highlightedBox)
-                        shape.highlightedBox = false;
+                    if (renderNode.highlightedBox)
+                        renderNode.highlightedBox = false;
                 }
             }
-            else if (shape.highlightedBox)
+            else if (renderNode.highlightedBox)
             {
-                shape.highlightedBox = false;
+                renderNode.highlightedBox = false;
             }
 
             // Adjusting highlights accordingly...
-            if ((shape.highlightedMouse || shape.highlightedBox) && !shape.highlighted)
+            if ((renderNode.highlightedMouse || renderNode.highlightedBox) && !renderNode.highlighted)
             {
-                //shape.CalculateShapeHighlighted();
-                this.paneHighlights.getChildren().add(shape.shapeHighlighted);
-                shape.highlighted = true;
+                //shape.RenderShape_ShapeHighlightedRefresh();
+                this.paneHighlights.getChildren().add(renderNode.shapeHighlighted);
+                renderNode.highlighted = true;
                 this.shapesHighlighted++;
             }
-            else if ((!shape.highlightedMouse && !shape.highlightedBox) && shape.highlighted)
+            else if ((!renderNode.highlightedMouse && !renderNode.highlightedBox) && renderNode.highlighted)
             {
-                this.RenderSystem_ShapeHighlightRemove(shape.id);
-                shape.highlighted = false;
+                this.RenderSystem_ShapeHighlightRemove(renderNode.id);
+                renderNode.highlighted = false;
                 this.shapesHighlighted--;
             }
 
-            this.shapes.set(i, shape);
+            this.nodes.set(i, renderNode);
         }
     }
 
@@ -359,10 +354,10 @@ public class RenderSystem
         }
     }
 
-    public void RenderSystem_ShapeAdd(RenderShape shape)
+    public void RenderSystem_NodeAdd(RenderNode renderNode)
     {
-        this.shapes.add(shape);
-        this.paneHolder.getChildren().add(1, shape.shapeMain);
+        this.nodes.add(renderNode);
+        this.paneHolder.getChildren().add(1, renderNode.node);
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -380,24 +375,24 @@ public class RenderSystem
             {
                 if (this.shapesSelected > 0)
                 {
-                    for (int i = 0; i < this.shapes.size(); i++)
+                    for (int i = 0; i < this.nodes.size(); i++)
                     {
-                        RenderShape shape = this.shapes.get(i);
+                        RenderNode renderNode = this.nodes.get(i);
 
-                        if (!shape.selected)
+                        if (!renderNode.selected)
                             continue;
 
-                        if (shape.highlighted)
+                        if (renderNode.highlighted)
                         {
-                            this.RenderSystem_ShapeHighlightRemove(shape.id);
+                            this.RenderSystem_ShapeHighlightRemove(renderNode.id);
                             this.shapesHighlighted--;
                         }
 
-                        this.RenderSystem_ShapeSelectionRemove(shape.id);
+                        this.RenderSystem_ShapeSelectionRemove(renderNode.id);
                         this.shapesSelected--;
 
-                        this.paneHolder.getChildren().remove(shape.shapeMain);
-                        this.shapes.remove(shape);
+                        this.paneHolder.getChildren().remove(renderNode.node);
+                        this.nodes.remove(renderNode);
 
                         i--;
                     }
@@ -426,7 +421,7 @@ public class RenderSystem
             // Handling global callback actions
             {
                 // Handling shape highlights
-                this.RenderSystem_ShapeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+                this.RenderSystem_HighlightsCheck(new PairMutable(event.getX(), event.getY()));
             }
 
             event.consume();
@@ -452,7 +447,7 @@ public class RenderSystem
             // Handling global callback actions
             {
                 // Handling shape highlights
-                this.RenderSystem_ShapeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+                this.RenderSystem_HighlightsCheck(new PairMutable(event.getX(), event.getY()));
             }
 
             event.consume();
@@ -498,36 +493,36 @@ public class RenderSystem
                     // Handling shape selection (only if we're not moving any shapes)
                     if (!this.shapesMoving)
                     {
-                        for (int i = 0; i < this.shapes.size(); i++)
+                        for (int i = 0; i < this.nodes.size(); i++)
                         {
-                            RenderShape shape = this.shapes.get(i);
+                            RenderNode renderNode = this.nodes.get(i);
 
-                            if (!shape.selected)
+                            if (!renderNode.selected)
                             {
-                                if (shape.highlightedMouse || shape.highlightedBox)
+                                if (renderNode.highlightedMouse || renderNode.highlightedBox)
                                 {
-                                    shape.selected = true;
-                                    //shape.CalculateShapeSelected();
-                                    this.paneSelections.getChildren().add(shape.shapeSelected);
+                                    renderNode.selected = true;
+                                    //shape.RenderShape_ShapeSelectedRefresh();
+                                    this.paneSelections.getChildren().add(renderNode.shapeSelected);
                                     this.shapesSelected++;
                                 }
                             }
                             else
                             {
-                                if ((!shape.highlightedMouse && !shape.highlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
+                                if ((!renderNode.highlightedMouse && !renderNode.highlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
                                 {
-                                    shape.selected = false;
-                                    this.RenderSystem_ShapeSelectionRemove(shape.id);
+                                    renderNode.selected = false;
+                                    this.RenderSystem_ShapeSelectionRemove(renderNode.id);
                                     this.shapesSelected--;
                                 }
                             }
 
-                            if (shape.highlightedBox && !shape.highlightedMouse)
-                                this.RenderSystem_ShapeHighlightRemove(shape.id);
+                            if (renderNode.highlightedBox && !renderNode.highlightedMouse)
+                                this.RenderSystem_ShapeHighlightRemove(renderNode.id);
 
-                            shape.mousePressPos = null;
+                            renderNode.mousePressPos = null;
 
-                            this.shapes.set(i, shape);
+                            this.nodes.set(i, renderNode);
                         }
 
                         if (this.selectionBox != null)
@@ -564,7 +559,7 @@ public class RenderSystem
         // When we drag the mouse (from inside the viewport)...
         this.paneListener.setOnMouseDragged(event -> {
             // Handling shape highlights
-            this.RenderSystem_ShapeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+            this.RenderSystem_HighlightsCheck(new PairMutable(event.getX(), event.getY()));
 
             // Only execute callback if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
@@ -582,16 +577,16 @@ public class RenderSystem
 
                 if (this.shapesSelected > 0)
                 {
-                    for (int i = 0; i < this.shapes.size(); i++)
+                    for (int i = 0; i < this.nodes.size(); i++)
                     {
-                        RenderShape shape = this.shapes.get(i);
+                        RenderNode renderNode = this.nodes.get(i);
 
-                        if (!shape.selected)
+                        if (!renderNode.selected)
                             continue;
 
-                        shape.mousePressPos = new PairMutable(new PairMutable(shape.shapeMain.getTranslateX(), shape.shapeMain.getTranslateY()));
+                        renderNode.mousePressPos = new PairMutable(new PairMutable(renderNode.node.getTranslateX(), renderNode.node.getTranslateY()));
 
-                        this.shapes.set(i, shape);
+                        this.nodes.set(i, renderNode);
                     }
                 }
             }
@@ -609,14 +604,14 @@ public class RenderSystem
                     // Handling moving of the shapes (only if we have some shapes selected & we're not holding the box selection key)
                     if ((this.shapesSelected > 0) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
                     {
-                        for (int i = 0; i < this.shapes.size(); i++)
+                        for (int i = 0; i < this.nodes.size(); i++)
                         {
-                            RenderShape shape = this.shapes.get(i);
+                            RenderNode renderNode = this.nodes.get(i);
 
-                            if (!shape.selected)
+                            if (!renderNode.selected)
                                 continue;
 
-                            PairMutable posPressReal = this.RenderSystem_PaneHolderGetRealPos(new PairMutable(shape.mousePressPos.GetLeftDouble(), shape.mousePressPos.GetRightDouble()));
+                            PairMutable posPressReal = this.RenderSystem_PaneHolderGetRealPos(new PairMutable(renderNode.mousePressPos.GetLeftDouble(), renderNode.mousePressPos.GetRightDouble()));
                             PairMutable edgeOffset = new PairMutable(0.0, 0.0);
 
                             if ((posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
@@ -628,10 +623,10 @@ public class RenderSystem
                             if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
                                 edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
 
-                            shape.shapeMain.setTranslateX(shape.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
-                            shape.shapeMain.setTranslateY(shape.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
+                            renderNode.node.setTranslateX(renderNode.mousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
+                            renderNode.node.setTranslateY(renderNode.mousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
 
-                            this.shapes.set(i, shape);
+                            this.nodes.set(i, renderNode);
                         }
 
                         this.shapesMoving = true;
@@ -713,16 +708,16 @@ public class RenderSystem
             // Handling global callback actions
             {
                 // Handling shape highlights
-                this.RenderSystem_ShapeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+                this.RenderSystem_HighlightsCheck(new PairMutable(event.getX(), event.getY()));
 
                 // Handling shape rotation (only if we have shapes selected and R is pressed)
                 if ((this.shapesSelected > 0) && EDAmameController.Controller_IsKeyPressed(KeyCode.R))
                 {
-                    for (int i = 0; i < this.shapes.size(); i++)
+                    for (int i = 0; i < this.nodes.size(); i++)
                     {
-                        RenderShape shape = this.shapes.get(i);
+                        RenderNode renderNode = this.nodes.get(i);
 
-                        if (!shape.selected)
+                        if (!renderNode.selected)
                             continue;
 
                         double angle = 10;
@@ -730,12 +725,12 @@ public class RenderSystem
                         if (event.getDeltaY() < 0)
                             angle = -10;
 
-                        shape.shapeMain.setRotate(shape.shapeMain.getRotate() + angle);
+                        renderNode.node.setRotate(renderNode.node.getRotate() + angle);
 
-                        //shape.CalculateShapeSelected();
-                        //shape.CalculateShapeHighlighted();
+                        //shape.RenderShape_ShapeSelectedRefresh();
+                        //shape.RenderShape_ShapeHighlightedRefresh();
 
-                        this.shapes.set(i, shape);
+                        this.nodes.set(i, renderNode);
                     }
                 }
                 // Handling zoom scaling (only if we're not rotating anything)
