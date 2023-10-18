@@ -9,19 +9,18 @@ package com.cyte.edamame.editor;
 
 import java.io.IOException;
 
-public class EditorFactory {
-
-    public static Editor createEditor(String key) throws IOException {
-        switch (key) {
+public class EditorFactory
+{
+    public static Editor createEditor(String key) throws IOException
+    {
+        switch (key)
+        {
             case "SymbolEditor":
                 return EditorSymbol.create();
-                // TODO: All editors will need to be inserted here
             case "FootprintEditor":
                 return EditorFootprint.create();
-/*            case "SchematicEditor":
-                return EditorSchematic.create();*/
             default:
-                throw new IllegalArgumentException("Invalid editor key: " + key);
+                throw new java.lang.Error("ERROR: Invalid editor key: " + key);
         }
     }
 }

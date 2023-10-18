@@ -40,8 +40,8 @@ public abstract class Editor
     //// GLOBAL VARIABLES ////
 
     /** Every editor can be uniquely identified by a random UUID (which do not persist across application execution. */
-    final UUID Editor_ID = UUID.randomUUID();
-    String Editor_Name = null;
+    final public String Editor_ID = UUID.randomUUID().toString();
+    public String Editor_Name = null;
 
     // DO NOT EDIT
 
@@ -70,7 +70,6 @@ public abstract class Editor
     public boolean Editor_Visible = false;
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
-    protected List<Menu> dynamicMenus = new ArrayList<>();
 
     //// MAIN FUNCTIONS ////
 
@@ -122,22 +121,6 @@ public abstract class Editor
      * @return A (possibly empty) list of control Editor_Tabs.
      */
     public ObservableList<Tab> Editor_GetControlTabs() { return Editor_Tabs; }
-
-    /**
-     * Returns a (possibly empty) structure of menu items for EDAmame to include in its Editor_Menus. The top Map maps
-     * menu names to a list of items to include in a menu with that name. The values of this map are a list of
-     * MenuItems that EDAmame should include/insert into any menu it has with a matching name.
-     * @return a (possibly empty) structure of menu items
-     */
-    public ObservableMap<String, ObservableList<MenuItem>> Editor_GetMenus() {
-        ObservableMap<String, ObservableList<MenuItem>> combinedMenus = FXCollections.observableHashMap();
-        for (Menu menu : dynamicMenus) {
-            String menuName = menu.getText();
-            ObservableList<MenuItem> items = menu.getItems();
-            combinedMenus.put(menuName, items);
-        }
-        return combinedMenus;
-    }
 
     //// CALLBACK FUNCTIONS ////
 
@@ -493,7 +476,7 @@ public abstract class Editor
 
         // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
-        String prefix = Editor_ID.toString();
+        String prefix = this.Editor_ID;
         Pane foundPaneListener = null;
         Pane foundPaneHolder = null;
         Pane foundPaneHighlights = null;
@@ -668,9 +651,5 @@ public abstract class Editor
                                                     EDAmameController.Editor_MouseCheckTimeout,
                                                     EDAmameController.Editor_SelectionBoxColors[editorType],
                                                     EDAmameController.Editor_SelectionBoxWidth);
-    }
-
-    public List<Menu> getDynamicMenus() {
-        return this.dynamicMenus;
     }
 }

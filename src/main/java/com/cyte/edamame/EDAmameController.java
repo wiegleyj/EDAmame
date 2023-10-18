@@ -6,7 +6,6 @@
  */
 
 // TODO:
-// Fix priority menu
 // Finish renaming all variables
 // Implement line drawing in symbol editor
 // Fix occasional dragging not recognized
@@ -111,19 +110,18 @@ public class EDAmameController implements Initializable
     @FXML
     private MenuBar Controller_MenuBar;                     // The main EDAmame menu bar.
     @FXML
-    private MenuItem Controller_MenuLogItem;                // The menu item for toggling log visibility.
-    @FXML
-    public Label Controller_StatusBar;
+    public Label Controller_StatusBar;                      // Load the menu config loader...
 
     // DO NOT EDIT
 
     public Timeline Editor_HeartbeatTimeline;
     private final Stage Controller_Stage;                                                              // The Controller_Stage hosting this controller.
     private final ObservableMap<Tab, Editor> Controller_Editors = FXCollections.observableHashMap();   // All Controller_Editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
+    private MenuItem Controller_MenuLogItem = null;                                                    // The menu item for toggling log visibility.
     static public EditorProps Controller_EditorPropertiesWindow = null;
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
     static public Label Controller_StatusBarGlobal;
-    private Map<String, MenuBarPriority> editorsConfig;
+    private Map<String, MenuBarPriority> Controller_EditorMenuConfig;
     static public LinkedList<PairMutable> Controller_RenderShapesDelayedBoundsRefresh = new LinkedList<PairMutable>();
 
     //// MAIN FUNCTIONS ////
@@ -159,36 +157,58 @@ public class EDAmameController implements Initializable
         Controller_LoggingChangeToTab();
         Controller_Logger.log(Level.INFO, "Initialization Commenced...\n");
 
-        // Load the menu configuration
-        try {
-            editorsConfig = MenuConfigLoader.loadMenuConfig();
-        } catch (Exception exception) {
-            Controller_Logger.log(Level.SEVERE, "Failed to load menu configuration.", exception);
-            return;
-        }
+        // Creating the menu bar...
+        {
+            // Load the menu config loader...
+            try
+            {
+                Controller_EditorMenuConfig = MenuConfigLoader.loadMenuConfig();
+            }
+            catch (Exception exception)
+            {
+                Controller_Logger.log(Level.SEVERE, "Failed to load menu configuration.", exception);
 
-        // Load the static menu ("EDAmame")
-        MenuBarPriority staticMenuPriority = editorsConfig.get("EDAmame");
-        if (staticMenuPriority != null) {
-            List<Menu> staticMenus = createMenusFromConfig(staticMenuPriority, null);
-            Controller_MenuBar.getMenus().addAll(staticMenus);
-        }
+                return;
+            }
 
-        /*for (String editorKey : editorsConfig.keySet()) {
-            if (!editorKey.equals("EDAmame")) {
-                Editor editor = null;
-                try {
-                    editor = EditorFactory.createEditor(editorKey);
-                } catch (IOException exception) {
-                    Controller_Logger.log(Level.SEVERE, "Failed to create editor of type: " + editorKey, exception);
-                    continue;
+            // Adding static menus...
+            MenuBarPriority staticMenuPriority = Controller_EditorMenuConfig.get("EDAmame");
+
+            if (staticMenuPriority != null)
+            {
+                List<Menu> staticMenus = createMenusFromConfig(staticMenuPriority, null);
+
+                // Searching for the log tab visibility button ("View" menu, "Hide/Show Log Tab" item)...
+                for (int i = 0; i < staticMenus.size(); i++)
+                {
+                    Menu currMenu = staticMenus.get(i);
+
+                    if (currMenu.getText().equals("View"))
+                    {
+                        for (int j = 0; j < currMenu.getItems().size(); j++)
+                        {
+                            MenuItem currMenuItem = currMenu.getItems().get(j);
+
+                            if (currMenuItem.getText().equals("Hide/Show Log Tab"))
+                            {
+                                this.Controller_MenuLogItem = currMenuItem;
+                                this.Controller_MenuLogItem.setOnAction(event -> {Controller_LogToggleVisibility();});
+
+                                break;
+                            }
+                        }
+                    }
+
+                    if (Controller_MenuLogItem != null)
+                        break;
                 }
 
-                MenuBarPriority editorMenuPriority = editorsConfig.get(editorKey);
-                List<Menu> editorMenus = createMenusFromConfig(editorMenuPriority, editor);
-                Controller_MenuBar.getMenus().addAll(editorMenus);
+                if (this.Controller_MenuLogItem == null)
+                    throw new java.lang.Error("ERROR: Unable to locate log tab visibility menu item in static menus config!");
+
+                Controller_MenuBar.getMenus().addAll(staticMenus);
             }
-        }*/
+        }
 
         // Set the Controller_Stage to close gracefully.
         Controller_Stage.setOnCloseRequest(evt -> { evt.consume(); Controller_Exit(); });
@@ -355,34 +375,29 @@ public class EDAmameController implements Initializable
      */
     private void Editor_Activate(Editor editor)
     {
-        // Select this editor in the panes and make all it's controls available.
-        if (editor != null) {
-            // set the editor ToolBars to not visible
-            ToolBar bar = editor.Editor_GetToolBar();
+        if (editor == null)
+            return;
 
-            if (bar != null)
-                editor.Editor_GetToolBar().setVisible(true);
+        // Making editor toolbars visible...
+        ToolBar bar = editor.Editor_GetToolBar();
 
-            // add all the control Editor_Tabs for the editor
-            Controller_TabPaneControls.getTabs().addAll(editor.Editor_GetControlTabs());
+        if (bar != null)
+            editor.Editor_GetToolBar().setVisible(true);
 
-            // change all of this editor's menu items to be visible.
-            for (ObservableList<MenuItem> items : editor.Editor_GetMenus().values())
-                for (MenuItem menuitem : items)
-                    menuitem.setVisible(true);
+        // Adding all the editor control tabs...
+        Controller_TabPaneControls.getTabs().addAll(editor.Editor_GetControlTabs());
 
-            // Add dynamic menus to main MenuBar
-            for (Menu dynamicMenu : editor.getDynamicMenus()) {
-                dynamicMenu.setVisible(true);
-                if (!Controller_MenuBar.getMenus().contains(dynamicMenu)) {
-                    Controller_MenuBar.getMenus().add(dynamicMenu);
-                }
-            }
+        // Showing any editor's menus...
+        for (int i = 0; i < this.Controller_MenuBar.getMenus().size(); i++)
+        {
+            Menu currMenu = this.Controller_MenuBar.getMenus().get(i);
+            String currMenuId = currMenu.getId();
 
-            editor.Editor_Visible = true;
-
-            //editor.Editor_RenderSystem.Clear();
+            if ((currMenuId != null) && currMenuId.contains("dynamic") && currMenuId.contains(editor.Editor_ID))
+                currMenu.setVisible(true);
         }
+
+        editor.Editor_Visible = true;
     }
 
     /**
@@ -397,23 +412,20 @@ public class EDAmameController implements Initializable
         if (EDAmameController.Controller_EditorPropertiesWindow != null)
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_Stage.close();
 
-        // set the editor ToolBars to not visible
+        // Removing any active toolbars...
         editor.Editor_GetToolBar().setVisible(false);
 
-        // remove all control Editor_Tabs from the controls Editor_Tab pane
+        // Removing any active control tabs...
         Controller_TabPaneControls.getTabs().removeAll(editor.Editor_GetControlTabs());
 
-        // change all the menu items to not visible
-        for (ObservableList<MenuItem> items : editor.Editor_GetMenus().values())
-            for (MenuItem menuitem : items)
-                menuitem.setVisible(false);
+        // Hiding all the editor's menus...
+        for (int i = 0; i < this.Controller_MenuBar.getMenus().size(); i++)
+        {
+            Menu currMenu = this.Controller_MenuBar.getMenus().get(i);
+            String currMenuId = currMenu.getId();
 
-        // Hide or Remove dynamic menus from the main MenuBar
-        for (Menu dynamicMenu : editor.getDynamicMenus()) {
-            dynamicMenu.setVisible(false);  // Ensure invisibility
-            if (Controller_MenuBar.getMenus().contains(dynamicMenu)) {
-                Controller_MenuBar.getMenus().remove(dynamicMenu);
-            }
+            if ((currMenuId != null) && currMenuId.contains("dynamic") && currMenuId.contains(editor.Editor_ID))
+                currMenu.setVisible(false);
         }
 
         editor.Editor_Visible = false;
@@ -428,9 +440,9 @@ public class EDAmameController implements Initializable
     {
         Tab editorTab = editor.Editor_GetTab();
 
+        // Adding editor's main tab...
         Controller_Editors.put(editorTab, editor);
 
-        // Place the main editor window in the TabPane
         if (editorTab != null)
         {
             // Adding a close callback
@@ -463,44 +475,17 @@ public class EDAmameController implements Initializable
         // visibility done through addition and removal from the children
         // of the control TabPane.
 
-        // Add all the Editor_Menus of the editor to the EDAmame MenuBar
-        for (Menu menu : Controller_MenuBar.getMenus())
+        // Adding all the editor's menus...
         {
-            // Retrieve the menu priority configuration for the current menu name
-            MenuPriority menuPriority = menuBarPriority.getMenuPriorityByName(menu.getText());
+            List<Menu> dynamicMenus = createMenusFromConfig(menuBarPriority, editor);
 
-            if (menuPriority != null)
+            for (int i = 0; i < dynamicMenus.size(); i++)
             {
-                ObservableList<MenuItem> editorItems = FXCollections.observableArrayList();
-                menuPriority.getItemPriorities().forEach((itemName, itemPriority) -> {
-                    MenuItem menuItem = new MenuItem(itemName);
-                    setMenuItemActions(menuItem, editor); // Setting actions based on the JSON configuration
-                    editorItems.add(menuItem);
-                });
-
-                // Get an iterator for this menu's items
-                ListIterator<MenuItem> iterator = menu.getItems().listIterator();
-
-                // Advance the iterator to either the end of the menu or until a separator with ID "editorItemsBegin"
-                boolean found = false;
-                while (iterator.hasNext() && !found)
-                {
-                    MenuItem item = iterator.next();
-                    if (item.getId() != null && item.getId().equals("editorItemsBegin"))
-                        found = true;
-                }
-
-                for (MenuItem item : editorItems)
-                {
-                    item.setVisible(false); // Or any other property setting based on your needs
-                    iterator.add(item);
-                }
+                Menu currMenu = dynamicMenus.get(i);
+                currMenu.setId("dynamic_" + editor.Editor_ID + "_" + i);
+                Controller_MenuBar.getMenus().add(currMenu);
             }
         }
-
-        // Dynamically add the menus from the provided MenuBarPriority
-        List<Menu> dynamicMenus = createMenusFromConfig(menuBarPriority, editor);
-        Controller_MenuBar.getMenus().addAll(dynamicMenus);
 
         // move the log Editor_Tab to the end.
         if (Controller_TabPane.getTabs().contains(Controller_TabLog))
@@ -521,27 +506,25 @@ public class EDAmameController implements Initializable
      */
     private void Editor_Remove(Editor editor)
     {
-        Editor_Deactivate(editor); // make sure the editor is not visible/active.
+        Editor_Deactivate(editor);
 
-        // remove the toolbar
+        // Removing any editor's toolbars...
         Controller_StackPaneEditorToolBars.getChildren().remove(editor.Editor_GetToolBar());
 
-        // remove control Editor_Tabs
+        // Removing any editor's control tabs...
         Controller_TabPaneControls.getTabs().removeAll(editor.Editor_GetControlTabs());
 
-        // remove all menu items
-        for (Menu menu: Controller_MenuBar.getMenus())
-            for (ObservableList<MenuItem> itemlist: editor.Editor_GetMenus().values())
-                menu.getItems().removeAll(itemlist);
+        // Removing any editor's menus...
+        for (int i = 0; i < this.Controller_MenuBar.getMenus().size(); i++)
+        {
+            Menu currMenu = this.Controller_MenuBar.getMenus().get(i);
+            String currMenuId = currMenu.getId();
 
-        // Remove dynamic menus from the main MenuBar
-        for (Menu dynamicMenu : editor.getDynamicMenus()) {
-            if (Controller_MenuBar.getMenus().contains(dynamicMenu)) {
-                Controller_MenuBar.getMenus().remove(dynamicMenu);
-            }
+            if ((currMenuId != null) && currMenuId.contains("dynamic") && currMenuId.contains(editor.Editor_ID))
+                Controller_MenuBar.getMenus().remove(currMenu);
         }
 
-        // remove the main editor Editor_Tab itself.
+        // Remove the main editor tab...
         Controller_TabPane.getTabs().remove(editor.Editor_GetTab());
     }
 
@@ -693,7 +676,6 @@ public class EDAmameController implements Initializable
      * The log Editor_Tab can be made visible or not. It is always the right most Editor_Tab of all Editor_Tabs. When explicitly added
      * the log Editor_Tab is automatically selected.
      */
-    @FXML
     private void Controller_LogToggleVisibility()
     {
         if (Controller_TabPane.getTabs().contains(Controller_TabLog))
@@ -852,13 +834,13 @@ public class EDAmameController implements Initializable
     {
         try
         {
-            if (editorsConfig == null)
+            if (Controller_EditorMenuConfig == null)
             {
                 System.out.println("editorsConfig is null!");
                 return;  // exit the method if editorsConfig is null
             }
 
-            MenuBarPriority menuBarPriorityForSymbolEditor = editorsConfig.get("SymbolEditor");
+            MenuBarPriority menuBarPriorityForSymbolEditor = Controller_EditorMenuConfig.get("SymbolEditor");
 
             if (menuBarPriorityForSymbolEditor == null)
             {
@@ -887,12 +869,12 @@ public class EDAmameController implements Initializable
     protected void EditorFootprintNewButton()
     {
         try {
-            if (editorsConfig == null) {
+            if (Controller_EditorMenuConfig == null) {
                 System.out.println("editorsConfig is null!");
                 return;  // exit the method if editorsConfig is null
             }
 
-            MenuBarPriority menuBarPriorityForFootprintEditor = editorsConfig.get("FootprintEditor");
+            MenuBarPriority menuBarPriorityForFootprintEditor = Controller_EditorMenuConfig.get("FootprintEditor");
 
             if (menuBarPriorityForFootprintEditor == null)
             {

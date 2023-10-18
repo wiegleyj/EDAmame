@@ -4,10 +4,7 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -22,44 +19,7 @@
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#Controller_OnKeyPressed" onKeyReleased="#Controller_OnKeyReleased" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
    <top>
        <VBox BorderPane.alignment="CENTER">
-           <MenuBar fx:id="Controller_MenuBar">
-               <Menu text="_File">
-                   <SeparatorMenuItem id="editorItemsBegin" mnemonicParsing="false" />
-                   <SeparatorMenuItem id="editorItemsEnd" mnemonicParsing="false" />
-                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="one" />
-                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="two" />
-                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="three" />
-                   <MenuItem mnemonicParsing="false" onAction="#Controller_Exit" text="four" />
-                   <MenuItem onAction="#Controller_Exit" text="E_xit" />
-               </Menu>
-               <Menu text="_Edit">
-                   <MenuItem mnemonicParsing="false" text="Delete" />
-               </Menu>
-               <Menu text="_View">
-                   <MenuItem fx:id="Controller_MenuLogItem" mnemonicParsing="false" onAction="#Controller_LogToggleVisibility" text="Hide Log Window" />
-               </Menu>
-               <Menu text="_Project">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Place">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Design">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Tools">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Reports">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Window">
-                   <MenuItem mnemonicParsing="false" text="Close" />
-               </Menu>
-               <Menu text="_Help">
-                   <MenuItem mnemonicParsing="false" text="About" />
-               </Menu>
-           </MenuBar>
+           <MenuBar fx:id="Controller_MenuBar" />
            <HBox>
                <ToolBar>
                    <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />
