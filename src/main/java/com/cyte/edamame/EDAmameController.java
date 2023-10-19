@@ -19,39 +19,46 @@
 // Implement undo-redo functionalities
 
 package com.cyte.edamame;
+
 import com.cyte.edamame.editor.*;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.MenuConfigLoader;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.TextAreaHandler;
-
-import java.util.*;
-
-import javafx.collections.*;
-import javafx.fxml.*;
-import javafx.stage.*;
-import javafx.scene.*;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Bounds;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.scene.input.*;
-import javafx.application.*;
-import javafx.geometry.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-
-import javafx.animation.Animation;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.util.Duration;
-
 /**
  * Main Controller for the {@link EDAmame} Application.<p>
  *
@@ -111,7 +118,6 @@ public class EDAmameController implements Initializable
     private MenuBar Controller_MenuBar;                     // The main EDAmame menu bar.
     @FXML
     public Label Controller_StatusBar;                      // Load the menu config loader...
-
     // DO NOT EDIT
 
     public Timeline Editor_HeartbeatTimeline;
@@ -947,5 +953,9 @@ public class EDAmameController implements Initializable
         {
             //e.printStackTrace();
         }
+    }
+    @FXML
+    void performExitAction(ActionEvent event) {
+        System.exit(0);
     }
 }
