@@ -70,6 +70,7 @@ public abstract class Editor
     public boolean Editor_Visible = false;
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
+    public MenuBarPriority Editor_MenuBarPriority;
 
     //// MAIN FUNCTIONS ////
 
@@ -92,14 +93,23 @@ public abstract class Editor
         }
     }
 
-    // ????
     /**
      * Request an editor to close. Handling any information/state saving as it needs.
      * @return true if the editor was able to close without unsaved information/state, false otherwise.
      */
-    public boolean close()
+    public void Editor_Close()
     {
-        return true;
+        for (int i = 0; i < this.Editor_Tab.getTabPane().getTabs().size(); i++)
+        {
+            Tab currTab = this.Editor_Tab.getTabPane().getTabs().get(i);
+
+            if (currTab.getId().contains(this.Editor_ID))
+            {
+                this.Editor_Tab.getTabPane().getTabs().remove(this.Editor_Tab);
+
+                break;
+            }
+        }
     }
 
     //// GETTER FUNCTIONS ////

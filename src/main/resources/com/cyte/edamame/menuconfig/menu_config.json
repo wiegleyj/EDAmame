@@ -1,109 +1,83 @@
 {
   "EDAmame" : {
     "menuPriorities" : {
-      "File" : {
-        "priority" : 5,
+      "STATIC_1" : {
+        "priority" : 1,
         "itemPriorities" : {
-          "New" : 10,
-          "Exit" : 30,
-          "Open" : 20
+          "New Symbol Editor" : 1,
+          "New Footprint Editor" : 2,
+          "Exit" : 3
+        },
+		"itemCallbacks" : {
+          "New Symbol Editor" : "com.cyte.edamame.EDAmameController.EditorSymbolNewButton",
+          "New Footprint Editor" : "com.cyte.edamame.EDAmameController.EditorFootprintNewButton",
+          "Exit" : "com.cyte.edamame.EDAmameController.Controller_Exit"
         }
       },
-      "Edit" : {
-        "priority" : 10,
+      "STATIC_2" : {
+        "priority" : 2,
         "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "View" : {
-        "priority" : 15,
-        "itemPriorities" : {
-          "Hide/Show Log Tab" : 40
-        }
-      },
-      "Project" : {
-        "priority" : 20,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Place" : {
-        "priority" : 25,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Design" : {
-        "priority" : 30,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Tools" : {
-        "priority" : 35,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Reports" : {
-        "priority" : 40,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Window" : {
-        "priority" : 45,
-        "itemPriorities" : {
-          "Delete" : 40,
-          "Select" : 5,
-          "Adjust" : 50,
-          "Move" : 15
-        }
-      },
-      "Help" : {
-        "priority" : 50,
-        "itemPriorities" : {
-          "Fake Item" : 3,
-          "About" : 6
-        }
+          "Controller_LogMenuItem" : 1
+        },
+		"itemCallbacks" : {}
       }
     }
   },
   "SymbolEditor" : {
     "menuPriorities" : {
-      "SYMBOL" : {
-        "priority" : 5,
+	  "STATIC_1" : {
+        "priority" : 1,
         "itemPriorities" : {
-          "TEST" : 10
-        }
+          "SYMBOL_STATIC_1_1" : 1,
+		  "SYMBOL_STATIC_1_2" : 2
+        },
+		"itemCallbacks" : {}
+      },
+	  "STATIC_2" : {
+        "priority" : 1,
+        "itemPriorities" : {
+          "SYMBOL_STATIC_2_1" : 1,
+		  "SYMBOL_STATIC_2_2" : 2
+        },
+		"itemCallbacks" : {}
+      },
+      "Symbol Editor" : {
+        "priority" : 1,
+        "itemPriorities" : {
+          "Close" : 1
+        },
+		"itemCallbacks" : {
+			"Close" : "com.cyte.edamame.editor.Editor.Editor_Close"
+		}
       }
     }
   },
   "FootprintEditor" : {
     "menuPriorities" : {
-      "FOOTPRINT" : {
-        "priority" : 5,
+	  "STATIC_1" : {
+        "priority" : 1,
         "itemPriorities" : {
-          "TEST" : 10
-        }
+          "FOOTPRINT_STATIC_1_1" : 1,
+		  "FOOTPRINT_STATIC_1_2" : 2
+        },
+		"itemCallbacks" : {}
+      },
+	  "STATIC_2" : {
+        "priority" : 1,
+        "itemPriorities" : {
+          "FOOTPRINT_STATIC_2_1" : 1,
+		  "FOOTPRINT_STATIC_2_2" : 2
+        },
+		"itemCallbacks" : {}
+      },
+      "Footprint Editor" : {
+        "priority" : 1,
+        "itemPriorities" : {
+          "Close" : 1
+        },
+		"itemCallbacks" : {
+			"Close" : "com.cyte.edamame.editor.Editor.Editor_Close"
+		}
       }
     }
   }

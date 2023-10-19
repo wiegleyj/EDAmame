@@ -15,6 +15,8 @@ public class MenuPriority {
     private int priority;
     @JsonProperty("itemPriorities")
     private Map<String, Integer> itemPriorities;
+    @JsonProperty("itemCallbacks")
+    private Map<String, String> itemCallbacks;
 
     public MenuPriority() {}
 
@@ -33,6 +35,10 @@ public class MenuPriority {
 
     public Map<String, Integer> getItemPriorities() {
         return itemPriorities;
+    }
+
+    public Map<String, String> getItemCallbacks() {
+        return itemCallbacks;
     }
 
     public void setItemPriorities(Map<String, Integer> itemPriorities) {
