@@ -47,7 +47,7 @@ public class EditorPCB extends Editor
         System.out.println("PCB mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("PCB mouse dragged!");
     }

@@ -595,7 +595,7 @@ public class RenderSystem
                                                        (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
 
             // Handling editor-specific callback actions
-            this.editor.Editor_ViewportOnMouseDragged(event);
+            this.editor.Editor_ViewportOnMouseDragged(event, mouseDiffPos);
 
             // Handling global callback actions
             {

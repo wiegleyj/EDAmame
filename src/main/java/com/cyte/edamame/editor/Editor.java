@@ -71,6 +71,7 @@ public abstract class Editor
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
     public MenuBarPriority Editor_MenuBarPriority;
+    public boolean Editor_LineDragging = false;
 
     //// MAIN FUNCTIONS ////
 
@@ -139,7 +140,7 @@ public abstract class Editor
     abstract public void Editor_ViewportOnMouseMoved(MouseEvent event);
     abstract public void Editor_ViewportOnMousePressed(MouseEvent event);
     abstract public void Editor_ViewportOnMouseReleased(MouseEvent event);
-    abstract public void Editor_ViewportOnMouseDragged(MouseEvent event);
+    abstract public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos);
     abstract public void Editor_ViewportOnScroll(ScrollEvent event);
     abstract public void Editor_ViewportOnKeyPressed(KeyEvent event);
     abstract public void Editor_ViewportOnKeyReleased(KeyEvent event);

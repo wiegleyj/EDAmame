@@ -77,7 +77,7 @@ public class EditorFootprint extends Editor
         System.out.println("Footprint mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("Footprint mouse dragged!");
     }

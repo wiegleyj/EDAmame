@@ -55,6 +55,14 @@ public class EditorSymbol extends Editor
     public TextField EditorSymbol_TextSize;
     @FXML
     public ColorPicker EditorSymbol_TextColor;
+    @FXML
+    public TextField EditorSymbol_LineWidth;
+    @FXML
+    public ColorPicker EditorSymbol_LineColor;
+
+    // DO NOT EDIT
+
+    public Line EditorSymbol_LinePreview = null;
 
     //// MAIN FUNCTIONS ////
 
@@ -241,7 +249,8 @@ public class EditorSymbol extends Editor
             if ((this.Editor_RenderSystem.shapesHighlighted == 0) &&
                 (this.Editor_RenderSystem.shapesSelected == 0) &&
                 !this.Editor_RenderSystem.shapesMoving &&
-                this.Editor_RenderSystem.selectionBox == null)
+                this.Editor_RenderSystem.selectionBox == null &&
+                !this.Editor_LineDragging)
             {
                 RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
@@ -430,114 +439,84 @@ public class EditorSymbol extends Editor
                     }
                 }
             }
+
+            if (this.Editor_LineDragging)
+            {
+                Line line = new Line(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY(),
+                        this.EditorSymbol_LinePreview.getEndX(), this.EditorSymbol_LinePreview.getEndY());
+                line.setStroke(this.EditorSymbol_LinePreview.getStroke());
+                line.setStrokeWidth(this.EditorSymbol_LinePreview.getStrokeWidth());
+                //remove preview
+                RenderNode renderNode = new RenderNode("Line", line);
+                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                this.EditorSymbol_LinePreview = null;
+                this.Editor_LineDragging = false;
+                //add actual line
+            }
         }
         else if (this.Editor_PressedRMB)
         {}
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
     {
         //System.out.println("Symbol mouse dragged!");
 
         if (this.Editor_PressedLMB)
         {
-            /*// Handling the symbol moving (should only trigger if we got symbols selected)
-            this.EditorSchematic_SymbolsMoving = false;
-
-            for (int i = 0; i < this.EditorSchematic_ViewportSymbolsDropped.size(); i++)
+            if (this.Editor_RenderSystem.shapesSelected == 0)
             {
-                EditorSchematic_Symbol symbol = this.EditorSchematic_ViewportSymbolsDropped.get(i);
+            RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
-                if (!symbol.selected)
-                    continue;
-
-                PairMutable theaterEdges = new PairMutable(new PairMutable(-this.EditorSchematic_TheaterSize.GetLeftDouble() / 2 + this.EditorSchematic_ViewportCenter.GetLeftDouble(),
-                        this.EditorSchematic_TheaterSize.GetLeftDouble() / 2 + this.EditorSchematic_ViewportCenter.GetLeftDouble()),
-                        new PairMutable(-this.EditorSchematic_TheaterSize.GetLeftDouble() / 2 + this.EditorSchematic_ViewportCenter.GetRightDouble(),
-                                this.EditorSchematic_TheaterSize.GetLeftDouble() / 2 + this.EditorSchematic_ViewportCenter.GetRightDouble()));
-                PairMutable symbolNewPos = new PairMutable(symbol.posMousePress.GetLeftDouble() + mouseDiffPos.GetLeftDouble(),
-                        symbol.posMousePress.GetRightDouble() + mouseDiffPos.GetRightDouble());
-                PairMutable symbolNewEdges = new PairMutable(new PairMutable(symbolNewPos.GetLeftDouble() - symbol.shape.boundingBox.GetLeftDouble() / 2,
-                        symbolNewPos.GetLeftDouble() + symbol.shape.boundingBox.GetLeftDouble() / 2),
-                        new PairMutable(symbolNewPos.GetRightDouble() - symbol.shape.boundingBox.GetRightDouble() / 2,
-                                symbolNewPos.GetRightDouble() + symbol.shape.boundingBox.GetRightDouble() / 2));
-                PairMutable symbolNewPosOffset = new PairMutable(0.0, 0.0);
-
-                if (symbolNewEdges.GetLeftPair().GetLeftDouble() < theaterEdges.GetLeftPair().GetLeftDouble())
-                    symbolNewPosOffset.left = theaterEdges.GetLeftPair().GetLeftDouble() - symbolNewEdges.GetLeftPair().GetLeftDouble();
-                if (symbolNewEdges.GetLeftPair().GetRightDouble() > theaterEdges.GetLeftPair().GetRightDouble())
-                    symbolNewPosOffset.left = theaterEdges.GetLeftPair().GetRightDouble() - symbolNewEdges.GetLeftPair().GetRightDouble();
-                if (symbolNewEdges.GetRightPair().GetLeftDouble() < theaterEdges.GetRightPair().GetLeftDouble())
-                    symbolNewPosOffset.right = theaterEdges.GetRightPair().GetLeftDouble() - symbolNewEdges.GetRightPair().GetLeftDouble();
-                if (symbolNewEdges.GetRightPair().GetRightDouble() > theaterEdges.GetRightPair().GetRightDouble())
-                    symbolNewPosOffset.right = theaterEdges.GetRightPair().GetRightDouble() - symbolNewEdges.GetRightPair().GetRightDouble();
-
-                symbol.posReal = new PairMutable(symbolNewPos.GetLeftDouble() + symbolNewPosOffset.GetLeftDouble(),
-                        symbolNewPos.GetRightDouble() + symbolNewPosOffset.GetRightDouble());
-
-                this.EditorSchematic_ViewportSymbolsDropped.set(i, symbol);
-                this.EditorSchematic_SymbolsMoving = true;
-            }
-
-            // Handling the wire drawing
-            this.EditorSchematic_WireDrawingType = this.EditorSchematic_GetSelectedWire();
-
-            if (this.EditorSchematic_WireDrawingType != -1)
+            if (selectedShapeButton.getText().equals("Line"))
             {
-                // TODO
-            }
-            // Handling the symbol box selection (only if we're not drawing wires and not moving symbols)
-            else if (!this.EditorSchematic_SymbolsMoving)
-            {
-                PairMutable rawMouseDiffPos = new PairMutable(mouseDiffPos);
-                rawMouseDiffPos.left = rawMouseDiffPos.GetLeftDouble() * this.EditorSchematic_RenderSystem.zoom;
-                rawMouseDiffPos.right = rawMouseDiffPos.GetRightDouble() * this.EditorSchematic_RenderSystem.zoom;
+                String stringWidth = this.EditorSymbol_LineWidth.getText();
+                Color color = this.EditorSymbol_LineColor.getValue();
 
-                this.EditorSchematic_SymbolSelectionBoxShape.points.set(0, new PairMutable(posMouse.GetLeftDouble(), posMouse.GetRightDouble()));
-                this.EditorSchematic_SymbolSelectionBoxShape.points.set(1, new PairMutable(posMouse.GetLeftDouble() - rawMouseDiffPos.GetLeftDouble(), posMouse.GetRightDouble()));
-                this.EditorSchematic_SymbolSelectionBoxShape.points.set(2, new PairMutable(posMouse.GetLeftDouble() - rawMouseDiffPos.GetLeftDouble(), posMouse.GetRightDouble() - rawMouseDiffPos.GetRightDouble()));
-                this.EditorSchematic_SymbolSelectionBoxShape.points.set(3, new PairMutable(posMouse.GetLeftDouble(), posMouse.GetRightDouble() - rawMouseDiffPos.GetRightDouble()));
-
-                if (!this.EditorSchematic_RenderSystem.shapes.contains(this.EditorSchematic_SymbolSelectionBoxShape))
-                    this.EditorSchematic_RenderSystem.AddShape(-1, this.EditorSchematic_SymbolSelectionBoxShape, null);
-
-                PairMutable selectionBoxExtents = new PairMutable(Math.abs(this.EditorSchematic_SymbolSelectionBoxShape.points.get(1).GetLeftDouble() - this.EditorSchematic_SymbolSelectionBoxShape.points.get(0).GetLeftDouble()),
-                        Math.abs(this.EditorSchematic_SymbolSelectionBoxShape.points.get(2).GetRightDouble() - this.EditorSchematic_SymbolSelectionBoxShape.points.get(1).GetRightDouble()));
-                PairMutable selectionBoxCenter = new PairMutable((this.EditorSchematic_SymbolSelectionBoxShape.points.get(1).GetLeftDouble() + this.EditorSchematic_SymbolSelectionBoxShape.points.get(0).GetLeftDouble()) / 2,
-                        (this.EditorSchematic_SymbolSelectionBoxShape.points.get(2).GetRightDouble() + this.EditorSchematic_SymbolSelectionBoxShape.points.get(1).GetRightDouble()) / 2);
-                PairMutable selectionBoxEdges = new PairMutable(new PairMutable(selectionBoxCenter.GetLeftDouble() - selectionBoxExtents.GetLeftDouble() / 2,
-                        selectionBoxCenter.GetLeftDouble() + selectionBoxExtents.GetLeftDouble() / 2),
-                        new PairMutable(selectionBoxCenter.GetRightDouble() - selectionBoxExtents.GetRightDouble() / 2,
-                                selectionBoxCenter.GetRightDouble() + selectionBoxExtents.GetRightDouble() / 2));
-
-                for (int i = 0; i < this.EditorSchematic_ViewportSymbolsDropped.size(); i++)
+                if (EDAmameController.Controller_IsStringNum(stringWidth))
                 {
-                    EditorSchematic_Symbol symbol = this.EditorSchematic_ViewportSymbolsDropped.get(i);
+                    double width = Double.parseDouble(stringWidth);
 
-                    if (symbol.passive)
-                        continue;
-
-                    PairMutable symbolBoxEdges = new PairMutable(new PairMutable(symbol.shape.posDraw.GetLeftDouble() - symbol.shape.boundingBox.GetLeftDouble() / 2,
-                            symbol.shape.posDraw.GetLeftDouble() + symbol.shape.boundingBox.GetLeftDouble() / 2),
-                            new PairMutable(symbol.shape.posDraw.GetRightDouble() - symbol.shape.boundingBox.GetRightDouble() / 2,
-                                    symbol.shape.posDraw.GetRightDouble() + symbol.shape.boundingBox.GetRightDouble() / 2));
-
-                    if ((selectionBoxEdges.GetLeftPair().GetRightDouble() > symbolBoxEdges.GetLeftPair().GetLeftDouble()) &&
-                            (selectionBoxEdges.GetLeftPair().GetLeftDouble() < symbolBoxEdges.GetLeftPair().GetRightDouble()) &&
-                            (selectionBoxEdges.GetRightPair().GetRightDouble() > symbolBoxEdges.GetRightPair().GetLeftDouble()) &&
-                            (selectionBoxEdges.GetRightPair().GetLeftDouble() < symbolBoxEdges.GetRightPair().GetRightDouble()))
+                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                     {
-                        symbol.highlightedBox = true;
+                        if (this.EditorSymbol_LinePreview == null)
+                        {
+                            this.EditorSymbol_LinePreview = new Line();
+                            this.EditorSymbol_LinePreview.setId("linePreview");
+
+                            //this.Editor_RenderSystem.paneHolder.getChildren().add(this.EditorSymbol_LinePreview);
+                            RenderNode renderNode = new RenderNode("linePreview", EditorSymbol_LinePreview);
+                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                        }
+
+                        PairMutable posStart = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX() - mouseDiffPos.GetLeftDouble(), event.getY() - mouseDiffPos.GetRightDouble()));
+                        PairMutable posEnd = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+
+                        this.EditorSymbol_LinePreview.setStartX(posStart.GetLeftDouble());
+                        System.out.println("Start X: " + EditorSymbol_LinePreview.getStartX());
+                        this.EditorSymbol_LinePreview.setStartY(posStart.GetRightDouble());
+                        System.out.println("Start Y: " + EditorSymbol_LinePreview.getStartY());
+                        this.EditorSymbol_LinePreview.setEndX(posEnd.GetLeftDouble());
+                        System.out.println("End X: " + EditorSymbol_LinePreview.getEndX());
+                        this.EditorSymbol_LinePreview.setEndY(posEnd.GetRightDouble());
+                        System.out.println("End: " + EditorSymbol_LinePreview.getStartY());
+                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                        this.EditorSymbol_LinePreview.setStroke(color);
+
                     }
                     else
                     {
-                        if (!this.EditorSchematic_IsKeyPressed(KeyCode.SHIFT))
-                            symbol.highlightedBox = false;
+                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
                     }
-
-                    this.EditorSchematic_ViewportSymbolsDropped.set(i, symbol);
                 }
-            }*/
+                else
+                {
+                    EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
+                }
+                }
+
+                this.Editor_LineDragging = true;
+            }
         }
         else if (this.Editor_PressedRMB)
         {}

@@ -47,7 +47,7 @@ public class EditorSchematic extends Editor
         System.out.println("Schematic mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event)
+    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("Schematic mouse dragged!");
     }

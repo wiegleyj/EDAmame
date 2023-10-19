@@ -139,7 +139,26 @@
             </VBox>
          </content>
         </Tab>
-        <Tab text="Lines" />
+        <Tab text="Lines">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <RadioButton mnemonicParsing="false" text="Line" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Width " />
+                        <TextField fx:id="EditorSymbol_LineWidth" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Color " />
+                        <ColorPicker fx:id="EditorSymbol_LineColor" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content></Tab>
       <Tab text="Text">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0">
