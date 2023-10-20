@@ -4,7 +4,9 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -19,7 +21,21 @@
 <BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" onKeyPressed="#Controller_OnKeyPressed" onKeyReleased="#Controller_OnKeyReleased" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.EDAmameController">
    <top>
        <VBox BorderPane.alignment="CENTER">
-           <MenuBar fx:id="Controller_MenuBar" />
+           <MenuBar fx:id="Controller_MenuBar">
+            <menus>
+               <Menu mnemonicParsing="false" text="STATIC_1">
+                 <items>
+                     <MenuItem id="10" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />
+                     <MenuItem id="11" mnemonicParsing="false" onAction="#EditorFootprintNewButton" text="New Footprint Editor" />
+                     <MenuItem id="12" mnemonicParsing="false" onAction="#Controller_Exit" text="Exit Program" />
+                 </items>
+               </Menu>
+               <Menu mnemonicParsing="false" text="STATIC_2">
+                 <items>
+                   <MenuItem id="10" fx:id="Controller_MenuLogItem" mnemonicParsing="false" onAction="#Controller_LogToggleVisibility" text="LogTab" />
+                 </items>
+               </Menu>
+            </menus></MenuBar>
            <HBox>
                <ToolBar>
                    <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />

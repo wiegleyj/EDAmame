@@ -17,16 +17,25 @@
 
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorSymbol">
     <MenuBar>
-        <Menu text="_File">
-            <MenuItem mnemonicParsing="false" text="EditorClose" />
-        </Menu>
-        <Menu text="_Edit">
-            <MenuItem mnemonicParsing="false" text="EditorDelete" />
-        </Menu>
-        <Menu text="_Help">
-            <MenuItem mnemonicParsing="false" text="EditorAbout" />
-        </Menu>
-    </MenuBar>
+      <menus>
+         <Menu mnemonicParsing="false" text="STATIC_1">
+           <items>
+             <MenuItem id="1" mnemonicParsing="false" text="FOOTPRINT_STATIC_1_1" />
+               <MenuItem id="2" mnemonicParsing="false" text="FOOTPRINT_STATIC_1_2" />
+           </items>
+         </Menu>
+         <Menu mnemonicParsing="false" text="STATIC_2">
+           <items>
+             <MenuItem id="1" mnemonicParsing="false" text="FOOTPRINT_STATIC_2_1" />
+               <MenuItem id="2" mnemonicParsing="false" text="FOOTPRINT_STATIC_2_2" />
+           </items>
+         </Menu>
+         <Menu mnemonicParsing="false" text="FOOTPRINT">
+           <items>
+             <MenuItem mnemonicParsing="false" onAction="#Editor_Close" text="Close" />
+           </items>
+         </Menu>
+      </menus></MenuBar>
     <ToolBar>
         <Button mnemonicParsing="false" text="Footprint Button 1" />
     </ToolBar>

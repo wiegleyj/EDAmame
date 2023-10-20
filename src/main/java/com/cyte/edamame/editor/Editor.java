@@ -6,6 +6,7 @@
  */
 
 package com.cyte.edamame.editor;
+import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.render.RenderSystem;
@@ -47,30 +48,24 @@ public abstract class Editor
 
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
     // The individual elements are extracted to these for use by the EDAmame Application.
+
     /** The main Editor_Tab for EDAmame to include in its main Editor_Tab list. */
     protected Tab Editor_Tab = null;
-
     /** An optional ToolBar to provide EDAmame to include/append to its toolbars. */
     protected ToolBar Editor_ToolBar = null;
-
     /** a list of Editor_Tabs to include in the navigation Editor_Tab pane when this editor is active. (can be empty) */
     protected ObservableList<Tab> Editor_Tabs = FXCollections.observableArrayList();
-
     /**
      * A structure of menu items to include in EDAmame's Editor_Menus. Any menuitems associated with a string will
      * be inserted/visible under the menu with the same name in the EDAmame main menubar. The string must
      * match exactly including mneumonic underscores and such. Missing Editor_Menus at the EDAmame level are not created.
      */
-    protected ObservableMap<String, ObservableList<MenuItem>> Editor_Menus = FXCollections.observableHashMap();
-
+    public HashMap<String, ObservableList<MenuItem>> Editor_Menus = new HashMap<String, ObservableList<MenuItem>>();    // NOTE: We have to use the hash map because a list would cause the menu items to disappear after the first editor dissection
     public RenderSystem Editor_RenderSystem;
-
-    // DO NOT EDIT
 
     public boolean Editor_Visible = false;
     public boolean Editor_PressedLMB = false;
     public boolean Editor_PressedRMB = false;
-    public MenuBarPriority Editor_MenuBarPriority;
     public boolean Editor_LineDragging = false;
 
     //// MAIN FUNCTIONS ////
@@ -100,17 +95,7 @@ public abstract class Editor
      */
     public void Editor_Close()
     {
-        for (int i = 0; i < this.Editor_Tab.getTabPane().getTabs().size(); i++)
-        {
-            Tab currTab = this.Editor_Tab.getTabPane().getTabs().get(i);
-
-            if (currTab.getId().contains(this.Editor_ID))
-            {
-                this.Editor_Tab.getTabPane().getTabs().remove(this.Editor_Tab);
-
-                break;
-            }
-        }
+        EDAmameApplication.App_Controller.Editor_Remove(this);
     }
 
     //// GETTER FUNCTIONS ////
@@ -511,26 +496,17 @@ public abstract class Editor
             {
                 EDAmameController.Controller_Logger.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + Editor_ID + "\"...\n");
 
-                Iterator<Menu> menuIterator = ((MenuBar)node).getMenus().iterator();
+                ObservableList<Menu> menus = ((MenuBar)node).getMenus();
 
-                while (menuIterator.hasNext())
+                for (int i = 0; i < menus.size(); i++)
                 {
-                    Menu menu = menuIterator.next();
+                    Menu currMenu = menus.get(i);
+                    String currMenuName = currMenu.getText();
 
-                    if (!Editor_Menus.containsKey(menu.getText()))
-                        Editor_Menus.put(menu.getText(), FXCollections.observableArrayList());
+                    if (!this.Editor_Menus.containsKey(currMenuName))
+                        this.Editor_Menus.put(currMenuName, FXCollections.observableArrayList());
 
-                    List<MenuItem> itemlist = Editor_Menus.get(menu.getText());
-                    Iterator<MenuItem> itemIterator = menu.getItems().iterator();
-
-                    while (itemIterator.hasNext())
-                    {
-                        MenuItem item = itemIterator.next();
-                        itemlist.add(item);
-                        itemIterator.remove();
-                    }
-
-                    menuIterator.remove();
+                    this.Editor_Menus.get(currMenuName).addAll(currMenu.getItems());
                 }
             }
             else if (node.getClass() == TabPane.class)

@@ -28,6 +28,8 @@ import java.util.ResourceBundle;
  */
 public class EDAmameApplication extends Application
 {
+    static public EDAmameController App_Controller;
+
     /**
      * Override for {@link Application} start method that is called as a result of the launch method.
      *
@@ -46,7 +48,8 @@ public class EDAmameApplication extends Application
         ResourceBundle bundle = ResourceBundle.getBundle("com.cyte.edamame.strings", locale);
         FXMLLoader loader = new FXMLLoader(EDAmame.class.getResource("fxml/EDAmame.fxml"));
         loader.setResources(bundle); // Internationalization is a priority but not well understood.
-        loader.setControllerFactory(c -> new EDAmameController(Controller_Stage));
+        App_Controller = new EDAmameController(Controller_Stage);
+        loader.setControllerFactory(c -> App_Controller);
 
         Scene scene = new Scene(loader.load());
         URL url = EDAmame.class.getResource("css/EDAmame.css");
