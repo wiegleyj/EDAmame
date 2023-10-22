@@ -22,59 +22,59 @@ public class EditorPCB extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver(DragEvent event)
+    public void Editor_OnDragOverSpecific(DragEvent event)
     {
         System.out.println("PCB dragged over!");
     }
 
-    public void Editor_ViewportOnDragDropped(DragEvent event)
+    public void Editor_OnDragDroppedSpecific(DragEvent event)
     {
         System.out.println("PCB drag dropped!");
     }
 
-    public void Editor_ViewportOnMouseMoved(MouseEvent event)
+    public void Editor_OnMouseMovedSpecific(MouseEvent event)
     {
         System.out.println("PCB mouse moved!");
     }
 
-    public void Editor_ViewportOnMousePressed(MouseEvent event)
+    public void Editor_OnMousePressedSpecific(MouseEvent event)
     {
         System.out.println("PCB mouse pressed!");
     }
 
-    public void Editor_ViewportOnMouseReleased(MouseEvent event)
+    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         System.out.println("PCB mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("PCB mouse dragged!");
     }
 
-    public void Editor_ViewportOnScroll(ScrollEvent event)
+    public void Editor_OnScrollSpecific(ScrollEvent event)
     {
         System.out.println("PCB mouse scrolled!");
     }
 
-    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    public void Editor_OnKeyPressedSpecific(KeyEvent event)
     {
         System.out.println("PCB key pressed!");
     }
 
-    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
     {
         System.out.println("PCB key released!");
     }
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsSpecificLoad()
+    public void Editor_PropsLoadSpecific()
     {
         System.out.println("Loading props PCB!");
     }
 
-    public void Editor_PropsSpecificApply()
+    public void Editor_PropsApplySpecific()
     {
         System.out.println("Applying props PCB!");
     }

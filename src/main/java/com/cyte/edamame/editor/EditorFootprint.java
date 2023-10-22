@@ -37,9 +37,10 @@ public class EditorFootprint extends Editor
         Scene scene = new Scene(fxmlLoader.load());
 
         EditorSymbol editor = fxmlLoader.getController();
-        editor.Editor_Name = "EditorFootprint";
+        editor.Editor_Init(1, "EditorFootprint");
         editor.Editor_Dissect(1, scene);
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
+        editor.Editor_ListenersInit();
 
         return editor;
     }
@@ -52,59 +53,59 @@ public class EditorFootprint extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver(DragEvent event)
+    public void Editor_OnDragOverSpecific(DragEvent event)
     {
         System.out.println("Footprint dragged over!");
     }
 
-    public void Editor_ViewportOnDragDropped(DragEvent event)
+    public void Editor_OnDragDroppedSpecific(DragEvent event)
     {
         System.out.println("Footprint drag dropped!");
     }
 
-    public void Editor_ViewportOnMouseMoved(MouseEvent event)
+    public void Editor_OnMouseMovedSpecific(MouseEvent event)
     {
         System.out.println("Footprint mouse moved!");
     }
 
-    public void Editor_ViewportOnMousePressed(MouseEvent event)
+    public void Editor_OnMousePressedSpecific(MouseEvent event)
     {
         System.out.println("Footprint mouse pressed!");
     }
 
-    public void Editor_ViewportOnMouseReleased(MouseEvent event)
+    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         System.out.println("Footprint mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("Footprint mouse dragged!");
     }
 
-    public void Editor_ViewportOnScroll(ScrollEvent event)
+    public void Editor_OnScrollSpecific(ScrollEvent event)
     {
         System.out.println("Footprint mouse scrolled!");
     }
 
-    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    public void Editor_OnKeyPressedSpecific(KeyEvent event)
     {
         System.out.println("Footprint key pressed!");
     }
 
-    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
     {
         System.out.println("Footprint key released!");
     }
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsSpecificLoad()
+    public void Editor_PropsLoadSpecific()
     {
         System.out.println("Loading props footprint!");
     }
 
-    public void Editor_PropsSpecificApply()
+    public void Editor_PropsApplySpecific()
     {
         System.out.println("Applying props footprint!");
     }

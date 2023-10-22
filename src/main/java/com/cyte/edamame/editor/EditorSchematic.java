@@ -22,59 +22,59 @@ public class EditorSchematic extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver(DragEvent event)
+    public void Editor_OnDragOverSpecific(DragEvent event)
     {
         System.out.println("Schematic dragged over!");
     }
 
-    public void Editor_ViewportOnDragDropped(DragEvent event)
+    public void Editor_OnDragDroppedSpecific(DragEvent event)
     {
         System.out.println("Schematic drag dropped!");
     }
 
-    public void Editor_ViewportOnMouseMoved(MouseEvent event)
+    public void Editor_OnMouseMovedSpecific(MouseEvent event)
     {
         System.out.println("Schematic mouse moved!");
     }
 
-    public void Editor_ViewportOnMousePressed(MouseEvent event)
+    public void Editor_OnMousePressedSpecific(MouseEvent event)
     {
         System.out.println("Schematic mouse pressed!");
     }
 
-    public void Editor_ViewportOnMouseReleased(MouseEvent event)
+    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         System.out.println("Schematic mouse released!");
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
     {
         System.out.println("Schematic mouse dragged!");
     }
 
-    public void Editor_ViewportOnScroll(ScrollEvent event)
+    public void Editor_OnScrollSpecific(ScrollEvent event)
     {
         System.out.println("Schematic mouse scrolled!");
     }
 
-    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    public void Editor_OnKeyPressedSpecific(KeyEvent event)
     {
         System.out.println("Schematic key pressed!");
     }
 
-    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
     {
         System.out.println("Schematic key released!");
     }
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsSpecificLoad()
+    public void Editor_PropsLoadSpecific()
     {
         System.out.println("Loading props schematic!");
     }
 
-    public void Editor_PropsSpecificApply()
+    public void Editor_PropsApplySpecific()
     {
         System.out.println("Applying props schematic!");
     }

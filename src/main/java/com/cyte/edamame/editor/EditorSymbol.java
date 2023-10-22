@@ -78,9 +78,10 @@ public class EditorSymbol extends Editor
         Scene scene = new Scene(fxmlLoader.load());
 
         EditorSymbol editor = fxmlLoader.getController();
-        editor.Editor_Name = "EditorSymbol";
+        editor.Editor_Init(0, "EditorSymbol");
         editor.Editor_Dissect(0, scene);
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
+        editor.Editor_ListenersInit();
 
         return editor;
     }
@@ -96,7 +97,7 @@ public class EditorSymbol extends Editor
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_ViewportOnDragOver(DragEvent event)
+    public void Editor_OnDragOverSpecific(DragEvent event)
     {
         //System.out.println("Symbol dragged over!");
 
@@ -145,7 +146,7 @@ public class EditorSymbol extends Editor
         this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));*/
     }
 
-    public void Editor_ViewportOnDragDropped(DragEvent event)
+    public void Editor_OnDragDroppedSpecific(DragEvent event)
     {
         //System.out.println("Symbol drag dropped!");
 
@@ -199,14 +200,14 @@ public class EditorSymbol extends Editor
         event.setDropCompleted(success);*/
     }
 
-    public void Editor_ViewportOnMouseMoved(MouseEvent event)
+    public void Editor_OnMouseMovedSpecific(MouseEvent event)
     {
         //System.out.println("Symbol mouse moved!");
 
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void Editor_ViewportOnMousePressed(MouseEvent event)
+    public void Editor_OnMousePressedSpecific(MouseEvent event)
     {
         //System.out.println("Symbol mouse pressed!");
 
@@ -239,23 +240,23 @@ public class EditorSymbol extends Editor
         {}
     }
 
-    public void Editor_ViewportOnMouseReleased(MouseEvent event)
+    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         //System.out.println("Symbol mouse released!");
 
         if (this.Editor_PressedLMB)
         {
             // Handling shape dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
-            if ((this.Editor_RenderSystem.shapesHighlighted == 0) &&
-                (this.Editor_RenderSystem.shapesSelected == 0) &&
-                !this.Editor_RenderSystem.shapesMoving &&
-                this.Editor_RenderSystem.selectionBox == null &&
+            if ((this.Editor_ShapesHighlighted == 0) &&
+                (this.Editor_ShapesSelected == 0) &&
+                !this.Editor_ShapesMoving &&
+                this.Editor_SelectionBox == null &&
                 !this.Editor_LineDragging)
             {
                 RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
                 // Only dropping the shape within the theater limits...
-                if ((selectedShapeButton != null) && (!this.Editor_RenderSystem.pressedOnShape))
+                if ((selectedShapeButton != null) && (!this.Editor_PressedOnShape))
                 {
                     PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
                     PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
@@ -458,64 +459,65 @@ public class EditorSymbol extends Editor
         {}
     }
 
-    public void Editor_ViewportOnMouseDragged(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
     {
         //System.out.println("Symbol mouse dragged!");
 
         if (this.Editor_PressedLMB)
         {
-            if (this.Editor_RenderSystem.shapesSelected == 0)
+            // Handling line drawing (only if we have no shapes selected)...
+            if (this.Editor_ShapesSelected == 0)
             {
-            RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+                RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
-            if (selectedShapeButton.getText().equals("Line"))
-            {
-                String stringWidth = this.EditorSymbol_LineWidth.getText();
-                Color color = this.EditorSymbol_LineColor.getValue();
-
-                if (EDAmameController.Controller_IsStringNum(stringWidth))
+                if ((selectedShapeButton != null) && selectedShapeButton.getText().equals("Line"))
                 {
-                    double width = Double.parseDouble(stringWidth);
+                    String stringWidth = this.EditorSymbol_LineWidth.getText();
+                    Color color = this.EditorSymbol_LineColor.getValue();
 
-                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                    if (EDAmameController.Controller_IsStringNum(stringWidth))
                     {
-                        if (this.EditorSymbol_LinePreview == null)
+                        double width = Double.parseDouble(stringWidth);
+
+                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                         {
-                            this.EditorSymbol_LinePreview = new Line();
-                            this.EditorSymbol_LinePreview.setId("linePreview");
+                            if (this.EditorSymbol_LinePreview == null)
+                            {
+                                this.EditorSymbol_LinePreview = new Line();
+                                this.EditorSymbol_LinePreview.setId("linePreview");
 
-                            //this.Editor_RenderSystem.paneHolder.getChildren().add(this.EditorSymbol_LinePreview);
-                            RenderNode renderNode = new RenderNode("linePreview", EditorSymbol_LinePreview);
-                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                //this.Editor_RenderSystem.paneHolder.getChildren().add(this.EditorSymbol_LinePreview);
+                                RenderNode renderNode = new RenderNode("linePreview", EditorSymbol_LinePreview);
+                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                            }
+
+                            PairMutable posStart = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX() - mouseDiffPos.GetLeftDouble(), event.getY() - mouseDiffPos.GetRightDouble()));
+                            PairMutable posEnd = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+
+                            this.EditorSymbol_LinePreview.setStartX(posStart.GetLeftDouble());
+                            System.out.println("Start X: " + EditorSymbol_LinePreview.getStartX());
+                            this.EditorSymbol_LinePreview.setStartY(posStart.GetRightDouble());
+                            System.out.println("Start Y: " + EditorSymbol_LinePreview.getStartY());
+                            this.EditorSymbol_LinePreview.setEndX(posEnd.GetLeftDouble());
+                            System.out.println("End X: " + EditorSymbol_LinePreview.getEndX());
+                            this.EditorSymbol_LinePreview.setEndY(posEnd.GetRightDouble());
+                            System.out.println("End: " + EditorSymbol_LinePreview.getStartY());
+                            this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                            this.EditorSymbol_LinePreview.setStroke(color);
+
+                            if (!this.Editor_LineDragging)
+                                this.Editor_LineDragging = true;
                         }
-
-                        PairMutable posStart = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX() - mouseDiffPos.GetLeftDouble(), event.getY() - mouseDiffPos.GetRightDouble()));
-                        PairMutable posEnd = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-
-                        this.EditorSymbol_LinePreview.setStartX(posStart.GetLeftDouble());
-                        System.out.println("Start X: " + EditorSymbol_LinePreview.getStartX());
-                        this.EditorSymbol_LinePreview.setStartY(posStart.GetRightDouble());
-                        System.out.println("Start Y: " + EditorSymbol_LinePreview.getStartY());
-                        this.EditorSymbol_LinePreview.setEndX(posEnd.GetLeftDouble());
-                        System.out.println("End X: " + EditorSymbol_LinePreview.getEndX());
-                        this.EditorSymbol_LinePreview.setEndY(posEnd.GetRightDouble());
-                        System.out.println("End: " + EditorSymbol_LinePreview.getStartY());
-                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
-                        this.EditorSymbol_LinePreview.setStroke(color);
-
+                        else
+                        {
+                            EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                        }
                     }
                     else
                     {
-                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
                     }
                 }
-                else
-                {
-                    EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
-                }
-                }
-
-                this.Editor_LineDragging = true;
             }
         }
         else if (this.Editor_PressedRMB)
@@ -525,12 +527,12 @@ public class EditorSymbol extends Editor
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void Editor_ViewportOnScroll(ScrollEvent event)
+    public void Editor_OnScrollSpecific(ScrollEvent event)
     {
 
     }
 
-    public void Editor_ViewportOnKeyPressed(KeyEvent event)
+    public void Editor_OnKeyPressedSpecific(KeyEvent event)
     {
         //System.out.println("Symbol key pressed!");
 
@@ -553,7 +555,7 @@ public class EditorSymbol extends Editor
         }
     }
 
-    public void Editor_ViewportOnKeyReleased(KeyEvent event)
+    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
     {
         //System.out.println("Symbol key released!");
 
@@ -562,9 +564,9 @@ public class EditorSymbol extends Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsSpecificLoad()
+    public void Editor_PropsLoadSpecific()
     {
-        if (this.Editor_RenderSystem.shapesSelected == 0)
+        if (this.Editor_ShapesSelected == 0)
             return;
 
         boolean needHeader = false;
@@ -709,9 +711,9 @@ public class EditorSymbol extends Editor
         }
     }
 
-    public void Editor_PropsSpecificApply()
+    public void Editor_PropsApplySpecific()
     {
-        if (this.Editor_RenderSystem.shapesSelected == 0)
+        if (this.Editor_ShapesSelected == 0)
             return;
 
         VBox propsBox = EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox;

@@ -70,7 +70,7 @@ public class EditorProps
         EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().clear();
 
         // Only attempting to load node properties if we have some nodes selected...
-        if (this.EditorProps_Editor.Editor_RenderSystem.shapesSelected == 0)
+        if (this.EditorProps_Editor.Editor_ShapesSelected == 0)
         {
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
             EDAmameController.Controller_SetStatusBar("Unable to load element properties because no elements are selected!");
@@ -79,8 +79,8 @@ public class EditorProps
         }
 
         // Loading both the global & editor-specific properties...
-        this.EditorProps_Editor.Editor_PropsGlobalLoad();
-        this.EditorProps_Editor.Editor_PropsSpecificLoad();
+        this.EditorProps_Editor.Editor_PropsLoadGlobal();
+        this.EditorProps_Editor.Editor_PropsLoadSpecific();
     }
 
     @FXML
@@ -90,7 +90,7 @@ public class EditorProps
             throw new java.lang.Error("ERROR: Attempting to apply from properties window with null editor reference!");
 
         // Only attempting to apply node properties if we have some nodes selected...
-        if (this.EditorProps_Editor.Editor_RenderSystem.shapesSelected == 0)
+        if (this.EditorProps_Editor.Editor_ShapesSelected == 0)
         {
             EDAmameController.Controller_SetStatusBar("Unable to apply element properties because no elements are selected!");
 
@@ -98,8 +98,8 @@ public class EditorProps
         }
 
         // Applying both the global & editor-specific properties...
-        this.EditorProps_Editor.Editor_PropsGlobalApply();
-        this.EditorProps_Editor.Editor_PropsSpecificApply();
+        this.EditorProps_Editor.Editor_PropsApplyGlobal();
+        this.EditorProps_Editor.Editor_PropsApplySpecific();
 
         // Refreshing all highlighted & selected shapes...
         for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.nodes.size(); i++)

@@ -7,6 +7,7 @@
 
 // TODO:
 // Implement line drawing in symbol editor
+// Implement line recognition into properties window
 // Fix occasional dragging not recognized
 // Bind highlighted & selected shapes sizes to main shape size
 // Refactor viewport mouse diff pos scaling
@@ -16,15 +17,14 @@
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
 // Implement undo-redo functionalities
+// Implement proper getters & setters for all class fields
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
 import com.cyte.edamame.render.RenderNode;
-import com.cyte.edamame.util.MenuConfigLoader;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.TextAreaHandler;
 
-import java.lang.reflect.*;
 import java.util.*;
 import java.util.Map.*;
 import java.util.stream.*;
@@ -166,7 +166,7 @@ public class EDAmameController implements Initializable
 
         // Changing Editor_Tabs in the main Editor_Tab pane is a significant task for changing
         // between Controller_Editors and modules. This logic is handled through Editor_Tab change events.
-        Editor_EnableSelect();
+        Controller_EditorEnableSelect();
 
         // Restore the previous location and size of windows. (Location of split pane dividers needs
         // to be handled elsewhere since layout of nodes isn't completed at time of initialization.
@@ -283,19 +283,19 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Enables to controller logic for switching between editor Editor_Tabs.
+     * Enables to controller logic for switching between editor tabs.
      *
      * Editors are composed of several nodes.
      *     A single main editor Editor_Tab that is always visible in editorTabPane.
-     *     A set of control Editor_Tabs that are only present/visible in the Controller_TabPaneControls when the editor is selected.
+     *     A set of control Editor_Tabs that are only present/visible in the tabPaneControls when the editor is selected.
      *     A Editor_ToolBar that is only visible in the Editor_ToolBar area when the editor is selected.
      *     A set of Editor_Menus and items that are only present in the Editor_Menus when the editor is selected.
      *
      * Editor_EnableSelect provides the control for the presence and visibility of these items
-     * based on Editor_Tab selection. When a Editor_Tab is selected the UI components for the previously selected editor
+     * based on tab selection. When a Editor_Tab is selected the UI components for the previously selected editor
      * are removed/hidden and the components for the newly selected editor are enabled/shown.
      */
-    public void Editor_EnableSelect()
+    public void Controller_EditorEnableSelect()
     {
         Controller_TabPane.getSelectionModel().selectedItemProperty().addListener(
                 (observable, oldValue, newValue) -> {
@@ -303,18 +303,18 @@ public class EDAmameController implements Initializable
                     Editor editor = Controller_Editors.get(oldValue);
 
                     if (editor != null) // if the old Editor_Tab was an editor then deactivate it.
-                        Editor_Deactivate(editor);
+                        Controller_EditorDeactivate(editor);
 
                     editor = Controller_Editors.get(newValue);
 
                     if (newValue != null) // if the new Editor_Tab selected is an editor then activate it.
-                        Editor_Activate(editor);
+                        Controller_EditorActivate(editor);
                 }
         );
     }
 
     /**
-     * Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own Controller_Editors. Editors
+     * Symbol Libraries, Footprint Libraries, Schematics, PCBs are all handled by their own editors. Editors
      * supply their own controllers and controls. The EDAmameController folds these controls into its own
      * Editor_Menus, toolbars and windows by obtaining, reparenting and controlling the visibility of those controls.
      *
@@ -323,7 +323,7 @@ public class EDAmameController implements Initializable
      *
      * @param editor Which editor to make controls visible for.
      */
-    public void Editor_Activate(Editor editor)
+    public void Controller_EditorActivate(Editor editor)
     {
         if (editor == null)
             return;
@@ -417,12 +417,12 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Editors are deactivated by EDAmame by making sure that unselected editor Editor_Tabs' controls are invisible and
+     * Editors are deactivated by EDAmame by making sure that unselected editor tabs' controls are invisible and
      * inaccessible.
      *
      * @param editor Which editor to make controls invisible for.
      */
-    public void Editor_Deactivate(Editor editor)
+    public void Controller_EditorDeactivate(Editor editor)
     {
         // Removing any active property windows for the active editor...
         if (EDAmameController.Controller_EditorPropertiesWindow != null)
@@ -466,11 +466,11 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Editors are added by EDAmame by including their menu items and toolbars in its Editor_Menus and toolbar areas.
+     * Editors are added by EDAmame by including their menu items and toolbars in its menus and toolbar areas.
      *
      * @param editor Which editor to setup and add controls for. They all start out invisible/unavailable.
      */
-    public void Editor_Add(Editor editor)
+    public void Controller_EditorAdd(Editor editor)
     {
         Tab editorTab = editor.Editor_GetTab();
         editorTab.setId("editorTab_" + editor.Editor_ID);
@@ -482,8 +482,8 @@ public class EDAmameController implements Initializable
         {
             // Adding a close callback
             editorTab.setOnCloseRequest(event -> {
-                Editor_Deactivate(editor);
-                Editor_Remove(editor);
+                Controller_EditorDeactivate(editor);
+                Controller_EditorRemove(editor);
 
                 event.consume();
             });
@@ -513,14 +513,14 @@ public class EDAmameController implements Initializable
     }
 
     /**
-     * Editors are removed by EDAmame by removing their menu items and toolbars in its Editor_Menus and toolbar areas.
+     * Editors are removed by EDAmame by removing their menu items and toolbars in its menus and toolbar areas.
      * This should really only be done once an editor has been closed and has no need to save data.
      *
      * @param editor Which editor to remove controls for.
      */
-    public void Editor_Remove(Editor editor)
+    public void Controller_EditorRemove(Editor editor)
     {
-        Editor_Deactivate(editor);
+        Controller_EditorDeactivate(editor);
 
         // Removing any editor's toolbars...
         Controller_StackPaneEditorToolBars.getChildren().remove(editor.Editor_GetToolBar());
@@ -697,7 +697,13 @@ public class EDAmameController implements Initializable
                 Editor editor = this.Controller_Editors.get(tab);
 
                 if ((editor != null) && editor.Editor_Visible)
-                    editor.Editor_RenderSystem.RenderSystem_OnKeyPressed(event);
+                {
+                    // Handling editor-specific callback actions
+                    editor.Editor_OnKeyPressedSpecific(event);
+
+                    // Handling global callback actions
+                    editor.Editor_OnKeyPressedGlobal(event);
+                }
             }
         }
 
@@ -722,7 +728,13 @@ public class EDAmameController implements Initializable
                 Editor editor = this.Controller_Editors.get(tab);
 
                 if ((editor != null) && editor.Editor_Visible)
-                    editor.Editor_RenderSystem.RenderSystem_OnKeyReleased(event);
+                {
+                    // Handling editor-specific callback actions
+                    editor.Editor_OnKeyReleasedSpecific(event);
+
+                    // Handling global callback actions
+                    editor.Editor_OnKeyReleasedGlobal(event);
+                }
             }
         }
 
@@ -803,7 +815,7 @@ public class EDAmameController implements Initializable
                 return;  // exit the method if editorInstance is null
             }
 
-            Editor_Add(editorInstance);
+            Controller_EditorAdd(editorInstance);
         }
         catch (IOException exception)
         {
@@ -825,7 +837,7 @@ public class EDAmameController implements Initializable
                 return;  // exit the method if editorInstance is null
             }
 
-            Editor_Add(editorInstance);
+            Controller_EditorAdd(editorInstance);
         }
         catch (IOException exception)
         {
