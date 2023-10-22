@@ -342,7 +342,7 @@ public class EDAmameController implements Initializable
             for (Map.Entry<String, ObservableList<MenuItem>> currEntry : editor.Editor_Menus.entrySet())
             {
                 String currMenuName = currEntry.getKey();
-                ObservableList<MenuItem> currMenuItems = currEntry.getValue();
+                ObservableList<MenuItem> currMenuItems = FXCollections.observableArrayList(getClonedMenuItems(currEntry.getValue()));
 
                 // Checking whether we need to merge menus...
                 Integer existingIdx = -1;
@@ -894,5 +894,21 @@ public class EDAmameController implements Initializable
         {
             //e.printStackTrace();
         }
+    }
+
+    private List<MenuItem> getClonedMenuItems(ObservableList<MenuItem> originalItems) {
+        List<MenuItem> clonedItems = new ArrayList<>();
+        for (MenuItem item : originalItems) {
+            clonedItems.add(cloneMenuItem(item));
+        }
+        return clonedItems;
+    }
+
+    private MenuItem cloneMenuItem(MenuItem original) {
+        MenuItem cloned = new MenuItem(original.getText());
+        cloned.setOnAction(original.getOnAction());
+        cloned.setId(original.getId()); // Might reconsider this if ID collisions are problematic
+        // Add additional clone properties of the original menu item as needed
+        return cloned;
     }
 }
