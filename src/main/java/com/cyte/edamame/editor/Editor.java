@@ -87,7 +87,6 @@ public abstract class Editor
     public boolean Editor_ShapesMoving = false;
     public boolean Editor_PressedOnShape = false;
     public Rectangle Editor_SelectionBox = null;
-    public boolean Editor_LineDragging = false;
 
     //// MAIN FUNCTIONS ////
 

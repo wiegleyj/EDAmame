@@ -6,8 +6,9 @@
  */
 
 // TODO:
-// Implement line drawing in symbol editor
+// Implement line drawing in symbol editor (with magnetic snapping)
 // Implement line recognition into properties window
+// Implement line drawing width global limits
 // Bind highlighted & selected shapes sizes to main shape size
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
@@ -82,6 +83,7 @@ public class EDAmameController implements Initializable
     final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Double Editor_SelectionBoxWidth = 1.0;
     final static public Integer Editor_MenuItemDefaultPriority = 10;
+    final static public Double Editor_MagneticSnapMaxRadius = 5.0;
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;
