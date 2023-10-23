@@ -22,49 +22,49 @@ public class RenderSystem
 {
     //// GLOBAL VARIABLES ////
 
-    final public UUID id = UUID.randomUUID();
+    final public UUID RenderSystem_ID = UUID.randomUUID();
 
-    public Pane paneListener;
-    public Pane paneHolder;
-    public Pane paneHighlights;
-    public Pane paneSelections;
-    public Canvas canvas;
-    public GraphicsContext gc;
-    public Shape crosshair;
-    public PairMutable theaterSize;
-    public Color backgroundColor;
-    public Color gridPointColor;
-    public Color gridBoxColor;
-    public Integer maxShapes;
+    public Pane RenderSystem_PaneListener;
+    public Pane RenderSystem_PaneHolder;
+    public Pane RenderSystem_PaneHighlights;
+    public Pane RenderSystem_PaneSelections;
+    public Canvas RenderSystem_Canvas;
+    public GraphicsContext RenderSystem_GC;
+    public Shape RenderSystem_Crosshair;
+    public PairMutable RenderSystem_TheaterSize;
+    public Color RenderSystem_BackgroundColor;
+    public Color RenderSystem_GridPointColor;
+    public Color RenderSystem_GridBoxColor;
+    public Integer RenderSystem_MaxShapes;
 
     // DO NOT EDIT
 
-    public LinkedList<RenderNode> nodes;
-    public PairMutable center;
+    public LinkedList<RenderNode> RenderSystem_Nodes;
+    public PairMutable RenderSystem_Center;
 
     //// CONSTRUCTORS ////
 
     public RenderSystem(Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue)
     {
-        this.paneListener = paneListenerValue;
-        this.paneHolder = paneHolderValue;
-        this.paneHighlights = paneHighlightsValue;
-        this.paneSelections = paneSelectionsValue;
-        this.canvas = canvasValue;
-        this.gc = this.canvas.getGraphicsContext2D();
-        this.crosshair = crosshairValue;
-        this.theaterSize = theaterSizeValue;
-        this.backgroundColor = backgroundColorValue;
-        this.gridPointColor = gridPointColorValue;
-        this.gridBoxColor = gridBoxColorValue;
-        this.maxShapes = maxShapesValue;
+        this.RenderSystem_PaneListener = paneListenerValue;
+        this.RenderSystem_PaneHolder = paneHolderValue;
+        this.RenderSystem_PaneHighlights = paneHighlightsValue;
+        this.RenderSystem_PaneSelections = paneSelectionsValue;
+        this.RenderSystem_Canvas = canvasValue;
+        this.RenderSystem_GC = this.RenderSystem_Canvas.getGraphicsContext2D();
+        this.RenderSystem_Crosshair = crosshairValue;
+        this.RenderSystem_TheaterSize = theaterSizeValue;
+        this.RenderSystem_BackgroundColor = backgroundColorValue;
+        this.RenderSystem_GridPointColor = gridPointColorValue;
+        this.RenderSystem_GridBoxColor = gridBoxColorValue;
+        this.RenderSystem_MaxShapes = maxShapesValue;
 
-        this.nodes = new LinkedList<RenderNode>();
-        this.center = new PairMutable(0.0, 0.0);
+        this.RenderSystem_Nodes = new LinkedList<RenderNode>();
+        this.RenderSystem_Center = new PairMutable(0.0, 0.0);
 
         this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
-        this.paneHolder.prefWidthProperty().bind(this.canvas.widthProperty());
-        this.paneHolder.prefHeightProperty().bind(this.canvas.heightProperty());
+        this.RenderSystem_PaneHolder.prefWidthProperty().bind(this.RenderSystem_Canvas.widthProperty());
+        this.RenderSystem_PaneHolder.prefHeightProperty().bind(this.RenderSystem_Canvas.heightProperty());
     }
 
     //// RENDERING FUNCTIONS ////
@@ -75,8 +75,8 @@ public class RenderSystem
         this.RenderSystem_CanvasClear();
 
         // Drawing the points
-        gc.setFill(this.gridPointColor);
-        gc.setGlobalAlpha(1.0);
+        RenderSystem_GC.setFill(this.RenderSystem_GridPointColor);
+        RenderSystem_GC.setGlobalAlpha(1.0);
         Double width = 3.0;
 
         Double posX = -2500.0;
@@ -86,7 +86,7 @@ public class RenderSystem
         {
             for (int j = 0; j < 70; j++)
             {
-                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
+                RenderSystem_GC.fillOval(posX - (width / 2), posY - (width / 2), width, width);
 
                 posX += 100.0;
             }
@@ -96,68 +96,68 @@ public class RenderSystem
         }
 
         // Drawing the grid box
-        gc.setStroke(this.gridBoxColor);
-        gc.setGlobalAlpha(1.0);
-        gc.setLineWidth(2.0);
-        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                      this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                      this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                      this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                      this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                      this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        RenderSystem_GC.setStroke(this.RenderSystem_GridBoxColor);
+        RenderSystem_GC.setGlobalAlpha(1.0);
+        RenderSystem_GC.setLineWidth(2.0);
+        RenderSystem_GC.strokeLine(this.RenderSystem_Canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.RenderSystem_Canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        RenderSystem_GC.strokeLine(this.RenderSystem_Canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.RenderSystem_Canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        RenderSystem_GC.strokeLine(this.RenderSystem_Canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.RenderSystem_Canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        RenderSystem_GC.strokeLine(this.RenderSystem_Canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                      this.RenderSystem_Canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                      this.RenderSystem_Canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
     }
 
     public void RenderSystem_CanvasClear()
     {
-        this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
-        this.gc.setFill(this.backgroundColor);
-        this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        this.RenderSystem_GC.clearRect(0, 0, this.RenderSystem_Canvas.getWidth(), this.RenderSystem_Canvas.getHeight());
+        this.RenderSystem_GC.setFill(this.RenderSystem_BackgroundColor);
+        this.RenderSystem_GC.fillRect(0, 0, this.RenderSystem_Canvas.getWidth(), this.RenderSystem_Canvas.getHeight());
     }
 
     //// PANE FUNCTIONS ////
 
     public PairMutable RenderSystem_PaneHolderGetRealPos(PairMutable pos)
     {
-        return new PairMutable(pos.GetLeftDouble() - this.paneHolder.getWidth() / 2,
-                               pos.GetRightDouble() - this.paneHolder.getHeight() / 2);
+        return new PairMutable(pos.GetLeftDouble() - this.RenderSystem_PaneHolder.getWidth() / 2,
+                               pos.GetRightDouble() - this.RenderSystem_PaneHolder.getHeight() / 2);
     }
 
     public PairMutable RenderSystem_PanePosListenerToHolder(PairMutable pos)
     {
-        Point2D newPos = this.paneHolder.parentToLocal(pos.GetLeftDouble(), pos.GetRightDouble());
+        Point2D newPos = this.RenderSystem_PaneHolder.parentToLocal(pos.GetLeftDouble(), pos.GetRightDouble());
 
         return new PairMutable(newPos.getX(), newPos.getY());
     }
 
     public PairMutable RenderSystem_PanePosHolderToListener(PairMutable pos)
     {
-        Point2D newPos = this.paneHolder.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+        Point2D newPos = this.RenderSystem_PaneHolder.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
 
         return new PairMutable(newPos.getX(), newPos.getY());
     }
 
     public void RenderSystem_PaneSetTranslate(PairMutable pos)
     {
-        this.paneHolder.setTranslateX(pos.GetLeftDouble());
-        this.paneHolder.setTranslateY(pos.GetRightDouble());
+        this.RenderSystem_PaneHolder.setTranslateX(pos.GetLeftDouble());
+        this.RenderSystem_PaneHolder.setTranslateY(pos.GetRightDouble());
     }
 
     public void RenderSystem_PaneSetScale(PairMutable scale, boolean compensate)
     {
         PairMutable prevScale = this.RenderSystem_PaneGetScale();
 
-        this.paneHolder.setScaleX(scale.GetLeftDouble());
-        this.paneHolder.setScaleY(scale.GetRightDouble());
+        this.RenderSystem_PaneHolder.setScaleX(scale.GetLeftDouble());
+        this.RenderSystem_PaneHolder.setScaleY(scale.GetRightDouble());
 
         if (compensate)
         {
@@ -165,8 +165,8 @@ public class RenderSystem
                                                      scale.GetRightDouble() - prevScale.GetRightDouble());
             PairMutable newPos = this.RenderSystem_PaneGetTranslate();
 
-            newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
-            newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
+            newPos.left = newPos.GetLeftDouble() + this.RenderSystem_Center.GetLeftDouble() * scaleDelta.GetLeftDouble();
+            newPos.right = newPos.GetRightDouble() + this.RenderSystem_Center.GetRightDouble() * scaleDelta.GetRightDouble();
 
             this.RenderSystem_PaneSetTranslate(newPos);
         }
@@ -174,34 +174,34 @@ public class RenderSystem
 
     public PairMutable RenderSystem_PaneGetScale()
     {
-        return new PairMutable(this.paneHolder.getScaleX(), this.paneHolder.getScaleY());
+        return new PairMutable(this.RenderSystem_PaneHolder.getScaleX(), this.RenderSystem_PaneHolder.getScaleY());
     }
 
     public PairMutable RenderSystem_PaneGetTranslate()
     {
-        return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
+        return new PairMutable(this.RenderSystem_PaneHolder.getTranslateX(), this.RenderSystem_PaneHolder.getTranslateY());
     }
 
     //// SHAPE FUNCTIONS ////
 
     public void RenderSystem_NodeAdd(RenderNode renderNode)
     {
-        if (this.nodes.size() >= this.maxShapes)
+        if (this.RenderSystem_Nodes.size() >= this.RenderSystem_MaxShapes)
             throw new java.lang.Error("ERROR: Exceeded render system maximum render nodes limit!");
 
-        this.nodes.add(renderNode);
-        this.paneHolder.getChildren().add(1, renderNode.node);
+        this.RenderSystem_Nodes.add(renderNode);
+        this.RenderSystem_PaneHolder.getChildren().add(1, renderNode.RenderNode_Node);
     }
 
     public void RenderSystem_NodeHighlightsRemove(RenderNode renderNode)
     {
-        for (int i = 0; i < this.paneHighlights.getChildren().size(); i++)
+        for (int i = 0; i < this.RenderSystem_PaneHighlights.getChildren().size(); i++)
         {
-            Shape highlightShape = (Shape)this.paneHighlights.getChildren().get(i);
+            Shape highlightShape = (Shape)this.RenderSystem_PaneHighlights.getChildren().get(i);
 
-            if (renderNode.id.equals(highlightShape.getId()))
+            if (renderNode.RenderNode_ID.equals(highlightShape.getId()))
             {
-                this.paneHighlights.getChildren().remove(i);
+                this.RenderSystem_PaneHighlights.getChildren().remove(i);
                 i--;
             }
         }
@@ -209,13 +209,13 @@ public class RenderSystem
 
     public void RenderSystem_NodeSelectionsRemove(RenderNode renderNode)
     {
-        for (int i = 0; i < this.paneSelections.getChildren().size(); i++)
+        for (int i = 0; i < this.RenderSystem_PaneSelections.getChildren().size(); i++)
         {
-            Shape selectionShape = (Shape)this.paneSelections.getChildren().get(i);
+            Shape selectionShape = (Shape)this.RenderSystem_PaneSelections.getChildren().get(i);
 
-            if (renderNode.id.equals(selectionShape.getId()))
+            if (renderNode.RenderNode_ID.equals(selectionShape.getId()))
             {
-                this.paneSelections.getChildren().remove(i);
+                this.RenderSystem_PaneSelections.getChildren().remove(i);
                 i--;
             }
         }

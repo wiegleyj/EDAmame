@@ -19,46 +19,46 @@ import javafx.geometry.*;
 
 public class RenderNode
 {
-    final public String id = UUID.randomUUID().toString();
+    final public String RenderNode_ID = UUID.randomUUID().toString();
 
-    public String name;
-    public Node node;
-    public Rectangle shapeHighlighted;
-    public Rectangle shapeSelected;
-    public boolean highlighted;
-    public boolean highlightedMouse;
-    public boolean highlightedBox;
-    public boolean selected;
-    public PairMutable mousePressPos;
+    public String RenderNode_Name;
+    public Node RenderNode_Node;
+    public Rectangle RenderNode_ShapeHighlighted;
+    public Rectangle RenderNode_ShapeSelected;
+    public boolean RenderNode_Highlighted;
+    public boolean RenderNode_HighlightedMouse;
+    public boolean RenderNode_HighlightedBox;
+    public boolean RenderNode_Selected;
+    public PairMutable RenderNode_MousePressPos;
 
     public RenderNode(String nameValue, Node nodeValue)
     {
-        this.name = nameValue;
-        this.node = nodeValue;
-        this.node.setId(id);
-        this.highlighted = false;
-        this.highlightedMouse = false;
-        this.highlightedBox = false;
-        this.selected = false;
-        this.mousePressPos = null;
+        this.RenderNode_Name = nameValue;
+        this.RenderNode_Node = nodeValue;
+        this.RenderNode_Node.setId(RenderNode_ID);
+        this.RenderNode_Highlighted = false;
+        this.RenderNode_HighlightedMouse = false;
+        this.RenderNode_HighlightedBox = false;
+        this.RenderNode_Selected = false;
+        this.RenderNode_MousePressPos = null;
 
         // Creating highlighted & selected shapes...
         {
-            this.shapeHighlighted = new Rectangle();
-            this.shapeHighlighted.setFill(Color.GRAY);
-            this.shapeHighlighted.setOpacity(0.5);
-            this.shapeHighlighted.setId(this.id);
-            this.shapeHighlighted.translateXProperty().bind(this.node.translateXProperty());
-            this.shapeHighlighted.translateYProperty().bind(this.node.translateYProperty());
-            this.shapeHighlighted.rotateProperty().bind(this.node.rotateProperty());
+            this.RenderNode_ShapeHighlighted = new Rectangle();
+            this.RenderNode_ShapeHighlighted.setFill(Color.GRAY);
+            this.RenderNode_ShapeHighlighted.setOpacity(0.5);
+            this.RenderNode_ShapeHighlighted.setId(this.RenderNode_ID);
+            this.RenderNode_ShapeHighlighted.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
+            this.RenderNode_ShapeHighlighted.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
+            this.RenderNode_ShapeHighlighted.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
 
-            this.shapeSelected = new Rectangle();
-            this.shapeSelected.setFill(Color.GRAY);
-            this.shapeSelected.setOpacity(0.5);
-            this.shapeSelected.setId(this.id);
-            this.shapeSelected.translateXProperty().bind(this.node.translateXProperty());
-            this.shapeSelected.translateYProperty().bind(this.node.translateYProperty());
-            this.shapeSelected.rotateProperty().bind(this.node.rotateProperty());
+            this.RenderNode_ShapeSelected = new Rectangle();
+            this.RenderNode_ShapeSelected.setFill(Color.GRAY);
+            this.RenderNode_ShapeSelected.setOpacity(0.5);
+            this.RenderNode_ShapeSelected.setId(this.RenderNode_ID);
+            this.RenderNode_ShapeSelected.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
+            this.RenderNode_ShapeSelected.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
+            this.RenderNode_ShapeSelected.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
         }
 
         this.RenderNode_BoundsRefresh();
@@ -66,14 +66,14 @@ public class RenderNode
 
     public boolean RenderNode_PosOnNode(PairMutable pos)
     {
-        return this.node.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
+        return this.RenderNode_Node.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
     }
 
     public void RenderNode_BoundsRefresh()
     {
-        if (this.node.getClass() == Label.class)
+        if (this.RenderNode_Node.getClass() == Label.class)
         {
-            Bounds bounds = this.node.getBoundsInLocal();
+            Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
             EDAmameController.Controller_RenderShapesDelayedBoundsRefresh.add(new PairMutable(new PairMutable(this, 0), new PairMutable(bounds.getWidth(), bounds.getHeight())));
         }
         else
@@ -85,41 +85,41 @@ public class RenderNode
 
     public void RenderNode_ShapeSelectedRefresh()
     {
-        Bounds bounds = this.node.getBoundsInLocal();
+        Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
 
-        if ((this.node.getClass() == Rectangle.class) ||
-            (this.node.getClass() == Label.class))
+        if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
+            (this.RenderNode_Node.getClass() == Label.class))
         {
-            this.shapeHighlighted.setLayoutX(0);
-            this.shapeHighlighted.setLayoutY(0);
+            this.RenderNode_ShapeHighlighted.setLayoutX(0);
+            this.RenderNode_ShapeHighlighted.setLayoutY(0);
         }
         else
         {
-            this.shapeHighlighted.setLayoutX(-bounds.getWidth() / 2);
-            this.shapeHighlighted.setLayoutY(-bounds.getHeight() / 2);
+            this.RenderNode_ShapeHighlighted.setLayoutX(-bounds.getWidth() / 2);
+            this.RenderNode_ShapeHighlighted.setLayoutY(-bounds.getHeight() / 2);
         }
 
-        this.shapeHighlighted.setWidth(bounds.getWidth());
-        this.shapeHighlighted.setHeight(bounds.getHeight());
+        this.RenderNode_ShapeHighlighted.setWidth(bounds.getWidth());
+        this.RenderNode_ShapeHighlighted.setHeight(bounds.getHeight());
     }
 
     public void RenderNode_ShapeHighlightedRefresh()
     {
-        Bounds bounds = this.node.getBoundsInLocal();
+        Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
 
-        if ((this.node.getClass() == Rectangle.class) ||
-            (this.node.getClass() == Label.class))
+        if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
+            (this.RenderNode_Node.getClass() == Label.class))
         {
-            this.shapeSelected.setLayoutX(0);
-            this.shapeSelected.setLayoutY(0);
+            this.RenderNode_ShapeSelected.setLayoutX(0);
+            this.RenderNode_ShapeSelected.setLayoutY(0);
         }
         else
         {
-            this.shapeSelected.setLayoutX(-bounds.getWidth() / 2);
-            this.shapeSelected.setLayoutY(-bounds.getHeight() / 2);
+            this.RenderNode_ShapeSelected.setLayoutX(-bounds.getWidth() / 2);
+            this.RenderNode_ShapeSelected.setLayoutY(-bounds.getHeight() / 2);
         }
 
-        this.shapeSelected.setWidth(bounds.getWidth());
-        this.shapeSelected.setHeight(bounds.getHeight());
+        this.RenderNode_ShapeSelected.setWidth(bounds.getWidth());
+        this.RenderNode_ShapeSelected.setHeight(bounds.getHeight());
     }
 }

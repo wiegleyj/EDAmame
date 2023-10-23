@@ -578,32 +578,32 @@ public class EditorSymbol extends Editor
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
         LinkedList<Double> trisLens = new LinkedList<Double>();
 
-        for (int i = 0; i < this.Editor_RenderSystem.nodes.size(); i++) {
-            RenderNode renderNode = this.Editor_RenderSystem.nodes.get(i);
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++) {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
-            if (!renderNode.selected)
+            if (!renderNode.RenderNode_Selected)
                 continue;
 
-            if (renderNode.node.getClass() != Label.class)
+            if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
-                shapesColor.add((Color)((Shape)renderNode.node).getFill());
+                shapesColor.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
                 needHeader = true;
             }
 
-            if (renderNode.node.getClass() == Circle.class)
+            if (renderNode.RenderNode_Node.getClass() == Circle.class)
             {
-                circlesRadii.add(((Circle)renderNode.node).getRadius());
+                circlesRadii.add(((Circle)renderNode.RenderNode_Node).getRadius());
             }
-            else if (renderNode.node.getClass() == Rectangle.class)
+            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
             {
-                rectsWidths.add(((Rectangle)renderNode.node).getWidth());
-                rectsHeights.add(((Rectangle)renderNode.node).getHeight());
+                rectsWidths.add(((Rectangle)renderNode.RenderNode_Node).getWidth());
+                rectsHeights.add(((Rectangle)renderNode.RenderNode_Node).getHeight());
             }
-            else if (renderNode.node.getClass() == Polygon.class)
+            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
             {
-                trisLens.add(((Polygon)renderNode.node).getPoints().get(2) - ((Polygon)renderNode.node).getPoints().get(0));
+                trisLens.add(((Polygon)renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon)renderNode.RenderNode_Node).getPoints().get(0));
             }
-            else if (renderNode.node.getClass() != Label.class)
+            else if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
                 throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to load Symbol Editor properties window!");
             }
@@ -719,15 +719,15 @@ public class EditorSymbol extends Editor
         VBox propsBox = EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox;
 
         // Iterating over all the shapes & attempting to apply shape properties if selected...
-        for (int i = 0; i < this.Editor_RenderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
-            RenderNode renderNode = this.Editor_RenderSystem.nodes.get(i);
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
-            if (!renderNode.selected)
+            if (!renderNode.RenderNode_Selected)
                 continue;
 
             // Applying color...
-            if (renderNode.node.getClass() != Label.class)
+            if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
                 Integer colorBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "colorBox");
 
@@ -743,7 +743,7 @@ public class EditorSymbol extends Editor
 
                     if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                     {
-                        ((Shape)renderNode.node).setFill(color);
+                        ((Shape)renderNode.RenderNode_Node).setFill(color);
                     }
                     else
                     {
@@ -753,7 +753,7 @@ public class EditorSymbol extends Editor
             }
 
             // Applying circle radius...
-            if (renderNode.node.getClass() == Circle.class)
+            if (renderNode.RenderNode_Node.getClass() == Circle.class)
             {
                 Integer circleBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "circleBox");
 
@@ -773,7 +773,7 @@ public class EditorSymbol extends Editor
 
                         if ((newRadius >= EDAmameController.Editor_CircleRadiusMin) && (newRadius <= EDAmameController.Editor_CircleRadiusMax))
                         {
-                            ((Circle)renderNode.node).setRadius(newRadius);
+                            ((Circle)renderNode.RenderNode_Node).setRadius(newRadius);
                         }
                         else
                         {
@@ -787,7 +787,7 @@ public class EditorSymbol extends Editor
                 }
             }
             // Applying rectangle width & height...
-            else if (renderNode.node.getClass() == Rectangle.class)
+            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
             {
                 Integer rectBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rectBox");
 
@@ -811,7 +811,7 @@ public class EditorSymbol extends Editor
 
                         if ((newWidth >= EDAmameController.Editor_RectWidthMin) && (newWidth <= EDAmameController.Editor_RectWidthMax))
                         {
-                            ((Rectangle) renderNode.node).setWidth(newWidth);
+                            ((Rectangle) renderNode.RenderNode_Node).setWidth(newWidth);
                         }
                         else
                         {
@@ -829,7 +829,7 @@ public class EditorSymbol extends Editor
 
                         if ((newHeight >= EDAmameController.Editor_RectHeightMin) && (newHeight <= EDAmameController.Editor_RectHeightMax))
                         {
-                            ((Rectangle)renderNode.node).setHeight(newHeight);
+                            ((Rectangle)renderNode.RenderNode_Node).setHeight(newHeight);
                         }
                         else
                         {
@@ -843,7 +843,7 @@ public class EditorSymbol extends Editor
                 }
             }
             // Applying triangle length...
-            else if (renderNode.node.getClass() == Polygon.class)
+            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
             {
                 Integer triBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "triBox");
 
@@ -863,7 +863,7 @@ public class EditorSymbol extends Editor
 
                         if ((newLen >= EDAmameController.Editor_TriLenMin) && (newLen <= EDAmameController.Editor_TriLenMax))
                         {
-                            ((Polygon)renderNode.node).getPoints().setAll(-newLen / 2, newLen / 2,
+                            ((Polygon)renderNode.RenderNode_Node).getPoints().setAll(-newLen / 2, newLen / 2,
                                                                            newLen / 2, newLen / 2,
                                                                            0.0, -newLen / 2);
                         }
@@ -878,12 +878,10 @@ public class EditorSymbol extends Editor
                     }
                 }
             }
-            else if (renderNode.node.getClass() != Label.class)
+            else if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
                 throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply Symbol Editor properties window!");
             }
-
-            this.Editor_RenderSystem.nodes.set(i, renderNode);
         }
     }
 

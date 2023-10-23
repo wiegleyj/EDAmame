@@ -8,8 +8,8 @@
 // TODO:
 // Implement line drawing in symbol editor
 // Implement line recognition into properties window
-// Fix occasional dragging not recognized
 // Bind highlighted & selected shapes sizes to main shape size
+// Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
 // Implement shape bounds highlight
 // Implement wire connection points into symbols
@@ -256,7 +256,7 @@ public class EDAmameController implements Initializable
 
                         renderNode.RenderNode_ShapeSelectedRefresh();
                         renderNode.RenderNode_ShapeHighlightedRefresh();
-                        Bounds bounds = renderNode.node.getBoundsInLocal();
+                        Bounds bounds = renderNode.RenderNode_Node.getBoundsInLocal();
 
                         if ((bounds.getWidth() != oldSize.GetLeftDouble()) && (bounds.getHeight() != oldSize.GetRightDouble()) ||
                             (loopsNum >= 5))

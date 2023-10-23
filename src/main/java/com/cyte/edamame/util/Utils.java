@@ -16,7 +16,7 @@ public class Utils
     static public Integer FindCanvasShape(LinkedList<RenderNode> nodes, String name)
     {
         for (int i = 0; i < nodes.size(); i++)
-            if (nodes.get(i).name.equals(name))
+            if (nodes.get(i).RenderNode_Name.equals(name))
                 return i;
 
         return -1;
