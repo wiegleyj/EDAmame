@@ -93,6 +93,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_TriLenMax = 500.0;
     final static public Double Editor_TextFontSizeMin = 10.0;
     final static public Double Editor_TextFontSizeMax = 100.0;
+    final static public Double Editor_LineSizeMin = 10.0;
+    final static public Double Editor_LineSizeMax = 100.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

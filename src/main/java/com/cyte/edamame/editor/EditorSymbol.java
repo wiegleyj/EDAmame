@@ -392,25 +392,29 @@ public class EditorSymbol extends Editor
                                 {
                                     double width = Double.parseDouble(stringWidth);
 
-                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                    if (((width >= EDAmameController.Editor_LineSizeMin) && (width <= EDAmameController.Editor_LineSizeMax)))
                                     {
-                                        this.EditorSymbol_LinePreview = new Line();
-                                        //this.EditorSymbol_LinePreview.setId("linePreview");
+                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
+                                            this.EditorSymbol_LinePreview = new Line();
+                                            //this.EditorSymbol_LinePreview.setId("linePreview");
 
-                                        this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
-                                        this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
-                                        this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
-                                        this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+                                            this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
+                                            this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
+                                            this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
+                                            this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
 
-                                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
-                                        this.EditorSymbol_LinePreview.setStroke(color);
+                                            this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                                            this.EditorSymbol_LinePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                            RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
+                                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                        } else {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                                        }
                                     }
                                     else
                                     {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_LineSizeMin + ", " + EDAmameController.Editor_LineSizeMax + ")");
                                     }
                                 }
                                 else
