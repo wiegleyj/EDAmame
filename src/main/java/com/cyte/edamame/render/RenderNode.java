@@ -30,8 +30,9 @@ public class RenderNode
     public boolean RenderNode_HighlightedBox;
     public boolean RenderNode_Selected;
     public PairMutable RenderNode_MousePressPos;
+    public boolean RenderNode_Passive;
 
-    public RenderNode(String nameValue, Node nodeValue)
+    public RenderNode(String nameValue, Node nodeValue, boolean passiveValue)
     {
         this.RenderNode_Name = nameValue;
         this.RenderNode_Node = nodeValue;
@@ -41,6 +42,7 @@ public class RenderNode
         this.RenderNode_HighlightedBox = false;
         this.RenderNode_Selected = false;
         this.RenderNode_MousePressPos = null;
+        this.RenderNode_Passive = passiveValue;
 
         // Creating highlighted & selected shapes...
         {
@@ -48,20 +50,21 @@ public class RenderNode
             this.RenderNode_ShapeHighlighted.setFill(Color.GRAY);
             this.RenderNode_ShapeHighlighted.setOpacity(0.5);
             this.RenderNode_ShapeHighlighted.setId(this.RenderNode_ID);
-            this.RenderNode_ShapeHighlighted.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
-            this.RenderNode_ShapeHighlighted.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
-            this.RenderNode_ShapeHighlighted.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
+            //this.RenderNode_ShapeHighlighted.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
+            //this.RenderNode_ShapeHighlighted.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
+            //this.RenderNode_ShapeHighlighted.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
 
             this.RenderNode_ShapeSelected = new Rectangle();
             this.RenderNode_ShapeSelected.setFill(Color.GRAY);
             this.RenderNode_ShapeSelected.setOpacity(0.5);
             this.RenderNode_ShapeSelected.setId(this.RenderNode_ID);
-            this.RenderNode_ShapeSelected.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
-            this.RenderNode_ShapeSelected.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
-            this.RenderNode_ShapeSelected.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
+            //this.RenderNode_ShapeSelected.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
+            //this.RenderNode_ShapeSelected.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
+            //this.RenderNode_ShapeSelected.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
         }
 
-        this.RenderNode_BoundsRefresh();
+        //RenderNode_ShapeHighlightedRefresh();
+        //RenderNode_ShapeSelectedRefresh();
     }
 
     public boolean RenderNode_PosOnNode(PairMutable pos)
@@ -71,55 +74,68 @@ public class RenderNode
 
     public void RenderNode_BoundsRefresh()
     {
-        if (this.RenderNode_Node.getClass() == Label.class)
+        /*if (this.RenderNode_Node.getClass() == Label.class)
         {
             Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
             EDAmameController.Controller_RenderShapesDelayedBoundsRefresh.add(new PairMutable(new PairMutable(this, 0), new PairMutable(bounds.getWidth(), bounds.getHeight())));
         }
         else
-        {
-            this.RenderNode_ShapeSelectedRefresh();
+        {*/
             this.RenderNode_ShapeHighlightedRefresh();
-        }
-    }
-
-    public void RenderNode_ShapeSelectedRefresh()
-    {
-        Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
-
-        if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
-            (this.RenderNode_Node.getClass() == Label.class))
-        {
-            this.RenderNode_ShapeHighlighted.setLayoutX(0);
-            this.RenderNode_ShapeHighlighted.setLayoutY(0);
-        }
-        else
-        {
-            this.RenderNode_ShapeHighlighted.setLayoutX(-bounds.getWidth() / 2);
-            this.RenderNode_ShapeHighlighted.setLayoutY(-bounds.getHeight() / 2);
-        }
-
-        this.RenderNode_ShapeHighlighted.setWidth(bounds.getWidth());
-        this.RenderNode_ShapeHighlighted.setHeight(bounds.getHeight());
+            this.RenderNode_ShapeSelectedRefresh();
+        //}
     }
 
     public void RenderNode_ShapeHighlightedRefresh()
     {
-        Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
+        Bounds boundsReal = this.RenderNode_Node.getBoundsInParent();
+
+        this.RenderNode_ShapeHighlighted.setTranslateX(boundsReal.getMinX());
+        this.RenderNode_ShapeHighlighted.setTranslateY(boundsReal.getMinY());
+
+        this.RenderNode_ShapeHighlighted.setWidth(boundsReal.getWidth());
+        this.RenderNode_ShapeHighlighted.setHeight(boundsReal.getHeight());
+    }
+
+    public void RenderNode_ShapeSelectedRefresh()
+    {
+        Bounds boundsLocal = this.RenderNode_Node.getBoundsInLocal();
+        Bounds boundsReal = this.RenderNode_Node.getBoundsInParent();
+        PairMutable posReal = new PairMutable((boundsReal.getMinX() + boundsReal.getMaxX()) / 2,
+                                              (boundsReal.getMinY() + boundsReal.getMaxY()) / 2);
 
         if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
             (this.RenderNode_Node.getClass() == Label.class))
+        {
+            this.RenderNode_ShapeSelected.setTranslateX(posReal.GetLeftDouble());
+            this.RenderNode_ShapeSelected.setTranslateY(posReal.GetRightDouble());
+        }
+        else
+        {
+            this.RenderNode_ShapeSelected.setTranslateX(posReal.GetLeftDouble() - boundsLocal.getWidth() / 2);
+            this.RenderNode_ShapeSelected.setTranslateY(posReal.GetRightDouble() - boundsLocal.getHeight() / 2);
+        }
+
+        this.RenderNode_ShapeSelected.setRotate(this.RenderNode_Node.getRotate());
+
+        this.RenderNode_ShapeSelected.setWidth(boundsLocal.getWidth());
+        this.RenderNode_ShapeSelected.setHeight(boundsLocal.getHeight());
+
+        /*Bounds boundsLocal = this.RenderNode_Node.getBoundsInLocal();
+
+        if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
+                (this.RenderNode_Node.getClass() == Label.class))
         {
             this.RenderNode_ShapeSelected.setLayoutX(0);
             this.RenderNode_ShapeSelected.setLayoutY(0);
         }
         else
         {
-            this.RenderNode_ShapeSelected.setLayoutX(-bounds.getWidth() / 2);
-            this.RenderNode_ShapeSelected.setLayoutY(-bounds.getHeight() / 2);
+            this.RenderNode_ShapeSelected.setLayoutX(-boundsLocal.getWidth() / 2);
+            this.RenderNode_ShapeSelected.setLayoutY(-boundsLocal.getHeight() / 2);
         }
 
-        this.RenderNode_ShapeSelected.setWidth(bounds.getWidth());
-        this.RenderNode_ShapeSelected.setHeight(bounds.getHeight());
+        this.RenderNode_ShapeSelected.setWidth(boundsLocal.getWidth());
+        this.RenderNode_ShapeSelected.setHeight(boundsLocal.getHeight());*/
     }
 }

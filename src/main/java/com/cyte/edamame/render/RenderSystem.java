@@ -182,7 +182,7 @@ public class RenderSystem
         return new PairMutable(this.RenderSystem_PaneHolder.getTranslateX(), this.RenderSystem_PaneHolder.getTranslateY());
     }
 
-    //// SHAPE FUNCTIONS ////
+    //// NODE FUNCTIONS ////
 
     public void RenderSystem_NodeAdd(RenderNode renderNode)
     {
@@ -191,6 +191,38 @@ public class RenderSystem
 
         this.RenderSystem_Nodes.add(renderNode);
         this.RenderSystem_PaneHolder.getChildren().add(1, renderNode.RenderNode_Node);
+    }
+
+    public RenderNode RenderSystem_NodeRemove(String name)
+    {
+        System.out.println(name);
+
+        for (int i = 0; i < this.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.RenderSystem_Nodes.get(i);
+
+            if (renderNode.RenderNode_Name.equals(name))
+            {
+                this.RenderSystem_Nodes.remove(renderNode);
+                this.RenderSystem_PaneHolder.getChildren().remove(renderNode.RenderNode_Node);
+
+                if (renderNode.RenderNode_Highlighted)
+                {
+                    this.RenderSystem_PaneHighlights.getChildren().remove(renderNode.RenderNode_ShapeHighlighted);
+                    renderNode.RenderNode_Highlighted = false;
+                }
+
+                if (renderNode.RenderNode_Selected)
+                {
+                    this.RenderSystem_PaneSelections.getChildren().remove(renderNode.RenderNode_ShapeSelected);
+                    renderNode.RenderNode_Selected = false;
+                }
+
+                return renderNode;
+            }
+        }
+
+        return null;
     }
 
     public void RenderSystem_NodeHighlightsRemove(RenderNode renderNode)

@@ -30,7 +30,7 @@ public class EditorFootprint extends Editor
     @FXML
     private Button EditorFootprint_InnerButton;
 
-    public static Editor create() throws IOException
+    public static Editor EditorFootprint_Create() throws IOException
     {
         // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorFootprint.fxml"));
@@ -78,7 +78,7 @@ public class EditorFootprint extends Editor
         System.out.println("Footprint mouse released!");
     }
 
-    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event)
     {
         System.out.println("Footprint mouse dragged!");
     }

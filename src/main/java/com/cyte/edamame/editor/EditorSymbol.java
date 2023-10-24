@@ -60,10 +60,6 @@ public class EditorSymbol extends Editor
     @FXML
     public ColorPicker EditorSymbol_LineColor;
 
-    // DO NOT EDIT
-
-    public Line EditorSymbol_LinePreview = null;
-
     //// MAIN FUNCTIONS ////
 
     /**
@@ -71,7 +67,7 @@ public class EditorSymbol extends Editor
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    static public Editor create() throws IOException
+    static public Editor EditorSymbol_Create() throws IOException
     {
         // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
@@ -206,13 +202,6 @@ public class EditorSymbol extends Editor
     {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
-
-        // Handling line drawing preview...
-        if (this.EditorSymbol_LinePreview != null)
-        {
-            this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
-            this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
-        }
     }
 
     public void Editor_OnMousePressedSpecific(MouseEvent event)
@@ -293,7 +282,7 @@ public class EditorSymbol extends Editor
                                         circle.setTranslateX(dropPos.GetLeftDouble());
                                         circle.setTranslateY(dropPos.GetRightDouble());
 
-                                        RenderNode renderNode = new RenderNode("Circle", circle);
+                                        RenderNode renderNode = new RenderNode("Circle", circle, false);
                                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                     }
                                     else
@@ -332,7 +321,7 @@ public class EditorSymbol extends Editor
                                         rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
                                         rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
 
-                                        RenderNode renderNode = new RenderNode("Rectangle", rectangle);
+                                        RenderNode renderNode = new RenderNode("Rectangle", rectangle, false);
                                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                     }
                                     else
@@ -373,7 +362,7 @@ public class EditorSymbol extends Editor
                                         triangle.setTranslateX(dropPos.GetLeftDouble());
                                         triangle.setTranslateY(dropPos.GetRightDouble());
 
-                                        RenderNode renderNode = new RenderNode("Triangle", triangle);
+                                        RenderNode renderNode = new RenderNode("Triangle", triangle, false);
                                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                     }
                                     else
@@ -406,10 +395,7 @@ public class EditorSymbol extends Editor
                                     if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                                     {
                                         this.EditorSymbol_LinePreview = new Line();
-                                        this.EditorSymbol_LinePreview.setId("linePreview");
-
-                                        RenderNode renderNode = new RenderNode("linePreview", EditorSymbol_LinePreview);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                        //this.EditorSymbol_LinePreview.setId("linePreview");
 
                                         this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
                                         this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
@@ -418,6 +404,9 @@ public class EditorSymbol extends Editor
 
                                         this.EditorSymbol_LinePreview.setStrokeWidth(width);
                                         this.EditorSymbol_LinePreview.setStroke(color);
+
+                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
+                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                     }
                                     else
                                     {
@@ -432,17 +421,19 @@ public class EditorSymbol extends Editor
                             // If we're finishing the line drawing...
                             else
                             {
-                                System.out.println("bruh");
+                                PairMutable posStart = new PairMutable(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY());
+                                PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
 
-                                Line line = new Line(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY(),
-                                                     dropPos.GetLeftDouble(), dropPos.GetRightDouble());
+                                Line line = new Line();
+                                this.Editor_LineDropPosCalculate(line, posStart, posEnd);
+
                                 line.setStroke(this.EditorSymbol_LinePreview.getStroke());
                                 line.setStrokeWidth(this.EditorSymbol_LinePreview.getStrokeWidth());
 
-                                RenderNode renderNode = new RenderNode("Line", line);
-                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                this.Editor_LinePreviewRemove();
 
-                                this.EditorSymbol_LinePreview = null;
+                                RenderNode renderNode = new RenderNode("Line", line, false);
+                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
                         }
                         else if (selectedShapeButton.getText().equals("Text"))
@@ -469,7 +460,7 @@ public class EditorSymbol extends Editor
                                             text.setTranslateX(dropPos.GetLeftDouble());
                                             text.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Text", text);
+                                            RenderNode renderNode = new RenderNode("Text", text, false);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -508,7 +499,7 @@ public class EditorSymbol extends Editor
         {}
     }
 
-    public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event)
     {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
@@ -523,9 +514,7 @@ public class EditorSymbol extends Editor
     }
 
     public void Editor_OnScrollSpecific(ScrollEvent event)
-    {
-
-    }
+    {}
 
     public void Editor_OnKeyPressedSpecific(KeyEvent event)
     {
@@ -551,11 +540,7 @@ public class EditorSymbol extends Editor
     }
 
     public void Editor_OnKeyReleasedSpecific(KeyEvent event)
-    {
-        //System.out.println("Symbol key released!");
-
-        //KeyCode releasedKey = event.getCode();
-    }
+    {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
@@ -572,6 +557,9 @@ public class EditorSymbol extends Editor
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
         LinkedList<Double> trisLens = new LinkedList<Double>();
+        LinkedList<PairMutable> lineStartPos = new LinkedList<PairMutable>();
+        LinkedList<PairMutable> lineEndPos = new LinkedList<PairMutable>();
+        LinkedList<Double> lineWidths = new LinkedList<Double>();
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++) {
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
@@ -581,7 +569,15 @@ public class EditorSymbol extends Editor
 
             if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
-                shapesColor.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
+                if (renderNode.RenderNode_Node.getClass() == Line.class)
+                {
+                    shapesColor.add((Color)((Line)renderNode.RenderNode_Node).getStroke());
+                }
+                else
+                {
+                    shapesColor.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
+                }
+
                 needHeader = true;
             }
 
@@ -597,6 +593,12 @@ public class EditorSymbol extends Editor
             else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
             {
                 trisLens.add(((Polygon)renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon)renderNode.RenderNode_Node).getPoints().get(0));
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
+                lineStartPos.add(new PairMutable(((Line)renderNode.RenderNode_Node).getStartX(), ((Line)renderNode.RenderNode_Node).getStartY()));
+                lineEndPos.add(new PairMutable(((Line)renderNode.RenderNode_Node).getEndX(), ((Line)renderNode.RenderNode_Node).getEndY()));
+                lineWidths.add(((Line)renderNode.RenderNode_Node).getStrokeWidth());
             }
             else if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
@@ -703,6 +705,12 @@ public class EditorSymbol extends Editor
 
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(triLenHBox);
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+        }
+
+        // Creating line box...
+        if (!lineStartPos.isEmpty() && !lineEndPos.isEmpty() && !lineWidths.isEmpty())
+        {
+            // TODO
         }
     }
 

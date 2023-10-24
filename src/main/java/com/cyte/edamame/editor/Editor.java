@@ -78,6 +78,7 @@ public abstract class Editor
     public boolean Editor_PressedRMB = false;
     public Double Editor_Zoom = 1.0;
     public PairMutable Editor_MouseDragFirstPos = null;
+    public PairMutable Editor_MouseDragDiffPos = null;
     public Long Editor_MouseDragLastTime = System.nanoTime();
     public PairMutable Editor_MouseDragFirstCenter = null;
     public boolean Editor_MouseDragReachedEdge = false;
@@ -87,6 +88,7 @@ public abstract class Editor
     public boolean Editor_ShapesMoving = false;
     public boolean Editor_PressedOnShape = false;
     public Rectangle Editor_SelectionBox = null;
+    public Line EditorSymbol_LinePreview = null;
 
     //// MAIN FUNCTIONS ////
 
@@ -117,14 +119,25 @@ public abstract class Editor
         if ((this.Editor_Type == -1) || (this.Editor_Name == null))
             throw new java.lang.Error("ERROR: Attempting to run editor without initializing it!");
 
+        // Handling render node highlight & selected shapes refreshing...
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            if (renderNode.RenderNode_Passive)
+                continue;
+
+            renderNode.RenderNode_BoundsRefresh();
+        }
+
         // Handling centering of holder pane & crosshair...
         {
             PairMutable canvasSize = new PairMutable(this.Editor_RenderSystem.RenderSystem_Canvas.getWidth(),
-                    this.Editor_RenderSystem.RenderSystem_Canvas.getHeight());
+                                                     this.Editor_RenderSystem.RenderSystem_Canvas.getHeight());
             PairMutable paneSize = new PairMutable(this.Editor_RenderSystem.RenderSystem_PaneListener.getWidth(),
-                    this.Editor_RenderSystem.RenderSystem_PaneListener.getHeight());
+                                                   this.Editor_RenderSystem.RenderSystem_PaneListener.getHeight());
             PairMutable centeredPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
-                    paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
+                                                      paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
             this.Editor_RenderSystem.RenderSystem_PaneHolder.setLayoutX(centeredPos.GetLeftDouble());
             this.Editor_RenderSystem.RenderSystem_PaneHolder.setLayoutY(centeredPos.GetRightDouble());
@@ -132,6 +145,11 @@ public abstract class Editor
             this.Editor_RenderSystem.RenderSystem_Crosshair.setTranslateX(this.Editor_RenderSystem.RenderSystem_PaneListener.getWidth() / 2);
             this.Editor_RenderSystem.RenderSystem_Crosshair.setTranslateY(this.Editor_RenderSystem.RenderSystem_PaneListener.getHeight() / 2);
         }
+
+        //for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        //    System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node.getBoundsInParent().toString());
+
+        //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
     }
 
     //// GETTER FUNCTIONS ////
@@ -156,12 +174,42 @@ public abstract class Editor
 
     //// RENDER FUNCTIONS ////
 
+    public void Editor_LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
+    {
+        PairMutable posAvg = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2, (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
+
+        line.setStartX(posStart.GetLeftDouble() - posAvg.GetLeftDouble());
+        line.setStartY(posStart.GetRightDouble() - posAvg.GetRightDouble());
+        line.setEndX(posEnd.GetLeftDouble() - posAvg.GetLeftDouble());
+        line.setEndY(posEnd.GetRightDouble() - posAvg.GetRightDouble());
+
+        line.setTranslateX(posAvg.GetLeftDouble());
+        line.setTranslateY(posAvg.GetRightDouble());
+    }
+
+    public void Editor_LinePreviewUpdate(PairMutable dropPos)
+    {
+        this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
+        this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+    }
+
+    public void Editor_LinePreviewRemove()
+    {
+        this.Editor_RenderSystem.RenderSystem_NodeRemove("linePreview");
+        this.EditorSymbol_LinePreview = null;
+    }
+
     public void Editor_NodeHighlightsCheck(PairMutable posEvent)
     {
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
             PairMutable posMouse = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            if (renderNode.RenderNode_Passive)
+                continue;
+
+            //renderNode.RenderNode_ShapeHighlightedRefresh();
             boolean onShape = renderNode.RenderNode_PosOnNode(posMouse);
 
             // Checking whether we are highlighting by cursor...
@@ -255,6 +303,34 @@ public abstract class Editor
         }
     }
 
+    public void Editor_MouseDragUpdate(PairMutable posMouse)
+    {
+        this.Editor_MouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.Editor_MouseDragFirstPos.GetLeftDouble()) * this.Editor_MouseDragFactor / this.Editor_Zoom,
+                                                       (posMouse.GetRightDouble() - this.Editor_MouseDragFirstPos.GetRightDouble()) * this.Editor_MouseDragFactor / this.Editor_Zoom);
+    }
+
+    public void Editor_MouseDragReset(PairMutable posMouse)
+    {
+        this.Editor_MouseDragFirstPos = new PairMutable(posMouse);
+        this.Editor_MouseDragFirstCenter = new PairMutable(this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble(),
+                                                           this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble());
+        this.Editor_MouseDragPaneFirstPos = new PairMutable(this.Editor_RenderSystem.RenderSystem_PaneGetTranslate());
+
+        if (this.Editor_ShapesSelected > 0)
+        {
+            for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+            {
+                RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+                if (!renderNode.RenderNode_Selected)
+                    continue;
+
+                renderNode.RenderNode_MousePressPos = new PairMutable(renderNode.RenderNode_Node.getTranslateX(),
+                                                                      renderNode.RenderNode_Node.getTranslateY());
+            }
+        }
+    }
+
     //// CALLBACK FUNCTIONS ////
 
     public void Editor_OnDragOverGlobal(DragEvent event)
@@ -268,8 +344,15 @@ public abstract class Editor
 
     public void Editor_OnMouseMovedGlobal(MouseEvent event)
     {
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
+
         // Handling shape highlights
         this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+
+        // Handling line drawing preview...
+        if (this.EditorSymbol_LinePreview != null)
+            this.Editor_LinePreviewUpdate(dropPos);
     }
 
     public void Editor_OnMousePressedGlobal(MouseEvent event)
@@ -296,8 +379,9 @@ public abstract class Editor
     {
         if (this.Editor_PressedLMB)
         {
-            // Handling shape selection (only if we're not moving any shapes)
-            if (!this.Editor_ShapesMoving)
+            // Handling shape selection (only if we're not moving any shapes or drawing any lines)
+            if (!this.Editor_ShapesMoving &&
+                (this.EditorSymbol_LinePreview == null))
             {
                 for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
                 {
@@ -357,15 +441,24 @@ public abstract class Editor
         this.Editor_PressedRMB = false;
     }
 
-    public void Editor_OnMouseDraggedGlobal(MouseEvent event, PairMutable mouseDiffPos)
+    public void Editor_OnMouseDraggedGlobal(MouseEvent event)
     {
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
+
         // Handling shape highlights
         this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
 
+        // Handling line drawing preview...
+        if (this.EditorSymbol_LinePreview != null)
+            this.Editor_LinePreviewUpdate(dropPos);
+
         if (this.Editor_PressedLMB)
         {
-            // Handling moving of the shapes (only if we have some shapes selected & we're not holding the box selection key)
-            if ((this.Editor_ShapesSelected > 0) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
+            // Handling moving of the shapes (only if we have some shapes selected, we're not holding the box selection key and we're not drawing any lines)
+            if ((this.Editor_ShapesSelected > 0) &&
+                !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT) &&
+                (this.EditorSymbol_LinePreview == null))
             {
                 for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
                 {
@@ -374,26 +467,29 @@ public abstract class Editor
                     if (!renderNode.RenderNode_Selected)
                         continue;
 
-                    PairMutable posPressReal = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(new PairMutable(renderNode.RenderNode_MousePressPos.GetLeftDouble(), renderNode.RenderNode_MousePressPos.GetRightDouble()));
+                    PairMutable posPressReal = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(new PairMutable(renderNode.RenderNode_MousePressPos.GetLeftDouble(),
+                                                                                                                          renderNode.RenderNode_MousePressPos.GetRightDouble()));
                     PairMutable edgeOffset = new PairMutable(0.0, 0.0);
 
-                    if ((posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
-                        edgeOffset.left = -(posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
-                    if ((posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble()) > EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
-                        edgeOffset.left = -(posPressReal.GetLeftDouble() + mouseDiffPos.GetLeftDouble() - EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
-                    if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) < -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
-                        edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-                    if ((posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
-                        edgeOffset.right = -(posPressReal.GetRightDouble() + mouseDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+                    if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
+                        edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
+                    if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) > EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
+                        edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() - EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
+                    if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) < -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
+                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+                    if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
+                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
 
-                    renderNode.RenderNode_Node.setTranslateX(renderNode.RenderNode_MousePressPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
-                    renderNode.RenderNode_Node.setTranslateY(renderNode.RenderNode_MousePressPos.GetRightDouble() + mouseDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
+                    renderNode.RenderNode_Node.setTranslateX(renderNode.RenderNode_MousePressPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
+                    renderNode.RenderNode_Node.setTranslateY(renderNode.RenderNode_MousePressPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
                 }
 
                 this.Editor_ShapesMoving = true;
             }
-            // Handling the box selection (only if we have no shapes selected and we are not moving the viewport)
-            else
+
+            // Handling the box selection (only if we have no shapes selected, we are not moving the viewport and we're not drawing any lines)
+            if ((this.Editor_ShapesSelected == 0) &&
+                (this.EditorSymbol_LinePreview == null))
             {
                 if (this.Editor_SelectionBox == null)
                 {
@@ -406,18 +502,18 @@ public abstract class Editor
                 }
 
                 // Adjusting if the width & height are negative...
-                if (mouseDiffPos.GetLeftDouble() < 0)
-                    this.Editor_SelectionBox.setTranslateX(this.Editor_MouseDragFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor);
+                if (this.Editor_MouseDragDiffPos.GetLeftDouble() < 0)
+                    this.Editor_SelectionBox.setTranslateX(this.Editor_MouseDragFirstPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor);
                 else
                     this.Editor_SelectionBox.setTranslateX(this.Editor_MouseDragFirstPos.GetLeftDouble());
 
-                if (mouseDiffPos.GetRightDouble() < 0)
-                    this.Editor_SelectionBox.setTranslateY(this.Editor_MouseDragFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor);
+                if (this.Editor_MouseDragDiffPos.GetRightDouble() < 0)
+                    this.Editor_SelectionBox.setTranslateY(this.Editor_MouseDragFirstPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor);
                 else
                     this.Editor_SelectionBox.setTranslateY(this.Editor_MouseDragFirstPos.GetRightDouble());
 
-                this.Editor_SelectionBox.setWidth(Math.abs(mouseDiffPos.GetLeftDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor));
-                this.Editor_SelectionBox.setHeight(Math.abs(mouseDiffPos.GetRightDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor));
+                this.Editor_SelectionBox.setWidth(Math.abs(this.Editor_MouseDragDiffPos.GetLeftDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor));
+                this.Editor_SelectionBox.setHeight(Math.abs(this.Editor_MouseDragDiffPos.GetRightDouble() * this.Editor_Zoom / this.Editor_MouseDragFactor));
             }
         }
         else if (this.Editor_PressedRMB)
@@ -426,40 +522,40 @@ public abstract class Editor
             {
                 this.Editor_MouseDragReachedEdge = false;
 
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (mouseDiffPos.GetLeftDouble() < 0))
+                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() < 0))
                 {
-                    mouseDiffPos.left = mouseDiffPos.GetLeftDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble()));
+                    this.Editor_MouseDragDiffPos.left = this.Editor_MouseDragDiffPos.GetLeftDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()));
                     this.Editor_MouseDragReachedEdge = true;
                 }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (mouseDiffPos.GetLeftDouble() > 0))
+                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() > 0))
                 {
-                    mouseDiffPos.left = mouseDiffPos.GetLeftDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble()));
+                    this.Editor_MouseDragDiffPos.left = this.Editor_MouseDragDiffPos.GetLeftDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()));
                     this.Editor_MouseDragReachedEdge = true;
                 }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (mouseDiffPos.GetRightDouble() < 0))
+                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (this.Editor_MouseDragDiffPos.GetRightDouble() < 0))
                 {
-                    mouseDiffPos.right = mouseDiffPos.GetRightDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble()));
+                    this.Editor_MouseDragDiffPos.right = this.Editor_MouseDragDiffPos.GetRightDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()));
                     this.Editor_MouseDragReachedEdge = true;
                 }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (mouseDiffPos.GetRightDouble() > 0))
+                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (this.Editor_MouseDragDiffPos.GetRightDouble() > 0))
                 {
-                    mouseDiffPos.right = mouseDiffPos.GetRightDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble()));
+                    this.Editor_MouseDragDiffPos.right = this.Editor_MouseDragDiffPos.GetRightDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()));
                     this.Editor_MouseDragReachedEdge = true;
                 }
 
-                this.Editor_RenderSystem.RenderSystem_Center.left = this.Editor_MouseDragFirstCenter.GetLeftDouble() + mouseDiffPos.GetLeftDouble();
-                this.Editor_RenderSystem.RenderSystem_Center.right = this.Editor_MouseDragFirstCenter.GetRightDouble() + mouseDiffPos.GetRightDouble();
+                this.Editor_RenderSystem.RenderSystem_Center.left = this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble();
+                this.Editor_RenderSystem.RenderSystem_Center.right = this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble();
 
-                this.Editor_RenderSystem.RenderSystem_PaneSetTranslate(new PairMutable(this.Editor_MouseDragPaneFirstPos.GetLeftDouble() + mouseDiffPos.GetLeftDouble() * this.Editor_Zoom,
-                                                                                       this.Editor_MouseDragPaneFirstPos.GetRightDouble() + mouseDiffPos.GetRightDouble() * this.Editor_Zoom));
+                this.Editor_RenderSystem.RenderSystem_PaneSetTranslate(new PairMutable(this.Editor_MouseDragPaneFirstPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() * this.Editor_Zoom,
+                                                                                       this.Editor_MouseDragPaneFirstPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() * this.Editor_Zoom));
             }
         }
     }
 
     public void Editor_OnScrollGlobal(ScrollEvent event)
     {
-        // Handling shape highlights
-        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
         // Handling shape rotation (only if we have shapes selected and R is pressed)
         if ((this.Editor_ShapesSelected > 0) && EDAmameController.Controller_IsKeyPressed(KeyCode.R))
@@ -498,11 +594,18 @@ public abstract class Editor
 
             this.Editor_RenderSystem.RenderSystem_PaneSetScale(new PairMutable(this.Editor_Zoom, this.Editor_Zoom), true);
         }
+
+        // Handling shape highlights
+        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+
+        // Handling line drawing preview...
+        if (this.EditorSymbol_LinePreview != null)
+            this.Editor_LinePreviewUpdate(dropPos);
     }
 
     public void Editor_OnKeyPressedGlobal(KeyEvent event)
     {
-        // Handling shape deletion
+        // Handling shape deletion...
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.BACK_SPACE) || EDAmameController.Controller_IsKeyPressed(KeyCode.DELETE))
         {
             if (this.Editor_ShapesSelected > 0)
@@ -530,6 +633,10 @@ public abstract class Editor
                 }
             }
         }
+
+        // Handling line drawing interruption...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.ESCAPE) && (this.EditorSymbol_LinePreview != null))
+            Editor_LinePreviewRemove();
     }
 
     public void Editor_OnKeyReleasedGlobal(KeyEvent event)
@@ -540,7 +647,7 @@ public abstract class Editor
     abstract public void Editor_OnMouseMovedSpecific(MouseEvent event);
     abstract public void Editor_OnMousePressedSpecific(MouseEvent event);
     abstract public void Editor_OnMouseReleasedSpecific(MouseEvent event);
-    abstract public void Editor_OnMouseDraggedSpecific(MouseEvent event, PairMutable mouseDiffPos);
+    abstract public void Editor_OnMouseDraggedSpecific(MouseEvent event);
     abstract public void Editor_OnScrollSpecific(ScrollEvent event);
     abstract public void Editor_OnKeyPressedSpecific(KeyEvent event);
     abstract public void Editor_OnKeyReleasedSpecific(KeyEvent event);
@@ -583,6 +690,12 @@ public abstract class Editor
 
         // When we press down the mouse...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnMousePressed(event -> {
+            // Updating the current mouse drag positions
+            PairMutable posMouse = new PairMutable(event.getX(), event.getY());
+
+            if ((this.Editor_MouseDragFirstPos == null) || this.Editor_MouseDragReachedEdge)
+                this.Editor_MouseDragReset(posMouse);
+
             // Handling global callback actions
             this.Editor_OnMousePressedGlobal(event);
 
@@ -609,38 +722,21 @@ public abstract class Editor
             if (((System.nanoTime() - this.Editor_MouseDragLastTime) / 1e9) < this.Editor_MouseDragCheckTimeout)
                 return;
 
-            // Acquiring the current mouse & diff positions
-            PairMutable posMouse = new PairMutable(event.getX(), event.getY());
-
-            if ((this.Editor_MouseDragFirstPos == null) || this.Editor_MouseDragReachedEdge)
+            // Updating the current mouse drag positions
             {
-                this.Editor_MouseDragFirstPos = new PairMutable(posMouse);
-                this.Editor_MouseDragFirstCenter = new PairMutable(this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble(),
-                                                                                this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble());
-                this.Editor_MouseDragPaneFirstPos = new PairMutable(this.Editor_RenderSystem.RenderSystem_PaneGetTranslate());
+                PairMutable posMouse = new PairMutable(event.getX(), event.getY());
 
-                if (this.Editor_ShapesSelected > 0)
-                {
-                    for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-                    {
-                        RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+                if ((this.Editor_MouseDragFirstPos == null) || this.Editor_MouseDragReachedEdge)
+                    this.Editor_MouseDragReset(posMouse);
 
-                        if (!renderNode.RenderNode_Selected)
-                            continue;
-
-                        renderNode.RenderNode_MousePressPos = new PairMutable(new PairMutable(renderNode.RenderNode_Node.getTranslateX(), renderNode.RenderNode_Node.getTranslateY()));
-                    }
-                }
+                this.Editor_MouseDragUpdate(posMouse);
             }
 
-            PairMutable mouseDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.Editor_MouseDragFirstPos.GetLeftDouble()) * this.Editor_MouseDragFactor / this.Editor_Zoom,
-                                                       (posMouse.GetRightDouble() - this.Editor_MouseDragFirstPos.GetRightDouble()) * this.Editor_MouseDragFactor / this.Editor_Zoom);
-
             // Handling editor-specific callback actions
-            this.Editor_OnMouseDraggedSpecific(event, mouseDiffPos);
+            this.Editor_OnMouseDraggedSpecific(event);
 
             // Handling global callback actions
-            this.Editor_OnMouseDraggedGlobal(event, mouseDiffPos);
+            this.Editor_OnMouseDraggedGlobal(event);
 
             this.Editor_MouseDragLastTime = System.nanoTime();
 

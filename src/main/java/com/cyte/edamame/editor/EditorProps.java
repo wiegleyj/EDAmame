@@ -103,7 +103,8 @@ public class EditorProps
 
         // Refreshing all highlighted & selected shapes...
         for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-            this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_BoundsRefresh();
+            this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_ShapeSelectedRefresh();
+            //this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_BoundsRefresh();
     }
 
     @FXML

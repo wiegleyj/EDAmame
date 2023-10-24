@@ -16,9 +16,9 @@ public class EditorFactory
         switch (key)
         {
             case "SymbolEditor":
-                return EditorSymbol.create();
+                return EditorSymbol.EditorSymbol_Create();
             case "FootprintEditor":
-                return EditorFootprint.create();
+                return EditorFootprint.EditorFootprint_Create();
             default:
                 throw new java.lang.Error("ERROR: Invalid editor key: " + key);
         }

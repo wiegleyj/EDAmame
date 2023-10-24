@@ -9,10 +9,8 @@
 // Implement line drawing in symbol editor (with magnetic snapping)
 // Implement line recognition into properties window
 // Implement line drawing width global limits
-// Bind highlighted & selected shapes sizes to main shape size
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
-// Implement shape bounds highlight
 // Implement wire connection points into symbols
 // Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
@@ -127,7 +125,7 @@ public class EDAmameController implements Initializable
     static public EditorProps Controller_EditorPropertiesWindow = null;
     static public LinkedList<KeyCode> Controller_PressedKeys = new LinkedList<KeyCode>();
     static public Label Controller_StatusBarGlobal;
-    static public LinkedList<PairMutable> Controller_RenderShapesDelayedBoundsRefresh = new LinkedList<PairMutable>();
+    //static public LinkedList<PairMutable> Controller_RenderShapesDelayedBoundsRefresh = new LinkedList<PairMutable>();
 
     //// MAIN FUNCTIONS ////
 
@@ -243,7 +241,7 @@ public class EDAmameController implements Initializable
                 editor.Editor_Heartbeat();
 
                 // Handling delayed bound node setting...
-                if (!Controller_RenderShapesDelayedBoundsRefresh.isEmpty())
+                /*if (!Controller_RenderShapesDelayedBoundsRefresh.isEmpty())
                 {
                     if (Controller_RenderShapesDelayedBoundsRefresh.size() >= 100)
                         throw new java.lang.Error("ERROR: Too many items in \"Controller_NodesDelayedCalcBounds\"!");
@@ -256,8 +254,9 @@ public class EDAmameController implements Initializable
                         Integer loopsNum = curr.GetLeftPair().GetRightInteger();
                         PairMutable oldSize = curr.GetRightPair();
 
-                        renderNode.RenderNode_ShapeSelectedRefresh();
                         renderNode.RenderNode_ShapeHighlightedRefresh();
+                        renderNode.RenderNode_ShapeSelectedRefresh();
+
                         Bounds bounds = renderNode.RenderNode_Node.getBoundsInLocal();
 
                         if ((bounds.getWidth() != oldSize.GetLeftDouble()) && (bounds.getHeight() != oldSize.GetRightDouble()) ||
@@ -271,7 +270,7 @@ public class EDAmameController implements Initializable
                             curr.GetLeftPair().right = loopsNum + 1;
                         }
                     }
-                }
+                }*/
 
                 //System.out.println(editor.Editor_RenderSystem.shapesHighlighted);
                 //System.out.println(editor.Editor_RenderSystem.shapesSelected);
