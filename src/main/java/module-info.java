@@ -12,6 +12,7 @@ module com.cyte.edamame {
     requires java.prefs;
     requires com.fasterxml.jackson.annotation;
     requires com.fasterxml.jackson.databind;
+    requires org.yaml.snakeyaml;
 
 
     opens com.cyte.edamame to javafx.fxml, javafx.graphics;

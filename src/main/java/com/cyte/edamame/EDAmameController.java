@@ -121,7 +121,7 @@ public class EDAmameController implements Initializable
 
     // DO NOT EDIT
 
-    final private Stage Controller_Stage;                                                              // The stage hosting this controller.
+    public final Stage Controller_Stage;                                                              // The stage hosting this controller.
     public Timeline Editor_HeartbeatTimeline;
     private final ObservableMap<Tab, Editor> Controller_Editors = FXCollections.observableHashMap();   // All editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
     static public EditorProps Controller_EditorPropertiesWindow = null;

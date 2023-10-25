@@ -6,11 +6,14 @@
  */
 
 package com.cyte.edamame.editor;
+import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.LinkedList;
 
 import javafx.fxml.*;
@@ -21,6 +24,12 @@ import javafx.scene.shape.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
+
+import java.io.File;
+
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.IOException;
 
@@ -889,6 +898,31 @@ public class EditorSymbol extends Editor
             {
                 throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply Symbol Editor properties window!");
             }
+        }
+    }
+
+    @FXML
+    public void Editor_SaveSymbol() throws IOException
+    {
+        LinkedList<Node> shapes = new LinkedList<Node>();
+
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+            shapes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save Symbol");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("YAML File", "*.yaml"));
+        fileChooser.setInitialFileName("symbol.yaml");
+        File file = fileChooser.showSaveDialog(EDAmameApplication.App_Controller.Controller_Stage);
+
+        if (file == null)
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to save symbol because the file directory is empty!");
+        }
+        else {
+            Yaml yaml = new Yaml();
+            FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
+            yaml.dump(shapes, fileWriter);
         }
     }
 
