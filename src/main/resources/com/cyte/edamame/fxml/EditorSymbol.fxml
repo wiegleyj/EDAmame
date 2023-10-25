@@ -25,7 +25,7 @@
     <MenuBar>
         <Menu text="STATIC_1">
             <MenuItem id="1" mnemonicParsing="false" onAction="#Editor_SaveSymbol" text="Save Symbol" />
-         <MenuItem id="2" mnemonicParsing="false" text="Load Symbol" />
+         <MenuItem id="2" mnemonicParsing="false" onAction="#Editor_LoadSymbol" text="Load Symbol" />
         </Menu>
       <Menu text="STATIC_2">
          <items>
