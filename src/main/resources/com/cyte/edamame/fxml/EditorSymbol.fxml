@@ -24,8 +24,8 @@
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorSymbol">
     <MenuBar>
         <Menu text="STATIC_1">
-            <MenuItem id="1" mnemonicParsing="false" onAction="#Editor_SaveSymbol" text="Save Symbol" />
-         <MenuItem id="2" mnemonicParsing="false" onAction="#Editor_LoadSymbol" text="Load Symbol" />
+            <MenuItem id="1" mnemonicParsing="false" onAction="#EditorSymbol_Save" text="Save Symbol" />
+         <MenuItem id="2" mnemonicParsing="false" onAction="#EditorSymbol_Load" text="Load Symbol" />
         </Menu>
       <Menu text="STATIC_2">
          <items>

@@ -13,6 +13,24 @@ import java.util.*;
 
 public class Utils
 {
+    static public Double GetDist(PairMutable pointA, PairMutable pointB)
+    {
+        return Math.sqrt(Math.pow(pointB.GetLeftDouble() - pointA.GetLeftDouble(), 2) + Math.pow(pointB.GetRightDouble() - pointA.GetRightDouble(), 2));
+    }
+
+    static public Double GetDist(LinkedList<Double> pointA, LinkedList<Double> pointB)
+    {
+        if (pointA.size() != pointB.size())
+            throw new java.lang.Error("ERROR: Attempting to get distance between points of different dimensions!");
+
+        Double squaredSum = 0.0;
+
+        for (int i = 0; i < pointA.size(); i++)
+            squaredSum += Math.pow(pointB.get(i) - pointA.get(i), 2);
+
+        return Math.sqrt(squaredSum);
+    }
+
     static public Integer FindCanvasShape(LinkedList<RenderNode> nodes, String name)
     {
         for (int i = 0; i < nodes.size(); i++)

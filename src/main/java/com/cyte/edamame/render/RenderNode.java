@@ -104,17 +104,17 @@ public class RenderNode
         PairMutable posReal = new PairMutable((boundsReal.getMinX() + boundsReal.getMaxX()) / 2,
                                               (boundsReal.getMinY() + boundsReal.getMaxY()) / 2);
 
-        if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
+        /*if ((this.RenderNode_Node.getClass() == Rectangle.class) ||
             (this.RenderNode_Node.getClass() == Label.class))
         {
             this.RenderNode_ShapeSelected.setTranslateX(posReal.GetLeftDouble());
             this.RenderNode_ShapeSelected.setTranslateY(posReal.GetRightDouble());
         }
         else
-        {
+        {*/
             this.RenderNode_ShapeSelected.setTranslateX(posReal.GetLeftDouble() - boundsLocal.getWidth() / 2);
             this.RenderNode_ShapeSelected.setTranslateY(posReal.GetRightDouble() - boundsLocal.getHeight() / 2);
-        }
+        //}
 
         this.RenderNode_ShapeSelected.setRotate(this.RenderNode_Node.getRotate());
 

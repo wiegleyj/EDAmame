@@ -6,15 +6,16 @@
  */
 
 package com.cyte.edamame.editor;
-import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.file.YAML;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 
 import java.io.*;
 import java.util.LinkedList;
 
+import com.cyte.edamame.util.Utils;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -23,10 +24,6 @@ import javafx.scene.shape.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
-
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
-import org.yaml.snakeyaml.Yaml;
 
 /**
  * Editor for maintaining Symbol libraries.
@@ -70,7 +67,8 @@ public class EditorSymbol extends Editor {
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
-    static public Editor EditorSymbol_Create() throws IOException {
+    static public Editor EditorSymbol_Create() throws IOException
+    {
         // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
@@ -94,7 +92,47 @@ public class EditorSymbol extends Editor {
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_OnDragOverSpecific(DragEvent event) {
+    @FXML
+    public void EditorSymbol_Save()
+    {
+        Save();
+
+        /*LinkedList<Object> shapes = new LinkedList<Object>();
+
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+            shapes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
+
+        YAML.YAML_ListSave(shapes);*/
+    }
+
+    @FXML
+    public void EditorSymbol_Load() throws IOException
+    {
+        Load();
+
+        /*LinkedList<Object> shapes = YAML.YAML_ListLoad();
+
+        System.out.println(shapes);*/
+    }
+
+    public void Save()
+    {
+        LinkedList<Object> shapes = new LinkedList<Object>();
+        shapes.add(new Circle(5, Color.RED));
+        shapes.add(new Circle(10, Color.BLUE));
+
+        YAML.YAML_ListSave(shapes);
+    }
+
+    public void Load()
+    {
+        LinkedList<Object> shapes = YAML.YAML_ListLoad();
+
+        System.out.println(shapes);
+    }
+
+    public void Editor_OnDragOverSpecific(DragEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
@@ -143,7 +181,8 @@ public class EditorSymbol extends Editor {
         this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));*/
     }
 
-    public void Editor_OnDragDroppedSpecific(DragEvent event) {
+    public void Editor_OnDragDroppedSpecific(DragEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
@@ -197,16 +236,19 @@ public class EditorSymbol extends Editor {
         event.setDropCompleted(success);*/
     }
 
-    public void Editor_OnMouseMovedSpecific(MouseEvent event) {
+    public void Editor_OnMouseMovedSpecific(MouseEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
     }
 
-    public void Editor_OnMousePressedSpecific(MouseEvent event) {
+    public void Editor_OnMousePressedSpecific(MouseEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-        if (this.Editor_PressedLMB) {
+        if (this.Editor_PressedLMB)
+        {
             /*// Handling the wire drawing
             this.EditorSchematic_WireDrawingType = this.EditorSchematic_GetSelectedWire();
 
@@ -229,150 +271,300 @@ public class EditorSymbol extends Editor {
 
             // Updating left mouse button flag
             this.EditorSchematic_PressedMouseLeft = true;*/
-        } else if (this.Editor_PressedRMB) {
         }
+        else if (this.Editor_PressedRMB)
+        {}
     }
 
-    public void Editor_OnMouseReleasedSpecific(MouseEvent event) {
+    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+
+        // Checking for magnetic snap...
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            if (renderNode.RenderNode_Passive)
+                continue;
+
+            PairMutable currNodePos = new PairMutable(renderNode.RenderNode_Node.getTranslateX(), renderNode.RenderNode_Node.getTranslateY());
+
+            LinkedList<Double> dists = new LinkedList<Double>();
+            LinkedList<PairMutable> positions = new LinkedList<PairMutable>();
+
+            // Checking for node center snapping...
+            dists.add(Utils.GetDist(currNodePos, dropPos));
+            positions.add(currNodePos);
+
+            // Checking for line endpoint snapping...
+            if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
+                PairMutable lineEndPoints = this.Editor_LineEndPointsCalculate((Line)renderNode.RenderNode_Node);
+
+                dists.add(Utils.GetDist(lineEndPoints.GetLeftPair(), dropPos));
+                positions.add(lineEndPoints.GetLeftPair());
+                dists.add(Utils.GetDist(lineEndPoints.GetRightPair(), dropPos));
+                positions.add(lineEndPoints.GetRightPair());
+            }
+
+            int minDistIdx = Utils.ListFindMinIdx(dists);
+            Double minDist = dists.get(minDistIdx);
+            PairMutable minDistPos = positions.get(minDistIdx);
+
+            if (minDist <= EDAmameController.Editor_MagneticSnapRadius)
+                dropPos = minDistPos;
+        }
+
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-        if (this.Editor_PressedLMB) {
+        if (this.Editor_PressedLMB)
+        {
             // Handling shape dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
-            if ((this.Editor_ShapesHighlighted == 0) &&
-                    (this.Editor_ShapesSelected == 0) &&
-                    !this.Editor_ShapesMoving &&
-                    this.Editor_SelectionBox == null) {
+            if ((this.Editor_ShapesSelected == 0) &&
+                !this.Editor_ShapesMoving &&
+                (this.Editor_SelectionBox == null) &&
+                !this.Editor_ShapesWereSelected)
+            {
                 RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
                 // Only dropping the shape within the theater limits...
-                if ((selectedShapeButton != null) && (!this.Editor_PressedOnShape)) {
+                if (selectedShapeButton != null)
+                {
                     if ((realPos.GetLeftDouble() > -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
-                            (realPos.GetLeftDouble() < EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
-                            (realPos.GetRightDouble() > -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
-                            (realPos.GetRightDouble() < EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)) {
+                        (realPos.GetLeftDouble() < EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                        (realPos.GetRightDouble() > -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
+                        (realPos.GetRightDouble() < EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
+                    {
                         if (!selectedShapeButton.getText().equals("Line"))
                             this.EditorSymbol_LinePreview = null;
 
-                        if (selectedShapeButton.getText().equals("Circle")) {
-                            String stringRadius = this.EditorSymbol_CircleRadius.getText();
+                        boolean lineStarted = false;
 
-                            if (EDAmameController.Controller_IsStringNum(stringRadius)) {
-                                double radius = Double.parseDouble(stringRadius);
-                                Color color = this.EditorSymbol_CircleColor.getValue();
+                        if (this.Editor_ShapesHighlighted == 0)
+                        {
+                            if (selectedShapeButton.getText().equals("Circle"))
+                            {
+                                String stringRadius = this.EditorSymbol_CircleRadius.getText();
 
-                                if ((radius >= EDAmameController.Editor_CircleRadiusMin) && (radius <= EDAmameController.Editor_CircleRadiusMax)) {
-                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
-                                        Circle circle = new Circle(radius, color);
+                                if (EDAmameController.Controller_IsStringNum(stringRadius))
+                                {
+                                    double radius = Double.parseDouble(stringRadius);
+                                    Color color = this.EditorSymbol_CircleColor.getValue();
 
-                                        circle.setTranslateX(dropPos.GetLeftDouble());
-                                        circle.setTranslateY(dropPos.GetRightDouble());
+                                    if ((radius >= EDAmameController.Editor_CircleRadiusMin) && (radius <= EDAmameController.Editor_CircleRadiusMax))
+                                    {
+                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                        {
+                                            Circle circle = new Circle(radius, color);
 
-                                        RenderNode renderNode = new RenderNode("Circle", circle, false);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                    } else {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered color field is transparent!");
-                                    }
-                                } else {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
-                                }
-                            } else {
-                                EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
-                            }
-                        } else if (selectedShapeButton.getText().equals("Rectangle")) {
-                            String stringWidth = this.EditorSymbol_RectangleWidth.getText();
-                            String stringHeight = this.EditorSymbol_RectangleHeight.getText();
+                                            circle.setTranslateX(dropPos.GetLeftDouble());
+                                            circle.setTranslateY(dropPos.GetRightDouble());
 
-                            if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight)) {
-                                double width = Double.parseDouble(stringWidth);
-                                double height = Double.parseDouble(stringHeight);
-                                Color color = this.EditorSymbol_RectangleColor.getValue();
-
-                                if (((width >= EDAmameController.Editor_RectWidthMin) && (width <= EDAmameController.Editor_RectWidthMax)) &&
-                                        ((height >= EDAmameController.Editor_RectHeightMin) && (height <= EDAmameController.Editor_RectHeightMax))) {
-                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
-                                        Rectangle rectangle = new Rectangle(width, height, color);
-
-                                        rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                                        rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
-
-                                        RenderNode renderNode = new RenderNode("Rectangle", rectangle, false);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                    } else {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered color field is transparent!");
-                                    }
-                                } else {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
-                                }
-                            } else {
-                                EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
-                            }
-
-                        } else if (selectedShapeButton.getText().equals("Triangle")) {
-                            String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
-
-                            if (EDAmameController.Controller_IsStringNum(stringMiddleHeight)) {
-                                double middleLength = Double.parseDouble(stringMiddleHeight);
-                                Color color = this.EditorSymbol_TriangleColor.getValue();
-
-                                if (((middleLength >= EDAmameController.Editor_TriLenMin) && (middleLength <= EDAmameController.Editor_TriLenMax))) {
-                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
-                                        Polygon triangle = new Polygon();
-                                        triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                middleLength / 2, middleLength / 2,
-                                                0.0, -middleLength / 2);
-                                        triangle.setFill(color);
-
-                                        triangle.setTranslateX(dropPos.GetLeftDouble());
-                                        triangle.setTranslateY(dropPos.GetRightDouble());
-
-                                        RenderNode renderNode = new RenderNode("Triangle", triangle, false);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                    } else {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered color field is transparent!");
-                                    }
-                                } else {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
-                                }
-                            } else {
-                                EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
-                            }
-                        } else if (selectedShapeButton.getText().equals("Line")) {
-                            // If we're starting the line drawing...
-                            if (this.EditorSymbol_LinePreview == null) {
-                                String stringWidth = this.EditorSymbol_LineWidth.getText();
-                                Color color = this.EditorSymbol_LineColor.getValue();
-
-                                if (EDAmameController.Controller_IsStringNum(stringWidth)) {
-                                    double width = Double.parseDouble(stringWidth);
-
-                                    if (((width >= EDAmameController.Editor_LineSizeMin) && (width <= EDAmameController.Editor_LineSizeMax))) {
-                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
-                                            this.EditorSymbol_LinePreview = new Line();
-                                            //this.EditorSymbol_LinePreview.setId("linePreview");
-
-                                            this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
-                                            this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
-                                            this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
-                                            this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
-
-                                            this.EditorSymbol_LinePreview.setStrokeWidth(width);
-                                            this.EditorSymbol_LinePreview.setStroke(color);
-
-                                            RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
+                                            RenderNode renderNode = new RenderNode("Circle", circle, false);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                        } else {
-                                            EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
                                         }
-                                    } else {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_LineSizeMin + ", " + EDAmameController.Editor_LineSizeMax + ")");
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered color field is transparent!");
+                                        }
                                     }
-                                } else {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
                                 }
                             }
+                            else if (selectedShapeButton.getText().equals("Rectangle"))
+                            {
+                                String stringWidth = this.EditorSymbol_RectangleWidth.getText();
+                                String stringHeight = this.EditorSymbol_RectangleHeight.getText();
+
+                                if (EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight))
+                                {
+                                    double width = Double.parseDouble(stringWidth);
+                                    double height = Double.parseDouble(stringHeight);
+                                    Color color = this.EditorSymbol_RectangleColor.getValue();
+
+                                    if (((width >= EDAmameController.Editor_RectWidthMin) && (width <= EDAmameController.Editor_RectWidthMax)) &&
+                                            ((height >= EDAmameController.Editor_RectHeightMin) && (height <= EDAmameController.Editor_RectHeightMax)))
+                                    {
+                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                        {
+                                            Rectangle rectangle = new Rectangle(width, height, color);
+
+                                            rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
+                                            rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+
+                                            RenderNode renderNode = new RenderNode("Rectangle", rectangle, false);
+                                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                        }
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered color field is transparent!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
+                                }
+
+                            }
+                            else if (selectedShapeButton.getText().equals("Triangle"))
+                            {
+                                String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
+
+                                if (EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                                {
+                                    double middleLength = Double.parseDouble(stringMiddleHeight);
+                                    Color color = this.EditorSymbol_TriangleColor.getValue();
+
+                                    if (((middleLength >= EDAmameController.Editor_TriLenMin) && (middleLength <= EDAmameController.Editor_TriLenMax)))
+                                    {
+                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                        {
+                                            Polygon triangle = new Polygon();
+                                            triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                                    middleLength / 2, middleLength / 2,
+                                                    0.0, -middleLength / 2);
+                                            triangle.setFill(color);
+
+                                            triangle.setTranslateX(dropPos.GetLeftDouble());
+                                            triangle.setTranslateY(dropPos.GetRightDouble());
+
+                                            RenderNode renderNode = new RenderNode("Triangle", triangle, false);
+                                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                        }
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered color field is transparent!");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
+                                }
+                            }
+                            else if (selectedShapeButton.getText().equals("Line"))
+                            {
+                                // If we're starting the line drawing...
+                                if (this.EditorSymbol_LinePreview == null)
+                                {
+                                    String stringWidth = this.EditorSymbol_LineWidth.getText();
+                                    Color color = this.EditorSymbol_LineColor.getValue();
+
+                                    if (EDAmameController.Controller_IsStringNum(stringWidth))
+                                    {
+                                        double width = Double.parseDouble(stringWidth);
+
+                                        if (((width >= EDAmameController.Editor_LineWidthMin) && (width <= EDAmameController.Editor_LineWidthMax)))
+                                        {
+                                            if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                            {
+                                                this.EditorSymbol_LinePreview = new Line();
+                                                //this.EditorSymbol_LinePreview.setId("linePreview");
+
+                                                this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
+                                                this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
+                                                this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
+                                                this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+
+                                                this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                                                this.EditorSymbol_LinePreview.setStroke(color);
+
+                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
+                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+
+                                                lineStarted = true;
+                                            }
+                                            else
+                                            {
+                                                EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_LineWidthMin + ", " + EDAmameController.Editor_LineWidthMax + ")");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
+                                    }
+                                }
+                            }
+                            else if (selectedShapeButton.getText().equals("Text"))
+                            {
+                                String stringTextContent = EditorSymbol_TextContent.getText();
+
+                                if (!stringTextContent.isEmpty())
+                                {
+                                    String stringFontSize = this.EditorSymbol_TextSize.getText();
+
+                                    if (EDAmameController.Controller_IsStringNum(stringFontSize))
+                                    {
+                                        double fontSize = Double.parseDouble(stringFontSize);
+                                        Color color = this.EditorSymbol_TextColor.getValue();
+
+                                        if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
+                                        {
+                                            if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                            {
+                                                Label text = new Label(stringTextContent);
+                                                text.setFont(new Font("Arial", fontSize));
+                                                text.setTextFill(color);
+
+                                                text.setTranslateX(dropPos.GetLeftDouble());
+                                                text.setTranslateY(dropPos.GetRightDouble());
+
+                                                RenderNode renderNode = new RenderNode("Text", text, false);
+                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                            }
+                                            else
+                                            {
+                                                EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font color field is transparent!");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is non-numeric!");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered text field is empty!");
+                                }
+                            }
+                            else
+                            {
+                                throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
+                            }
+                        }
+
+                        if (selectedShapeButton.getText().equals("Line"))
+                        {
                             // If we're finishing the line drawing...
-                            else {
+                            if ((this.EditorSymbol_LinePreview != null) && !lineStarted)
+                            {
                                 PairMutable posStart = new PairMutable(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY());
                                 PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
 
@@ -387,75 +579,50 @@ public class EditorSymbol extends Editor {
                                 RenderNode renderNode = new RenderNode("Line", line, false);
                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
-                        } else if (selectedShapeButton.getText().equals("Text")) {
-                            String stringTextContent = EditorSymbol_TextContent.getText();
-
-                            if (!stringTextContent.isEmpty()) {
-                                String stringFontSize = this.EditorSymbol_TextSize.getText();
-
-                                if (EDAmameController.Controller_IsStringNum(stringFontSize)) {
-                                    double fontSize = Double.parseDouble(stringFontSize);
-                                    Color color = this.EditorSymbol_TextColor.getValue();
-
-                                    if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax))) {
-                                        if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
-                                            Label text = new Label(stringTextContent);
-                                            text.setFont(new Font("Arial", fontSize));
-                                            text.setTextFill(color);
-
-                                            text.setTranslateX(dropPos.GetLeftDouble());
-                                            text.setTranslateY(dropPos.GetRightDouble());
-
-                                            RenderNode renderNode = new RenderNode("Text", text, false);
-                                            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                        } else {
-                                            EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font color field is transparent!");
-                                        }
-                                    } else {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
-                                    }
-                                } else {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is non-numeric!");
-                                }
-                            } else {
-                                EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered text field is empty!");
-                            }
-                        } else {
-                            throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Symbol Editor!");
                         }
-                    } else {
+                    }
+                    else
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to drop element because the dropping position is outside the theater limits!");
                     }
                 }
             }
-        } else if (this.Editor_PressedRMB) {
+
+            this.Editor_ShapesWereSelected = false;
         }
+        else if (this.Editor_PressedRMB)
+        {}
     }
 
-    public void Editor_OnMouseDraggedSpecific(MouseEvent event) {
+    public void Editor_OnMouseDraggedSpecific(MouseEvent event)
+    {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-        if (this.Editor_PressedLMB) {
-        } else if (this.Editor_PressedRMB) {
-        }
+        if (this.Editor_PressedLMB)
+        {}
+        else if (this.Editor_PressedRMB)
+        {}
 
         // Handling symbol highlighting
         //this.EditorSchematic_CheckSymbolsDroppedMouseHighlights(new PairMutable(event.getX(), event.getY()));
     }
 
-    public void Editor_OnScrollSpecific(ScrollEvent event) {
-    }
+    public void Editor_OnScrollSpecific(ScrollEvent event)
+    {}
 
-    public void Editor_OnKeyPressedSpecific(KeyEvent event) {
+    public void Editor_OnKeyPressedSpecific(KeyEvent event)
+    {
         //System.out.println("Symbol key pressed!");
 
         // Handling the shape properties window (only if there's not another properties window already open)...
-        if (EDAmameController.Controller_IsKeyPressed(KeyCode.E) && (EDAmameController.Controller_EditorPropertiesWindow == null)) {
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.E) && (EDAmameController.Controller_EditorPropertiesWindow == null))
+        {
             // Attempting to create the properties window...
             EditorProps propsWindow = EditorProps.EditorProps_Create();
 
-            if ((propsWindow != null)) {
+            if ((propsWindow != null))
+            {
                 propsWindow.EditorProps_Stage.setOnHidden(e -> {
                     EDAmameController.Controller_EditorPropertiesWindow = null;
                 });
@@ -467,12 +634,13 @@ public class EditorSymbol extends Editor {
         }
     }
 
-    public void Editor_OnKeyReleasedSpecific(KeyEvent event) {
-    }
+    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
+    {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsLoadSpecific() {
+    public void Editor_PropsLoadSpecific()
+    {
         if (this.Editor_ShapesSelected == 0)
             return;
 
@@ -488,40 +656,55 @@ public class EditorSymbol extends Editor {
         LinkedList<PairMutable> lineEndPos = new LinkedList<PairMutable>();
         LinkedList<Double> lineWidths = new LinkedList<Double>();
 
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++) {
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
             if (!renderNode.RenderNode_Selected)
                 continue;
 
-            if (renderNode.RenderNode_Node.getClass() != Label.class) {
-                if (renderNode.RenderNode_Node.getClass() == Line.class) {
+            if (renderNode.RenderNode_Node.getClass() != Label.class)
+            {
+                if (renderNode.RenderNode_Node.getClass() == Line.class)
+                {
                     shapesColor.add((Color) ((Line) renderNode.RenderNode_Node).getStroke());
-                } else {
+                }
+                else
+                {
                     shapesColor.add((Color) ((Shape) renderNode.RenderNode_Node).getFill());
                 }
 
                 needHeader = true;
             }
 
-            if (renderNode.RenderNode_Node.getClass() == Circle.class) {
+            if (renderNode.RenderNode_Node.getClass() == Circle.class)
+            {
                 circlesRadii.add(((Circle) renderNode.RenderNode_Node).getRadius());
-            } else if (renderNode.RenderNode_Node.getClass() == Rectangle.class) {
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
+            {
                 rectsWidths.add(((Rectangle) renderNode.RenderNode_Node).getWidth());
                 rectsHeights.add(((Rectangle) renderNode.RenderNode_Node).getHeight());
-            } else if (renderNode.RenderNode_Node.getClass() == Polygon.class) {
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
+            {
                 trisLens.add(((Polygon) renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon) renderNode.RenderNode_Node).getPoints().get(0));
-            } else if (renderNode.RenderNode_Node.getClass() == Line.class) {
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
                 lineStartPos.add(new PairMutable(((Line) renderNode.RenderNode_Node).getStartX(), ((Line) renderNode.RenderNode_Node).getStartY()));
                 lineEndPos.add(new PairMutable(((Line) renderNode.RenderNode_Node).getEndX(), ((Line) renderNode.RenderNode_Node).getEndY()));
                 lineWidths.add(((Line) renderNode.RenderNode_Node).getStrokeWidth());
-            } else if (renderNode.RenderNode_Node.getClass() != Label.class) {
+            }
+            else if (renderNode.RenderNode_Node.getClass() != Label.class)
+            {
                 throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to load Symbol Editor properties window!");
             }
         }
 
         // Creating header...
-        if (needHeader) {
+        if (needHeader)
+        {
             Text shapeHeader = new Text("Symbol Editor Properties:");
             shapeHeader.setStyle("-fx-font-weight: bold;");
             shapeHeader.setStyle("-fx-font-size: 16px;");
@@ -530,7 +713,8 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating color box...
-        if (!shapesColor.isEmpty()) {
+        if (!shapesColor.isEmpty())
+        {
             HBox colorHBox = new HBox(10);
             colorHBox.setId("colorBox");
             colorHBox.getChildren().add(new Label("Shape Colors: "));
@@ -548,7 +732,8 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating circle radius box...
-        if (!circlesRadii.isEmpty()) {
+        if (!circlesRadii.isEmpty())
+        {
             HBox circleHBox = new HBox(10);
             circleHBox.setId("circleBox");
             circleHBox.getChildren().add(new Label("Circle Radii: "));
@@ -566,7 +751,8 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating rectangle width & height box...
-        if (!rectsWidths.isEmpty() && !rectsHeights.isEmpty()) {
+        if (!rectsWidths.isEmpty() && !rectsHeights.isEmpty())
+        {
             HBox rectHBox = new HBox(10);
             rectHBox.setId("rectBox");
             rectHBox.getChildren().add(new Label("Rectangle Widths: "));
@@ -599,7 +785,8 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating triangle lengths box...
-        if (!trisLens.isEmpty()) {
+        if (!trisLens.isEmpty())
+        {
             HBox triLenHBox = new HBox(10);
             triLenHBox.setId("triBox");
             triLenHBox.getChildren().add(new Label("Triangle Lengths: "));
@@ -617,29 +804,34 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating line box...
-        if (!lineStartPos.isEmpty() && !lineEndPos.isEmpty() && !lineWidths.isEmpty()) {
+        if (!lineStartPos.isEmpty() && !lineEndPos.isEmpty() && !lineWidths.isEmpty())
+        {
             // TODO
         }
     }
 
-    public void Editor_PropsApplySpecific() {
+    public void Editor_PropsApplySpecific()
+    {
         if (this.Editor_ShapesSelected == 0)
             return;
 
         VBox propsBox = EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox;
 
         // Iterating over all the shapes & attempting to apply shape properties if selected...
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++) {
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
             if (!renderNode.RenderNode_Selected)
                 continue;
 
             // Applying color...
-            if (renderNode.RenderNode_Node.getClass() != Label.class) {
+            if (renderNode.RenderNode_Node.getClass() != Label.class)
+            {
                 Integer colorBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "colorBox");
 
-                if (colorBoxIdx != -1) {
+                if (colorBoxIdx != -1)
+                {
                     HBox colorBox = (HBox) propsBox.getChildren().get(colorBoxIdx);
                     ColorPicker colorPicker = (ColorPicker) EDAmameController.Controller_GetNodeById(colorBox.getChildren(), "color");
 
@@ -648,19 +840,24 @@ public class EditorSymbol extends Editor {
 
                     Color color = colorPicker.getValue();
 
-                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)) {
+                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                    {
                         ((Shape) renderNode.RenderNode_Node).setFill(color);
-                    } else {
+                    }
+                    else
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to apply shape colors because the entered color is transparent!");
                     }
                 }
             }
 
             // Applying circle radius...
-            if (renderNode.RenderNode_Node.getClass() == Circle.class) {
+            if (renderNode.RenderNode_Node.getClass() == Circle.class)
+            {
                 Integer circleBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "circleBox");
 
-                if (circleBoxIdx != -1) {
+                if (circleBoxIdx != -1)
+                {
                     HBox circleBox = (HBox) propsBox.getChildren().get(circleBoxIdx);
                     TextField radiiText = (TextField) EDAmameController.Controller_GetNodeById(circleBox.getChildren(), "circleRadii");
 
@@ -669,24 +866,32 @@ public class EditorSymbol extends Editor {
 
                     String radiusStr = radiiText.getText();
 
-                    if (EDAmameController.Controller_IsStringNum(radiusStr)) {
+                    if (EDAmameController.Controller_IsStringNum(radiusStr))
+                    {
                         Double newRadius = Double.parseDouble(radiusStr);
 
-                        if ((newRadius >= EDAmameController.Editor_CircleRadiusMin) && (newRadius <= EDAmameController.Editor_CircleRadiusMax)) {
+                        if ((newRadius >= EDAmameController.Editor_CircleRadiusMin) && (newRadius <= EDAmameController.Editor_CircleRadiusMax))
+                        {
                             ((Circle) renderNode.RenderNode_Node).setRadius(newRadius);
-                        } else {
+                        }
+                        else
+                        {
                             EDAmameController.Controller_SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
                         }
-                    } else if (!radiusStr.equals("<mixed>")) {
+                    }
+                    else if (!radiusStr.equals("<mixed>"))
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to apply circle radii because the entered field is non-numeric!");
                     }
                 }
             }
             // Applying rectangle width & height...
-            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class) {
+            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
+            {
                 Integer rectBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rectBox");
 
-                if (rectBoxIdx != -1) {
+                if (rectBoxIdx != -1)
+                {
                     HBox rectBox = (HBox) propsBox.getChildren().get(rectBoxIdx);
                     TextField widthText = (TextField) EDAmameController.Controller_GetNodeById(rectBox.getChildren(), "rectWidths");
                     TextField heightText = (TextField) EDAmameController.Controller_GetNodeById(rectBox.getChildren(), "rectHeights");
@@ -699,36 +904,50 @@ public class EditorSymbol extends Editor {
                     String widthStr = widthText.getText();
                     String heightStr = heightText.getText();
 
-                    if (EDAmameController.Controller_IsStringNum(widthStr)) {
+                    if (EDAmameController.Controller_IsStringNum(widthStr))
+                    {
                         Double newWidth = Double.parseDouble(widthStr);
 
-                        if ((newWidth >= EDAmameController.Editor_RectWidthMin) && (newWidth <= EDAmameController.Editor_RectWidthMax)) {
+                        if ((newWidth >= EDAmameController.Editor_RectWidthMin) && (newWidth <= EDAmameController.Editor_RectWidthMax))
+                        {
                             ((Rectangle) renderNode.RenderNode_Node).setWidth(newWidth);
-                        } else {
+                        }
+                        else
+                        {
                             EDAmameController.Controller_SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + ")");
                         }
-                    } else if (!widthStr.equals("<mixed>")) {
+                    }
+                    else if (!widthStr.equals("<mixed>"))
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to apply rectangle widths because the entered field is non-numeric!");
                     }
 
-                    if (EDAmameController.Controller_IsStringNum(heightStr)) {
+                    if (EDAmameController.Controller_IsStringNum(heightStr))
+                    {
                         Double newHeight = Double.parseDouble(heightStr);
 
-                        if ((newHeight >= EDAmameController.Editor_RectHeightMin) && (newHeight <= EDAmameController.Editor_RectHeightMax)) {
+                        if ((newHeight >= EDAmameController.Editor_RectHeightMin) && (newHeight <= EDAmameController.Editor_RectHeightMax))
+                        {
                             ((Rectangle) renderNode.RenderNode_Node).setHeight(newHeight);
-                        } else {
+                        }
+                        else
+                        {
                             EDAmameController.Controller_SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
                         }
-                    } else if (!heightStr.equals("<mixed>")) {
+                    }
+                    else if (!heightStr.equals("<mixed>"))
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to apply rectangle heights because the entered field is non-numeric!");
                     }
                 }
             }
             // Applying triangle length...
-            else if (renderNode.RenderNode_Node.getClass() == Polygon.class) {
+            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
+            {
                 Integer triBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "triBox");
 
-                if (triBoxIdx != -1) {
+                if (triBoxIdx != -1)
+                {
                     HBox triBox = (HBox) propsBox.getChildren().get(triBoxIdx);
                     TextField lensText = (TextField) EDAmameController.Controller_GetNodeById(triBox.getChildren(), "triLens");
 
@@ -737,71 +956,31 @@ public class EditorSymbol extends Editor {
 
                     String lenStr = lensText.getText();
 
-                    if (EDAmameController.Controller_IsStringNum(lenStr)) {
+                    if (EDAmameController.Controller_IsStringNum(lenStr))
+                    {
                         Double newLen = Double.parseDouble(lenStr);
 
-                        if ((newLen >= EDAmameController.Editor_TriLenMin) && (newLen <= EDAmameController.Editor_TriLenMax)) {
+                        if ((newLen >= EDAmameController.Editor_TriLenMin) && (newLen <= EDAmameController.Editor_TriLenMax))
+                        {
                             ((Polygon) renderNode.RenderNode_Node).getPoints().setAll(-newLen / 2, newLen / 2,
                                     newLen / 2, newLen / 2,
                                     0.0, -newLen / 2);
-                        } else {
+                        }
+                        else
+                        {
                             EDAmameController.Controller_SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
                         }
-                    } else if (!lenStr.equals("<mixed>")) {
+                    }
+                    else if (!lenStr.equals("<mixed>"))
+                    {
                         EDAmameController.Controller_SetStatusBar("Unable to apply triangle lengths because the entered field is non-numeric!");
                     }
                 }
-            } else if (renderNode.RenderNode_Node.getClass() != Label.class) {
+            }
+            else if (renderNode.RenderNode_Node.getClass() != Label.class)
+            {
                 throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply Symbol Editor properties window!");
             }
-        }
-    }
-
-    @FXML
-    public void Editor_SaveSymbol() throws IOException
-    {
-        LinkedList<Node> shapes = new LinkedList<Node>();
-
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-            shapes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
-
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save Symbol");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("YAML File", "*.yaml"));
-        fileChooser.setInitialFileName("symbol.yaml");
-        File file = fileChooser.showSaveDialog(EDAmameApplication.App_Controller.Controller_Stage);
-
-        if (file == null) {
-            EDAmameController.Controller_SetStatusBar("Unable to save symbol because the file directory is empty!");
-        } else {
-            Yaml yaml = new Yaml();
-            FileWriter fileWriter = new FileWriter(file.getAbsolutePath());
-            yaml.dump(shapes, fileWriter);
-        }
-    }
-
-    @FXML
-    public void Editor_LoadSymbol() throws IOException
-    {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Load Symbol");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("YAML File", "*.yaml"));
-        File file = fileChooser.showOpenDialog(EDAmameApplication.App_Controller.Controller_Stage);
-
-        if (file == null) {
-            EDAmameController.Controller_SetStatusBar("Unable to load symbol because the file directory is empty!");
-        } else {
-            Yaml yaml = new Yaml();
-            FileReader fileReader = new FileReader(file.getAbsolutePath());
-
-            //breaks here, load parses to it says a java object
-            //LinkedList<Node> shapes = yaml.load(fileReader);
-
-            //this can be modified when load is resolved
-            //for (int i = 0; i < shapes.size(); i++) {
-                //RenderNode renderNode = new RenderNode("Shape", shapes.get(i), false);
-                //this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-            //}
         }
     }
 

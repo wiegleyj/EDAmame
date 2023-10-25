@@ -8,10 +8,11 @@
 // TODO:
 // Implement line drawing in symbol editor (with magnetic snapping)
 // Implement line recognition into properties window
-// Implement line drawing width global limits
+// Fix highlighted & selected shapes
+// Implement symbol saving & loading
+// Implement wire connection points into symbols
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
-// Implement wire connection points into symbols
 // Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
@@ -20,7 +21,6 @@
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
-import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.TextAreaHandler;
 
@@ -81,7 +81,7 @@ public class EDAmameController implements Initializable
     final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Double Editor_SelectionBoxWidth = 1.0;
     final static public Integer Editor_MenuItemDefaultPriority = 10;
-    final static public Double Editor_MagneticSnapMaxRadius = 5.0;
+    final static public Double Editor_MagneticSnapRadius = 5.0;
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;
@@ -93,8 +93,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_TriLenMax = 500.0;
     final static public Double Editor_TextFontSizeMin = 10.0;
     final static public Double Editor_TextFontSizeMax = 100.0;
-    final static public Double Editor_LineSizeMin = 10.0;
-    final static public Double Editor_LineSizeMax = 100.0;
+    final static public Double Editor_LineWidthMin = 5.0;
+    final static public Double Editor_LineWidthMax = 20.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

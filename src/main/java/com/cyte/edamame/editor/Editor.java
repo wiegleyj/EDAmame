@@ -85,8 +85,9 @@ public abstract class Editor
     public PairMutable Editor_MouseDragPaneFirstPos = null;
     public Integer Editor_ShapesHighlighted = 0;
     public Integer Editor_ShapesSelected = 0;
+    public boolean Editor_ShapesWereSelected = false;
     public boolean Editor_ShapesMoving = false;
-    public boolean Editor_PressedOnShape = false;
+    //public boolean Editor_PressedOnShape = false;
     public Rectangle Editor_SelectionBox = null;
     public Line EditorSymbol_LinePreview = null;
 
@@ -185,6 +186,12 @@ public abstract class Editor
 
         line.setTranslateX(posAvg.GetLeftDouble());
         line.setTranslateY(posAvg.GetRightDouble());
+    }
+
+    public PairMutable Editor_LineEndPointsCalculate(Line line)
+    {
+        return new PairMutable(new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY()),
+                               new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY()));
     }
 
     public void Editor_LinePreviewUpdate(PairMutable dropPos)
@@ -314,7 +321,7 @@ public abstract class Editor
         this.Editor_MouseDragFirstPos = new PairMutable(posMouse);
         this.Editor_MouseDragFirstCenter = new PairMutable(this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble(),
                                                            this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble());
-        this.Editor_MouseDragPaneFirstPos = new PairMutable(this.Editor_RenderSystem.RenderSystem_PaneGetTranslate());
+        this.Editor_MouseDragPaneFirstPos = new PairMutable(this.Editor_RenderSystem.RenderSystem_PaneHolderGetTranslate());
 
         if (this.Editor_ShapesSelected > 0)
         {
@@ -357,12 +364,6 @@ public abstract class Editor
 
     public void Editor_OnMousePressedGlobal(MouseEvent event)
     {
-        // Updating mouse pressed flags
-        if (event.isPrimaryButtonDown())
-            this.Editor_PressedLMB = true;
-        if (event.isSecondaryButtonDown())
-            this.Editor_PressedRMB = true;
-
         if (this.Editor_PressedLMB)
         {}
         else if (this.Editor_PressedRMB)
@@ -371,14 +372,19 @@ public abstract class Editor
         this.Editor_MouseDragFirstPos = null;
         this.Editor_MouseDragPaneFirstPos = null;
 
-        if (this.Editor_ShapesHighlighted > 0)
-            this.Editor_PressedOnShape = true;
+        //if (this.Editor_ShapesHighlighted > 0)
+        //    this.Editor_PressedOnShape = true;
     }
 
     public void Editor_OnMouseReleasedGlobal(MouseEvent event)
     {
         if (this.Editor_PressedLMB)
         {
+            if (this.Editor_ShapesSelected > 0)
+                this.Editor_ShapesWereSelected = true;
+            else
+                this.Editor_ShapesWereSelected = false;
+
             // Handling shape selection (only if we're not moving any shapes or drawing any lines)
             if (!this.Editor_ShapesMoving &&
                 (this.EditorSymbol_LinePreview == null))
@@ -425,8 +431,8 @@ public abstract class Editor
             // Handling auto-zoom
             if (EDAmameController.Controller_IsKeyPressed(KeyCode.ALT))
             {
-                this.Editor_RenderSystem.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
-                this.Editor_RenderSystem.RenderSystem_PaneSetScale(new PairMutable(1.0, 1.0), false);
+                this.Editor_RenderSystem.RenderSystem_PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
+                this.Editor_RenderSystem.RenderSystem_PaneHolderSetScale(new PairMutable(1.0, 1.0), false);
 
                 this.Editor_RenderSystem.RenderSystem_Center = new PairMutable(0.0, 0.0);
                 this.Editor_Zoom = 1.0;
@@ -434,11 +440,7 @@ public abstract class Editor
         }
 
         this.Editor_ShapesMoving = false;
-        this.Editor_PressedOnShape = false;
-
-        // Updating mouse pressed flags
-        this.Editor_PressedLMB = false;
-        this.Editor_PressedRMB = false;
+        //this.Editor_PressedOnShape = false;
     }
 
     public void Editor_OnMouseDraggedGlobal(MouseEvent event)
@@ -546,7 +548,7 @@ public abstract class Editor
                 this.Editor_RenderSystem.RenderSystem_Center.left = this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble();
                 this.Editor_RenderSystem.RenderSystem_Center.right = this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble();
 
-                this.Editor_RenderSystem.RenderSystem_PaneSetTranslate(new PairMutable(this.Editor_MouseDragPaneFirstPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() * this.Editor_Zoom,
+                this.Editor_RenderSystem.RenderSystem_PaneHolderSetTranslate(new PairMutable(this.Editor_MouseDragPaneFirstPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() * this.Editor_Zoom,
                                                                                        this.Editor_MouseDragPaneFirstPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() * this.Editor_Zoom));
             }
         }
@@ -592,7 +594,7 @@ public abstract class Editor
             else
                 this.Editor_Zoom *= this.Editor_ZoomFactor;
 
-            this.Editor_RenderSystem.RenderSystem_PaneSetScale(new PairMutable(this.Editor_Zoom, this.Editor_Zoom), true);
+            this.Editor_RenderSystem.RenderSystem_PaneHolderSetScale(new PairMutable(this.Editor_Zoom, this.Editor_Zoom), true);
         }
 
         // Handling shape highlights
@@ -656,22 +658,22 @@ public abstract class Editor
     {
         // When we drag the mouse (from outside the viewport)...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnDragOver(event -> {
-            // Handling editor-specific callback actions
-            this.Editor_OnDragOverSpecific(event);
-
             // Handling global callback actions
             this.Editor_OnDragOverGlobal(event);
+
+            // Handling editor-specific callback actions
+            this.Editor_OnDragOverSpecific(event);
 
             event.consume();
         });
 
         // When we drop something with the cursor (from outside the viewport)...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnDragDropped(event -> {
-            // Handling editor-specific callback actions
-            this.Editor_OnDragDroppedSpecific(event);
-
             // Handling global callback actions
             this.Editor_OnDragDroppedGlobal(event);
+
+            // Handling editor-specific callback actions
+            this.Editor_OnDragDroppedSpecific(event);
 
             event.setDropCompleted(true);
             event.consume();
@@ -679,17 +681,23 @@ public abstract class Editor
 
         // When we move the mouse...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnMouseMoved(event -> {
-            // Handling editor-specific callback actions
-            this.Editor_OnMouseMovedSpecific(event);
-
             // Handling global callback actions
             this.Editor_OnMouseMovedGlobal(event);
+
+            // Handling editor-specific callback actions
+            this.Editor_OnMouseMovedSpecific(event);
 
             event.consume();
         });
 
         // When we press down the mouse...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnMousePressed(event -> {
+            // Updating mouse pressed flags
+            if (event.isPrimaryButtonDown())
+                this.Editor_PressedLMB = true;
+            if (event.isSecondaryButtonDown())
+                this.Editor_PressedRMB = true;
+
             // Updating the current mouse drag positions
             PairMutable posMouse = new PairMutable(event.getX(), event.getY());
 
@@ -707,11 +715,15 @@ public abstract class Editor
 
         // When we release the mouse...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnMouseReleased(event -> {
+            // Handling global callback actions
+            this.Editor_OnMouseReleasedGlobal(event);
+
             // Handling editor-specific callback actions
             this.Editor_OnMouseReleasedSpecific(event);
 
-            // Handling global callback actions
-            this.Editor_OnMouseReleasedGlobal(event);
+            // Updating mouse pressed flags
+            this.Editor_PressedLMB = false;
+            this.Editor_PressedRMB = false;
 
             event.consume();
         });
@@ -732,11 +744,11 @@ public abstract class Editor
                 this.Editor_MouseDragUpdate(posMouse);
             }
 
-            // Handling editor-specific callback actions
-            this.Editor_OnMouseDraggedSpecific(event);
-
             // Handling global callback actions
             this.Editor_OnMouseDraggedGlobal(event);
+
+            // Handling editor-specific callback actions
+            this.Editor_OnMouseDraggedSpecific(event);
 
             this.Editor_MouseDragLastTime = System.nanoTime();
 
@@ -745,11 +757,11 @@ public abstract class Editor
 
         // When we scroll the mouse...
         this.Editor_RenderSystem.RenderSystem_PaneListener.setOnScroll(event -> {
-            // Handling editor-specific callback actions
-            this.Editor_OnScrollSpecific(event);
-
             // Handling global callback actions
             this.Editor_OnScrollGlobal(event);
+
+            // Handling editor-specific callback actions
+            this.Editor_OnScrollSpecific(event);
 
             event.consume();
         });

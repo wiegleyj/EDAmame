@@ -62,7 +62,7 @@ public class RenderSystem
         this.RenderSystem_Nodes = new LinkedList<RenderNode>();
         this.RenderSystem_Center = new PairMutable(0.0, 0.0);
 
-        this.RenderSystem_PaneSetTranslate(new PairMutable(0.0, 0.0));
+        this.RenderSystem_PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
         this.RenderSystem_PaneHolder.prefWidthProperty().bind(this.RenderSystem_Canvas.widthProperty());
         this.RenderSystem_PaneHolder.prefHeightProperty().bind(this.RenderSystem_Canvas.heightProperty());
     }
@@ -146,15 +146,15 @@ public class RenderSystem
         return new PairMutable(newPos.getX(), newPos.getY());
     }
 
-    public void RenderSystem_PaneSetTranslate(PairMutable pos)
+    public void RenderSystem_PaneHolderSetTranslate(PairMutable pos)
     {
         this.RenderSystem_PaneHolder.setTranslateX(pos.GetLeftDouble());
         this.RenderSystem_PaneHolder.setTranslateY(pos.GetRightDouble());
     }
 
-    public void RenderSystem_PaneSetScale(PairMutable scale, boolean compensate)
+    public void RenderSystem_PaneHolderSetScale(PairMutable scale, boolean compensate)
     {
-        PairMutable prevScale = this.RenderSystem_PaneGetScale();
+        PairMutable prevScale = this.RenderSystem_PaneHolderGetScale();
 
         this.RenderSystem_PaneHolder.setScaleX(scale.GetLeftDouble());
         this.RenderSystem_PaneHolder.setScaleY(scale.GetRightDouble());
@@ -163,21 +163,21 @@ public class RenderSystem
         {
             PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
                                                      scale.GetRightDouble() - prevScale.GetRightDouble());
-            PairMutable newPos = this.RenderSystem_PaneGetTranslate();
+            PairMutable newPos = this.RenderSystem_PaneHolderGetTranslate();
 
             newPos.left = newPos.GetLeftDouble() + this.RenderSystem_Center.GetLeftDouble() * scaleDelta.GetLeftDouble();
             newPos.right = newPos.GetRightDouble() + this.RenderSystem_Center.GetRightDouble() * scaleDelta.GetRightDouble();
 
-            this.RenderSystem_PaneSetTranslate(newPos);
+            this.RenderSystem_PaneHolderSetTranslate(newPos);
         }
     }
 
-    public PairMutable RenderSystem_PaneGetScale()
+    public PairMutable RenderSystem_PaneHolderGetScale()
     {
         return new PairMutable(this.RenderSystem_PaneHolder.getScaleX(), this.RenderSystem_PaneHolder.getScaleY());
     }
 
-    public PairMutable RenderSystem_PaneGetTranslate()
+    public PairMutable RenderSystem_PaneHolderGetTranslate()
     {
         return new PairMutable(this.RenderSystem_PaneHolder.getTranslateX(), this.RenderSystem_PaneHolder.getTranslateY());
     }
