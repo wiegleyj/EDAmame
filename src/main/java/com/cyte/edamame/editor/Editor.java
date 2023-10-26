@@ -10,6 +10,7 @@ import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.render.RenderSystem;
+import com.cyte.edamame.util.Utils;
 
 import java.util.*;
 import java.util.logging.Level;
@@ -89,6 +90,7 @@ public abstract class Editor
     public boolean Editor_ShapesMoving = false;
     //public boolean Editor_PressedOnShape = false;
     public Rectangle Editor_SelectionBox = null;
+    public boolean Editor_WasSelectionBox = false;
     public Line EditorSymbol_LinePreview = null;
 
     //// MAIN FUNCTIONS ////
@@ -120,7 +122,7 @@ public abstract class Editor
         if ((this.Editor_Type == -1) || (this.Editor_Name == null))
             throw new java.lang.Error("ERROR: Attempting to run editor without initializing it!");
 
-        // Handling render node highlight & selected shapes refreshing...
+        // Handling render node highlight, selected & snap shapes refreshing...
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
@@ -129,6 +131,7 @@ public abstract class Editor
                 continue;
 
             renderNode.RenderNode_BoundsRefresh();
+            renderNode.RenderNode_SnapPointsRefresh();
         }
 
         // Handling centering of holder pane & crosshair...
@@ -175,7 +178,34 @@ public abstract class Editor
 
     //// RENDER FUNCTIONS ////
 
-    public void Editor_LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
+    public void Editor_NodeSnapPointsCheck(PairMutable posEvent)
+    {
+        PairMutable posMouse = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
+            {
+                Shape snapPoint = renderNode.RenderNode_SnapPoints.get(j);
+                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
+
+                Double dist = Utils.GetDist(posMouse, snapPos);
+
+                if (dist <= EDAmameController.Editor_SnapPointRadius)
+                {
+                    snapPoint.setVisible(true);
+                }
+                else
+                {
+                    snapPoint.setVisible(false);
+                }
+            }
+        }
+    }
+
+    static public void Editor_LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
     {
         PairMutable posAvg = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2, (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
 
@@ -188,7 +218,7 @@ public abstract class Editor
         line.setTranslateY(posAvg.GetRightDouble());
     }
 
-    public PairMutable Editor_LineEndPointsCalculate(Line line)
+    static public PairMutable Editor_LineEndPointsCalculate(Line line)
     {
         return new PairMutable(new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY()),
                                new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY()));
@@ -208,9 +238,10 @@ public abstract class Editor
 
     public void Editor_NodeHighlightsCheck(PairMutable posEvent)
     {
+        PairMutable posMouse = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
-            PairMutable posMouse = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
             RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
             if (renderNode.RenderNode_Passive)
@@ -219,34 +250,36 @@ public abstract class Editor
             //renderNode.RenderNode_ShapeHighlightedRefresh();
             boolean onShape = renderNode.RenderNode_PosOnNode(posMouse);
 
-            // Checking whether we are highlighting by cursor...
-            if (onShape)
+            if (!EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL))
             {
-                if (EDAmameController.Controller_IsKeyPressed(KeyCode.Q))
+                // Checking whether we are highlighting by cursor...
+                if (onShape)
                 {
-                    if ((this.Editor_ShapesHighlighted > 1) && renderNode.RenderNode_HighlightedMouse)
-                        renderNode.RenderNode_HighlightedMouse = false;
-                    else if ((this.Editor_ShapesHighlighted == 0) && !renderNode.RenderNode_HighlightedMouse)
-                        renderNode.RenderNode_HighlightedMouse = true;
+                    if (EDAmameController.Controller_IsKeyPressed(KeyCode.Q))
+                    {
+                        if ((this.Editor_ShapesHighlighted > 1) && renderNode.RenderNode_HighlightedMouse)
+                            renderNode.RenderNode_HighlightedMouse = false;
+                        else if ((this.Editor_ShapesHighlighted == 0) && !renderNode.RenderNode_HighlightedMouse)
+                            renderNode.RenderNode_HighlightedMouse = true;
+                    }
+                    else
+                    {
+                        if (!renderNode.RenderNode_HighlightedMouse)
+                            renderNode.RenderNode_HighlightedMouse = true;
+                    }
                 }
                 else
                 {
-                    if (!renderNode.RenderNode_HighlightedMouse)
-                        renderNode.RenderNode_HighlightedMouse = true;
+                    if (renderNode.RenderNode_HighlightedMouse)
+                        renderNode.RenderNode_HighlightedMouse = false;
                 }
-            }
-            else
-            {
-                if (renderNode.RenderNode_HighlightedMouse)
-                    renderNode.RenderNode_HighlightedMouse = false;
-            }
 
-            // Checking whether we are highlighting by selection box...
-            if (this.Editor_SelectionBox != null)
-            {
-                Bounds shapeBounds = renderNode.RenderNode_Node.getBoundsInParent();
-                PairMutable selectionBoxL = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(this.Editor_SelectionBox.getTranslateX(), this.Editor_SelectionBox.getTranslateY()));
-                PairMutable selectionBoxH = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(this.Editor_SelectionBox.getTranslateX() + this.Editor_SelectionBox.getWidth(), this.Editor_SelectionBox.getTranslateY() + this.Editor_SelectionBox.getHeight()));
+                // Checking whether we are highlighting by selection box...
+                if (this.Editor_SelectionBox != null)
+                {
+                    Bounds shapeBounds = renderNode.RenderNode_Node.getBoundsInParent();
+                    PairMutable selectionBoxL = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(this.Editor_SelectionBox.getTranslateX(), this.Editor_SelectionBox.getTranslateY()));
+                    PairMutable selectionBoxH = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(this.Editor_SelectionBox.getTranslateX() + this.Editor_SelectionBox.getWidth(), this.Editor_SelectionBox.getTranslateY() + this.Editor_SelectionBox.getHeight()));
 
                 /*Circle testShapeL = new Circle(5, Color.RED);
                 testShapeL.setId("TESTMARKER");
@@ -274,22 +307,28 @@ public abstract class Editor
                 testShapeBH.setTranslateY(boxH.GetRightDouble());
                 this.paneHolder.getChildren().add(testShapeBH);*/
 
-                if ((selectionBoxL.GetLeftDouble() < shapeBounds.getMaxX()) &&
-                        (selectionBoxH.GetLeftDouble() > shapeBounds.getMinX()) &&
-                        (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
-                        (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
-                {
-                    if (!renderNode.RenderNode_HighlightedBox)
-                        renderNode.RenderNode_HighlightedBox = true;
+                    if ((selectionBoxL.GetLeftDouble() < shapeBounds.getMaxX()) &&
+                            (selectionBoxH.GetLeftDouble() > shapeBounds.getMinX()) &&
+                            (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
+                            (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
+                    {
+                        if (!renderNode.RenderNode_HighlightedBox)
+                            renderNode.RenderNode_HighlightedBox = true;
+                    }
+                    else
+                    {
+                        if (renderNode.RenderNode_HighlightedBox)
+                            renderNode.RenderNode_HighlightedBox = false;
+                    }
                 }
-                else
+                else if (renderNode.RenderNode_HighlightedBox)
                 {
-                    if (renderNode.RenderNode_HighlightedBox)
-                        renderNode.RenderNode_HighlightedBox = false;
+                    renderNode.RenderNode_HighlightedBox = false;
                 }
             }
-            else if (renderNode.RenderNode_HighlightedBox)
+            else
             {
+                renderNode.RenderNode_HighlightedMouse = false;
                 renderNode.RenderNode_HighlightedBox = false;
             }
 
@@ -342,8 +381,13 @@ public abstract class Editor
 
     public void Editor_OnDragOverGlobal(DragEvent event)
     {
-        // Handling shape highlights
-        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+        PairMutable eventPos = new PairMutable(event.getX(), event.getY());
+
+        // Handling shape highlights...
+        this.Editor_NodeHighlightsCheck(eventPos);
+
+        // Handling node snap shapes...
+        this.Editor_NodeSnapPointsCheck(eventPos);
     }
 
     public void Editor_OnDragDroppedGlobal(DragEvent event)
@@ -351,11 +395,15 @@ public abstract class Editor
 
     public void Editor_OnMouseMovedGlobal(MouseEvent event)
     {
-        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable eventPos = new PairMutable(event.getX(), event.getY());
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(eventPos);
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-        // Handling shape highlights
-        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+        // Handling shape highlights...
+        this.Editor_NodeHighlightsCheck(eventPos);
+
+        // Handling node snap shapes...
+        this.Editor_NodeSnapPointsCheck(eventPos);
 
         // Handling line drawing preview...
         if (this.EditorSymbol_LinePreview != null)
@@ -423,6 +471,11 @@ public abstract class Editor
                 {
                     this.Editor_RenderSystem.RenderSystem_PaneListener.getChildren().remove(this.Editor_SelectionBox);
                     this.Editor_SelectionBox = null;
+                    this.Editor_WasSelectionBox = true;
+                }
+                else
+                {
+                    this.Editor_WasSelectionBox = false;
                 }
             }
         }
@@ -445,11 +498,15 @@ public abstract class Editor
 
     public void Editor_OnMouseDraggedGlobal(MouseEvent event)
     {
-        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable eventPos = new PairMutable(event.getX(), event.getY());
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(eventPos);
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
-        // Handling shape highlights
-        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+        // Handling shape highlights...
+        this.Editor_NodeHighlightsCheck(eventPos);
+
+        // Handling node snap shapes...
+        this.Editor_NodeSnapPointsCheck(eventPos);
 
         // Handling line drawing preview...
         if (this.EditorSymbol_LinePreview != null)
@@ -556,7 +613,8 @@ public abstract class Editor
 
     public void Editor_OnScrollGlobal(ScrollEvent event)
     {
-        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable eventPos = new PairMutable(event.getX(), event.getY());
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(eventPos);
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
         // Handling shape rotation (only if we have shapes selected and R is pressed)
@@ -566,7 +624,7 @@ public abstract class Editor
             {
                 RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
 
-                if (!renderNode.RenderNode_Selected)
+                if (!renderNode.RenderNode_Selected || (renderNode.RenderNode_Node.getClass() == Line.class))
                     continue;
 
                 double angle = 10;
@@ -597,8 +655,11 @@ public abstract class Editor
             this.Editor_RenderSystem.RenderSystem_PaneHolderSetScale(new PairMutable(this.Editor_Zoom, this.Editor_Zoom), true);
         }
 
-        // Handling shape highlights
-        this.Editor_NodeHighlightsCheck(new PairMutable(event.getX(), event.getY()));
+        // Handling shape highlights...
+        this.Editor_NodeHighlightsCheck(eventPos);
+
+        // Handling node snap shapes...
+        this.Editor_NodeSnapPointsCheck(eventPos);
 
         // Handling line drawing preview...
         if (this.EditorSymbol_LinePreview != null)
@@ -795,9 +856,14 @@ public abstract class Editor
             if (!renderNode.RenderNode_Selected)
                 continue;
 
+            //if (renderNode.RenderNode_Node.getClass() != Line.class)
+            //{
             shapesPosX.add(renderNode.RenderNode_Node.getTranslateX() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
             shapesPosY.add(renderNode.RenderNode_Node.getTranslateY() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
-            shapesRots.add(renderNode.RenderNode_Node.getRotate());
+
+            if (renderNode.RenderNode_Node.getClass() != Line.class)
+                shapesRots.add(renderNode.RenderNode_Node.getRotate());
+            //}
 
             if (renderNode.RenderNode_Node.getClass() == Label.class)
             {
@@ -808,6 +874,7 @@ public abstract class Editor
         }
 
         // Creating position box...
+        if (!shapesPosX.isEmpty() && !shapesPosY.isEmpty())
         {
             HBox posHBox = new HBox(10);
             posHBox.setId("posBox");
@@ -840,6 +907,7 @@ public abstract class Editor
         }
 
         // Creating rotation box...
+        if (!shapesRots.isEmpty())
         {
             HBox rotHBox = new HBox(10);
             rotHBox.setId("rotBox");
@@ -919,6 +987,7 @@ public abstract class Editor
                 continue;
 
             // Applying position...
+            //if (renderNode.RenderNode_Node.getClass() != Line.class)
             {
                 Integer posBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "posBox");
 
@@ -977,6 +1046,7 @@ public abstract class Editor
             }
 
             // Applying rotation...
+            if (renderNode.RenderNode_Node.getClass() != Line.class)
             {
                 Integer rotBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rotBox");
 
@@ -1112,6 +1182,7 @@ public abstract class Editor
         Pane foundPaneHolder = null;
         Pane foundPaneHighlights = null;
         Pane foundPaneSelections = null;
+        Pane foundPaneSnaps = null;
         Canvas foundCanvas = null;
         Shape foundCrosshair = null;
 
@@ -1188,7 +1259,7 @@ public abstract class Editor
                                             {
                                                 foundPaneHolder = (Pane)nextNodeC;
 
-                                                // Searching for the highlight pane, selections pane and the canvas...
+                                                // Searching for the highlight pane, selections pane, snaps pane and the canvas...
                                                 for (int l = 0; l < foundPaneHolder.getChildren().size(); l++)
                                                 {
                                                     Node nextNodeD = foundPaneHolder.getChildren().get(l);
@@ -1207,6 +1278,16 @@ public abstract class Editor
 
                                                             EDAmameController.Controller_Logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.Editor_Name + "\".\n");
                                                         }
+                                                        else if (foundPaneSnaps == null)
+                                                        {
+                                                            foundPaneSnaps = (Pane)nextNodeD;
+
+                                                            EDAmameController.Controller_Logger.log(Level.INFO, "Found snaps pane of an editor with name \"" + this.Editor_Name + "\".\n");
+                                                        }
+                                                        else
+                                                        {
+                                                            throw new java.lang.Error("ERROR: Encountered extra pane under the holder pane!");
+                                                        }
                                                     }
                                                     else if (nextNodeD.getClass() == Canvas.class)
                                                     {
@@ -1214,11 +1295,19 @@ public abstract class Editor
 
                                                         EDAmameController.Controller_Logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.Editor_Name + "\".\n");
                                                     }
+                                                    else
+                                                    {
+                                                        throw new java.lang.Error("ERROR: Encountered unknown child under the holder pane!");
+                                                    }
                                                 }
                                             }
                                             else if (nextNodeC.getClass() == Circle.class)
                                             {
                                                 foundCrosshair = (Circle)nextNodeC;
+                                            }
+                                            else
+                                            {
+                                                throw new java.lang.Error("ERROR: Encountered unknown child under the listener pane!");
                                             }
                                         }
 
@@ -1250,6 +1339,8 @@ public abstract class Editor
             throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.Editor_Name + "\"!");
         if (foundPaneSelections == null)
             throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.Editor_Name + "\"!");
+        if (foundPaneSnaps == null)
+            throw new InvalidClassException("Unable to locate snaps pane for an editor with name \"" + this.Editor_Name + "\"!");
         if (foundCanvas == null)
             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.Editor_Name + "\"!");
         if (foundCrosshair == null)
@@ -1259,6 +1350,7 @@ public abstract class Editor
                                                     foundPaneHolder,
                                                     foundPaneHighlights,
                                                     foundPaneSelections,
+                                                    foundPaneSnaps,
                                                     foundCanvas,
                                                     foundCrosshair,
                                                     EDAmameController.Editor_TheaterSize,

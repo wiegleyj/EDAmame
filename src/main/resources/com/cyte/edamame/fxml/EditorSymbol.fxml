@@ -24,8 +24,8 @@
 <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorSymbol">
     <MenuBar>
         <Menu text="STATIC_1">
-            <MenuItem id="1" mnemonicParsing="false" onAction="#EditorSymbol_Save" text="Save Symbol" />
-         <MenuItem id="2" mnemonicParsing="false" onAction="#EditorSymbol_Load" text="Load Symbol" />
+            <MenuItem id="1" mnemonicParsing="false" onAction="#EditorSymbol_Save" text="SYMBOL_STATIC_1_1" />
+         <MenuItem id="2" mnemonicParsing="false" onAction="#EditorSymbol_Load" text="SYMBOL_STATIC_1_2" />
         </Menu>
       <Menu text="STATIC_2">
          <items>
@@ -40,8 +40,8 @@
       </Menu>
     </MenuBar>
     <ToolBar>
-        <Button mnemonicParsing="false" text="Symbol Button 1" />
-      <Button mnemonicParsing="false" text="Symbol Button 2" />
+        <Button mnemonicParsing="false" text="Save" />
+      <Button mnemonicParsing="false" text="Load" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="EditorTab">
@@ -55,14 +55,15 @@
                               <Canvas height="3000.0" width="3000.0" />
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
+                              <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                            </children>
                         </Pane>
-                        <Circle fill="#1f93ff00" radius="5.0" stroke="RED" strokeType="INSIDE" />
+                        <Circle fill="#1f93ff00" radius="1.0" stroke="RED" strokeType="INSIDE" />
                      </children>
                   </Pane>
                   <ToolBar>
                     <items>
-                      <Button mnemonicParsing="false" text="Button" />
+                      <Button mnemonicParsing="false" text="TEST" />
                     </items>
                   </ToolBar>
                </children>

@@ -28,6 +28,7 @@ public class RenderSystem
     public Pane RenderSystem_PaneHolder;
     public Pane RenderSystem_PaneHighlights;
     public Pane RenderSystem_PaneSelections;
+    public Pane RenderSystem_PaneSnaps;
     public Canvas RenderSystem_Canvas;
     public GraphicsContext RenderSystem_GC;
     public Shape RenderSystem_Crosshair;
@@ -44,12 +45,13 @@ public class RenderSystem
 
     //// CONSTRUCTORS ////
 
-    public RenderSystem(Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue)
+    public RenderSystem(Pane paneListenerValue, Pane paneHolderValue, Pane paneHighlightsValue, Pane paneSelectionsValue, Pane paneSnapsValue, Canvas canvasValue, Shape crosshairValue, PairMutable theaterSizeValue, Color backgroundColorValue, Color gridPointColorValue, Color gridBoxColorValue, Integer maxShapesValue)
     {
         this.RenderSystem_PaneListener = paneListenerValue;
         this.RenderSystem_PaneHolder = paneHolderValue;
         this.RenderSystem_PaneHighlights = paneHighlightsValue;
         this.RenderSystem_PaneSelections = paneSelectionsValue;
+        this.RenderSystem_PaneSnaps = paneSnapsValue;
         this.RenderSystem_Canvas = canvasValue;
         this.RenderSystem_GC = this.RenderSystem_Canvas.getGraphicsContext2D();
         this.RenderSystem_Crosshair = crosshairValue;
@@ -191,12 +193,13 @@ public class RenderSystem
 
         this.RenderSystem_Nodes.add(renderNode);
         this.RenderSystem_PaneHolder.getChildren().add(1, renderNode.RenderNode_Node);
+
+        for (int i = 0; i < renderNode.RenderNode_SnapPoints.size(); i++)
+            this.RenderSystem_PaneSnaps.getChildren().add(renderNode.RenderNode_SnapPoints.get(i));
     }
 
     public RenderNode RenderSystem_NodeRemove(String name)
     {
-        System.out.println(name);
-
         for (int i = 0; i < this.RenderSystem_Nodes.size(); i++)
         {
             RenderNode renderNode = this.RenderSystem_Nodes.get(i);
@@ -217,6 +220,9 @@ public class RenderSystem
                     this.RenderSystem_PaneSelections.getChildren().remove(renderNode.RenderNode_ShapeSelected);
                     renderNode.RenderNode_Selected = false;
                 }
+
+                for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
+                    this.RenderSystem_PaneSnaps.getChildren().remove(renderNode.RenderNode_SnapPoints.get(j));
 
                 return renderNode;
             }

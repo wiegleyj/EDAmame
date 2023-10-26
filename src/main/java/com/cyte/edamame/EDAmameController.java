@@ -6,9 +6,8 @@
  */
 
 // TODO:
-// Implement line drawing in symbol editor (with magnetic snapping)
 // Implement line recognition into properties window
-// Fix highlighted & selected shapes
+// Fix rectangle & text incorrect center snap points
 // Implement symbol saving & loading
 // Implement wire connection points into symbols
 // Fix occasional dragging not recognized
@@ -32,6 +31,7 @@ import javafx.collections.*;
 import javafx.fxml.*;
 import javafx.stage.*;
 import javafx.scene.*;
+import javafx.scene.shape.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
@@ -81,7 +81,9 @@ public class EDAmameController implements Initializable
     final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
     final static public Double Editor_SelectionBoxWidth = 1.0;
     final static public Integer Editor_MenuItemDefaultPriority = 10;
-    final static public Double Editor_MagneticSnapRadius = 5.0;
+    final static public Double Editor_SnapPointRadius = 15.0;
+    final static public Color Editor_SnapPointShapeColor = Color.DARKGREEN;
+    final static public Double Editor_SnapPointShapeOpacity = 0.5;
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;

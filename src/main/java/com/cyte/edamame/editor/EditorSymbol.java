@@ -95,27 +95,27 @@ public class EditorSymbol extends Editor {
     @FXML
     public void EditorSymbol_Save()
     {
-        Save();
+        //Save();
 
-        /*LinkedList<Object> shapes = new LinkedList<Object>();
+        LinkedList<Object> shapes = new LinkedList<Object>();
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
             shapes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
 
-        YAML.YAML_ListSave(shapes);*/
+        YAML.YAML_ListSave(shapes);
     }
 
     @FXML
     public void EditorSymbol_Load() throws IOException
     {
-        Load();
+        //Load();
 
-        /*LinkedList<Object> shapes = YAML.YAML_ListLoad();
+        LinkedList<Object> shapes = YAML.YAML_ListLoad();
 
-        System.out.println(shapes);*/
+        System.out.println(shapes);
     }
 
-    public void Save()
+    /*public void Save()
     {
         LinkedList<Object> shapes = new LinkedList<Object>();
         shapes.add(new Circle(5, Color.RED));
@@ -129,7 +129,7 @@ public class EditorSymbol extends Editor {
         LinkedList<Object> shapes = YAML.YAML_ListLoad();
 
         System.out.println(shapes);
-    }
+    }*/
 
     public void Editor_OnDragOverSpecific(DragEvent event)
     {
@@ -279,6 +279,7 @@ public class EditorSymbol extends Editor {
     public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        Double minDist = EDAmameController.Editor_SnapPointRadius;
 
         // Checking for magnetic snap...
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
@@ -288,32 +289,19 @@ public class EditorSymbol extends Editor {
             if (renderNode.RenderNode_Passive)
                 continue;
 
-            PairMutable currNodePos = new PairMutable(renderNode.RenderNode_Node.getTranslateX(), renderNode.RenderNode_Node.getTranslateY());
-
-            LinkedList<Double> dists = new LinkedList<Double>();
-            LinkedList<PairMutable> positions = new LinkedList<PairMutable>();
-
-            // Checking for node center snapping...
-            dists.add(Utils.GetDist(currNodePos, dropPos));
-            positions.add(currNodePos);
-
-            // Checking for line endpoint snapping...
-            if (renderNode.RenderNode_Node.getClass() == Line.class)
+            for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
             {
-                PairMutable lineEndPoints = this.Editor_LineEndPointsCalculate((Line)renderNode.RenderNode_Node);
+                Shape snapPoint = renderNode.RenderNode_SnapPoints.get(j);
+                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
 
-                dists.add(Utils.GetDist(lineEndPoints.GetLeftPair(), dropPos));
-                positions.add(lineEndPoints.GetLeftPair());
-                dists.add(Utils.GetDist(lineEndPoints.GetRightPair(), dropPos));
-                positions.add(lineEndPoints.GetRightPair());
+                Double currDist = Utils.GetDist(dropPos, snapPos);
+
+                if (currDist <= minDist)
+                {
+                    dropPos = snapPos;
+                    minDist = currDist;
+                }
             }
-
-            int minDistIdx = Utils.ListFindMinIdx(dists);
-            Double minDist = dists.get(minDistIdx);
-            PairMutable minDistPos = positions.get(minDistIdx);
-
-            if (minDist <= EDAmameController.Editor_MagneticSnapRadius)
-                dropPos = minDistPos;
         }
 
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
@@ -324,7 +312,8 @@ public class EditorSymbol extends Editor {
             if ((this.Editor_ShapesSelected == 0) &&
                 !this.Editor_ShapesMoving &&
                 (this.Editor_SelectionBox == null) &&
-                !this.Editor_ShapesWereSelected)
+                !this.Editor_ShapesWereSelected &&
+                !this.Editor_WasSelectionBox)
             {
                 RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
 
@@ -569,7 +558,7 @@ public class EditorSymbol extends Editor {
                                 PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
 
                                 Line line = new Line();
-                                this.Editor_LineDropPosCalculate(line, posStart, posEnd);
+                                Editor.Editor_LineDropPosCalculate(line, posStart, posEnd);
 
                                 line.setStroke(this.EditorSymbol_LinePreview.getStroke());
                                 line.setStrokeWidth(this.EditorSymbol_LinePreview.getStrokeWidth());
@@ -652,8 +641,10 @@ public class EditorSymbol extends Editor {
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
         LinkedList<Double> trisLens = new LinkedList<Double>();
-        LinkedList<PairMutable> lineStartPos = new LinkedList<PairMutable>();
-        LinkedList<PairMutable> lineEndPos = new LinkedList<PairMutable>();
+        LinkedList<Double> lineStartPosX = new LinkedList<Double>();
+        LinkedList<Double> lineStartPosY = new LinkedList<Double>();
+        LinkedList<Double> lineEndPosX = new LinkedList<Double>();
+        LinkedList<Double> lineEndPosY = new LinkedList<Double>();
         LinkedList<Double> lineWidths = new LinkedList<Double>();
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
@@ -667,11 +658,11 @@ public class EditorSymbol extends Editor {
             {
                 if (renderNode.RenderNode_Node.getClass() == Line.class)
                 {
-                    shapesColor.add((Color) ((Line) renderNode.RenderNode_Node).getStroke());
+                    shapesColor.add((Color)((Line)renderNode.RenderNode_Node).getStroke());
                 }
                 else
                 {
-                    shapesColor.add((Color) ((Shape) renderNode.RenderNode_Node).getFill());
+                    shapesColor.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
                 }
 
                 needHeader = true;
@@ -679,22 +670,29 @@ public class EditorSymbol extends Editor {
 
             if (renderNode.RenderNode_Node.getClass() == Circle.class)
             {
-                circlesRadii.add(((Circle) renderNode.RenderNode_Node).getRadius());
+                circlesRadii.add(((Circle)renderNode.RenderNode_Node).getRadius());
             }
             else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
             {
-                rectsWidths.add(((Rectangle) renderNode.RenderNode_Node).getWidth());
-                rectsHeights.add(((Rectangle) renderNode.RenderNode_Node).getHeight());
+                rectsWidths.add(((Rectangle)renderNode.RenderNode_Node).getWidth());
+                rectsHeights.add(((Rectangle)renderNode.RenderNode_Node).getHeight());
             }
             else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
             {
-                trisLens.add(((Polygon) renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon) renderNode.RenderNode_Node).getPoints().get(0));
+                trisLens.add(((Polygon)renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon) renderNode.RenderNode_Node).getPoints().get(0));
             }
             else if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
-                lineStartPos.add(new PairMutable(((Line) renderNode.RenderNode_Node).getStartX(), ((Line) renderNode.RenderNode_Node).getStartY()));
-                lineEndPos.add(new PairMutable(((Line) renderNode.RenderNode_Node).getEndX(), ((Line) renderNode.RenderNode_Node).getEndY()));
-                lineWidths.add(((Line) renderNode.RenderNode_Node).getStrokeWidth());
+                Line line = (Line)renderNode.RenderNode_Node;
+                PairMutable linePoints = Editor.Editor_LineEndPointsCalculate(line);
+                PairMutable startPoint = linePoints.GetLeftPair();
+                PairMutable endPoint = linePoints.GetRightPair();
+
+                lineStartPosX.add(startPoint.GetLeftDouble());
+                lineStartPosY.add(startPoint.GetRightDouble());
+                lineEndPosX.add(endPoint.GetLeftDouble());
+                lineEndPosY.add(endPoint.GetRightDouble());
+                lineWidths.add(line.getStrokeWidth());
             }
             else if (renderNode.RenderNode_Node.getClass() != Label.class)
             {
@@ -804,9 +802,84 @@ public class EditorSymbol extends Editor {
         }
 
         // Creating line box...
-        if (!lineStartPos.isEmpty() && !lineEndPos.isEmpty() && !lineWidths.isEmpty())
+        if (!lineStartPosX.isEmpty() && !lineStartPosY.isEmpty() && !lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
         {
-            // TODO
+            // Start point
+            /*HBox lineStartPointsHBox = new HBox(10);
+            lineStartPointsHBox.setId("lineStartPointsBox");
+            lineStartPointsHBox.getChildren().add(new Label("Line Start Points X: "));
+            TextField lineStartPointsXText = new TextField();
+            lineStartPointsXText.setMinWidth(100);
+            lineStartPointsXText.setPrefWidth(100);
+            lineStartPointsXText.setMaxWidth(100);
+            lineStartPointsXText.setId("lineStartPointsX");
+            lineStartPointsHBox.getChildren().add(lineStartPointsXText);
+            lineStartPointsHBox.getChildren().add(new Label("Y: "));
+            TextField lineStartPointsYText = new TextField();
+            lineStartPointsYText.setId("lineStartPointsY");
+            lineStartPointsYText.setMinWidth(100);
+            lineStartPointsYText.setPrefWidth(100);
+            lineStartPointsYText.setMaxWidth(100);
+            lineStartPointsHBox.getChildren().add(lineStartPointsYText);
+
+            if (EDAmameController.Controller_IsListAllEqual(lineStartPosX))
+                lineStartPointsXText.setText(Double.toString(lineStartPosX.get(0)));
+            else
+                lineStartPointsXText.setText("<mixed>");
+
+            if (EDAmameController.Controller_IsListAllEqual(lineStartPosY))
+                lineStartPointsYText.setText(Double.toString(lineStartPosY.get(0)));
+            else
+                lineStartPointsYText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(lineStartPointsHBox);
+
+            // End point
+            HBox lineEndPointsHBox = new HBox(10);
+            lineEndPointsHBox.setId("lineEndPointsBox");
+            lineEndPointsHBox.getChildren().add(new Label("Line End Points X: "));
+            TextField lineEndPointsXText = new TextField();
+            lineEndPointsXText.setMinWidth(100);
+            lineEndPointsXText.setPrefWidth(100);
+            lineEndPointsXText.setMaxWidth(100);
+            lineEndPointsXText.setId("lineEndPointsX");
+            lineEndPointsHBox.getChildren().add(lineEndPointsXText);
+            lineEndPointsHBox.getChildren().add(new Label("Y: "));
+            TextField lineEndPointsYText = new TextField();
+            lineEndPointsYText.setId("lineEndPointsY");
+            lineEndPointsYText.setMinWidth(100);
+            lineEndPointsYText.setPrefWidth(100);
+            lineEndPointsYText.setMaxWidth(100);
+            lineEndPointsHBox.getChildren().add(lineEndPointsYText);
+
+            if (EDAmameController.Controller_IsListAllEqual(lineEndPosX))
+                lineEndPointsXText.setText(Double.toString(lineEndPosX.get(0)));
+            else
+                lineEndPointsXText.setText("<mixed>");
+
+            if (EDAmameController.Controller_IsListAllEqual(lineEndPosY))
+                lineEndPointsYText.setText(Double.toString(lineEndPosY.get(0)));
+            else
+                lineEndPointsYText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(lineEndPointsHBox);*/
+
+            // Width
+            HBox lineWidthsHBox = new HBox(10);
+            lineWidthsHBox.setId("lineWidthsBox");
+            lineWidthsHBox.getChildren().add(new Label("Line Widths: "));
+            TextField lineWidthsText = new TextField();
+            lineWidthsText.setId("lineWidths");
+            lineWidthsHBox.getChildren().add(lineWidthsText);
+
+            if (EDAmameController.Controller_IsListAllEqual(lineWidths))
+                lineWidthsText.setText(Double.toString(lineWidths.get(0)));
+            else
+                lineWidthsText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(lineWidthsHBox);
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
         }
     }
 
@@ -842,7 +915,14 @@ public class EditorSymbol extends Editor {
 
                     if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                     {
-                        ((Shape) renderNode.RenderNode_Node).setFill(color);
+                        if (renderNode.RenderNode_Node.getClass() == Line.class)
+                        {
+                            ((Shape)renderNode.RenderNode_Node).setStroke(color);
+                        }
+                        else
+                        {
+                            ((Shape)renderNode.RenderNode_Node).setFill(color);
+                        }
                     }
                     else
                     {
@@ -974,6 +1054,42 @@ public class EditorSymbol extends Editor {
                     else if (!lenStr.equals("<mixed>"))
                     {
                         EDAmameController.Controller_SetStatusBar("Unable to apply triangle lengths because the entered field is non-numeric!");
+                    }
+                }
+            }
+            // Applying lines...
+            else if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
+                // TODO
+
+                Integer lineWidthsBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "lineWidthsBox");
+
+                if (lineWidthsBoxIdx != -1)
+                {
+                    HBox lineWidthsBox = (HBox) propsBox.getChildren().get(lineWidthsBoxIdx);
+                    TextField lineWidthsText = (TextField) EDAmameController.Controller_GetNodeById(lineWidthsBox.getChildren(), "lineWidths");
+
+                    if (lineWidthsText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"lineWidths\" node in Symbol Editor properties window \"lineWidthsBox\" entry!");
+
+                    String widthStr = lineWidthsText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(widthStr))
+                    {
+                        Double newWidth = Double.parseDouble(widthStr);
+
+                        if ((newWidth >= EDAmameController.Editor_LineWidthMin) && (newWidth <= EDAmameController.Editor_LineWidthMax))
+                        {
+                            ((Line)renderNode.RenderNode_Node).setStrokeWidth(newWidth);
+                        }
+                        else
+                        {
+                            EDAmameController.Controller_SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.Editor_LineWidthMin + ", " + EDAmameController.Editor_LineWidthMax + ")");
+                        }
+                    }
+                    else if (!widthStr.equals("<mixed>"))
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply line widths because the entered field is non-numeric!");
                     }
                 }
             }
