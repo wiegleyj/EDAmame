@@ -336,13 +336,15 @@ public abstract class Editor
             if ((renderNode.RenderNode_HighlightedMouse || renderNode.RenderNode_HighlightedBox) && !renderNode.RenderNode_Highlighted)
             {
                 //shape.RenderShape_ShapeHighlightedRefresh();
-                this.Editor_RenderSystem.RenderSystem_PaneHighlights.getChildren().add(renderNode.RenderNode_ShapeHighlighted);
+                //this.Editor_RenderSystem.RenderSystem_PaneHighlights.getChildren().add(renderNode.RenderNode_ShapeHighlighted);
+                renderNode.RenderNode_ShapeHighlighted.setVisible(true);
                 renderNode.RenderNode_Highlighted = true;
                 this.Editor_ShapesHighlighted++;
             }
             else if ((!renderNode.RenderNode_HighlightedMouse && !renderNode.RenderNode_HighlightedBox) && renderNode.RenderNode_Highlighted)
             {
-                this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                renderNode.RenderNode_ShapeHighlighted.setVisible(false);
                 renderNode.RenderNode_Highlighted = false;
                 this.Editor_ShapesHighlighted--;
             }
@@ -447,7 +449,8 @@ public abstract class Editor
                         {
                             renderNode.RenderNode_Selected = true;
                             //shape.RenderShape_ShapeSelectedRefresh();
-                            this.Editor_RenderSystem.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
+                            //this.Editor_RenderSystem.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
+                            renderNode.RenderNode_ShapeSelected.setVisible(true);
                             this.Editor_ShapesSelected++;
                         }
                     }
@@ -456,13 +459,15 @@ public abstract class Editor
                         if ((!renderNode.RenderNode_HighlightedMouse && !renderNode.RenderNode_HighlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
                         {
                             renderNode.RenderNode_Selected = false;
-                            this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
+                            //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
+                            renderNode.RenderNode_ShapeSelected.setVisible(false);
                             this.Editor_ShapesSelected--;
                         }
                     }
 
                     if (renderNode.RenderNode_HighlightedBox && !renderNode.RenderNode_HighlightedMouse)
-                        this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                        //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                        renderNode.RenderNode_ShapeHighlighted.setVisible(false);
 
                     renderNode.RenderNode_MousePressPos = null;
                 }
@@ -547,7 +552,7 @@ public abstract class Editor
             }
 
             // Handling the box selection (only if we have no shapes selected, we are not moving the viewport and we're not drawing any lines)
-            if ((this.Editor_ShapesSelected == 0) &&
+            if (((this.Editor_ShapesSelected == 0) || EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT)) &&
                 (this.EditorSymbol_LinePreview == null))
             {
                 if (this.Editor_SelectionBox == null)
@@ -682,11 +687,13 @@ public abstract class Editor
 
                     if (renderNode.RenderNode_Highlighted)
                     {
-                        this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                        //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                        renderNode.RenderNode_ShapeHighlighted.setVisible(false);
                         this.Editor_ShapesHighlighted--;
                     }
 
-                    this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
+                    //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
+                    renderNode.RenderNode_ShapeSelected.setVisible(false);
                     this.Editor_ShapesSelected--;
 
                     this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().remove(renderNode.RenderNode_Node);

@@ -51,6 +51,7 @@
                               <Canvas height="3000.0" width="3000.0" />
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
+                              <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                            </children>
                         </Pane>
                         <Circle fill="#1f93ff00" radius="5.0" stroke="RED" strokeType="INSIDE" />

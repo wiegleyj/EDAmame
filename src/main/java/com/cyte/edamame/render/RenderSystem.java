@@ -194,6 +194,12 @@ public class RenderSystem
         this.RenderSystem_Nodes.add(renderNode);
         this.RenderSystem_PaneHolder.getChildren().add(1, renderNode.RenderNode_Node);
 
+        if (!renderNode.RenderNode_Passive)
+        {
+            this.RenderSystem_PaneHighlights.getChildren().add(renderNode.RenderNode_ShapeHighlighted);
+            this.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
+        }
+
         for (int i = 0; i < renderNode.RenderNode_SnapPoints.size(); i++)
             this.RenderSystem_PaneSnaps.getChildren().add(renderNode.RenderNode_SnapPoints.get(i));
     }
@@ -209,17 +215,14 @@ public class RenderSystem
                 this.RenderSystem_Nodes.remove(renderNode);
                 this.RenderSystem_PaneHolder.getChildren().remove(renderNode.RenderNode_Node);
 
-                if (renderNode.RenderNode_Highlighted)
+                if (!renderNode.RenderNode_Passive)
                 {
                     this.RenderSystem_PaneHighlights.getChildren().remove(renderNode.RenderNode_ShapeHighlighted);
-                    renderNode.RenderNode_Highlighted = false;
+                    this.RenderSystem_PaneSelections.getChildren().remove(renderNode.RenderNode_ShapeSelected);
                 }
 
-                if (renderNode.RenderNode_Selected)
-                {
-                    this.RenderSystem_PaneSelections.getChildren().remove(renderNode.RenderNode_ShapeSelected);
-                    renderNode.RenderNode_Selected = false;
-                }
+                renderNode.RenderNode_Highlighted = false;
+                renderNode.RenderNode_Selected = false;
 
                 for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
                     this.RenderSystem_PaneSnaps.getChildren().remove(renderNode.RenderNode_SnapPoints.get(j));
@@ -229,33 +232,5 @@ public class RenderSystem
         }
 
         return null;
-    }
-
-    public void RenderSystem_NodeHighlightsRemove(RenderNode renderNode)
-    {
-        for (int i = 0; i < this.RenderSystem_PaneHighlights.getChildren().size(); i++)
-        {
-            Shape highlightShape = (Shape)this.RenderSystem_PaneHighlights.getChildren().get(i);
-
-            if (renderNode.RenderNode_ID.equals(highlightShape.getId()))
-            {
-                this.RenderSystem_PaneHighlights.getChildren().remove(i);
-                i--;
-            }
-        }
-    }
-
-    public void RenderSystem_NodeSelectionsRemove(RenderNode renderNode)
-    {
-        for (int i = 0; i < this.RenderSystem_PaneSelections.getChildren().size(); i++)
-        {
-            Shape selectionShape = (Shape)this.RenderSystem_PaneSelections.getChildren().get(i);
-
-            if (renderNode.RenderNode_ID.equals(selectionShape.getId()))
-            {
-                this.RenderSystem_PaneSelections.getChildren().remove(i);
-                i--;
-            }
-        }
     }
 }

@@ -6,10 +6,13 @@
  */
 
 // TODO:
+// Ask about YAML saving
+// Ask about theater limits
 // Implement line recognition into properties window
 // Fix rectangle & text incorrect center snap points
 // Implement symbol saving & loading
 // Implement wire connection points into symbols
+// Fix dragging while zooming near theater edges
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
 // Refactor dissect editor function searching for canvas

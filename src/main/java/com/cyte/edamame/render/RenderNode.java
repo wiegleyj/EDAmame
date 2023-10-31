@@ -59,6 +59,7 @@ public class RenderNode
                 this.RenderNode_ShapeHighlighted.setFill(Color.GRAY);
                 this.RenderNode_ShapeHighlighted.setOpacity(0.5);
                 this.RenderNode_ShapeHighlighted.setId(this.RenderNode_ID);
+                this.RenderNode_ShapeHighlighted.setVisible(false);
                 //this.RenderNode_ShapeHighlighted.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
                 //this.RenderNode_ShapeHighlighted.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
                 //this.RenderNode_ShapeHighlighted.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
@@ -67,6 +68,7 @@ public class RenderNode
                 this.RenderNode_ShapeSelected.setFill(Color.GRAY);
                 this.RenderNode_ShapeSelected.setOpacity(0.5);
                 this.RenderNode_ShapeSelected.setId(this.RenderNode_ID);
+                this.RenderNode_ShapeSelected.setVisible(false);
                 //this.RenderNode_ShapeSelected.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
                 //this.RenderNode_ShapeSelected.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
                 //this.RenderNode_ShapeSelected.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
