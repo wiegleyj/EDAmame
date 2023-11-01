@@ -8,7 +8,7 @@
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
-import com.cyte.edamame.file.YAML;
+import com.cyte.edamame.file.File;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
 
@@ -95,41 +95,22 @@ public class EditorSymbol extends Editor {
     @FXML
     public void EditorSymbol_Save()
     {
-        //Save();
-
-        LinkedList<Object> shapes = new LinkedList<Object>();
-
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-            shapes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
-
-        YAML.YAML_ListSave(shapes);
+        File.File_NodesSave(this.Editor_RenderSystem.RenderSystem_Nodes);
     }
 
     @FXML
-    public void EditorSymbol_Load() throws IOException
+    public void EditorSymbol_Load()
     {
-        //Load();
+        LinkedList<RenderNode> nodes = File.File_NodesLoad();
 
-        LinkedList<Object> shapes = YAML.YAML_ListLoad();
+        if (nodes == null)
+            return;
 
-        System.out.println(shapes);
+        for (int i = 0; i < nodes.size(); i++)
+            this.Editor_RenderSystem.RenderSystem_NodeAdd(nodes.get(i));
+
+        System.out.println(nodes);
     }
-
-    /*public void Save()
-    {
-        LinkedList<Object> shapes = new LinkedList<Object>();
-        shapes.add(new Circle(5, Color.RED));
-        shapes.add(new Circle(10, Color.BLUE));
-
-        YAML.YAML_ListSave(shapes);
-    }
-
-    public void Load()
-    {
-        LinkedList<Object> shapes = YAML.YAML_ListLoad();
-
-        System.out.println(shapes);
-    }*/
 
     public void Editor_OnDragOverSpecific(DragEvent event)
     {
@@ -320,11 +301,11 @@ public class EditorSymbol extends Editor {
                 // Only dropping the shape within the theater limits...
                 if (selectedShapeButton != null)
                 {
-                    if ((realPos.GetLeftDouble() > -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                    /*if ((realPos.GetLeftDouble() > -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
                         (realPos.GetLeftDouble() < EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
                         (realPos.GetRightDouble() > -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
                         (realPos.GetRightDouble() < EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
-                    {
+                    {*/
                         if (!selectedShapeButton.getText().equals("Line"))
                             this.EditorSymbol_LinePreview = null;
 
@@ -569,11 +550,11 @@ public class EditorSymbol extends Editor {
                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
                         }
-                    }
+                    /*}
                     else
                     {
                         EDAmameController.Controller_SetStatusBar("Unable to drop element because the dropping position is outside the theater limits!");
-                    }
+                    }*/
                 }
             }
 
@@ -693,10 +674,6 @@ public class EditorSymbol extends Editor {
                 lineEndPosX.add(endPoint.GetLeftDouble());
                 lineEndPosY.add(endPoint.GetRightDouble());
                 lineWidths.add(line.getStrokeWidth());
-            }
-            else if (renderNode.RenderNode_Node.getClass() != Label.class)
-            {
-                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to load Symbol Editor properties window!");
             }
         }
 
@@ -1092,10 +1069,6 @@ public class EditorSymbol extends Editor {
                         EDAmameController.Controller_SetStatusBar("Unable to apply line widths because the entered field is non-numeric!");
                     }
                 }
-            }
-            else if (renderNode.RenderNode_Node.getClass() != Label.class)
-            {
-                throw new java.lang.Error("ERROR: Encountered unknown shape type when attempting to apply Symbol Editor properties window!");
             }
         }
     }

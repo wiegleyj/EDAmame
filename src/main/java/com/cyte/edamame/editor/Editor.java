@@ -535,14 +535,14 @@ public abstract class Editor
                                                                                                                           renderNode.RenderNode_MousePressPos.GetRightDouble()));
                     PairMutable edgeOffset = new PairMutable(0.0, 0.0);
 
-                    if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
+                    /*if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
                         edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
                     if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) > EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
                         edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() - EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
                     if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) < -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
                         edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
                     if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
-                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);*/
 
                     renderNode.RenderNode_Node.setTranslateX(renderNode.RenderNode_MousePressPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
                     renderNode.RenderNode_Node.setTranslateY(renderNode.RenderNode_MousePressPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
@@ -586,7 +586,7 @@ public abstract class Editor
             {
                 this.Editor_MouseDragReachedEdge = false;
 
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() < 0))
+                /*if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() < 0))
                 {
                     this.Editor_MouseDragDiffPos.left = this.Editor_MouseDragDiffPos.GetLeftDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()));
                     this.Editor_MouseDragReachedEdge = true;
@@ -605,7 +605,7 @@ public abstract class Editor
                 {
                     this.Editor_MouseDragDiffPos.right = this.Editor_MouseDragDiffPos.GetRightDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()));
                     this.Editor_MouseDragReachedEdge = true;
-                }
+                }*/
 
                 this.Editor_RenderSystem.RenderSystem_Center.left = this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble();
                 this.Editor_RenderSystem.RenderSystem_Center.right = this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble();
@@ -1016,15 +1016,15 @@ public abstract class Editor
                     {
                         Double newPosX = Double.parseDouble(posXStr);
 
-                        if ((newPosX >= -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
+                        /*if ((newPosX >= -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
                             (newPosX <= EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2))
-                        {
+                        {*/
                             renderNode.RenderNode_Node.setTranslateX(newPosX + this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
-                        }
+                        /*}
                         else
                         {
                             EDAmameController.Controller_SetStatusBar("Unable to apply element X position because the entered field is outside the theater limits!");
-                        }
+                        }*/
                     }
                     else if (!posXStr.equals("<mixed>"))
                     {
@@ -1035,15 +1035,15 @@ public abstract class Editor
                     {
                         Double newPosY = Double.parseDouble(posYStr);
 
-                        if ((newPosY >= -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
+                        /*if ((newPosY >= -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
                             (newPosY <= EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
-                        {
+                        {*/
                             renderNode.RenderNode_Node.setTranslateY(newPosY + this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
-                        }
+                        /*}
                         else
                         {
                             EDAmameController.Controller_SetStatusBar("Unable to apply element Y position because the entered field is outside the theater limits!");
-                        }
+                        }*/
                     }
                     else if (!posYStr.equals("<mixed>"))
                     {

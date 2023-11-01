@@ -6,11 +6,11 @@
  */
 
 // TODO:
-// Ask about YAML saving
-// Ask about theater limits
+// Implement symbol saving & loading
+// Implement more shapes & more polygon points
 // Implement line recognition into properties window
 // Fix rectangle & text incorrect center snap points
-// Implement symbol saving & loading
+// Refactor node property loading to RenderNode
 // Implement wire connection points into symbols
 // Fix dragging while zooming near theater edges
 // Fix occasional dragging not recognized
@@ -34,7 +34,6 @@ import javafx.collections.*;
 import javafx.fxml.*;
 import javafx.stage.*;
 import javafx.scene.*;
-import javafx.scene.shape.*;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
@@ -42,7 +41,6 @@ import javafx.scene.input.*;
 import javafx.application.*;
 import javafx.geometry.*;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.*;
@@ -546,7 +544,7 @@ public class EDAmameController implements Initializable
      * Saves the window position and size of the application as Java Preferences.
      *
      * The values of the size and position of the application are saved to the Java Preference storage.
-     * User preferences and settings for application behavior are stored in YAML files to avoid overly
+     * User preferences and settings for application behavior are stored in File files to avoid overly
      * complicating platform dependent stores such as registries.
      */
     public void Controller_WindowContextSave()
@@ -861,7 +859,7 @@ public class EDAmameController implements Initializable
         System.out.println("hi");
 
         String classpath = System.getProperty("java.class.path");
-        String[] classPathValues = classpath.split(File.pathSeparator);
+        String[] classPathValues = classpath.split(java.io.File.pathSeparator);
         for (String classPath: classPathValues) {
             System.out.println(classPath);
         }

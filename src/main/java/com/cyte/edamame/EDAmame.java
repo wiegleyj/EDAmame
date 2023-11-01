@@ -42,7 +42,7 @@ package com.cyte.edamame;
  *             EDAmame enables you to do that with just a few hours of work (and then nobody else ever has
  *             to do it again).</li>
  *             <li>Library data can be exported in human readable, easily automated or communicated formats
- *             such as YAML.</li>
+ *             such as File.</li>
  *         </ul></li>
  *         <li>Intuitive and flexible user interface.
  *         <ul>

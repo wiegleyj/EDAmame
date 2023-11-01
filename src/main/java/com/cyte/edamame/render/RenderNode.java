@@ -195,4 +195,30 @@ public class RenderNode
         this.RenderNode_ShapeSelected.setWidth(boundsLocal.getWidth());
         this.RenderNode_ShapeSelected.setHeight(boundsLocal.getHeight());*/
     }
+
+    public String RenderNode_ToFXMLString()
+    {
+        String str = "<";
+
+        if (this.RenderNode_Node.getClass() == Circle.class)
+        {
+            Circle circle = (Circle)this.RenderNode_Node;
+
+            str += "Circle";
+            str += " radius=\"" + circle.getRadius() + "\"";
+            str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
+            //str += " stroke=\"#" + circle.getStroke().toString() + "\"";
+            //str += " strokeType=\"#" + circle.getStrokeType().toString() + "\"";
+            str += " translateX=\"" + circle.getTranslateX() + "\"";
+            str += " translateY=\"" + circle.getTranslateY() + "\"";
+        }
+        else
+        {
+            throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
+        }
+
+        str += " />";
+
+        return str;
+    }
 }
