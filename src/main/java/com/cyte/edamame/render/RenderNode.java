@@ -36,6 +36,7 @@ public class RenderNode
     public boolean RenderNode_Passive;
     public LinkedList<Shape> RenderNode_SnapPoints;
     public LinkedList<PairMutable> RenderNode_SnapPointOffsets;
+    public static String addZeros = "000000ff";
 
     public RenderNode(String nameValue, Node nodeValue, boolean passiveValue)
     {
@@ -198,26 +199,122 @@ public class RenderNode
 
     public String RenderNode_ToFXMLString()
     {
-        String str = "<";
+        String str = "";
 
         if (this.RenderNode_Node.getClass() == Circle.class)
         {
             Circle circle = (Circle)this.RenderNode_Node;
 
-            str += "Circle";
+            str += "<Circle";
             str += " radius=\"" + circle.getRadius() + "\"";
             str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
+            if (Integer.toHexString(circle.getFill().hashCode()).length() < 8)
+            {
+                //add 0 buffer
+                //returns 8 digits where last two are ff
+                str += " fill=\"#" + addZeros + "\"";
+            } else {
+                str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
+            }
             //str += " stroke=\"#" + circle.getStroke().toString() + "\"";
             //str += " strokeType=\"#" + circle.getStrokeType().toString() + "\"";
             str += " translateX=\"" + circle.getTranslateX() + "\"";
             str += " translateY=\"" + circle.getTranslateY() + "\"";
+            str += " />";
+        }
+        else if  (this.RenderNode_Node.getClass() == Rectangle.class)
+        {
+            Rectangle rectangle = (Rectangle)this.RenderNode_Node;
+
+            str += "<Rectangle";
+            str += " width=\"" + rectangle.getWidth() + "\"";
+            str += " height=\"" + rectangle.getHeight() + "\"";
+            str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
+            if (Integer.toHexString(rectangle.getFill().hashCode()).length() < 8)
+            {
+                //add 0 buffer
+                //returns 8 digits where last two are ff
+                str += " fill=\"#" + addZeros + "\"";
+            } else {
+                str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
+            }
+            //str += " stroke=\"#" + rectangle.getStroke().toString() + "\"";
+            //str += " strokeType=\"#" + rectangle.getStrokeType().toString() + "\"";
+            str += " translateX=\"" + rectangle.getTranslateX() + "\"";
+            str += " translateY=\"" + rectangle.getTranslateY() + "\"";
+            str += " />";
+        }
+        else if (this.RenderNode_Node.getClass() == Polygon.class)
+        {
+            Polygon triangle = (Polygon)this.RenderNode_Node;
+
+            str += "<Polygon";
+            //str += " points=\"" + triangle.getPoints();
+            str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
+            if (Integer.toHexString(triangle.getFill().hashCode()).length() < 8)
+            {
+                //add 0 buffer
+                //returns 8 digits where last two are ff
+                str += " fill=\"#" + addZeros + "\"";
+            } else {
+                str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
+            }
+            //str += " stroke=\"#" + polygon.getStroke().toString() + "\"";
+            //str += " strokeType=\"#" + polygon.getStrokeType().toString() + "\"";
+            str += " translateX=\"" + triangle.getTranslateX() + "\"";
+            str += " translateY=\"" + triangle.getTranslateY() + "\"";
+            str += "<points>";
+            for (int i = 0; i < triangle.getPoints().size() - 1; i++)
+            {
+                str += "<Double fx:value=\"" + triangle.getPoints() + "\"";
+            }
+        }
+        else if (this.RenderNode_Node.getClass() == Line.class)
+        {
+            Line line = (Line)this.RenderNode_Node;
+
+            str += "<Line";
+            str += " startX=\"" + line.getStartX() + "\"";
+            str += " startY=\"" + line.getStartY() + "\"";
+            str += " endX=\"" + line.getEndX() + "\"";
+            str += " endY=\"" + line.getEndY() + "\"";
+            //str += " fill=\"#" + Integer.toHexString(line.getStroke().hashCode()) + "\"";
+            if (Integer.toHexString(line.getStroke().hashCode()).length() < 8)
+            {
+                //add 0 buffer
+                //returns 8 digits where last two are ff
+                str += " fill=\"#" + addZeros + "\"";
+            } else {
+                str += " fill=\"#" + Integer.toHexString(line.getStroke().hashCode()) + "\"";
+            }
+            //str += " stroke=\"#" + line.getStroke().toString() + "\"";
+            //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
+            str += " />";
+        }
+        else if (this.RenderNode_Node.getClass() == Label.class)
+        {
+            Label text = (Label)this.RenderNode_Node;
+
+            str += "<Label";
+            str += " text=\"" + text.getText() + "\"";
+            if (Integer.toHexString(text.getTextFill().hashCode()).length() < 8)
+            {
+                //add 0 buffer
+                //returns 8 digits where last two are ff
+                str += " textFill=\"#" + addZeros + "\">\n";
+            } else {
+                str += " textFill=\"#" + Integer.toHexString(text.getTextFill().hashCode()) + "\">\n";
+            }
+            str += "\t\t\t<font> \n\t\t\t\t<Font";
+            //str += " font=\"" + text.getFont().getName() + "\"";
+            str += " size=\"" + text.getFont().getSize() + "\"";
+            str += "/>\n" + "\t\t\t</font>\n" + "\t\t</Label>";
+
         }
         else
         {
             throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
         }
-
-        str += " />";
 
         return str;
     }
