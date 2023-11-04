@@ -36,7 +36,6 @@ public class RenderNode
     public boolean RenderNode_Passive;
     public LinkedList<Shape> RenderNode_SnapPoints;
     public LinkedList<PairMutable> RenderNode_SnapPointOffsets;
-    public static String addZeros = "000000ff";
 
     public RenderNode(String nameValue, Node nodeValue, boolean passiveValue)
     {
@@ -207,11 +206,14 @@ public class RenderNode
 
             str += "<Circle";
             str += " radius=\"" + circle.getRadius() + "\"";
-            str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
+            //str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
             if (Integer.toHexString(circle.getFill().hashCode()).length() < 8)
             {
-                //add 0 buffer
-                //returns 8 digits where last two are ff
+                String addZeros = Integer.toHexString(circle.getFill().hashCode());
+                while (addZeros.length() < 8)
+                {
+                    addZeros = "0" + addZeros;
+                }
                 str += " fill=\"#" + addZeros + "\"";
             } else {
                 str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
@@ -229,11 +231,14 @@ public class RenderNode
             str += "<Rectangle";
             str += " width=\"" + rectangle.getWidth() + "\"";
             str += " height=\"" + rectangle.getHeight() + "\"";
-            str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
+            //str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
             if (Integer.toHexString(rectangle.getFill().hashCode()).length() < 8)
             {
-                //add 0 buffer
-                //returns 8 digits where last two are ff
+                String addZeros = Integer.toHexString(rectangle.getFill().hashCode());
+                while (addZeros.length() < 8)
+                {
+                    addZeros = "0" + addZeros;
+                }
                 str += " fill=\"#" + addZeros + "\"";
             } else {
                 str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
@@ -250,11 +255,14 @@ public class RenderNode
 
             str += "<Polygon";
             //str += " points=\"" + triangle.getPoints();
-            str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
+            //str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
             if (Integer.toHexString(triangle.getFill().hashCode()).length() < 8)
             {
-                //add 0 buffer
-                //returns 8 digits where last two are ff
+                String addZeros = Integer.toHexString(triangle.getFill().hashCode());
+                while (addZeros.length() < 8)
+                {
+                    addZeros = "0" + addZeros;
+                }
                 str += " fill=\"#" + addZeros + "\"";
             } else {
                 str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
@@ -262,12 +270,13 @@ public class RenderNode
             //str += " stroke=\"#" + polygon.getStroke().toString() + "\"";
             //str += " strokeType=\"#" + polygon.getStrokeType().toString() + "\"";
             str += " translateX=\"" + triangle.getTranslateX() + "\"";
-            str += " translateY=\"" + triangle.getTranslateY() + "\"";
-            str += "<points>";
+            str += " translateY=\"" + triangle.getTranslateY() + "\">";
+            str += "\n\t\t\t<points>";
             for (int i = 0; i < triangle.getPoints().size() - 1; i++)
             {
-                str += "<Double fx:value=\"" + triangle.getPoints() + "\"";
+                str += "\n\t\t\t\t<Double fx:value=\"" + triangle.getPoints().get(i) + "\"/>";
             }
+            str += "\n\t\t\t</points>\n\t\t</Polygon>";
         }
         else if (this.RenderNode_Node.getClass() == Line.class)
         {
@@ -279,14 +288,8 @@ public class RenderNode
             str += " endX=\"" + line.getEndX() + "\"";
             str += " endY=\"" + line.getEndY() + "\"";
             //str += " fill=\"#" + Integer.toHexString(line.getStroke().hashCode()) + "\"";
-            if (Integer.toHexString(line.getStroke().hashCode()).length() < 8)
-            {
-                //add 0 buffer
-                //returns 8 digits where last two are ff
-                str += " fill=\"#" + addZeros + "\"";
-            } else {
-                str += " fill=\"#" + Integer.toHexString(line.getStroke().hashCode()) + "\"";
-            }
+            str += " stroke=\"" + line.getStroke() + "\"";
+
             //str += " stroke=\"#" + line.getStroke().toString() + "\"";
             //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
             str += " />";
@@ -299,8 +302,11 @@ public class RenderNode
             str += " text=\"" + text.getText() + "\"";
             if (Integer.toHexString(text.getTextFill().hashCode()).length() < 8)
             {
-                //add 0 buffer
-                //returns 8 digits where last two are ff
+                String addZeros = Integer.toHexString(text.getTextFill().hashCode());
+                while (addZeros.length() < 8)
+                {
+                    addZeros = "0" + addZeros;
+                }
                 str += " textFill=\"#" + addZeros + "\">\n";
             } else {
                 str += " textFill=\"#" + Integer.toHexString(text.getTextFill().hashCode()) + "\">\n";
