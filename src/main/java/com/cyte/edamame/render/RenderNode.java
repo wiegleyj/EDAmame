@@ -254,8 +254,6 @@ public class RenderNode
             Polygon triangle = (Polygon)this.RenderNode_Node;
 
             str += "<Polygon";
-            //str += " points=\"" + triangle.getPoints();
-            //str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
             if (Integer.toHexString(triangle.getFill().hashCode()).length() < 8)
             {
                 String addZeros = Integer.toHexString(triangle.getFill().hashCode());
@@ -272,7 +270,7 @@ public class RenderNode
             str += " translateX=\"" + triangle.getTranslateX() + "\"";
             str += " translateY=\"" + triangle.getTranslateY() + "\">";
             str += "\n\t\t\t<points>";
-            for (int i = 0; i < triangle.getPoints().size() - 1; i++)
+            for (int i = 0; i < triangle.getPoints().size(); i++)
             {
                 str += "\n\t\t\t\t<Double fx:value=\"" + triangle.getPoints().get(i) + "\"/>";
             }
@@ -287,9 +285,10 @@ public class RenderNode
             str += " startY=\"" + line.getStartY() + "\"";
             str += " endX=\"" + line.getEndX() + "\"";
             str += " endY=\"" + line.getEndY() + "\"";
-            //str += " fill=\"#" + Integer.toHexString(line.getStroke().hashCode()) + "\"";
-            str += " stroke=\"" + line.getStroke() + "\"";
-
+            str += " strokeWidth=\"" + line.getStrokeWidth() + "\"";
+            str += " translateX=\"" + line.getTranslateX() + "\"";
+            str += " translateY=\"" + line.getTranslateY() + "\"";
+            str += " stroke=\"" + line.getStroke().toString().replace("0x", "#") + "\"";
             //str += " stroke=\"#" + line.getStroke().toString() + "\"";
             //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
             str += " />";
@@ -307,14 +306,18 @@ public class RenderNode
                 {
                     addZeros = "0" + addZeros;
                 }
-                str += " textFill=\"#" + addZeros + "\">\n";
+                str += " textFill=\"#" + addZeros + "\"";
             } else {
-                str += " textFill=\"#" + Integer.toHexString(text.getTextFill().hashCode()) + "\">\n";
+                str += " textFill=\"#" + Integer.toHexString(text.getTextFill().hashCode()) + "\"";
             }
+            str += " translateX=\"" + text.getTranslateX() + "\"";
+            str += " translateY=\"" + text.getTranslateY() + "\">\n";
             str += "\t\t\t<font> \n\t\t\t\t<Font";
             //str += " font=\"" + text.getFont().getName() + "\"";
-            str += " size=\"" + text.getFont().getSize() + "\"";
-            str += "/>\n" + "\t\t\t</font>\n" + "\t\t</Label>";
+            str += " name=\"" + text.getFont().getFamily() + "\"";
+            str += " size=\"" + text.getFont().getSize() + "\" />\n";
+
+            str += "\t\t\t</font>\n" + "\t\t</Label>";
 
         }
         else
