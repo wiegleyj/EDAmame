@@ -122,6 +122,8 @@ public abstract class Editor
         if ((this.Editor_Type == -1) || (this.Editor_Name == null))
             throw new java.lang.Error("ERROR: Attempting to run editor without initializing it!");
 
+        this.Editor_TestShapesClear();
+
         // Handling render node highlight, selected & snap shapes refreshing...
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
@@ -218,10 +220,12 @@ public abstract class Editor
         line.setTranslateY(posAvg.GetRightDouble());
     }
 
-    static public PairMutable Editor_LineEndPointsCalculate(Line line)
+    static public PairMutable Editor_LineEndPointsCalculate(Line line, boolean start)
     {
-        return new PairMutable(new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY()),
-                               new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY()));
+        if (start)
+            return new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY());
+
+        return new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY());
     }
 
     public void Editor_LinePreviewUpdate(PairMutable dropPos)
@@ -1365,5 +1369,22 @@ public abstract class Editor
                                                     EDAmameController.Editor_GridPointColors[editorType],
                                                     EDAmameController.Editor_GridBoxColors[editorType],
                                                     EDAmameController.Editor_MaxShapes);
+    }
+
+    //// TESTING FUNCTIONS ////
+
+    public void Editor_TestShapesClear()
+    {
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().size(); i++)
+        {
+            Node currChild = this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().get(i);
+            String currChildId = currChild.getId();
+
+            if ((currChildId != null) && currChildId.equals("testShape"))
+            {
+                this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().remove(currChild);
+                i--;
+            }
+        }
     }
 }

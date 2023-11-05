@@ -8,14 +8,9 @@
 // TODO:
 // Implement symbol saving & loading
 // Implement more shapes & more polygon points
-// Implement line recognition into properties window
-// Fix rectangle & text incorrect center snap points
-// Refactor node property loading to RenderNode
 // Implement wire connection points into symbols
-// Fix dragging while zooming near theater edges
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
-// Refactor dissect editor function searching for canvas
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
 // Implement undo-redo functionalities

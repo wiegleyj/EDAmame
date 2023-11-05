@@ -17,6 +17,7 @@ import java.util.LinkedList;
 
 import com.cyte.edamame.util.Utils;
 import javafx.fxml.*;
+import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
@@ -331,7 +332,7 @@ public class EditorSymbol extends Editor {
                                             circle.setTranslateX(dropPos.GetLeftDouble());
                                             circle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Circle", circle, false);
+                                            RenderNode renderNode = new RenderNode("Circle", circle, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -367,10 +368,10 @@ public class EditorSymbol extends Editor {
                                         {
                                             Rectangle rectangle = new Rectangle(width, height, color);
 
-                                            rectangle.setTranslateX(dropPos.GetLeftDouble() - width / 2);
-                                            rectangle.setTranslateY(dropPos.GetRightDouble() - height / 2);
+                                            rectangle.setTranslateX(dropPos.GetLeftDouble());
+                                            rectangle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Rectangle", rectangle, false);
+                                            RenderNode renderNode = new RenderNode("Rectangle", rectangle, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -411,7 +412,7 @@ public class EditorSymbol extends Editor {
                                             triangle.setTranslateX(dropPos.GetLeftDouble());
                                             triangle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Triangle", triangle, false);
+                                            RenderNode renderNode = new RenderNode("Triangle", triangle, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -456,7 +457,7 @@ public class EditorSymbol extends Editor {
                                                 this.EditorSymbol_LinePreview.setStrokeWidth(width);
                                                 this.EditorSymbol_LinePreview.setStroke(color);
 
-                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true);
+                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, this.Editor_RenderSystem);
                                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
 
                                                 lineStarted = true;
@@ -501,7 +502,7 @@ public class EditorSymbol extends Editor {
                                                 text.setTranslateX(dropPos.GetLeftDouble());
                                                 text.setTranslateY(dropPos.GetRightDouble());
 
-                                                RenderNode renderNode = new RenderNode("Text", text, false);
+                                                RenderNode renderNode = new RenderNode("Text", text, false, this.Editor_RenderSystem);
                                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                             }
                                             else
@@ -546,7 +547,7 @@ public class EditorSymbol extends Editor {
 
                                 this.Editor_LinePreviewRemove();
 
-                                RenderNode renderNode = new RenderNode("Line", line, false);
+                                RenderNode renderNode = new RenderNode("Line", line, false, this.Editor_RenderSystem);
                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
                         }
@@ -665,14 +666,20 @@ public class EditorSymbol extends Editor {
             else if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
                 Line line = (Line)renderNode.RenderNode_Node;
-                PairMutable linePoints = Editor.Editor_LineEndPointsCalculate(line);
-                PairMutable startPoint = linePoints.GetLeftPair();
-                PairMutable endPoint = linePoints.GetRightPair();
+                //PairMutable linePoints = Editor.Editor_LineEndPointsCalculate(line);
+                //PairMutable startPoint = linePoints.GetLeftPair();
+                //PairMutable endPoint = linePoints.GetRightPair();
 
-                lineStartPosX.add(startPoint.GetLeftDouble());
-                lineStartPosY.add(startPoint.GetRightDouble());
-                lineEndPosX.add(endPoint.GetLeftDouble());
-                lineEndPosY.add(endPoint.GetRightDouble());
+                //lineStartPosX.add(startPoint.GetLeftDouble());
+                //lineStartPosY.add(startPoint.GetRightDouble());
+                //lineEndPosX.add(endPoint.GetLeftDouble());
+                //lineEndPosY.add(endPoint.GetRightDouble());
+
+                lineStartPosX.add(line.getStartX());
+                lineStartPosY.add(line.getStartY());
+                lineEndPosX.add(line.getEndX());
+                lineEndPosY.add(line.getEndY());
+
                 lineWidths.add(line.getStrokeWidth());
             }
         }
@@ -782,7 +789,7 @@ public class EditorSymbol extends Editor {
         if (!lineStartPosX.isEmpty() && !lineStartPosY.isEmpty() && !lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
         {
             // Start point
-            /*HBox lineStartPointsHBox = new HBox(10);
+            HBox lineStartPointsHBox = new HBox(10);
             lineStartPointsHBox.setId("lineStartPointsBox");
             lineStartPointsHBox.getChildren().add(new Label("Line Start Points X: "));
             TextField lineStartPointsXText = new TextField();
@@ -839,7 +846,7 @@ public class EditorSymbol extends Editor {
             else
                 lineEndPointsYText.setText("<mixed>");
 
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(lineEndPointsHBox);*/
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(lineEndPointsHBox);
 
             // Width
             HBox lineWidthsHBox = new HBox(10);
@@ -1037,7 +1044,59 @@ public class EditorSymbol extends Editor {
             // Applying lines...
             else if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
-                // TODO
+                Integer lineStartPointsBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "lineStartPointsBox");
+
+                if (lineStartPointsBoxIdx != -1)
+                {
+                    HBox lineStartPointsBox = (HBox) propsBox.getChildren().get(lineStartPointsBoxIdx);
+                    TextField startPointXText = (TextField) EDAmameController.Controller_GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsX");
+                    TextField startPointYText = (TextField) EDAmameController.Controller_GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsY");
+
+                    if (startPointXText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsX\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
+                    if (startPointYText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsY\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
+
+                    String startPointXStr = startPointXText.getText();
+                    String startPointYStr = startPointYText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(startPointXStr))
+                        ((Line)renderNode.RenderNode_Node).setStartX(Double.parseDouble(startPointXStr));
+                    else if (!startPointXStr.equals("<mixed>"))
+                        EDAmameController.Controller_SetStatusBar("Unable to apply line start point X because the entered field is non-numeric!");
+
+                    if (EDAmameController.Controller_IsStringNum(startPointYStr))
+                        ((Line)renderNode.RenderNode_Node).setStartY(Double.parseDouble(startPointYStr));
+                    else if (!startPointYStr.equals("<mixed>"))
+                        EDAmameController.Controller_SetStatusBar("Unable to apply line start point Y because the entered field is non-numeric!");
+                }
+
+                Integer lineEndPointsBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "lineEndPointsBox");
+
+                if (lineEndPointsBoxIdx != -1)
+                {
+                    HBox lineEndPointsBox = (HBox) propsBox.getChildren().get(lineEndPointsBoxIdx);
+                    TextField endPointXText = (TextField) EDAmameController.Controller_GetNodeById(lineEndPointsBox.getChildren(), "lineEndPointsX");
+                    TextField endPointYText = (TextField) EDAmameController.Controller_GetNodeById(lineEndPointsBox.getChildren(), "lineEndPointsY");
+
+                    if (endPointXText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"lineEndPointsX\" node in Symbol Editor properties window \"lineEndPointsBox\" entry!");
+                    if (endPointYText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"lineEndPointsY\" node in Symbol Editor properties window \"lineEndPointsBox\" entry!");
+
+                    String endPointXStr = endPointXText.getText();
+                    String endPointYStr = endPointYText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(endPointXStr))
+                        ((Line)renderNode.RenderNode_Node).setEndX(Double.parseDouble(endPointXStr));
+                    else if (!endPointXStr.equals("<mixed>"))
+                        EDAmameController.Controller_SetStatusBar("Unable to apply line end point X because the entered field is non-numeric!");
+
+                    if (EDAmameController.Controller_IsStringNum(endPointYStr))
+                        ((Line)renderNode.RenderNode_Node).setEndY(Double.parseDouble(endPointYStr));
+                    else if (!endPointYStr.equals("<mixed>"))
+                        EDAmameController.Controller_SetStatusBar("Unable to apply line end point Y because the entered field is non-numeric!");
+                }
 
                 Integer lineWidthsBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "lineWidthsBox");
 

@@ -139,7 +139,7 @@ public class File
                 (node.getClass() == Line.class) ||
                 (node.getClass() == Label.class))
             {
-                RenderNode renderNode = new RenderNode("Loaded Node", node, false);
+                RenderNode renderNode = new RenderNode("Loaded Node", node, false, null);
 
                 renderNodes.add(renderNode);
             }

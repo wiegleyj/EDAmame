@@ -233,4 +233,16 @@ public class RenderSystem
 
         return null;
     }
+
+    //// TESTING FUNCTIONS ////
+
+    public void RenderSystem_TestShapeAdd(PairMutable pos)
+    {
+        Circle testShape = new Circle(5, Color.RED);
+        testShape.setId("testShape");
+        testShape.setTranslateX(pos.GetLeftDouble());
+        testShape.setTranslateY(pos.GetRightDouble());
+
+        this.RenderSystem_PaneHolder.getChildren().add(testShape);
+    }
 }
