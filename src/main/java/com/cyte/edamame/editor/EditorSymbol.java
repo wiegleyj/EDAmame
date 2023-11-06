@@ -109,8 +109,6 @@ public class EditorSymbol extends Editor {
 
         for (int i = 0; i < nodes.size(); i++)
             this.Editor_RenderSystem.RenderSystem_NodeAdd(nodes.get(i));
-
-        System.out.println(nodes);
     }
 
     public void Editor_OnDragOverSpecific(DragEvent event)

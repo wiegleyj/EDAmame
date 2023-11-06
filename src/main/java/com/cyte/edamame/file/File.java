@@ -72,7 +72,8 @@ public class File
         file.println("<?import javafx.scene.shape.Rectangle?>");
         file.println("<?import javafx.scene.shape.Polygon?>");
         file.println("<?import javafx.scene.shape.Line?>");
-        file.println("<?import javafx.scene.control.Label?>\n");
+        file.println("<?import javafx.scene.control.Label?>");
+        file.println("<?import javafx.scene.text.Font?>\n");
 
         file.println("<Pane maxHeight=\"-Infinity\" maxWidth=\"-Infinity\" minHeight=\"-Infinity\" minWidth=\"-Infinity\" xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
         file.println("\t<children>");

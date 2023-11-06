@@ -6,7 +6,6 @@
  */
 
 // TODO:
-// Implement symbol saving & loading
 // Implement more shapes & more polygon points
 // Implement wire connection points into symbols
 // Fix occasional dragging not recognized
