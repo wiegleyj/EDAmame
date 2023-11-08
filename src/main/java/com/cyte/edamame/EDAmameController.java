@@ -6,7 +6,7 @@
  */
 
 // TODO:
-// Implement more shapes & more polygon points
+// Implement schematic editor
 // Implement wire connection points into symbols
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
@@ -61,19 +61,19 @@ public class EDAmameController implements Initializable
 {
     //// GLOBAL VARIABLES ////
 
-    final static public String[] Editor_Names = {"Symbol Editor", "Footprint Editor"};
+    final static public String[] Editor_Names = {"Symbol Editor", "Schematic Editor", "Footprint Editor", "PCB Editor"};
     final static public Double Editor_HeartbeatDelay = 0.01;
 
     final static public PairMutable Editor_TheaterSize = new PairMutable(1000.0, 1000.0);
-    final static public Color[] Editor_BackgroundColors = {Color.BEIGE, Color.DARKBLUE};
-    final static public Color[] Editor_GridPointColors = {Color.GRAY, Color.YELLOW};
-    final static public Color[] Editor_GridBoxColors = {Color.BLACK, Color.YELLOW};
+    final static public Color[] Editor_BackgroundColors = {Color.BEIGE, Color.LIGHTBLUE, Color.DARKBLUE, Color.MAROON};
+    final static public Color[] Editor_GridPointColors = {Color.GRAY, Color.GRAY, Color.YELLOW, Color.YELLOW};
+    final static public Color[] Editor_GridBoxColors = {Color.BLACK,Color.BLACK, Color.YELLOW, Color.YELLOW};
     final static public Integer Editor_MaxShapes = 10000;
     final static public PairMutable Editor_ZoomLimits = new PairMutable(0.35, 5.0);
     final static public Double Editor_ZoomFactor = 1.5;
     final static public Double Editor_MouseDragFactor = 1.0;
     final static public Double Editor_MouseCheckTimeout = 0.0001;
-    final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.YELLOW};
+    final static public Color[] Editor_SelectionBoxColors = {Color.BLACK, Color.BLACK, Color.YELLOW, Color.YELLOW};
     final static public Double Editor_SelectionBoxWidth = 1.0;
     final static public Integer Editor_MenuItemDefaultPriority = 10;
     final static public Double Editor_SnapPointRadius = 15.0;
@@ -609,6 +609,96 @@ public class EDAmameController implements Initializable
 
     //// CALLBACK FUNCTIONS ////
 
+    @FXML
+    public void EditorSymbolNewPressed()
+    {
+        try
+        {
+            Editor editorInstance = EditorSymbol.EditorSymbol_Create();
+
+            if (editorInstance == null)
+            {
+                System.out.println("editorInstance is null!");
+
+                return;
+            }
+
+            Controller_EditorAdd(editorInstance);
+        }
+        catch (IOException exception)
+        {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void EditorSchematicNewPressed()
+    {
+        try
+        {
+            Editor editorInstance = EditorSchematic.EditorSchematic_Create();
+
+            if (editorInstance == null)
+            {
+                System.out.println("editorInstance is null!");
+
+                return;
+            }
+
+            this.Controller_EditorAdd(editorInstance);
+        }
+        catch (IOException exception)
+        {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void EditorFootprintNewPressed()
+    {
+        try
+        {
+            Editor editorInstance = EditorFootprint.EditorFootprint_Create();
+
+            if (editorInstance == null)
+            {
+                System.out.println("editorInstance is null!");
+                return;  // exit the method if editorInstance is null
+            }
+
+            this.Controller_EditorAdd(editorInstance);
+        }
+        catch (IOException exception)
+        {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
+    @FXML
+    public void EditorPCBNewPressed()
+    {
+        try
+        {
+            Editor editorInstance = EditorPCB.EditorPCB_Create();
+
+            if (editorInstance == null)
+            {
+                System.out.println("editorInstance is null!");
+                return;  // exit the method if editorInstance is null
+            }
+
+            this.Controller_EditorAdd(editorInstance);
+        }
+        catch (IOException exception)
+        {
+            System.out.println("ERROR: " + exception.getMessage());
+            exception.printStackTrace();
+        }
+    }
+
     /**
      * Controller_Exit() implements graceful and intelligent shutdown of the EDAmame application.
      *
@@ -798,53 +888,6 @@ public class EDAmameController implements Initializable
     }
 
     //// TESTING FUNCTIONS ////
-
-    /**
-     * A test method for a test button to add a fake editor to the page to verify concept.
-     */
-    @FXML
-    public void EditorSymbolNewButton()
-    {
-        try
-        {
-            Editor editorInstance = EditorFactory.createEditor("SymbolEditor");
-
-            if (editorInstance == null)
-            {
-                System.out.println("editorInstance is null!");
-                return;  // exit the method if editorInstance is null
-            }
-
-            Controller_EditorAdd(editorInstance);
-        }
-        catch (IOException exception)
-        {
-            System.out.println("ERROR: " + exception.getMessage());
-            exception.printStackTrace();
-        }
-    }
-
-    @FXML
-    public void EditorFootprintNewButton()
-    {
-        try
-        {
-            Editor editorInstance = EditorFactory.createEditor("FootprintEditor");
-
-            if (editorInstance == null)
-            {
-                System.out.println("editorInstance is null!");
-                return;  // exit the method if editorInstance is null
-            }
-
-            Controller_EditorAdd(editorInstance);
-        }
-        catch (IOException exception)
-        {
-            System.out.println("ERROR: " + exception.getMessage());
-            exception.printStackTrace();
-        }
-    }
 
     /** A test method for checking database connectivity. */
     @FXML

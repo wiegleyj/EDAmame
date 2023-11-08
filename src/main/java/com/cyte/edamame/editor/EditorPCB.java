@@ -7,18 +7,50 @@
 
 package com.cyte.edamame.editor;
 
+import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.util.PairMutable;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+
+import java.io.IOException;
 
 /**
  * Editor for developing Printed Circuit Boards
  */
 public class EditorPCB extends Editor
 {
+    //// GLOBAL VARIABLES ////
 
+    @FXML
+    private Button EditorPCB_InnerButton;
+
+    //// MAIN FUNCTIONS ////
+
+    public static Editor EditorPCB_Create() throws IOException
+    {
+        FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorPCB.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+
+        EditorPCB editor = fxmlLoader.getController();
+        editor.Editor_Init(3, "EditorPCB");
+        editor.Editor_Dissect(3, scene);
+        editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
+        editor.Editor_ListenersInit();
+
+        return editor;
+    }
+
+    @FXML
+    public void initialize()
+    {
+        System.out.println("I was initialized, the button was " + this.EditorPCB_InnerButton);
+    }
 
     //// CALLBACK FUNCTIONS ////
 

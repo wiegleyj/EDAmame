@@ -7,20 +7,71 @@
 
 package com.cyte.edamame.editor;
 
+import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.file.File;
+import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
-import javafx.scene.input.DragEvent;
-import javafx.scene.input.KeyEvent;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.input.*;
+import javafx.scene.layout.*;
+
+import java.io.IOException;
+import java.util.LinkedList;
 
 /**
  * Editor for developing schematics
  */
 public class EditorSchematic extends Editor
 {
+    //// GLOBAL VARIABLES ////
 
+    @FXML
+    private Button EditorSchematic_InnerButton;
+
+    //// MAIN FUNCTIONS ////
+
+    public static Editor EditorSchematic_Create() throws IOException
+    {
+        FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSchematic.fxml"));
+        Scene scene = new Scene(fxmlLoader.load());
+
+        EditorSchematic editor = fxmlLoader.getController();
+        editor.Editor_Init(1, "EditorSchematic");
+        editor.Editor_Dissect(1, scene);
+        editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
+        editor.Editor_ListenersInit();
+
+        return editor;
+    }
+
+    @FXML
+    public void initialize()
+    {
+        System.out.println("I was initialized, the button was " + this.EditorSchematic_InnerButton);
+    }
 
     //// CALLBACK FUNCTIONS ////
+
+    @FXML
+    public void EditorSchematic_Save()
+    {
+        System.out.println("Loading schematic!");
+    }
+
+    @FXML
+    public void EditorSchematic_Load()
+    {
+        System.out.println("Saving schematic!");
+    }
+
+    @FXML
+    public void EditorSchematic_LoadSymbol()
+    {
+        System.out.println("Loading symbol!");
+    }
 
     public void Editor_OnDragOverSpecific(DragEvent event)
     {

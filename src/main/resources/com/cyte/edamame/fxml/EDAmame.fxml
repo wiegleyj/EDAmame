@@ -25,9 +25,11 @@
             <menus>
                <Menu mnemonicParsing="false" text="STATIC_1">
                  <items>
-                     <MenuItem id="10" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />
-                     <MenuItem id="11" mnemonicParsing="false" onAction="#EditorFootprintNewButton" text="New Footprint Editor" />
-                     <MenuItem id="12" mnemonicParsing="false" onAction="#Controller_Exit" text="Exit Program" />
+                     <MenuItem id="10" mnemonicParsing="false" onAction="#EditorSymbolNewPressed" text="New Symbol Editor" />
+                     <MenuItem id="11" mnemonicParsing="false" onAction="#EditorSchematicNewPressed" text="New Schematic Editor" />
+                     <MenuItem id="12" mnemonicParsing="false" onAction="#EditorFootprintNewPressed" text="New Footprint Editor" />
+                     <MenuItem id="13" mnemonicParsing="false" onAction="#EditorPCBNewPressed" text="New PCB Editor" />
+                     <MenuItem id="20" mnemonicParsing="false" onAction="#Controller_Exit" text="Exit Program" />
                  </items>
                </Menu>
                <Menu mnemonicParsing="false" text="STATIC_2">
@@ -38,8 +40,10 @@
             </menus></MenuBar>
            <HBox>
                <ToolBar>
-                   <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewButton" text="New Symbol Editor" />
-                   <Button mnemonicParsing="false" onAction="#EditorFootprintNewButton" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New Footprint Editor" />
+                   <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewPressed" text="New Symbol Editor" />
+               <Button accessibleHelp="HOTHelp" accessibleText="Hot" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorSchematicNewPressed" text="New Schematic Editor" />
+                   <Button mnemonicParsing="false" onAction="#EditorFootprintNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New Footprint Editor" />
+               <Button layoutX="132.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorPCBNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New PCB Editor" />
                </ToolBar>
                <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS" />
            </HBox>

@@ -25,20 +25,21 @@ import java.io.IOException;
  */
 public class EditorFootprint extends Editor
 {
-    //// MAIN FUNCTIONS ////
+    //// GLOBAL VARIABLES ////
 
     @FXML
     private Button EditorFootprint_InnerButton;
 
+    //// MAIN FUNCTIONS ////
+
     public static Editor EditorFootprint_Create() throws IOException
     {
-        // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorFootprint.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
-        EditorSymbol editor = fxmlLoader.getController();
-        editor.Editor_Init(1, "EditorFootprint");
-        editor.Editor_Dissect(1, scene);
+        EditorFootprint editor = fxmlLoader.getController();
+        editor.Editor_Init(2, "EditorFootprint");
+        editor.Editor_Dissect(2, scene);
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
         editor.Editor_ListenersInit();
 

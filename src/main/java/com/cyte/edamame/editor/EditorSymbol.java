@@ -70,7 +70,6 @@ public class EditorSymbol extends Editor {
      */
     static public Editor EditorSymbol_Create() throws IOException
     {
-        // Loading FXML file for the symbol editor
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
@@ -87,7 +86,8 @@ public class EditorSymbol extends Editor {
      * Provides initialization of the Controller
      */
     @FXML
-    public void initialize() {
+    public void initialize()
+    {
         System.out.println("I was initialized, the button was " + this.EditorSymbol_InnerButton);
     }
 
