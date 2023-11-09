@@ -41,11 +41,24 @@ public class EditorSymbol extends Editor {
     @FXML
     public TextField EditorSymbol_CircleRadius;
     @FXML
+    public ColorPicker EditorSymbol_CircleBorderColor;
+    @FXML
+    public TextField EditorSymbol_CircleBorderSize;
+    @FXML
     public ColorPicker EditorSymbol_RectangleColor;
     @FXML
     public TextField EditorSymbol_RectangleWidth;
     @FXML
     public TextField EditorSymbol_RectangleHeight;
+    @FXML
+    public ColorPicker EditorSymbol_RectangleBorderColor;
+    @FXML
+    public TextField EditorSymbol_RectangleBorderSize;
+    @FXML
+    public ColorPicker EditorSymbol_TriangleBorderColor;
+    @FXML
+    public TextField EditorSymbol_TriangleBorderSize;
+
     @FXML
     public ColorPicker EditorSymbol_TriangleColor;
     @FXML

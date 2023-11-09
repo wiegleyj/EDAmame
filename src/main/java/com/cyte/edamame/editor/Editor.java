@@ -859,6 +859,9 @@ public abstract class Editor
         LinkedList<String> textContents = new LinkedList<String>();
         LinkedList<Double> textFontSizes = new LinkedList<Double>();
         LinkedList<Color> textFontColors = new LinkedList<Color>();
+        LinkedList<Paint> strokes = new LinkedList<Paint>();
+        LinkedList<Double> strokeWidths = new LinkedList<Double>();
+
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
@@ -872,6 +875,7 @@ public abstract class Editor
             shapesPosX.add(renderNode.RenderNode_Node.getTranslateX() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
             shapesPosY.add(renderNode.RenderNode_Node.getTranslateY() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
 
+
             if (renderNode.RenderNode_Node.getClass() != Line.class)
                 shapesRots.add(renderNode.RenderNode_Node.getRotate());
             //}
@@ -881,6 +885,22 @@ public abstract class Editor
                 textContents.add(((Label)renderNode.RenderNode_Node).getText());
                 textFontSizes.add(((Label)renderNode.RenderNode_Node).getFont().getSize());
                 textFontColors.add((Color)((Label)renderNode.RenderNode_Node).getTextFill());
+            }
+
+            if (renderNode.RenderNode_Node.getClass() == Circle.class)
+            {
+                strokes.add(((Circle)renderNode.RenderNode_Node).getStroke());
+                strokeWidths.add(((Circle)renderNode.RenderNode_Node).getStrokeWidth());
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
+            {
+                strokes.add(((Rectangle)renderNode.RenderNode_Node).getStroke());
+                strokeWidths.add(((Rectangle)renderNode.RenderNode_Node).getStrokeWidth());
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
+            {
+                strokes.add(((Polygon)renderNode.RenderNode_Node).getStroke());
+                strokeWidths.add(((Polygon)renderNode.RenderNode_Node).getStrokeWidth());
             }
         }
 
@@ -978,6 +998,28 @@ public abstract class Editor
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textFontSizeHBox);
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textFontColorHBox);
         }
+
+        if (!strokes.isEmpty() && !strokeWidths.isEmpty())
+        {
+            HBox strokesWidthHBox = new HBox(10);
+            strokesWidthHBox.setId("strokesWidthBox");
+            strokesWidthHBox.getChildren().add(new Label("Shape Borders: "));
+            TextField strokesWidthTextBox = new TextField();
+            strokesWidthTextBox.setId("strokeWidth");
+            strokesWidthHBox.getChildren().add(strokesWidthTextBox);
+
+            HBox strokeColorHBox = new HBox(10);
+            strokeColorHBox.setId("strokeColorBox");
+            strokeColorHBox.getChildren().add(new Label("Shape Border Colors: "));
+            ColorPicker strokeColorPicker = new ColorPicker();
+            strokeColorPicker.setId("strokeColor");
+            strokeColorHBox.getChildren().add(strokeColorPicker);
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokesWidthHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokeColorHBox);
+        }
+
+
 
         EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
     }
