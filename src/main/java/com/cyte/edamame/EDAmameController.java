@@ -6,11 +6,8 @@
  */
 
 // TODO:
-// Ask about pane layout-only size adjustment
-// Ask about symbol wire connection points
-// Ask about saving schematics
 // Implement wire connection points into symbols
-// Refactor symbol saving so the shapes aren't all parented to a Pane
+// Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
 // Fix 3+ editors crashing

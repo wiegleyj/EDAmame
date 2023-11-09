@@ -68,8 +68,7 @@ public class File
 
         file.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         file.println("<?import java.lang.Double?>");
-        file.println("<?import javafx.scene.layout.Pane?>");
-        //file.println("<?import javafx.scene.layout.AnchorPane?>");
+        file.println("<?import javafx.scene.Group?>");
         file.println("<?import javafx.scene.shape.Circle?>");
         file.println("<?import javafx.scene.shape.Rectangle?>");
         file.println("<?import javafx.scene.shape.Polygon?>");
@@ -77,8 +76,7 @@ public class File
         file.println("<?import javafx.scene.control.Label?>");
         file.println("<?import javafx.scene.text.Font?>\n");
 
-        file.println("<Pane maxHeight=\"-Infinity\" maxWidth=\"-Infinity\" minHeight=\"-Infinity\" minWidth=\"-Infinity\" xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
-        //file.println("<AnchorPane  xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
+        file.println("<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
         file.println("\t<children>");
 
         PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
@@ -87,7 +85,7 @@ public class File
             file.println("\t\t" + RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos));
 
         file.println("\t</children>");
-        file.println("</Pane>");
+        file.println("</Group>");
 
         file.close();
     }
@@ -125,15 +123,15 @@ public class File
         fxmlLoader.setLocation(new URL("file:///" + filePath));
         Node root = fxmlLoader.<Node>load();
 
-        if (root.getClass() != Pane.class)
+        if (root.getClass() != Group.class)
         {
-            EDAmameController.Controller_SetStatusBar("Attempting to load FXML file without parent Pane class!");
+            EDAmameController.Controller_SetStatusBar("Attempting to load FXML file without parent Group node!");
 
             return null;
         }
 
         LinkedList<Node> nodes = new LinkedList<Node>();
-        ObservableList<Node> children = ((Pane)root).getChildren();
+        ObservableList<Node> children = ((Group)root).getChildren();
 
         for (int i = 0; i < children.size(); i++)
         {
