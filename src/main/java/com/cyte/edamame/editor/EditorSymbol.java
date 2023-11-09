@@ -96,19 +96,28 @@ public class EditorSymbol extends Editor {
     @FXML
     public void EditorSymbol_Save()
     {
-        File.File_NodesSave(this.Editor_RenderSystem.RenderSystem_Nodes);
+        LinkedList<Node> nodes = new LinkedList<Node>();
+
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+            nodes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
+
+        File.File_NodesSave(nodes);
     }
 
     @FXML
     public void EditorSymbol_Load()
     {
-        LinkedList<RenderNode> nodes = File.File_NodesLoad();
+        LinkedList<Node> nodes = File.File_NodesLoad();
 
         if (nodes == null)
             return;
 
         for (int i = 0; i < nodes.size(); i++)
-            this.Editor_RenderSystem.RenderSystem_NodeAdd(nodes.get(i));
+        {
+            RenderNode renderNode = new RenderNode("LoadedNode", nodes.get(i), false, this.Editor_RenderSystem);
+
+            this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+        }
     }
 
     public void Editor_OnDragOverSpecific(DragEvent event)

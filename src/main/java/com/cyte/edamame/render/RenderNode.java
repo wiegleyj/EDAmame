@@ -8,7 +8,6 @@
 package com.cyte.edamame.render;
 
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.PairMutable;
 
 import java.util.UUID;
@@ -18,6 +17,7 @@ import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
+import javafx.scene.layout.*;
 import javafx.geometry.*;
 
 public class RenderNode
@@ -168,7 +168,7 @@ public class RenderNode
         }
     }
 
-    public PairMutable RenderSystem_PosToHolderPane(PairMutable pos)
+    public PairMutable RenderNode_PosToHolderPane(PairMutable pos)
     {
         Point2D newPos = this.RenderNode_Node.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
 
@@ -199,52 +199,52 @@ public class RenderNode
 
             if (snapPointId.equals("snapTopLeft"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 -boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapTopCenter"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
                                                                                 -boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapTopRight"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 -boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapLeft"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 0.0 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapCenter"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
                                                                                 0.0 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapRight"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 0.0 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapBottomLeft"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(-boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapBottomCenter"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(0.0 + posSnapOffset.GetLeftDouble(),
                                                                                 boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapBottomRight"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(boundsNodeLocal.getWidth() / 2 + posSnapOffset.GetLeftDouble(),
                                                                                 boundsNodeLocal.getHeight() / 2 + posSnapOffset.GetRightDouble()));
             }
             else if (snapPointId.equals("snapStart"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(((Line)this.RenderNode_Node).getStartX(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(((Line)this.RenderNode_Node).getStartX(),
                                                                                 ((Line)this.RenderNode_Node).getStartY()));
             }
             else if (snapPointId.equals("snapMiddle"))
@@ -254,11 +254,11 @@ public class RenderNode
                 PairMutable posMiddle = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2,
                                                         (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
 
-                posSnapReal = this.RenderSystem_PosToHolderPane(posMiddle);
+                posSnapReal = this.RenderNode_PosToHolderPane(posMiddle);
             }
             else if (snapPointId.equals("snapEnd"))
             {
-                posSnapReal = this.RenderSystem_PosToHolderPane(new PairMutable(((Line)this.RenderNode_Node).getEndX(),
+                posSnapReal = this.RenderNode_PosToHolderPane(new PairMutable(((Line)this.RenderNode_Node).getEndX(),
                                                                                 ((Line)this.RenderNode_Node).getEndY()));
             }
             else
@@ -269,8 +269,7 @@ public class RenderNode
             snapPoint.setTranslateX(posSnapReal.GetLeftDouble());
             snapPoint.setTranslateY(posSnapReal.GetRightDouble());
 
-            //this.RenderNode_RenderSystem.RenderSystem_TestShapeAdd(new PairMutable(posSnapReal.GetLeftDouble(),
-            //                                                                       posSnapReal.GetRightDouble()));
+            this.RenderNode_RenderSystem.RenderSystem_TestShapeAdd(posSnapReal);
         }
     }
 
@@ -317,6 +316,11 @@ public class RenderNode
             this.RenderNode_ShapeSelected.setTranslateX((boundsReal.getMinX() + boundsReal.getMaxX()) / 2 - boundsLocal.getWidth() / 2);
             this.RenderNode_ShapeSelected.setTranslateY((boundsReal.getMinY() + boundsReal.getMaxY()) / 2 - boundsLocal.getHeight() / 2);
         }
+        else if (this.RenderNode_Node.getClass() == Pane.class)
+        {
+            this.RenderNode_ShapeSelected.setTranslateX(boundsReal.getMinX());
+            this.RenderNode_ShapeSelected.setTranslateY(boundsReal.getMinY());
+        }
         else
         {
             this.RenderNode_ShapeSelected.setTranslateX(posReal.GetLeftDouble() - boundsLocal.getWidth() / 2);
@@ -346,13 +350,13 @@ public class RenderNode
         this.RenderNode_ShapeSelected.setHeight(boundsLocal.getHeight());*/
     }
 
-    public String RenderNode_ToFXMLString()
+    public static String RenderNode_ToFXMLString(Node node)
     {
         String str = "";
 
-        if (this.RenderNode_Node.getClass() == Circle.class)
+        if (node.getClass() == Circle.class)
         {
-            Circle circle = (Circle)this.RenderNode_Node;
+            Circle circle = (Circle)node;
 
             str += "<Circle";
             str += " radius=\"" + circle.getRadius() + "\"";
@@ -374,9 +378,9 @@ public class RenderNode
             str += " translateY=\"" + circle.getTranslateY() + "\"";
             str += " />";
         }
-        else if  (this.RenderNode_Node.getClass() == Rectangle.class)
+        else if  (node.getClass() == Rectangle.class)
         {
-            Rectangle rectangle = (Rectangle)this.RenderNode_Node;
+            Rectangle rectangle = (Rectangle)node;
 
             str += "<Rectangle";
             str += " width=\"" + rectangle.getWidth() + "\"";
@@ -399,9 +403,9 @@ public class RenderNode
             str += " translateY=\"" + rectangle.getTranslateY() + "\"";
             str += " />";
         }
-        else if (this.RenderNode_Node.getClass() == Polygon.class)
+        else if (node.getClass() == Polygon.class)
         {
-            Polygon triangle = (Polygon)this.RenderNode_Node;
+            Polygon triangle = (Polygon)node;
 
             str += "<Polygon";
             if (Integer.toHexString(triangle.getFill().hashCode()).length() < 8)
@@ -426,9 +430,9 @@ public class RenderNode
             }
             str += "\n\t\t\t</points>\n\t\t</Polygon>";
         }
-        else if (this.RenderNode_Node.getClass() == Line.class)
+        else if (node.getClass() == Line.class)
         {
-            Line line = (Line)this.RenderNode_Node;
+            Line line = (Line)node;
 
             str += "<Line";
             str += " startX=\"" + line.getStartX() + "\"";
@@ -443,9 +447,9 @@ public class RenderNode
             //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
             str += " />";
         }
-        else if (this.RenderNode_Node.getClass() == Label.class)
+        else if (node.getClass() == Label.class)
         {
-            Label text = (Label)this.RenderNode_Node;
+            Label text = (Label)node;
 
             str += "<Label";
             str += " text=\"" + text.getText() + "\"";

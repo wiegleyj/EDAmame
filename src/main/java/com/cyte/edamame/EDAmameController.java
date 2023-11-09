@@ -6,6 +6,7 @@
  */
 
 // TODO:
+// Refactor node loading so it doesn't load RenderNode
 // Implement schematic editor
 // Implement wire connection points into symbols
 // Fix occasional dragging not recognized

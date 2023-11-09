@@ -13,6 +13,7 @@ import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -70,63 +71,78 @@ public class EditorSchematic extends Editor
     @FXML
     public void EditorSchematic_LoadSymbol()
     {
-        System.out.println("Loading symbol!");
+        LinkedList<Node> nodes = File.File_NodesLoad();
+
+        if (nodes == null)
+            return;
+
+        Pane symbolNode = new Pane();
+        /*symbolNode.minWidthProperty().bind(symbolNode.prefWidthProperty());
+        symbolNode.minHeightProperty().bind(symbolNode.prefHeightProperty());
+        symbolNode.maxWidthProperty().bind(symbolNode.prefWidthProperty());
+        symbolNode.maxHeightProperty().bind(symbolNode.prefHeightProperty());*/
+
+        PairMutable avgChildPos = new PairMutable(0.0, 0.0);
+
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            Node node = nodes.get(i);
+            Bounds nodeBoundsReal = node.getBoundsInParent();
+
+            avgChildPos.left = (avgChildPos.GetLeftDouble() + (nodeBoundsReal.getMinX() + nodeBoundsReal.getMaxX()) / 2) / 2;
+            avgChildPos.right = (avgChildPos.GetRightDouble() + (nodeBoundsReal.getMinY() + nodeBoundsReal.getMaxY()) / 2) / 2;
+        }
+
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            Node node = nodes.get(i);
+            node.setTranslateX(node.getTranslateX() - avgChildPos.GetLeftDouble());
+            node.setTranslateY(node.getTranslateY() - avgChildPos.GetRightDouble());
+        }
+
+        symbolNode.setTranslateX(avgChildPos.GetLeftDouble());
+        symbolNode.setTranslateY(avgChildPos.GetRightDouble());
+        symbolNode.getChildren().addAll(nodes);
+        symbolNode.setMinWidth(symbolNode.getWidth());
+        symbolNode.setMinHeight(symbolNode.getHeight());
+
+        RenderNode symbolRenderNode = new RenderNode("LoadedNode", symbolNode, false, this.Editor_RenderSystem);
+
+        this.Editor_RenderSystem.RenderSystem_NodeAdd(symbolRenderNode);
     }
 
     public void Editor_OnDragOverSpecific(DragEvent event)
-    {
-        System.out.println("Schematic dragged over!");
-    }
+    {}
 
     public void Editor_OnDragDroppedSpecific(DragEvent event)
-    {
-        System.out.println("Schematic drag dropped!");
-    }
+    {}
 
     public void Editor_OnMouseMovedSpecific(MouseEvent event)
-    {
-        System.out.println("Schematic mouse moved!");
-    }
+    {}
 
     public void Editor_OnMousePressedSpecific(MouseEvent event)
-    {
-        System.out.println("Schematic mouse pressed!");
-    }
+    {}
 
     public void Editor_OnMouseReleasedSpecific(MouseEvent event)
-    {
-        System.out.println("Schematic mouse released!");
-    }
+    {}
 
     public void Editor_OnMouseDraggedSpecific(MouseEvent event)
-    {
-        System.out.println("Schematic mouse dragged!");
-    }
+    {}
 
     public void Editor_OnScrollSpecific(ScrollEvent event)
-    {
-        System.out.println("Schematic mouse scrolled!");
-    }
+    {}
 
     public void Editor_OnKeyPressedSpecific(KeyEvent event)
-    {
-        System.out.println("Schematic key pressed!");
-    }
+    {}
 
     public void Editor_OnKeyReleasedSpecific(KeyEvent event)
-    {
-        System.out.println("Schematic key released!");
-    }
+    {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
     public void Editor_PropsLoadSpecific()
-    {
-        System.out.println("Loading props schematic!");
-    }
+    {}
 
     public void Editor_PropsApplySpecific()
-    {
-        System.out.println("Applying props schematic!");
-    }
+    {}
 }

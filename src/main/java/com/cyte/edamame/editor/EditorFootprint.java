@@ -55,59 +55,37 @@ public class EditorFootprint extends Editor
     //// CALLBACK FUNCTIONS ////
 
     public void Editor_OnDragOverSpecific(DragEvent event)
-    {
-        System.out.println("Footprint dragged over!");
-    }
+    {}
 
     public void Editor_OnDragDroppedSpecific(DragEvent event)
-    {
-        System.out.println("Footprint drag dropped!");
-    }
+    {}
 
     public void Editor_OnMouseMovedSpecific(MouseEvent event)
-    {
-        System.out.println("Footprint mouse moved!");
-    }
+    {}
 
     public void Editor_OnMousePressedSpecific(MouseEvent event)
-    {
-        System.out.println("Footprint mouse pressed!");
-    }
+    {}
 
     public void Editor_OnMouseReleasedSpecific(MouseEvent event)
-    {
-        System.out.println("Footprint mouse released!");
-    }
+    {}
 
     public void Editor_OnMouseDraggedSpecific(MouseEvent event)
-    {
-        System.out.println("Footprint mouse dragged!");
-    }
+    {}
 
     public void Editor_OnScrollSpecific(ScrollEvent event)
-    {
-        System.out.println("Footprint mouse scrolled!");
-    }
+    {}
 
     public void Editor_OnKeyPressedSpecific(KeyEvent event)
-    {
-        System.out.println("Footprint key pressed!");
-    }
+    {}
 
     public void Editor_OnKeyReleasedSpecific(KeyEvent event)
-    {
-        System.out.println("Footprint key released!");
-    }
+    {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
     public void Editor_PropsLoadSpecific()
-    {
-        System.out.println("Loading props footprint!");
-    }
+    {}
 
     public void Editor_PropsApplySpecific()
-    {
-        System.out.println("Applying props footprint!");
-    }
+    {}
 }

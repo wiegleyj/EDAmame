@@ -32,7 +32,7 @@ import java.util.LinkedList;
 
 public class File
 {
-    static public boolean File_NodesSave(LinkedList<RenderNode> nodes)
+    static public boolean File_NodesSave(LinkedList<Node> nodes)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Symbol");
@@ -61,7 +61,7 @@ public class File
         return false;
     }
 
-    static public void File_NodesWrite(String filePath, LinkedList<RenderNode> nodes) throws IOException
+    static public void File_NodesWrite(String filePath, LinkedList<Node> nodes) throws IOException
     {
         PrintWriter file = new PrintWriter(filePath, "UTF-8");
 
@@ -79,7 +79,7 @@ public class File
         file.println("\t<children>");
 
         for (int i = 0; i < nodes.size(); i++)
-            file.println("\t\t" + nodes.get(i).RenderNode_ToFXMLString());
+            file.println("\t\t" + RenderNode.RenderNode_ToFXMLString(nodes.get(i)));
 
         file.println("\t</children>");
         file.println("</Pane>");
@@ -87,7 +87,7 @@ public class File
         file.close();
     }
 
-    static public LinkedList<RenderNode> File_NodesLoad()
+    static public LinkedList<Node> File_NodesLoad()
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Symbol");
@@ -113,7 +113,7 @@ public class File
         return null;
     }
 
-    static public LinkedList<RenderNode> File_NodesRead(String filePath) throws IOException
+    static public LinkedList<Node> File_NodesRead(String filePath) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader();
         filePath = filePath.replace('\\', '/');
@@ -127,7 +127,7 @@ public class File
             return null;
         }
 
-        LinkedList<RenderNode> renderNodes = new LinkedList<RenderNode>();
+        LinkedList<Node> nodes = new LinkedList<Node>();
         ObservableList<Node> children = ((Pane)root).getChildren();
 
         for (int i = 0; i < children.size(); i++)
@@ -140,9 +140,7 @@ public class File
                 (node.getClass() == Line.class) ||
                 (node.getClass() == Label.class))
             {
-                RenderNode renderNode = new RenderNode("Loaded Node", node, false, null);
-
-                renderNodes.add(renderNode);
+                nodes.add(node);
             }
             else
             {
@@ -152,7 +150,7 @@ public class File
             }
         }
 
-        return renderNodes;
+        return nodes;
     }
 
     /*static public LinkedList<Object> YAML_ListLoad()
