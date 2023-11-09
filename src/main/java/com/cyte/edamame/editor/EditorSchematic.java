@@ -76,31 +76,15 @@ public class EditorSchematic extends Editor
         if ((nodes == null) || nodes.isEmpty())
             return;
 
-        Pane symbolNode = new Pane();
+        Group symbolNode = new Group();
         //symbolNode.setStyle("-fx-background-color:black");
-
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealCenter();
-        PairMutable nodeBounds = RenderNode.RenderNode_NodesGetRealBounds(nodes);
-        double nodesWidth = nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble();
-        double nodesHeight = nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble();
-        symbolNode.setTranslateX(dropPos.GetLeftDouble() - nodesWidth / 2);
-        symbolNode.setTranslateY(dropPos.GetRightDouble() - nodesHeight / 2);
+
+        symbolNode.setTranslateX(dropPos.GetLeftDouble());
+        symbolNode.setTranslateY(dropPos.GetRightDouble());
+        symbolNode.getChildren().addAll(nodes);
 
         //System.out.println((nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble()) + ", " + (nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble()));
-
-        for (int i = 0; i < nodes.size(); i++)
-        {
-            Node node = nodes.get(i);
-
-            double translateX = node.getTranslateX();
-            double translateY = node.getTranslateY();
-            node.setTranslateX(0);
-            node.setTranslateY(0);
-            node.setLayoutX(translateX + nodesWidth / 2);
-            node.setLayoutY(translateY + nodesHeight / 2);
-
-            symbolNode.getChildren().add(node);
-        }
 
         /*symbolNode.setMinWidth(Pane.USE_COMPUTED_SIZE);
         symbolNode.setMinHeight(Pane.USE_COMPUTED_SIZE);
