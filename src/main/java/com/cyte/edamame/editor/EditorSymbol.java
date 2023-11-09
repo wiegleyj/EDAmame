@@ -101,21 +101,25 @@ public class EditorSymbol extends Editor {
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
             nodes.add(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node);
 
-        File.File_NodesSave(nodes);
+        File.File_NodesSave(nodes, true);
     }
 
     @FXML
     public void EditorSymbol_Load()
     {
-        LinkedList<Node> nodes = File.File_NodesLoad();
+        LinkedList<Node> nodes = File.File_NodesLoad(true);
 
         if (nodes == null)
             return;
 
         for (int i = 0; i < nodes.size(); i++)
         {
-            RenderNode renderNode = new RenderNode("LoadedNode", nodes.get(i), false, this.Editor_RenderSystem);
+            Node node = nodes.get(i);
+            PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetDrawPos(new PairMutable(node.getTranslateX(), node.getTranslateY()));
+            node.setTranslateX(realPos.GetLeftDouble());
+            node.setTranslateY(realPos.GetRightDouble());
 
+            RenderNode renderNode = new RenderNode("LoadedNode", node, false, this.Editor_RenderSystem);
             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
         }
     }

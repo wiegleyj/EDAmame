@@ -6,9 +6,11 @@
  */
 
 // TODO:
-// Refactor node loading so it doesn't load RenderNode
-// Implement schematic editor
+// Ask about pane layout-only size adjustment
+// Ask about symbol wire connection points
+// Ask about saving schematics
 // Implement wire connection points into symbols
+// Refactor symbol saving so the shapes aren't all parented to a Pane
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
 // Fix 3+ editors crashing

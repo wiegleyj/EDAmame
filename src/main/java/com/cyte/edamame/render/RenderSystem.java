@@ -128,10 +128,22 @@ public class RenderSystem
 
     //// PANE FUNCTIONS ////
 
+    public PairMutable RenderSystem_PaneHolderGetDrawPos(PairMutable pos)
+    {
+        return new PairMutable(pos.GetLeftDouble() + this.RenderSystem_PaneHolder.getWidth() / 2,
+                              pos.GetRightDouble() + this.RenderSystem_PaneHolder.getHeight() / 2);
+    }
+
     public PairMutable RenderSystem_PaneHolderGetRealPos(PairMutable pos)
     {
         return new PairMutable(pos.GetLeftDouble() - this.RenderSystem_PaneHolder.getWidth() / 2,
                                pos.GetRightDouble() - this.RenderSystem_PaneHolder.getHeight() / 2);
+    }
+
+    public PairMutable RenderSystem_PaneHolderGetRealCenter()
+    {
+        return new PairMutable(-this.RenderSystem_Center.GetLeftDouble() + this.RenderSystem_PaneHolder.getWidth() / 2,
+                               -this.RenderSystem_Center.GetRightDouble() + this.RenderSystem_PaneHolder.getHeight() / 2);
     }
 
     public PairMutable RenderSystem_PanePosListenerToHolder(PairMutable pos)
@@ -236,10 +248,15 @@ public class RenderSystem
 
     //// TESTING FUNCTIONS ////
 
-    public void RenderSystem_TestShapeAdd(PairMutable pos)
+    public void RenderSystem_TestShapeAdd(PairMutable pos, Double radius, Color color, boolean passive)
     {
-        Circle testShape = new Circle(5, Color.RED);
-        testShape.setId("testShape");
+        Circle testShape = new Circle(radius, color);
+
+        if (passive)
+            testShape.setId("testShapePassive");
+        else
+            testShape.setId("testShapeActive");
+
         testShape.setTranslateX(pos.GetLeftDouble());
         testShape.setTranslateY(pos.GetRightDouble());
 

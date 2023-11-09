@@ -13,11 +13,11 @@ import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -71,44 +71,48 @@ public class EditorSchematic extends Editor
     @FXML
     public void EditorSchematic_LoadSymbol()
     {
-        LinkedList<Node> nodes = File.File_NodesLoad();
+        LinkedList<Node> nodes = File.File_NodesLoad(true);
 
-        if (nodes == null)
+        if ((nodes == null) || nodes.isEmpty())
             return;
 
         Pane symbolNode = new Pane();
-        /*symbolNode.minWidthProperty().bind(symbolNode.prefWidthProperty());
-        symbolNode.minHeightProperty().bind(symbolNode.prefHeightProperty());
-        symbolNode.maxWidthProperty().bind(symbolNode.prefWidthProperty());
-        symbolNode.maxHeightProperty().bind(symbolNode.prefHeightProperty());*/
+        //symbolNode.setStyle("-fx-background-color:black");
 
-        PairMutable avgChildPos = new PairMutable(0.0, 0.0);
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealCenter();
+        PairMutable nodeBounds = RenderNode.RenderNode_NodesGetRealBounds(nodes);
+        double nodesWidth = nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble();
+        double nodesHeight = nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble();
+        symbolNode.setTranslateX(dropPos.GetLeftDouble() - nodesWidth / 2);
+        symbolNode.setTranslateY(dropPos.GetRightDouble() - nodesHeight / 2);
 
-        for (int i = 0; i < nodes.size(); i++)
-        {
-            Node node = nodes.get(i);
-            Bounds nodeBoundsReal = node.getBoundsInParent();
-
-            avgChildPos.left = (avgChildPos.GetLeftDouble() + (nodeBoundsReal.getMinX() + nodeBoundsReal.getMaxX()) / 2) / 2;
-            avgChildPos.right = (avgChildPos.GetRightDouble() + (nodeBoundsReal.getMinY() + nodeBoundsReal.getMaxY()) / 2) / 2;
-        }
+        //System.out.println((nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble()) + ", " + (nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble()));
 
         for (int i = 0; i < nodes.size(); i++)
         {
             Node node = nodes.get(i);
-            node.setTranslateX(node.getTranslateX() - avgChildPos.GetLeftDouble());
-            node.setTranslateY(node.getTranslateY() - avgChildPos.GetRightDouble());
+
+            double translateX = node.getTranslateX();
+            double translateY = node.getTranslateY();
+            node.setTranslateX(0);
+            node.setTranslateY(0);
+            node.setLayoutX(translateX + nodesWidth / 2);
+            node.setLayoutY(translateY + nodesHeight / 2);
+
+            symbolNode.getChildren().add(node);
         }
 
-        symbolNode.setTranslateX(avgChildPos.GetLeftDouble());
-        symbolNode.setTranslateY(avgChildPos.GetRightDouble());
-        symbolNode.getChildren().addAll(nodes);
-        symbolNode.setMinWidth(symbolNode.getWidth());
-        symbolNode.setMinHeight(symbolNode.getHeight());
+        /*symbolNode.setMinWidth(Pane.USE_COMPUTED_SIZE);
+        symbolNode.setMinHeight(Pane.USE_COMPUTED_SIZE);
+        symbolNode.setMaxWidth(Pane.USE_COMPUTED_SIZE);
+        symbolNode.setMaxHeight(Pane.USE_COMPUTED_SIZE);
+        symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
+        symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
 
-        RenderNode symbolRenderNode = new RenderNode("LoadedNode", symbolNode, false, this.Editor_RenderSystem);
-
+        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, this.Editor_RenderSystem);
         this.Editor_RenderSystem.RenderSystem_NodeAdd(symbolRenderNode);
+
+        //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);
     }
 
     public void Editor_OnDragOverSpecific(DragEvent event)

@@ -1380,7 +1380,7 @@ public abstract class Editor
             Node currChild = this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().get(i);
             String currChildId = currChild.getId();
 
-            if ((currChildId != null) && currChildId.equals("testShape"))
+            if ((currChildId != null) && currChildId.equals("testShapePassive"))
             {
                 this.Editor_RenderSystem.RenderSystem_PaneHolder.getChildren().remove(currChild);
                 i--;

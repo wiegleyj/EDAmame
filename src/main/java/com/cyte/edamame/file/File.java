@@ -12,6 +12,7 @@ import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
 
+import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.collections.ObservableList;
@@ -32,7 +33,7 @@ import java.util.LinkedList;
 
 public class File
 {
-    static public boolean File_NodesSave(LinkedList<Node> nodes)
+    static public boolean File_NodesSave(LinkedList<Node> nodes, boolean center)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Symbol");
@@ -48,7 +49,7 @@ public class File
         {
             try
             {
-                File_NodesWrite(file.getAbsolutePath(), nodes);
+                File_NodesWrite(file.getAbsolutePath(), nodes, center);
 
                 return true;
             }
@@ -61,13 +62,14 @@ public class File
         return false;
     }
 
-    static public void File_NodesWrite(String filePath, LinkedList<Node> nodes) throws IOException
+    static public void File_NodesWrite(String filePath, LinkedList<Node> nodes, boolean center) throws IOException
     {
         PrintWriter file = new PrintWriter(filePath, "UTF-8");
 
         file.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
         file.println("<?import java.lang.Double?>");
         file.println("<?import javafx.scene.layout.Pane?>");
+        //file.println("<?import javafx.scene.layout.AnchorPane?>");
         file.println("<?import javafx.scene.shape.Circle?>");
         file.println("<?import javafx.scene.shape.Rectangle?>");
         file.println("<?import javafx.scene.shape.Polygon?>");
@@ -76,10 +78,13 @@ public class File
         file.println("<?import javafx.scene.text.Font?>\n");
 
         file.println("<Pane maxHeight=\"-Infinity\" maxWidth=\"-Infinity\" minHeight=\"-Infinity\" minWidth=\"-Infinity\" xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
+        //file.println("<AnchorPane  xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
         file.println("\t<children>");
 
+        PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+
         for (int i = 0; i < nodes.size(); i++)
-            file.println("\t\t" + RenderNode.RenderNode_ToFXMLString(nodes.get(i)));
+            file.println("\t\t" + RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos));
 
         file.println("\t</children>");
         file.println("</Pane>");
@@ -87,7 +92,7 @@ public class File
         file.close();
     }
 
-    static public LinkedList<Node> File_NodesLoad()
+    static public LinkedList<Node> File_NodesLoad(boolean center)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Symbol");
@@ -102,7 +107,7 @@ public class File
         {
             try
             {
-                return File_NodesRead(file.getAbsolutePath());
+                return File_NodesRead(file.getAbsolutePath(), center);
             }
             catch (IOException e)
             {
@@ -113,7 +118,7 @@ public class File
         return null;
     }
 
-    static public LinkedList<Node> File_NodesRead(String filePath) throws IOException
+    static public LinkedList<Node> File_NodesRead(String filePath, boolean center) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader();
         filePath = filePath.replace('\\', '/');
@@ -148,6 +153,16 @@ public class File
 
                 return null;
             }
+        }
+
+        PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+
+        for (int i = 0; i < nodes.size(); i++)
+        {
+            Node node = nodes.get(i);
+
+            node.setTranslateX(node.getTranslateX() + childMidPos.GetLeftDouble());
+            node.setTranslateY(node.getTranslateY() + childMidPos.GetRightDouble());
         }
 
         return nodes;
