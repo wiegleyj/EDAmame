@@ -11,8 +11,21 @@ import com.cyte.edamame.render.RenderNode;
 
 import java.util.*;
 
+import javafx.scene.*;
+import javafx.scene.control.*;
+import javafx.scene.paint.*;
+import javafx.scene.shape.*;
+import javafx.geometry.*;
+
 public class Utils
 {
+    static public PairMutable GetPosInNodeParent(Node node, PairMutable pos)
+    {
+        Point2D newPos = node.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+
+        return new PairMutable(newPos.getX(), newPos.getY());
+    }
+
     static public Double GetDist(PairMutable pointA, PairMutable pointB)
     {
         return Math.sqrt(Math.pow(pointB.GetLeftDouble() - pointA.GetLeftDouble(), 2) + Math.pow(pointB.GetRightDouble() - pointA.GetRightDouble(), 2));

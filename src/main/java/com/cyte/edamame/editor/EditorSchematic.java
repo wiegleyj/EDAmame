@@ -6,18 +6,21 @@
  */
 
 package com.cyte.edamame.editor;
-
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.util.Utils;
+
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -82,7 +85,30 @@ public class EditorSchematic extends Editor
 
         symbolNode.setTranslateX(dropPos.GetLeftDouble());
         symbolNode.setTranslateY(dropPos.GetRightDouble());
+
         symbolNode.getChildren().addAll(nodes);
+
+        boolean edgeSnaps = true;
+        LinkedList<PairMutable> snapsManualPos = null;
+
+        for (int i = 0; i < symbolNode.getChildren().size(); i++)
+        {
+            Node node = symbolNode.getChildren().get(i);
+
+            if (node.getClass() == Group.class)
+            {
+                edgeSnaps = false;
+                snapsManualPos = new LinkedList<PairMutable>();
+                Group group = (Group)node;
+                for (int j = 0; j < group.getChildren().size(); j++)
+                {
+                    Node currChild = group.getChildren().get(j);
+
+                    if (currChild.getClass() == Circle.class)
+                        snapsManualPos.add(Utils.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())));
+                }
+            }
+        }
 
         //System.out.println((nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble()) + ", " + (nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble()));
 
@@ -93,7 +119,7 @@ public class EditorSchematic extends Editor
         symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
         symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
 
-        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, this.Editor_RenderSystem);
+        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, edgeSnaps, snapsManualPos, false, this.Editor_RenderSystem);
         this.Editor_RenderSystem.RenderSystem_NodeAdd(symbolRenderNode);
 
         //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);

@@ -228,5 +228,32 @@
                </children>
             </VBox>
          </content></Tab>
+      <Tab text="Pins">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <RadioButton mnemonicParsing="false" text="Pin" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Label: " />
+                        <TextField fx:id="EditorSymbol_PinLabel" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Radius: " />
+                        <TextField fx:id="EditorSymbol_PinRadius" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Color: " />
+                        <ColorPicker fx:id="EditorSymbol_PinColor" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </Tab>
     </TabPane>
 </VBox>

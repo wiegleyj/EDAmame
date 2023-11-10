@@ -6,10 +6,13 @@
  */
 
 // TODO:
-// Implement wire connection points into symbols
+// Implement symbol connection into Schematic Editor
+// Implement pin recognition into properties window
+// Implement straight-only dragging
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
+// Refactor all editor Panes to Groups
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
 // Implement undo-redo functionalities
@@ -79,6 +82,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_SnapPointRadius = 15.0;
     final static public Color Editor_SnapPointShapeColor = Color.DARKGREEN;
     final static public Double Editor_SnapPointShapeOpacity = 0.5;
+    final static public Double Editor_PinLabelFontSize = 10.0;
+    final static public PairMutable Editor_PinLabelOffset = new PairMutable(5.0, 5.0);
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;
@@ -92,6 +97,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_TextFontSizeMax = 100.0;
     final static public Double Editor_LineWidthMin = 5.0;
     final static public Double Editor_LineWidthMax = 20.0;
+    final static public Double Editor_PinRadiusMin = 5.0;
+    final static public Double Editor_PinRadiusMax = 10.0;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

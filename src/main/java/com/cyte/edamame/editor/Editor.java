@@ -632,8 +632,11 @@ public abstract class Editor
             for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
             {
                 RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+                String nodeId = renderNode.RenderNode_Node.getId();
 
-                if (!renderNode.RenderNode_Selected || (renderNode.RenderNode_Node.getClass() == Line.class))
+                if (!renderNode.RenderNode_Selected ||
+                    (renderNode.RenderNode_Node.getClass() == Line.class) ||
+                    ((nodeId != null) && nodeId.contains("PIN_")))
                     continue;
 
                 double angle = 10;

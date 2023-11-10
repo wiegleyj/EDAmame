@@ -79,10 +79,17 @@ public class File
         file.println("<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
         file.println("\t<children>");
 
-        PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+        PairMutable childMidPos = new PairMutable(0.0, 0.0);
+
+        if (center)
+        {
+            childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+            childMidPos.left = -childMidPos.GetLeftDouble();
+            childMidPos.right = -childMidPos.GetRightDouble();
+        }
 
         for (int i = 0; i < nodes.size(); i++)
-            file.println("\t\t" + RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos));
+            file.println(RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos, 2));
 
         file.println("\t</children>");
         file.println("</Group>");
@@ -141,7 +148,8 @@ public class File
                 (node.getClass() == Rectangle.class) ||
                 (node.getClass() == Polygon.class) ||
                 (node.getClass() == Line.class) ||
-                (node.getClass() == Label.class))
+                (node.getClass() == Label.class) ||
+                (node.getClass() == Group.class))
             {
                 nodes.add(node);
             }
@@ -153,14 +161,19 @@ public class File
             }
         }
 
-        PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
-
-        for (int i = 0; i < nodes.size(); i++)
+        if (center)
         {
-            Node node = nodes.get(i);
+            PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+            childMidPos.left = -childMidPos.GetLeftDouble();
+            childMidPos.right = -childMidPos.GetRightDouble();
 
-            node.setTranslateX(node.getTranslateX() + childMidPos.GetLeftDouble());
-            node.setTranslateY(node.getTranslateY() + childMidPos.GetRightDouble());
+            for (int i = 0; i < nodes.size(); i++)
+            {
+                Node node = nodes.get(i);
+
+                node.setTranslateX(node.getTranslateX() + childMidPos.GetLeftDouble());
+                node.setTranslateY(node.getTranslateY() + childMidPos.GetRightDouble());
+            }
         }
 
         return nodes;

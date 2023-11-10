@@ -29,7 +29,8 @@ import javafx.scene.text.*;
 /**
  * Editor for maintaining Symbol libraries.
  */
-public class EditorSymbol extends Editor {
+public class EditorSymbol extends Editor
+{
     //// GLOBAL VARIABLES ////
 
     @FXML
@@ -58,11 +59,14 @@ public class EditorSymbol extends Editor {
     public ColorPicker EditorSymbol_TriangleBorderColor;
     @FXML
     public TextField EditorSymbol_TriangleBorderSize;
-
     @FXML
     public ColorPicker EditorSymbol_TriangleColor;
     @FXML
     public TextField EditorSymbol_TriangleHeight;
+    @FXML
+    public TextField EditorSymbol_LineWidth;
+    @FXML
+    public ColorPicker EditorSymbol_LineColor;
     @FXML
     public TextField EditorSymbol_TextContent;
     @FXML
@@ -70,9 +74,11 @@ public class EditorSymbol extends Editor {
     @FXML
     public ColorPicker EditorSymbol_TextColor;
     @FXML
-    public TextField EditorSymbol_LineWidth;
+    public TextField EditorSymbol_PinLabel;
     @FXML
-    public ColorPicker EditorSymbol_LineColor;
+    public TextField EditorSymbol_PinRadius;
+    @FXML
+    public ColorPicker EditorSymbol_PinColor;
 
     //// MAIN FUNCTIONS ////
 
@@ -132,7 +138,25 @@ public class EditorSymbol extends Editor {
             node.setTranslateX(realPos.GetLeftDouble());
             node.setTranslateY(realPos.GetRightDouble());
 
-            RenderNode renderNode = new RenderNode("LoadedNode", node, false, this.Editor_RenderSystem);
+            boolean edgeSnaps = true;
+            LinkedList<PairMutable> snapManualPos = null;
+
+            if (node.getClass() == Group.class)
+            {
+                edgeSnaps = false;
+                snapManualPos = new LinkedList<PairMutable>();
+                Group group = (Group)node;
+
+                for (int j = 0; j < group.getChildren().size(); j++)
+                {
+                    Node currChild = group.getChildren().get(j);
+
+                    if (currChild.getClass() == Circle.class)
+                        snapManualPos.add(new PairMutable(currChild.getTranslateX(), currChild.getTranslateY()));
+                }
+            }
+
+            RenderNode renderNode = new RenderNode("LoadedNode", node, edgeSnaps, snapManualPos, false, this.Editor_RenderSystem);
             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
         }
     }
@@ -356,7 +380,7 @@ public class EditorSymbol extends Editor {
                                             circle.setTranslateX(dropPos.GetLeftDouble());
                                             circle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Circle", circle, false, this.Editor_RenderSystem);
+                                            RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -395,7 +419,7 @@ public class EditorSymbol extends Editor {
                                             rectangle.setTranslateX(dropPos.GetLeftDouble());
                                             rectangle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Rectangle", rectangle, false, this.Editor_RenderSystem);
+                                            RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -436,7 +460,7 @@ public class EditorSymbol extends Editor {
                                             triangle.setTranslateX(dropPos.GetLeftDouble());
                                             triangle.setTranslateY(dropPos.GetRightDouble());
 
-                                            RenderNode renderNode = new RenderNode("Triangle", triangle, false, this.Editor_RenderSystem);
+                                            RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
                                             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                         }
                                         else
@@ -481,7 +505,7 @@ public class EditorSymbol extends Editor {
                                                 this.EditorSymbol_LinePreview.setStrokeWidth(width);
                                                 this.EditorSymbol_LinePreview.setStroke(color);
 
-                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, this.Editor_RenderSystem);
+                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
                                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
 
                                                 lineStarted = true;
@@ -526,7 +550,7 @@ public class EditorSymbol extends Editor {
                                                 text.setTranslateX(dropPos.GetLeftDouble());
                                                 text.setTranslateY(dropPos.GetRightDouble());
 
-                                                RenderNode renderNode = new RenderNode("Text", text, false, this.Editor_RenderSystem);
+                                                RenderNode renderNode = new RenderNode("Text", text, true, null, false, this.Editor_RenderSystem);
                                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                             }
                                             else
@@ -547,6 +571,67 @@ public class EditorSymbol extends Editor {
                                 else
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered text field is empty!");
+                                }
+                            }
+                            else if (selectedShapeButton.getText().equals("Pin"))
+                            {
+                                String stringPinLabel = this.EditorSymbol_PinLabel.getText();
+
+                                if (!stringPinLabel.isEmpty())
+                                {
+                                    String stringPinRadius = this.EditorSymbol_PinRadius.getText();
+
+                                    if (EDAmameController.Controller_IsStringNum(stringPinRadius))
+                                    {
+                                        double pinRadius = Double.parseDouble(stringPinRadius);
+                                        Color pinColor = this.EditorSymbol_PinColor.getValue();
+
+                                        if (((pinRadius >= EDAmameController.Editor_PinRadiusMin) && (pinRadius <= EDAmameController.Editor_PinRadiusMax)))
+                                        {
+                                            if ((pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000))
+                                            {
+                                                Group pin = new Group();
+                                                pin.setId("PIN_" + stringPinLabel);
+
+                                                Circle pinCircle = new Circle(pinRadius, pinColor);
+
+                                                Label pinLabel = new Label(stringPinLabel);
+                                                pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
+                                                pinLabel.setTextFill(pinColor);
+
+                                                pin.getChildren().add(pinCircle);
+                                                pin.getChildren().add(pinLabel);
+
+                                                pin.setTranslateX(dropPos.GetLeftDouble());
+                                                pin.setTranslateY(dropPos.GetRightDouble());
+
+                                                pinLabel.setTranslateX(EDAmameController.Editor_PinLabelOffset.GetLeftDouble());
+                                                pinLabel.setTranslateY(EDAmameController.Editor_PinLabelOffset.GetRightDouble());
+
+                                                LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
+                                                snap.add(new PairMutable(0.0, 0.0));
+
+                                                RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, this.Editor_RenderSystem);
+                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                            }
+                                            else
+                                            {
+                                                EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
+                                            }
+                                        }
+                                        else
+                                        {
+                                            EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.Editor_PinRadiusMin + ", " + EDAmameController.Editor_PinRadiusMax + ")");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered label field is empty!");
                                 }
                             }
                             else
@@ -571,7 +656,7 @@ public class EditorSymbol extends Editor {
 
                                 this.Editor_LinePreviewRemove();
 
-                                RenderNode renderNode = new RenderNode("Line", line, false, this.Editor_RenderSystem);
+                                RenderNode renderNode = new RenderNode("Line", line, true, null, false, this.Editor_RenderSystem);
                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
                         }
