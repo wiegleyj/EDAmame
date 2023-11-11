@@ -93,6 +93,8 @@ public class EDAmameController implements Initializable
     final static public Double Editor_RectHeightMax = 500.0;
     final static public Double Editor_TriLenMin = 10.0;
     final static public Double Editor_TriLenMax = 500.0;
+    final static public Double Editor_BorderMin = 0.0;
+    final static public Double Editor_BorderMax = 10.0;
     final static public Double Editor_TextFontSizeMin = 10.0;
     final static public Double Editor_TextFontSizeMax = 100.0;
     final static public Double Editor_LineWidthMin = 5.0;
