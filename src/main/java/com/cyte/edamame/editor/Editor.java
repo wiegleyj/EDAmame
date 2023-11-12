@@ -1011,12 +1011,22 @@ public abstract class Editor
             strokesWidthTextBox.setId("strokeWidth");
             strokesWidthHBox.getChildren().add(strokesWidthTextBox);
 
+            if (EDAmameController.Controller_IsListAllEqual(strokeWidths))
+                strokesWidthTextBox.setText(Double.toString(strokeWidths.get(0)));
+            else
+                strokesWidthTextBox.setText("<mixed>");
+
             HBox strokeColorHBox = new HBox(10);
             strokeColorHBox.setId("strokeColorBox");
             strokeColorHBox.getChildren().add(new Label("Shape Border Colors: "));
             ColorPicker strokeColorPicker = new ColorPicker();
             strokeColorPicker.setId("strokeColor");
             strokeColorHBox.getChildren().add(strokeColorPicker);
+
+            if (EDAmameController.Controller_IsListAllEqual(strokes))
+                strokeColorPicker.setValue((Color) strokes.get(0));
+            else
+                strokeColorPicker.setValue(Color.TRANSPARENT);
 
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokesWidthHBox);
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokeColorHBox);
@@ -1099,6 +1109,7 @@ public abstract class Editor
                         EDAmameController.Controller_SetStatusBar("Unable to apply element Y position because the entered field is non-numeric!");
                     }
                 }
+
             }
 
             // Applying rotation...
