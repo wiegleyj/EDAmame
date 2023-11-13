@@ -15,9 +15,7 @@ import com.cyte.edamame.EDAmame;
 import java.io.*;
 import java.util.LinkedList;
 
-import com.cyte.edamame.util.Utils;
 import javafx.fxml.*;
-import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
@@ -36,7 +34,7 @@ public class EditorSymbol extends Editor
     @FXML
     private Button EditorSymbol_InnerButton;
     @FXML
-    public ToggleGroup EditorSymbol_ShapeToggleGroup;
+    public ToggleGroup EditorSymbol_ToggleGroup;
     @FXML
     public ColorPicker EditorSymbol_CircleColor;
     @FXML
@@ -309,31 +307,7 @@ public class EditorSymbol extends Editor
     public void Editor_OnMouseReleasedSpecific(MouseEvent event)
     {
         PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        Double minDist = EDAmameController.Editor_SnapPointRadius;
-
-        // Checking for magnetic snap...
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-        {
-            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
-
-            if (renderNode.RenderNode_Passive)
-                continue;
-
-            for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
-            {
-                Shape snapPoint = renderNode.RenderNode_SnapPoints.get(j);
-                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
-
-                Double currDist = Utils.GetDist(dropPos, snapPos);
-
-                if (currDist <= minDist)
-                {
-                    dropPos = snapPos;
-                    minDist = currDist;
-                }
-            }
-        }
-
+        dropPos = this.Editor_MagneticSnapCheck(dropPos);
         PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
 
         if (this.Editor_PressedLMB)
@@ -345,7 +319,7 @@ public class EditorSymbol extends Editor
                 !this.Editor_ShapesWereSelected &&
                 !this.Editor_WasSelectionBox)
             {
-                RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ShapeToggleGroup.getSelectedToggle();
+                RadioButton selectedShapeButton = (RadioButton) EditorSymbol_ToggleGroup.getSelectedToggle();
 
                 // Only dropping the shape within the theater limits...
                 if (selectedShapeButton != null)

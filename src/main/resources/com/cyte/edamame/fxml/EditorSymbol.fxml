@@ -83,7 +83,7 @@
                      <children>
                         <RadioButton mnemonicParsing="false" text="Circle">
                            <toggleGroup>
-                              <ToggleGroup fx:id="EditorSymbol_ShapeToggleGroup" />
+                              <ToggleGroup fx:id="EditorSymbol_ToggleGroup" />
                            </toggleGroup>
                         </RadioButton>
                         <HBox prefHeight="100.0" prefWidth="200.0">
@@ -115,7 +115,7 @@
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Separator prefWidth="200.0" />
-                        <RadioButton mnemonicParsing="false" text="Rectangle" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                        <RadioButton mnemonicParsing="false" text="Rectangle" toggleGroup="$EditorSymbol_ToggleGroup" />
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <Label text="Width: " />
@@ -151,7 +151,7 @@
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
                         <Separator prefWidth="200.0" />
-                        <RadioButton mnemonicParsing="false" text="Triangle" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                        <RadioButton mnemonicParsing="false" text="Triangle" toggleGroup="$EditorSymbol_ToggleGroup" />
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
                               <Label text="Height: " />
@@ -178,35 +178,33 @@
                         </HBox>
                      </children>
                   </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Line" toggleGroup="$EditorSymbol_ToggleGroup" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Width " />
+                              <TextField fx:id="EditorSymbol_LineWidth" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Color " />
+                              <ColorPicker fx:id="EditorSymbol_LineColor" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
                </children>
             </VBox>
          </content>
         </Tab>
-        <Tab text="Lines">
-         <content>
-            <VBox prefHeight="200.0" prefWidth="100.0">
-               <children>
-                  <RadioButton mnemonicParsing="false" text="Line" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <Label text="Width " />
-                        <TextField fx:id="EditorSymbol_LineWidth" />
-                     </children>
-                  </HBox>
-                  <HBox prefHeight="100.0" prefWidth="200.0">
-                     <children>
-                        <Label text="Color " />
-                        <ColorPicker fx:id="EditorSymbol_LineColor" />
-                     </children>
-                  </HBox>
-               </children>
-            </VBox>
-         </content></Tab>
       <Tab text="Text">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <RadioButton mnemonicParsing="false" text="Text" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                  <RadioButton mnemonicParsing="false" text="Text" toggleGroup="$EditorSymbol_ToggleGroup" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label text="Text Content: " />
@@ -232,7 +230,7 @@
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
-                  <RadioButton mnemonicParsing="false" text="Pin" toggleGroup="$EditorSymbol_ShapeToggleGroup" />
+                  <RadioButton mnemonicParsing="false" text="Pin" toggleGroup="$EditorSymbol_ToggleGroup" />
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label text="Label: " />

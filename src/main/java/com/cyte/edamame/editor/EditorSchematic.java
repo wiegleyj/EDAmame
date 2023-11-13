@@ -7,6 +7,7 @@
 
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
@@ -20,7 +21,9 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
+import javafx.scene.paint.Paint;
+import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -34,6 +37,12 @@ public class EditorSchematic extends Editor
 
     @FXML
     private Button EditorSchematic_InnerButton;
+    @FXML
+    public ToggleGroup EditorSchematic_ToggleGroup;
+    @FXML
+    public TextField EditorSchematic_WireWidth;
+    @FXML
+    public ColorPicker EditorSchematic_WireColor;
 
     //// MAIN FUNCTIONS ////
 
@@ -88,7 +97,7 @@ public class EditorSchematic extends Editor
 
         symbolNode.getChildren().addAll(nodes);
 
-        boolean edgeSnaps = true;
+        boolean edgeSnaps = false;
         LinkedList<PairMutable> snapsManualPos = null;
 
         for (int i = 0; i < symbolNode.getChildren().size(); i++)
@@ -97,16 +106,25 @@ public class EditorSchematic extends Editor
 
             if (node.getClass() == Group.class)
             {
-                edgeSnaps = false;
-                snapsManualPos = new LinkedList<PairMutable>();
+                if (snapsManualPos == null)
+                    snapsManualPos = new LinkedList<PairMutable>();
+
                 Group group = (Group)node;
+
                 for (int j = 0; j < group.getChildren().size(); j++)
                 {
                     Node currChild = group.getChildren().get(j);
 
                     if (currChild.getClass() == Circle.class)
+                    {
                         snapsManualPos.add(Utils.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())));
+                        //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(Utils.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())), 5.0, Color.RED, false);
+                    }
                 }
+            }
+            else if (node.getClass() == Line.class)
+            {
+                edgeSnaps = true;
             }
         }
 
@@ -138,7 +156,106 @@ public class EditorSchematic extends Editor
     {}
 
     public void Editor_OnMouseReleasedSpecific(MouseEvent event)
-    {}
+    {
+        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        dropPos = this.Editor_MagneticSnapCheck(dropPos);
+        PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
+
+        // Handling element dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
+        if ((this.Editor_ShapesSelected == 0) &&
+                !this.Editor_ShapesMoving &&
+                (this.Editor_SelectionBox == null) &&
+                !this.Editor_ShapesWereSelected &&
+                !this.Editor_WasSelectionBox)
+        {
+            RadioButton selectedShapeButton = (RadioButton)EditorSchematic_ToggleGroup.getSelectedToggle();
+
+            // Only dropping the element within the theater limits...
+            if (selectedShapeButton != null)
+            {
+                if (!selectedShapeButton.getText().equals("Wire"))
+                    this.EditorSymbol_LinePreview = null;
+
+                boolean lineStarted = false;
+
+                if (this.Editor_ShapesHighlighted == 0)
+                {
+                    if (selectedShapeButton.getText().equals("Wire"))
+                    {
+                        // If we're starting the line drawing...
+                        if (this.EditorSymbol_LinePreview == null)
+                        {
+                            String stringWidth = this.EditorSchematic_WireWidth.getText();
+                            Color color = this.EditorSchematic_WireColor.getValue();
+
+                            if (EDAmameController.Controller_IsStringNum(stringWidth))
+                            {
+                                double width = Double.parseDouble(stringWidth);
+
+                                if (((width >= EDAmameController.Editor_WireWidthMin) && (width <= EDAmameController.Editor_WireWidthMax)))
+                                {
+                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                    {
+                                        this.EditorSymbol_LinePreview = new Line();
+
+                                        this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
+                                        this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
+                                        this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
+                                        this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+
+                                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                                        this.EditorSymbol_LinePreview.setStroke(color);
+
+                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
+                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+
+                                        lineStarted = true;
+                                    }
+                                    else
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered color field is transparent!");
+                                    }
+                                }
+                                else
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_WireWidthMin + ", " + EDAmameController.Editor_WireWidthMax + ")");
+                                }
+                            }
+                            else
+                            {
+                                EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered width field is non-numeric!");
+                            }
+                        }
+                    }
+                    else
+                    {
+                        throw new java.lang.Error("ERROR: Attempt to drop an element shape in a Schematic Editor!");
+                    }
+                }
+
+                if (selectedShapeButton.getText().equals("Wire"))
+                {
+                    // If we're finishing the line drawing...
+                    if ((this.EditorSymbol_LinePreview != null) && !lineStarted)
+                    {
+                        PairMutable posStart = new PairMutable(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY());
+                        PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
+
+                        Line line = new Line();
+                        Editor.Editor_LineDropPosCalculate(line, posStart, posEnd);
+
+                        line.setStroke(this.EditorSymbol_LinePreview.getStroke());
+                        line.setStrokeWidth(this.EditorSymbol_LinePreview.getStrokeWidth());
+
+                        this.Editor_LinePreviewRemove();
+
+                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, this.Editor_RenderSystem);
+                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                    }
+                }
+            }
+        }
+    }
 
     public void Editor_OnMouseDraggedSpecific(MouseEvent event)
     {}

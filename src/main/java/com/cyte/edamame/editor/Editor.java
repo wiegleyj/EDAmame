@@ -1225,6 +1225,37 @@ public abstract class Editor
 
     //// SUPPORT FUNCTIONS ////
 
+    public PairMutable Editor_MagneticSnapCheck(PairMutable pos)
+    {
+        PairMutable posSnapped = new PairMutable(pos);
+        Double minDist = EDAmameController.Editor_SnapPointRadius;
+
+        // Checking for magnetic snap...
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            if (renderNode.RenderNode_Passive)
+                continue;
+
+            for (int j = 0; j < renderNode.RenderNode_SnapPoints.size(); j++)
+            {
+                Shape snapPoint = renderNode.RenderNode_SnapPoints.get(j);
+                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
+
+                Double currDist = Utils.GetDist(pos, snapPos);
+
+                if (currDist <= minDist)
+                {
+                    posSnapped = snapPos;
+                    minDist = currDist;
+                }
+            }
+        }
+
+        return posSnapped;
+    }
+
     /** Editor_Dissect a controller into its component for delivery to EDAmame<p>
      *
      * The design of Controller_Editors is intended to be done through FXML and SceneBuilder. SceneBuilder doesn't
