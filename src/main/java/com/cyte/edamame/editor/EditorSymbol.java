@@ -341,57 +341,57 @@ public class EditorSymbol extends Editor
                                 EDAmameController.Controller_SetStatusBar("EDAmame Status Area");
 
                                 String stringRadius = this.EditorSymbol_CircleRadius.getText();
+                                String stringStrokeSize = this.EditorSymbol_CircleBorderSize.getText();
+                                Color fillColor = this.EditorSymbol_CircleColor.getValue();
+                                Paint strokeColor = this.EditorSymbol_CircleBorderColor.getValue();
+                                boolean canDrop = true;
+
                                 if (!EDAmameController.Controller_IsStringNum(stringRadius))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double radius = Double.parseDouble(stringRadius);
                                 if (!((radius >= EDAmameController.Editor_CircleRadiusMin) && (radius <= EDAmameController.Editor_CircleRadiusMax)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Color fillColor = this.EditorSymbol_CircleColor.getValue();
-                                if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered color field is transparent!");
-                                    return;
-                                }
-
-                                String stringStrokeSize = this.EditorSymbol_CircleBorderSize.getText();
                                 if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border size is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double strokeSize = Double.parseDouble(stringStrokeSize);
                                 if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Paint strokeColor = this.EditorSymbol_CircleBorderColor.getValue();
-                                if (!((strokeColor != Color.TRANSPARENT) && (strokeColor.hashCode() != 0x00000000)))
+                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border color field is transparent!");
-                                    return;
+                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered fill and border is transparent!");
+                                        canDrop = false;
+                                    }
                                 }
 
-                                Circle circle = new Circle(radius, fillColor);
+                                if (canDrop)
+                                {
+                                    Circle circle = new Circle(radius, fillColor);
 
-                                circle.setTranslateX(dropPos.GetLeftDouble());
-                                circle.setTranslateY(dropPos.GetRightDouble());
+                                    circle.setTranslateX(dropPos.GetLeftDouble());
+                                    circle.setTranslateY(dropPos.GetRightDouble());
 
-                                circle.setStroke(strokeColor);
-                                circle.setStrokeWidth(strokeSize);
+                                    circle.setStroke(strokeColor);
+                                    circle.setStrokeWidth(strokeSize);
 
-                                RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, this.Editor_RenderSystem);
-                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-
-
+                                    RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, this.Editor_RenderSystem);
+                                    this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                }
                             }
                             else if (selectedShapeButton.getText().equals("Rectangle"))
                             {
@@ -399,10 +399,15 @@ public class EditorSymbol extends Editor
 
                                 String stringWidth = this.EditorSymbol_RectangleWidth.getText();
                                 String stringHeight = this.EditorSymbol_RectangleHeight.getText();
+                                String stringStrokeSize = this.EditorSymbol_RectangleBorderSize.getText();
+                                Color fillColor = this.EditorSymbol_RectangleColor.getValue();
+                                Paint strokeColor = this.EditorSymbol_RectangleBorderColor.getValue();
+                                boolean canDrop = true;
+
                                 if (!(EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double width = Double.parseDouble(stringWidth);
                                 double height = Double.parseDouble(stringHeight);
@@ -410,106 +415,105 @@ public class EditorSymbol extends Editor
                                         ((height >= EDAmameController.Editor_RectHeightMin) && (height <= EDAmameController.Editor_RectHeightMax))))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Color fillColor = this.EditorSymbol_RectangleColor.getValue();
-                                if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered color field is transparent!");
-                                    return;
-                                }
-
-                                String stringStrokeSize = this.EditorSymbol_RectangleBorderSize.getText();
                                 if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border size is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double strokeSize = Double.parseDouble(stringStrokeSize);
                                 if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Paint strokeColor = this.EditorSymbol_RectangleBorderColor.getValue();
-                                if (!((strokeColor != Color.TRANSPARENT) && (strokeColor.hashCode() != 0x00000000)))
+                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border color field is transparent!");
-                                    return;
+                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered fill and border is transparent!");
+                                        canDrop = false;
+                                    }
                                 }
 
-                                Rectangle rectangle = new Rectangle(width, height, fillColor);
+                                if (canDrop)
+                                {
+                                    Rectangle rectangle = new Rectangle(width, height, fillColor);
 
-                                rectangle.setTranslateX(dropPos.GetLeftDouble());
-                                rectangle.setTranslateY(dropPos.GetRightDouble());
+                                    rectangle.setTranslateX(dropPos.GetLeftDouble());
+                                    rectangle.setTranslateY(dropPos.GetRightDouble());
 
-                                rectangle.setStroke(strokeColor);
-                                rectangle.setStrokeWidth(strokeSize);
+                                    rectangle.setStroke(strokeColor);
+                                    rectangle.setStrokeWidth(strokeSize);
 
-                                RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, this.Editor_RenderSystem);
-                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-
+                                    RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, this.Editor_RenderSystem);
+                                    this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                }
                             }
                             else if (selectedShapeButton.getText().equals("Triangle"))
                             {
                                 EDAmameController.Controller_SetStatusBar("EDAmame Status Area");
 
                                 String stringMiddleHeight = this.EditorSymbol_TriangleHeight.getText();
+                                String stringStrokeSize = this.EditorSymbol_TriangleBorderSize.getText();
+                                Color fillColor = this.EditorSymbol_TriangleColor.getValue();
+                                Paint strokeColor = this.EditorSymbol_TriangleBorderColor.getValue();
+                                boolean canDrop = true;
+
                                 if (!EDAmameController.Controller_IsStringNum(stringMiddleHeight))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double middleLength = Double.parseDouble(stringMiddleHeight);
                                 if (!((middleLength >= EDAmameController.Editor_TriLenMin) && (middleLength <= EDAmameController.Editor_TriLenMax)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Color fillColor = this.EditorSymbol_TriangleColor.getValue();
-                                if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered fill color field is transparent!");
-                                    return;
-                                }
-
-                                String stringStrokeSize = this.EditorSymbol_TriangleBorderSize.getText();
                                 if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border size is non-numeric!");
-                                    return;
+                                    canDrop = false;
                                 }
                                 double strokeSize = Double.parseDouble(stringStrokeSize);
                                 if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    return;
+                                    canDrop = false;
                                 }
 
-                                Paint strokeColor = this.EditorSymbol_TriangleBorderColor.getValue();
-                                if (!((strokeColor != Color.TRANSPARENT) && (strokeColor.hashCode() != 0x00000000)))
+                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border color field is transparent!");
-                                    return;
+                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered fill and border is transparent!");
+                                        canDrop = false;
+                                    }
                                 }
 
-                                Polygon triangle = new Polygon();
-                                triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                        middleLength / 2, middleLength / 2,
-                                        0.0, -middleLength / 2);
-                                triangle.setFill(fillColor);
+                                if (canDrop)
+                                {
+                                    Polygon triangle = new Polygon();
+                                    triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
+                                            middleLength / 2, middleLength / 2,
+                                            0.0, -middleLength / 2);
+                                    triangle.setFill(fillColor);
 
-                                triangle.setTranslateX(dropPos.GetLeftDouble());
-                                triangle.setTranslateY(dropPos.GetRightDouble());
+                                    triangle.setTranslateX(dropPos.GetLeftDouble());
+                                    triangle.setTranslateY(dropPos.GetRightDouble());
 
-                                triangle.setStroke(strokeColor);
-                                triangle.setStrokeWidth(strokeSize);
+                                    triangle.setStroke(strokeColor);
+                                    triangle.setStrokeWidth(strokeSize);
 
-                                RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
-                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                    RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
+                                    this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                }
+
                             }
                             else if (selectedShapeButton.getText().equals("Line"))
                             {
