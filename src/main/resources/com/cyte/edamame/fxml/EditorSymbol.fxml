@@ -43,7 +43,7 @@
         <Button mnemonicParsing="false" onAction="#EditorSymbol_Save" text="Save Symbol" />
       <Button mnemonicParsing="false" onAction="#EditorSymbol_Load" text="Load Symbol" />
     </ToolBar>
-    <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+    <TabPane onKeyPressed="#handleKeyPress" prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="EditorTab">
             <HBox>
             <StackPane alignment="TOP_CENTER" cacheShape="false" centerShape="false" minHeight="-Infinity" minWidth="-Infinity" prefHeight="200.0" prefWidth="200.0" scaleShape="false" HBox.hgrow="SOMETIMES">

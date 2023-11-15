@@ -15,6 +15,9 @@ import com.cyte.edamame.EDAmame;
 import java.io.*;
 import java.util.LinkedList;
 
+import com.cyte.edamame.util.ShapeMemento;
+import com.cyte.edamame.util.ShapeOriginator;
+import com.cyte.edamame.util.ShapeRecorder;
 import javafx.fxml.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -24,6 +27,11 @@ import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
 
+import javafx.fxml.FXML;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.Pane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 /**
  * Editor for maintaining Symbol libraries.
  */
@@ -77,7 +85,11 @@ public class EditorSymbol extends Editor
     public TextField EditorSymbol_PinRadius;
     @FXML
     public ColorPicker EditorSymbol_PinColor;
+    @FXML
+    private Pane drawingPane;
 
+    private ShapeOriginator originator;
+    private ShapeRecorder recorder;
     //// MAIN FUNCTIONS ////
 
     /**
@@ -85,6 +97,61 @@ public class EditorSymbol extends Editor
      *
      * @throws IOException if there are problems loading the scene from FXML resources.
      */
+    @FXML
+        public void initialize() {
+                System.out.println("I was initialized, the button was " + this.EditorSymbol_InnerButton);
+
+            originator = new ShapeOriginator();
+            recorder = new ShapeRecorder();
+
+            // Add an initial shape to the drawingPane
+            Circle initialCircle = createCircle(50, 50, 30, Color.BLUE);
+            drawingPane.getChildren().add(initialCircle);
+
+            // Save the initial state
+            originator.setState(initialCircle);
+            recorder.addMemento(originator.saveStateToMemento());
+        }
+
+        @FXML
+        private void handleKeyPress(KeyEvent event) {
+            if (event.isControlDown() && event.getCode().equals(KeyCode.Z)) {
+                undo();
+            } else if (event.isControlDown() && event.getCode().equals(KeyCode.Y)) {
+                redo();
+            }
+        }
+
+        // Add your shape manipulation methods here...
+
+        private void undo() {
+            if (recorder.getMementoList().size() > 1) {
+                ShapeMemento memento = (ShapeMemento) recorder.getMementoList().get(recorder.getMementoList().size() - 2);
+                recorder.getMementoList().remove(recorder.getMementoList().size() - 1);
+                originator.restoreStateFromMemento(memento);
+
+                // Update the drawingPane with the restored state
+                drawingPane.getChildren().setAll(originator.getState());
+            }
+        }
+
+        private void redo() {
+            if (recorder.getMementoList().size() < 2) {
+                return; // No redo available
+            }
+
+            ShapeMemento memento = (ShapeMemento) recorder.getMementoList().get(recorder.getMementoList().size() - 1);
+            originator.restoreStateFromMemento(memento);
+
+            // Update the drawingPane with the restored state
+            drawingPane.getChildren().setAll(originator.getState());
+        }
+
+        private Circle createCircle(double centerX, double centerY, double radius, Color color) {
+            Circle circle = new Circle(centerX, centerY, radius, color);
+            // Add event handlers for shape manipulation as needed
+            return circle;
+        }
     static public Editor EditorSymbol_Create() throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSymbol.fxml"));
@@ -102,11 +169,6 @@ public class EditorSymbol extends Editor
     /**
      * Provides initialization of the Controller
      */
-    @FXML
-    public void initialize()
-    {
-        System.out.println("I was initialized, the button was " + this.EditorSymbol_InnerButton);
-    }
 
     //// CALLBACK FUNCTIONS ////
 
