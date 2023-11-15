@@ -43,8 +43,8 @@
                <ToolBar>
                    <Button accessibleHelp="HOTHelp" accessibleText="Hot" mnemonicParsing="false" onAction="#EditorSymbolNewPressed" text="New Symbol Editor" />
                <Button accessibleHelp="HOTHelp" accessibleText="Hot" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorSchematicNewPressed" text="New Schematic Editor" />
-                   <Button mnemonicParsing="false" onAction="#EditorFootprintNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New Footprint Editor" />
-               <Button layoutX="132.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorPCBNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New PCB Editor" />
+                   <Button mnemonicParsing="false" onAction="#EditorFootprintNewPressed" text="New Footprint Editor" />
+               <Button layoutX="132.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorPCBNewPressed" text="New PCB Editor" />
                </ToolBar>
                <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS">
                <children>
