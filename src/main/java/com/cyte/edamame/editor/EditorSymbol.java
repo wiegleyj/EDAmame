@@ -90,6 +90,7 @@ public class EditorSymbol extends Editor
 
     private ShapeOriginator originator;
     private ShapeRecorder recorder;
+
     //// MAIN FUNCTIONS ////
 
     /**
