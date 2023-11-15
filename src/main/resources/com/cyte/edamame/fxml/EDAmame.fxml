@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -45,7 +46,10 @@
                    <Button mnemonicParsing="false" onAction="#EditorFootprintNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New Footprint Editor" />
                <Button layoutX="132.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorPCBNewPressed" style="-fx-background-image: url('images/e0NDKzR.jpg');" text="New PCB Editor" />
                </ToolBar>
-               <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS" />
+               <StackPane fx:id="Controller_StackPaneEditorToolBars" HBox.hgrow="ALWAYS">
+               <children>
+                  <TextField prefHeight="25.0" prefWidth="64.0" />
+               </children></StackPane>
            </HBox>
        </VBox>
    </top>
