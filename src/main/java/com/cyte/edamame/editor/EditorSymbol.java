@@ -379,8 +379,7 @@ public class EditorSymbol extends Editor
                                     }
                                 }
 
-                                if (canDrop)
-                                {
+                                if (canDrop) {
                                     Circle circle = new Circle(radius, fillColor);
 
                                     circle.setTranslateX(dropPos.GetLeftDouble());
@@ -513,162 +512,160 @@ public class EditorSymbol extends Editor
                                     RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
-
                             }
                             else if (selectedShapeButton.getText().equals("Line"))
                             {
+                                EDAmameController.Controller_SetStatusBar("EDAmame Status Area");
+
                                 // If we're starting the line drawing...
                                 if (this.EditorSymbol_LinePreview == null)
                                 {
                                     String stringWidth = this.EditorSymbol_LineWidth.getText();
                                     Color color = this.EditorSymbol_LineColor.getValue();
+                                    boolean canDrop = true;
 
-                                    if (EDAmameController.Controller_IsStringNum(stringWidth))
-                                    {
-                                        double width = Double.parseDouble(stringWidth);
-
-                                        if (((width >= EDAmameController.Editor_LineWidthMin) && (width <= EDAmameController.Editor_LineWidthMax)))
-                                        {
-                                            if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
-                                            {
-                                                this.EditorSymbol_LinePreview = new Line();
-                                                //this.EditorSymbol_LinePreview.setId("linePreview");
-
-                                                this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
-                                                this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
-                                                this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
-                                                this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
-
-                                                this.EditorSymbol_LinePreview.setStrokeWidth(width);
-                                                this.EditorSymbol_LinePreview.setStroke(color);
-
-                                                RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
-                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-
-                                                lineStarted = true;
-                                            }
-                                            else
-                                            {
-                                                EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_LineWidthMin + ", " + EDAmameController.Editor_LineWidthMax + ")");
-                                        }
-                                    }
-                                    else
+                                    if (!EDAmameController.Controller_IsStringNum(stringWidth))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
+                                        canDrop = false;
+                                    }
+                                    double width = Double.parseDouble(stringWidth);
+                                    if (!((width >= EDAmameController.Editor_LineWidthMin) && (width <= EDAmameController.Editor_LineWidthMax)))
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_LineWidthMin + ", " + EDAmameController.Editor_LineWidthMax + ")");
+                                        canDrop = false;
+                                    }
+
+                                    if (!((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                    {
+                                        EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
+                                        canDrop = false;
+                                    }
+
+                                    if (canDrop)
+                                    {
+                                        this.EditorSymbol_LinePreview = new Line();
+                                        //this.EditorSymbol_LinePreview.setId("linePreview");
+
+                                        this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
+                                        this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
+                                        this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
+                                        this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+
+                                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
+                                        this.EditorSymbol_LinePreview.setStroke(color);
+
+                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
+                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+
+                                        lineStarted = true;
                                     }
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Text"))
                             {
+                                EDAmameController.Controller_SetStatusBar("EDAmame Status Area");
+
                                 String stringTextContent = EditorSymbol_TextContent.getText();
+                                boolean canDrop = true;
 
-                                if (!stringTextContent.isEmpty())
-                                {
-                                    String stringFontSize = this.EditorSymbol_TextSize.getText();
-
-                                    if (EDAmameController.Controller_IsStringNum(stringFontSize))
-                                    {
-                                        double fontSize = Double.parseDouble(stringFontSize);
-                                        Color color = this.EditorSymbol_TextColor.getValue();
-
-                                        if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
-                                        {
-                                            if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
-                                            {
-                                                Label text = new Label(stringTextContent);
-                                                text.setFont(new Font("Arial", fontSize));
-                                                text.setTextFill(color);
-
-                                                text.setTranslateX(dropPos.GetLeftDouble());
-                                                text.setTranslateY(dropPos.GetRightDouble());
-
-                                                RenderNode renderNode = new RenderNode("Text", text, true, null, false, this.Editor_RenderSystem);
-                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                            }
-                                            else
-                                            {
-                                                EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font color field is transparent!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is non-numeric!");
-                                    }
-                                }
-                                else
+                                if (stringTextContent.isEmpty())
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered text field is empty!");
+                                    canDrop = false;
+                                }
+                                String stringFontSize = this.EditorSymbol_TextSize.getText();
+                                if (!EDAmameController.Controller_IsStringNum(stringFontSize))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is non-numeric!");
+                                    canDrop = false;
+                                }
+                                double fontSize = Double.parseDouble(stringFontSize);
+                                Color color = this.EditorSymbol_TextColor.getValue();
+
+                                if (!((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
+                                    canDrop = false;
+                                }
+
+                                if (!((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font color field is transparent!");
+                                    canDrop = false;
+                                }
+
+                                if (canDrop) {
+                                    Label text = new Label(stringTextContent);
+                                    text.setFont(new Font("Arial", fontSize));
+                                    text.setTextFill(color);
+
+                                    text.setTranslateX(dropPos.GetLeftDouble());
+                                    text.setTranslateY(dropPos.GetRightDouble());
+
+                                    RenderNode renderNode = new RenderNode("Text", text, true, null, false, this.Editor_RenderSystem);
+                                    this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Pin"))
                             {
+                                EDAmameController.Controller_SetStatusBar("EDAmame Status Area");
+
                                 String stringPinLabel = this.EditorSymbol_PinLabel.getText();
+                                boolean canDrop = true;
 
-                                if (!stringPinLabel.isEmpty())
-                                {
-                                    String stringPinRadius = this.EditorSymbol_PinRadius.getText();
-
-                                    if (EDAmameController.Controller_IsStringNum(stringPinRadius))
-                                    {
-                                        double pinRadius = Double.parseDouble(stringPinRadius);
-                                        Color pinColor = this.EditorSymbol_PinColor.getValue();
-
-                                        if (((pinRadius >= EDAmameController.Editor_PinRadiusMin) && (pinRadius <= EDAmameController.Editor_PinRadiusMax)))
-                                        {
-                                            if ((pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000))
-                                            {
-                                                Group pin = new Group();
-                                                pin.setId("PIN_" + stringPinLabel);
-
-                                                Circle pinCircle = new Circle(pinRadius, pinColor);
-
-                                                Label pinLabel = new Label(stringPinLabel);
-                                                pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
-                                                pinLabel.setTextFill(pinColor);
-
-                                                pin.getChildren().add(pinCircle);
-                                                pin.getChildren().add(pinLabel);
-
-                                                pin.setTranslateX(dropPos.GetLeftDouble());
-                                                pin.setTranslateY(dropPos.GetRightDouble());
-
-                                                pinLabel.setTranslateX(EDAmameController.Editor_PinLabelOffset.GetLeftDouble());
-                                                pinLabel.setTranslateY(EDAmameController.Editor_PinLabelOffset.GetRightDouble());
-
-                                                LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
-                                                snap.add(new PairMutable(0.0, 0.0));
-
-                                                RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, this.Editor_RenderSystem);
-                                                this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
-                                            }
-                                            else
-                                            {
-                                                EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
-                                            }
-                                        }
-                                        else
-                                        {
-                                            EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.Editor_PinRadiusMin + ", " + EDAmameController.Editor_PinRadiusMax + ")");
-                                        }
-                                    }
-                                    else
-                                    {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
-                                    }
-                                }
-                                else
+                                if (stringPinLabel.isEmpty())
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered label field is empty!");
+                                    canDrop = false;
+                                }
+                                String stringPinRadius = this.EditorSymbol_PinRadius.getText();
+
+                                if (!EDAmameController.Controller_IsStringNum(stringPinRadius))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
+                                    canDrop = false;
+                                }
+
+                                double pinRadius = Double.parseDouble(stringPinRadius);
+                                Color pinColor = this.EditorSymbol_PinColor.getValue();
+
+                                if (!((pinRadius >= EDAmameController.Editor_PinRadiusMin) && (pinRadius <= EDAmameController.Editor_PinRadiusMax)))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.Editor_PinRadiusMin + ", " + EDAmameController.Editor_PinRadiusMax + ")");
+                                    canDrop = false;
+                                }
+                                if (!((pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
+                                {
+                                    EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
+                                    canDrop = false;
+                                }
+
+                                if (canDrop)
+                                {
+                                    Group pin = new Group();
+                                    pin.setId("PIN_" + stringPinLabel);
+
+                                    Circle pinCircle = new Circle(pinRadius, pinColor);
+
+                                    Label pinLabel = new Label(stringPinLabel);
+                                    pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
+                                    pinLabel.setTextFill(pinColor);
+
+                                    pin.getChildren().add(pinCircle);
+                                    pin.getChildren().add(pinLabel);
+
+                                    pin.setTranslateX(dropPos.GetLeftDouble());
+                                    pin.setTranslateY(dropPos.GetRightDouble());
+
+                                    pinLabel.setTranslateX(EDAmameController.Editor_PinLabelOffset.GetLeftDouble());
+                                    pinLabel.setTranslateY(EDAmameController.Editor_PinLabelOffset.GetRightDouble());
+
+                                    LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
+                                    snap.add(new PairMutable(0.0, 0.0));
+
+                                    RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, this.Editor_RenderSystem);
+                                    this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
                             else
