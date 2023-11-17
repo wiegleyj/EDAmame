@@ -14,11 +14,13 @@ import com.cyte.edamame.shape.SnapPoint;
 import java.util.UUID;
 import java.util.LinkedList;
 
+import com.cyte.edamame.util.Utils;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
+import javafx.scene.text.*;
 
 public class RenderNode
 {
@@ -34,6 +36,7 @@ public class RenderNode
     public boolean RenderNode_Selected;
     public PairMutable RenderNode_MousePressPos;
     public boolean RenderNode_Passive;
+    public boolean RenderNode_AutoSnapPoints;
     public LinkedList<SnapPoint> RenderNode_SnapPoints;
     public RenderSystem RenderNode_RenderSystem;
 
@@ -48,6 +51,7 @@ public class RenderNode
         this.RenderNode_Selected = false;
         this.RenderNode_MousePressPos = null;
         this.RenderNode_Passive = passiveValue;
+        this.RenderNode_AutoSnapPoints = edgeSnapPoints;
         this.RenderNode_SnapPoints = new LinkedList<SnapPoint>();
         this.RenderNode_RenderSystem = renderSystemValue;
 
@@ -330,6 +334,29 @@ public class RenderNode
         this.RenderNode_ShapeSelected.setHeight(boundsLocal.getHeight());
     }
 
+    public RenderNode RenderNode_Clone()
+    {
+        LinkedList<PairMutable> clonedSnapPointManualPos = null;
+
+        if (!this.RenderNode_SnapPoints.isEmpty())
+        {
+            clonedSnapPointManualPos = new LinkedList<PairMutable>();
+
+            for (int i = 0; i < this.RenderNode_SnapPoints.size(); i++)
+                clonedSnapPointManualPos.add(new PairMutable(this.RenderNode_SnapPoints.get(i).getTranslateX(),
+                                                             this.RenderNode_SnapPoints.get(i).getTranslateY()));
+        }
+
+        RenderNode clonedNode = new RenderNode(this.RenderNode_Name,
+                                               Utils.Utils_NodeClone(this.RenderNode_Node),
+                                               this.RenderNode_AutoSnapPoints,
+                                               clonedSnapPointManualPos,
+                                               this.RenderNode_Passive,
+                                               null);
+
+        return clonedNode;
+    }
+
     public static PairMutable RenderNode_NodesGetMiddlePos(LinkedList<Node> nodes)
     {
         PairMutable nodeBounds = RenderNode_NodesGetRealBounds(nodes);
@@ -508,26 +535,26 @@ public class RenderNode
             //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
             str += " />";
         }
-        else if (node.getClass() == Label.class)
+        else if (node.getClass() == Text.class)
         {
-            Label text = (Label)node;
+            Text text = (Text)node;
 
-            str += tabStr + "<Label";
+            str += tabStr + "<Text";
             str += " id=\"" + text.getId() + "\"";
             str += " text=\"" + text.getText() + "\"";
 
-            if (Integer.toHexString(text.getTextFill().hashCode()).length() < 8)
+            if (Integer.toHexString(text.getFill().hashCode()).length() < 8)
             {
-                String addZeros = Integer.toHexString(text.getTextFill().hashCode());
+                String addZeros = Integer.toHexString(text.getFill().hashCode());
 
                 while (addZeros.length() < 8)
                     addZeros = "0" + addZeros;
 
-                str += " textFill=\"#" + addZeros + "\"";
+                str += " fill=\"#" + addZeros + "\"";
             }
             else
             {
-                str += " textFill=\"#" + Integer.toHexString(text.getTextFill().hashCode()) + "\"";
+                str += " fill=\"#" + Integer.toHexString(text.getFill().hashCode()) + "\"";
             }
 
             str += " translateX=\"" + (text.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
@@ -540,7 +567,7 @@ public class RenderNode
             str += " size=\"" + text.getFont().getSize() + "\" />\n";
 
             str += tabStr + "\t</font>\n";
-            str += tabStr + "</Label>";
+            str += tabStr + "</Text>";
         }
         else if (node.getClass() == Group.class)
         {
@@ -566,4 +593,6 @@ public class RenderNode
 
         return str;
     }
+
+
 }

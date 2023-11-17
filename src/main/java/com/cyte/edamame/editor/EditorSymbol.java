@@ -346,7 +346,7 @@ public class EditorSymbol extends Editor
                                 Paint strokeColor = this.EditorSymbol_CircleBorderColor.getValue();
                                 boolean canDrop = true;
 
-                                if (!EDAmameController.Controller_IsStringNum(stringRadius))
+                                if (stringRadius.isEmpty() || !EDAmameController.Controller_IsStringNum(stringRadius))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
                                     canDrop = false;
@@ -358,7 +358,7 @@ public class EditorSymbol extends Editor
                                     canDrop = false;
                                 }
 
-                                if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
+                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border size is non-numeric!");
                                     canDrop = false;
@@ -372,7 +372,7 @@ public class EditorSymbol extends Editor
 
                                 if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered fill and border is transparent!");
                                         canDrop = false;
@@ -403,7 +403,7 @@ public class EditorSymbol extends Editor
                                 Paint strokeColor = this.EditorSymbol_RectangleBorderColor.getValue();
                                 boolean canDrop = true;
 
-                                if (!(EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight)))
+                                if ((stringWidth.isEmpty() || stringHeight.isEmpty()) || !(EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
                                     canDrop = false;
@@ -417,7 +417,7 @@ public class EditorSymbol extends Editor
                                     canDrop = false;
                                 }
 
-                                if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
+                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border size is non-numeric!");
                                     canDrop = false;
@@ -431,7 +431,7 @@ public class EditorSymbol extends Editor
 
                                 if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered fill and border is transparent!");
                                         canDrop = false;
@@ -462,7 +462,7 @@ public class EditorSymbol extends Editor
                                 Paint strokeColor = this.EditorSymbol_TriangleBorderColor.getValue();
                                 boolean canDrop = true;
 
-                                if (!EDAmameController.Controller_IsStringNum(stringMiddleHeight))
+                                if (stringMiddleHeight.isEmpty() || !EDAmameController.Controller_IsStringNum(stringMiddleHeight))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
                                     canDrop = false;
@@ -474,7 +474,7 @@ public class EditorSymbol extends Editor
                                     canDrop = false;
                                 }
 
-                                if (!EDAmameController.Controller_IsStringNum(stringStrokeSize))
+                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border size is non-numeric!");
                                     canDrop = false;
@@ -488,7 +488,7 @@ public class EditorSymbol extends Editor
 
                                 if ((strokeSize == 0) || (!strokeColor.isOpaque()))
                                 {
-                                    if (!((fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered fill and border is transparent!");
                                         canDrop = false;
@@ -524,7 +524,7 @@ public class EditorSymbol extends Editor
                                     Color color = this.EditorSymbol_LineColor.getValue();
                                     boolean canDrop = true;
 
-                                    if (!EDAmameController.Controller_IsStringNum(stringWidth))
+                                    if (stringWidth.isEmpty() || !EDAmameController.Controller_IsStringNum(stringWidth))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered width field is non-numeric!");
                                         canDrop = false;
@@ -536,7 +536,7 @@ public class EditorSymbol extends Editor
                                         canDrop = false;
                                     }
 
-                                    if (!((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                    if (!((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
                                     {
                                         EDAmameController.Controller_SetStatusBar("Unable to drop line because the entered color field is transparent!");
                                         canDrop = false;
@@ -575,7 +575,7 @@ public class EditorSymbol extends Editor
                                     canDrop = false;
                                 }
                                 String stringFontSize = this.EditorSymbol_TextSize.getText();
-                                if (!EDAmameController.Controller_IsStringNum(stringFontSize))
+                                if (stringFontSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringFontSize))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font size field is non-numeric!");
                                     canDrop = false;
@@ -589,19 +589,25 @@ public class EditorSymbol extends Editor
                                     canDrop = false;
                                 }
 
-                                if (!((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                if (!((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop text because the entered font color field is transparent!");
                                     canDrop = false;
                                 }
 
                                 if (canDrop) {
-                                    Label text = new Label(stringTextContent);
+                                    Text text = new Text(stringTextContent);
+                                    text.setFont(new Font("Arial", fontSize));
+                                    text.setFill(color);
+
+                                    text.setTranslateX(dropPos.GetLeftDouble());
+                                    text.setTranslateY(dropPos.GetRightDouble());
+                                    /*Label text = new Label(stringTextContent);
                                     text.setFont(new Font("Arial", fontSize));
                                     text.setTextFill(color);
 
                                     text.setTranslateX(dropPos.GetLeftDouble());
-                                    text.setTranslateY(dropPos.GetRightDouble());
+                                    text.setTranslateY(dropPos.GetRightDouble());*/
 
                                     RenderNode renderNode = new RenderNode("Text", text, true, null, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
@@ -621,7 +627,7 @@ public class EditorSymbol extends Editor
                                 }
                                 String stringPinRadius = this.EditorSymbol_PinRadius.getText();
 
-                                if (!EDAmameController.Controller_IsStringNum(stringPinRadius))
+                                if (stringPinRadius.isEmpty() || !EDAmameController.Controller_IsStringNum(stringPinRadius))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
                                     canDrop = false;
@@ -635,7 +641,7 @@ public class EditorSymbol extends Editor
                                     EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.Editor_PinRadiusMin + ", " + EDAmameController.Editor_PinRadiusMax + ")");
                                     canDrop = false;
                                 }
-                                if (!((pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
+                                if (!((pinColor != null) && (pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
                                 {
                                     EDAmameController.Controller_SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
                                     canDrop = false;
@@ -648,9 +654,12 @@ public class EditorSymbol extends Editor
 
                                     Circle pinCircle = new Circle(pinRadius, pinColor);
 
-                                    Label pinLabel = new Label(stringPinLabel);
+                                    Text pinLabel = new Text(stringPinLabel);
                                     pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
-                                    pinLabel.setTextFill(pinColor);
+                                    pinLabel.setFill(pinColor);
+                                    /*Label pinLabel = new Label(stringPinLabel);
+                                    pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
+                                    pinLabel.setTextFill(pinColor);*/
 
                                     pin.getChildren().add(pinCircle);
                                     pin.getChildren().add(pinLabel);
@@ -761,7 +770,6 @@ public class EditorSymbol extends Editor
         boolean needHeader = false;
 
         // Reading all shape type properties...
-        LinkedList<Color> shapesColor = new LinkedList<Color>();
         LinkedList<Double> circlesRadii = new LinkedList<Double>();
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
@@ -771,6 +779,11 @@ public class EditorSymbol extends Editor
         LinkedList<Double> lineEndPosX = new LinkedList<Double>();
         LinkedList<Double> lineEndPosY = new LinkedList<Double>();
         LinkedList<Double> lineWidths = new LinkedList<Double>();
+        LinkedList<Double> strokeWidths = new LinkedList<Double>();
+        LinkedList<Paint> strokes = new LinkedList<Paint>();
+        LinkedList<String> textContents = new LinkedList<String>();
+        LinkedList<Double> textFontSizes = new LinkedList<Double>();
+        LinkedList<String> pinLabels = new LinkedList<String>();
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
@@ -779,32 +792,30 @@ public class EditorSymbol extends Editor
             if (!renderNode.RenderNode_Selected)
                 continue;
 
-            if (renderNode.RenderNode_Node.getClass() != Label.class)
-            {
-                if (renderNode.RenderNode_Node.getClass() == Line.class)
-                {
-                    shapesColor.add((Color)((Line)renderNode.RenderNode_Node).getStroke());
-                }
-                else
-                {
-                    shapesColor.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
-                }
-
-                needHeader = true;
-            }
-
             if (renderNode.RenderNode_Node.getClass() == Circle.class)
             {
                 circlesRadii.add(((Circle)renderNode.RenderNode_Node).getRadius());
+                strokeWidths.add(((Circle)renderNode.RenderNode_Node).getStrokeWidth());
+                strokes.add(((Circle)renderNode.RenderNode_Node).getStroke());
+
+                needHeader = true;
             }
             else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
             {
                 rectsWidths.add(((Rectangle)renderNode.RenderNode_Node).getWidth());
                 rectsHeights.add(((Rectangle)renderNode.RenderNode_Node).getHeight());
+                strokeWidths.add(((Rectangle)renderNode.RenderNode_Node).getStrokeWidth());
+                strokes.add(((Rectangle)renderNode.RenderNode_Node).getStroke());
+
+                needHeader = true;
             }
             else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
             {
                 trisLens.add(((Polygon)renderNode.RenderNode_Node).getPoints().get(2) - ((Polygon) renderNode.RenderNode_Node).getPoints().get(0));
+                strokeWidths.add(((Polygon)renderNode.RenderNode_Node).getStrokeWidth());
+                strokes.add(((Polygon)renderNode.RenderNode_Node).getStroke());
+
+                needHeader = true;
             }
             else if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
@@ -822,8 +833,29 @@ public class EditorSymbol extends Editor
                 lineStartPosY.add(line.getStartY());
                 lineEndPosX.add(line.getEndX());
                 lineEndPosY.add(line.getEndY());
-
                 lineWidths.add(line.getStrokeWidth());
+
+                needHeader = true;
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Text.class)
+            {
+                textContents.add(((Text)renderNode.RenderNode_Node).getText());
+                textFontSizes.add(((Text)renderNode.RenderNode_Node).getFont().getSize());
+
+                needHeader = true;
+            }
+            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            {
+                Group group = (Group)renderNode.RenderNode_Node;
+
+                if (group.getChildren().size() != 2)
+                    throw new java.lang.Error("ERROR: Attempting to load pin into symbol properties window without 2 children!");
+                if (group.getChildren().get(1).getClass() != Text.class)
+                    throw new java.lang.Error("ERROR: Attempting to load pin into symbol properties window without a text node!");
+
+                pinLabels.add(((Text)group.getChildren().get(1)).getText());
+
+                needHeader = true;
             }
         }
 
@@ -834,25 +866,6 @@ public class EditorSymbol extends Editor
             shapeHeader.setStyle("-fx-font-weight: bold;");
             shapeHeader.setStyle("-fx-font-size: 16px;");
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(shapeHeader);
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
-        }
-
-        // Creating color box...
-        if (!shapesColor.isEmpty())
-        {
-            HBox colorHBox = new HBox(10);
-            colorHBox.setId("colorBox");
-            colorHBox.getChildren().add(new Label("Shape Colors: "));
-            ColorPicker colorPicker = new ColorPicker();
-            colorPicker.setId("color");
-            colorHBox.getChildren().add(colorPicker);
-
-            if (EDAmameController.Controller_IsListAllEqual(shapesColor))
-                colorPicker.setValue(shapesColor.get(0));
-            else
-                colorPicker.setValue(Color.TRANSPARENT);
-
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(colorHBox);
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
         }
 
@@ -1008,6 +1021,89 @@ public class EditorSymbol extends Editor
 
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
         }
+
+        // Creating border box...
+        if (!strokes.isEmpty() && !strokeWidths.isEmpty())
+        {
+            HBox strokesWidthHBox = new HBox(10);
+            strokesWidthHBox.setId("strokesWidthBox");
+            strokesWidthHBox.getChildren().add(new Label("Shape Borders: "));
+            TextField strokesWidthTextBox = new TextField();
+            strokesWidthTextBox.setId("strokeWidth");
+            strokesWidthHBox.getChildren().add(strokesWidthTextBox);
+
+            if (EDAmameController.Controller_IsListAllEqual(strokeWidths))
+                strokesWidthTextBox.setText(Double.toString(strokeWidths.get(0)));
+            else
+                strokesWidthTextBox.setText("<mixed>");
+
+            HBox strokeColorHBox = new HBox(10);
+            strokeColorHBox.setId("strokeColorBox");
+            strokeColorHBox.getChildren().add(new Label("Shape Border Colors: "));
+            ColorPicker strokeColorPicker = new ColorPicker();
+            strokeColorPicker.setId("strokeColor");
+            strokeColorHBox.getChildren().add(strokeColorPicker);
+
+            if (EDAmameController.Controller_IsListAllEqual(strokes))
+                strokeColorPicker.setValue((Color)strokes.get(0));
+            else
+                strokeColorPicker.setValue(null);
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokesWidthHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokeColorHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+        }
+
+        // Creating text box...
+        if (!textFontSizes.isEmpty())
+        {
+            HBox textContentHBox = new HBox(10);
+            textContentHBox.setId("textContentBox");
+            textContentHBox.getChildren().add(new Label("Text Contents: "));
+            TextField textContentText = new TextField();
+            textContentText.setId("textContent");
+            textContentHBox.getChildren().add(textContentText);
+
+            HBox textFontSizeHBox = new HBox(10);
+            textFontSizeHBox.setId("fontSizeBox");
+            textFontSizeHBox.getChildren().add(new Label("Text Font Sizes: "));
+            TextField textFontSizeText = new TextField();
+            textFontSizeText.setId("fontSize");
+            textFontSizeHBox.getChildren().add(textFontSizeText);
+
+            if (EDAmameController.Controller_IsListAllEqual(textContents))
+                textContentText.setText(textContents.get(0));
+            else
+                textContentText.setText("<mixed>");
+
+            if (EDAmameController.Controller_IsListAllEqual(textFontSizes))
+                textFontSizeText.setText(Double.toString(textFontSizes.get(0)));
+            else
+                textFontSizeText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textContentHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textFontSizeHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+        }
+
+        // Creating pin label box...
+        if (!pinLabels.isEmpty())
+        {
+            HBox pinLabelHBox = new HBox(10);
+            pinLabelHBox.setId("pinLabelBox");
+            pinLabelHBox.getChildren().add(new Label("Pin Labels: "));
+            TextField pinLabelText = new TextField();
+            pinLabelText.setId("pinLabels");
+            pinLabelHBox.getChildren().add(pinLabelText);
+
+            if (EDAmameController.Controller_IsListAllEqual(pinLabels))
+                pinLabelText.setText(pinLabels.get(0));
+            else
+                pinLabelText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(pinLabelHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
+        }
     }
 
     public void Editor_PropsApplySpecific()
@@ -1024,39 +1120,6 @@ public class EditorSymbol extends Editor
 
             if (!renderNode.RenderNode_Selected)
                 continue;
-
-            // Applying color...
-            if (renderNode.RenderNode_Node.getClass() != Label.class)
-            {
-                Integer colorBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "colorBox");
-
-                if (colorBoxIdx != -1)
-                {
-                    HBox colorBox = (HBox) propsBox.getChildren().get(colorBoxIdx);
-                    ColorPicker colorPicker = (ColorPicker) EDAmameController.Controller_GetNodeById(colorBox.getChildren(), "color");
-
-                    if (colorPicker == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"color\" node in Symbol Editor properties window \"colorBox\" entry!");
-
-                    Color color = colorPicker.getValue();
-
-                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
-                    {
-                        if (renderNode.RenderNode_Node.getClass() == Line.class)
-                        {
-                            ((Shape)renderNode.RenderNode_Node).setStroke(color);
-                        }
-                        else
-                        {
-                            ((Shape)renderNode.RenderNode_Node).setFill(color);
-                        }
-                    }
-                    else
-                    {
-                        EDAmameController.Controller_SetStatusBar("Unable to apply shape colors because the entered color is transparent!");
-                    }
-                }
-            }
 
             // Applying circle radius...
             if (renderNode.RenderNode_Node.getClass() == Circle.class)
@@ -1269,6 +1332,157 @@ public class EditorSymbol extends Editor
                     else if (!widthStr.equals("<mixed>"))
                     {
                         EDAmameController.Controller_SetStatusBar("Unable to apply line widths because the entered field is non-numeric!");
+                    }
+                }
+            }
+            // Applying texts...
+            else if (renderNode.RenderNode_Node.getClass() == Text.class)
+            {
+                Integer contentBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "textContentBox");
+
+                if (contentBoxIdx != -1)
+                {
+                    HBox contentBox = (HBox)propsBox.getChildren().get(contentBoxIdx);
+                    TextField contentText = (TextField)EDAmameController.Controller_GetNodeById(contentBox.getChildren(), "textContent");
+
+                    if (contentText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"textContent\" node in global properties window \"textContentBox\" entry!");
+
+                    String content = contentText.getText();
+
+                    if (!content.isEmpty())
+                    {
+                        if (!content.equals("<mixed>"))
+                            ((Text)renderNode.RenderNode_Node).setText(content);
+                    }
+                    else
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply text contents because the entered field is empty!");
+                    }
+                }
+
+                Integer fontSizeBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "fontSizeBox");
+
+                if (fontSizeBoxIdx != -1)
+                {
+                    HBox fontSizeBox = (HBox)propsBox.getChildren().get(fontSizeBoxIdx);
+                    TextField fontSizeText = (TextField)EDAmameController.Controller_GetNodeById(fontSizeBox.getChildren(), "fontSize");
+
+                    if (fontSizeText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"fontSize\" node in global properties window \"fontSizeBox\" entry!");
+
+                    String fontSizeStr = fontSizeText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(fontSizeStr))
+                    {
+                        double fontSize = Double.parseDouble(fontSizeStr);
+
+                        if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
+                        {
+                            ((Text)renderNode.RenderNode_Node).setFont(new Font("Arial", fontSize));
+                        }
+                        else
+                        {
+                            EDAmameController.Controller_SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
+                        }
+                    }
+                    else if (!fontSizeStr.equals("<mixed>"))
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply text font size because the entered field is non-numeric!");
+                    }
+                }
+            }
+            // Applying circle radius...
+            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            {
+                Group group = (Group)renderNode.RenderNode_Node;
+
+                if (group.getChildren().size() != 2)
+                    throw new java.lang.Error("ERROR: Attempting to apply pin from symbol properties window without 2 children!");
+                if (group.getChildren().get(1).getClass() != Text.class)
+                    throw new java.lang.Error("ERROR: Attempting to apply pin from symbol properties window without a text node!");
+
+                Integer pinLabelBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "pinLabelBox");
+
+                if (pinLabelBoxIdx != -1)
+                {
+                    HBox pinLabelBox = (HBox)propsBox.getChildren().get(pinLabelBoxIdx);
+                    TextField pinLabelText = (TextField)EDAmameController.Controller_GetNodeById(pinLabelBox.getChildren(), "pinLabels");
+
+                    if (pinLabelText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"pinLabels\" node in global properties window \"pinLabelBox\" entry!");
+
+                    String pinLabel = pinLabelText.getText();
+
+                    if (!pinLabel.isEmpty())
+                    {
+                        if (!pinLabel.equals("<mixed>"))
+                            ((Text)group.getChildren().get(1)).setText(pinLabel);
+                    }
+                    else
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply pin label because the entered field is empty!");
+                    }
+                }
+            }
+
+            // Applying borders...
+            if (renderNode.RenderNode_Node.getClass() != Line.class &&
+                renderNode.RenderNode_Node.getClass() != Text.class &&
+                renderNode.RenderNode_Node.getClass() != Group.class)
+            {
+                Integer strokeWidthBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "strokesWidthBox");
+
+                if (strokeWidthBoxIdx != -1)
+                {
+                    HBox strokeWidthBox = (HBox)propsBox.getChildren().get(strokeWidthBoxIdx);
+                    TextField strokeWidthText = (TextField) EDAmameController.Controller_GetNodeById(strokeWidthBox.getChildren(), "strokeWidth");
+
+                    if (strokeWidthText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"strokeWidth\" node in Symbol Editor properties window \"strokesWidthBox\" entry!");
+
+                    String strokeWidthStr = strokeWidthText.getText();
+
+                    if (EDAmameController.Controller_IsStringNum(strokeWidthStr))
+                    {
+                        Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
+
+                        if ((newStrokeWidth >= EDAmameController.Editor_BorderMin) && (newStrokeWidth <= EDAmameController.Editor_BorderMax))
+                        {
+                            ((Shape)renderNode.RenderNode_Node).setStrokeWidth(newStrokeWidth);
+                        }
+                        else
+                        {
+                            EDAmameController.Controller_SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
+                        }
+                    }
+                    else if (!strokeWidthStr.equals("<mixed>"))
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply shape border width because the entered field is non-numeric!");
+                    }
+                }
+
+                Integer strokeBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "strokeColorBox");
+
+                if (strokeBoxIdx != -1)
+                {
+                    HBox strokeBox = (HBox) propsBox.getChildren().get(strokeBoxIdx);
+                    ColorPicker colorPicker = (ColorPicker)EDAmameController.Controller_GetNodeById(strokeBox.getChildren(), "strokeColor");
+
+                    if (colorPicker == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"strokeColor\" node in Symbol Editor properties window \"strokeColorBox\" entry!");
+
+                    Color color = colorPicker.getValue();
+
+                    if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                    {
+                        if (renderNode.RenderNode_Node.getClass() != Line.class)
+                            ((Shape)renderNode.RenderNode_Node).setStroke(color);
+                    }
+                    else
+                    {
+                        if (color != null)
+                            EDAmameController.Controller_SetStatusBar("Unable to apply shape border color because the entered color is transparent!");
                     }
                 }
             }

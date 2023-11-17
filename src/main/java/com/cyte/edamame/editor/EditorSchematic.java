@@ -194,7 +194,7 @@ public class EditorSchematic extends Editor
 
                                 if (((width >= EDAmameController.Editor_WireWidthMin) && (width <= EDAmameController.Editor_WireWidthMax)))
                                 {
-                                    if ((color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                                    if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                                     {
                                         this.EditorSymbol_LinePreview = new Line();
 

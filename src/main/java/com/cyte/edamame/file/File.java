@@ -25,6 +25,7 @@ import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
+import javafx.scene.text.*;
 
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -73,7 +74,7 @@ public class File
         file.println("<?import javafx.scene.shape.Rectangle?>");
         file.println("<?import javafx.scene.shape.Polygon?>");
         file.println("<?import javafx.scene.shape.Line?>");
-        file.println("<?import javafx.scene.control.Label?>");
+        file.println("<?import javafx.scene.text.Text?>");
         file.println("<?import javafx.scene.text.Font?>\n");
 
         file.println("<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
@@ -148,7 +149,7 @@ public class File
                 (node.getClass() == Rectangle.class) ||
                 (node.getClass() == Polygon.class) ||
                 (node.getClass() == Line.class) ||
-                (node.getClass() == Label.class) ||
+                (node.getClass() == Text.class) ||
                 (node.getClass() == Group.class))
             {
                 nodes.add(node);

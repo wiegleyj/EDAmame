@@ -198,6 +198,12 @@ public class RenderSystem
 
     //// NODE FUNCTIONS ////
 
+    public void RenderSystem_NodesAdd(LinkedList<RenderNode> renderNodes)
+    {
+        for (int i = 0; i < renderNodes.size(); i++)
+            this.RenderSystem_NodeAdd(renderNodes.get(i));
+    }
+
     public void RenderSystem_NodeAdd(RenderNode renderNode)
     {
         if (this.RenderSystem_Nodes.size() >= this.RenderSystem_MaxShapes)
@@ -214,6 +220,12 @@ public class RenderSystem
 
         for (int i = 0; i < renderNode.RenderNode_SnapPoints.size(); i++)
             this.RenderSystem_PaneSnaps.getChildren().add(renderNode.RenderNode_SnapPoints.get(i));
+    }
+
+    public void RenderSystem_NodesClear()
+    {
+        while (!this.RenderSystem_Nodes.isEmpty())
+            RenderSystem_NodeRemove(this.RenderSystem_Nodes.get(0).RenderNode_Name);
     }
 
     public RenderNode RenderSystem_NodeRemove(String name)
@@ -244,6 +256,16 @@ public class RenderSystem
         }
 
         return null;
+    }
+
+    public LinkedList<RenderNode> RenderSystem_NodesClone()
+    {
+        LinkedList<RenderNode> clonedNodes = new LinkedList<RenderNode>();
+
+        for (int i = 0; i < this.RenderSystem_Nodes.size(); i++)
+            clonedNodes.add(this.RenderSystem_Nodes.get(i).RenderNode_Clone());
+
+        return clonedNodes;
     }
 
     //// TESTING FUNCTIONS ////

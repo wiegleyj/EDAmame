@@ -15,12 +15,14 @@ import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
 
+import java.util.LinkedList;
+
 public class SnapPoint extends Circle
 {
     public PairMutable SnapPoint_Pos;
     public RenderNode SnapPoint_RenderNode;
 
-    public SnapPoint(PairMutable posValue, Double radiusValue, Color colorValue, Double opacityValue, RenderNode renderNodeValue)
+    public SnapPoint(PairMutable posValue, Double radiusValue, Paint colorValue, Double opacityValue, RenderNode renderNodeValue)
     {
         this.SnapPoint_Pos = posValue;
         this.SnapPoint_RenderNode = renderNodeValue;
@@ -30,4 +32,23 @@ public class SnapPoint extends Circle
         this.setTranslateX(posValue.GetLeftDouble());
         this.setTranslateY(posValue.GetRightDouble());
     }
+
+    public SnapPoint SnapPoint_Clone(RenderNode renderNodeValue)
+    {
+        return new SnapPoint(new PairMutable(this.SnapPoint_Pos),
+                             this.getRadius(),
+                             this.getFill(),
+                             this.getOpacity(),
+                             renderNodeValue);
+    }
+
+    /*public static LinkedList<SnapPoint> SnapPoint_CloneList(LinkedList<SnapPoint> oldSnapPoints)
+    {
+        LinkedList<SnapPoint> clonedSnapPoints = new LinkedList<SnapPoint>();
+
+        for (int i = 0; i < oldSnapPoints.size(); i++)
+            clonedSnapPoints.add(oldSnapPoints.get(i).SnapPoint_Clone(oldSnapPoints.get(i).SnapPoint_RenderNode));
+
+        return clonedSnapPoints;
+    }*/
 }

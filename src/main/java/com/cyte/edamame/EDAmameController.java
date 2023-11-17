@@ -6,9 +6,12 @@
  */
 
 // TODO:
-// Implement pin recognition into properties window
-// Implement shape border & fill appropriate checks
+// Fix undo in schematic editor
+// Implement max char limit for all texts
+// Refactor RenderNode FXML function blank color setting
+// Refactor RenderNode cloning into another constructor
 // Implement straight-only dragging
+// Implement selection cancellation when ESC pressed
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
@@ -21,7 +24,7 @@
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.TextAreaHandler;
+import com.cyte.edamame.memento.TextAreaHandler;
 
 import java.util.*;
 import java.util.Map.*;
@@ -83,7 +86,8 @@ public class EDAmameController implements Initializable
     final static public Color Editor_SnapPointShapeColor = Color.DARKGREEN;
     final static public Double Editor_SnapPointShapeOpacity = 0.5;
     final static public Double Editor_PinLabelFontSize = 10.0;
-    final static public PairMutable Editor_PinLabelOffset = new PairMutable(5.0, 5.0);
+    final static public PairMutable Editor_PinLabelOffset = new PairMutable(5.0, 10.0);
+    final static public Integer Editor_UndoStackMaxLen = 10;
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;

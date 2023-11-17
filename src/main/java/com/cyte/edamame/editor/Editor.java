@@ -8,6 +8,7 @@
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.memento.MementoExperimental;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.render.RenderSystem;
 import com.cyte.edamame.util.Utils;
@@ -93,6 +94,8 @@ public abstract class Editor
     public boolean Editor_WasSelectionBox = false;
     public Line EditorSymbol_LinePreview = null;
 
+    public MementoExperimental UndoRedoSystem = null;
+
     //// MAIN FUNCTIONS ////
 
     public void Editor_Init(Integer type, String name)
@@ -106,6 +109,8 @@ public abstract class Editor
         this.Editor_MouseDragCheckTimeout = EDAmameController.Editor_MouseCheckTimeout;
         this.Editor_SelectionBoxColor = EDAmameController.Editor_SelectionBoxColors[this.Editor_Type];
         this.Editor_SelectionBoxWidth = EDAmameController.Editor_SelectionBoxWidth;
+
+        this.UndoRedoSystem = new MementoExperimental(this);
     }
 
     /**
@@ -154,6 +159,8 @@ public abstract class Editor
 
         //for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         //    System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_Node.getBoundsInParent().toString());
+
+        //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
 
         //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
     }
@@ -419,7 +426,9 @@ public abstract class Editor
     public void Editor_OnMousePressedGlobal(MouseEvent event)
     {
         if (this.Editor_PressedLMB)
-        {}
+        {
+            this.UndoRedoSystem.Memento_NodeHistoryUpdate();
+        }
         else if (this.Editor_PressedRMB)
         {}
 
@@ -714,6 +723,10 @@ public abstract class Editor
         // Handling line drawing interruption...
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.ESCAPE) && (this.EditorSymbol_LinePreview != null))
             Editor_LinePreviewRemove();
+
+        // Handling element redo...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL) && EDAmameController.Controller_IsKeyPressed(KeyCode.Z))
+            this.UndoRedoSystem.Memento_NodesUndo();
     }
 
     public void Editor_OnKeyReleasedGlobal(KeyEvent event)
@@ -856,15 +869,10 @@ public abstract class Editor
             return;
 
         // Reading all global node properties...
-        LinkedList<Double> shapesPosX = new LinkedList<Double>();
-        LinkedList<Double> shapesPosY = new LinkedList<Double>();
-        LinkedList<Double> shapesRots = new LinkedList<Double>();
-        LinkedList<String> textContents = new LinkedList<String>();
-        LinkedList<Double> textFontSizes = new LinkedList<Double>();
-        LinkedList<Color> textFontColors = new LinkedList<Color>();
-        LinkedList<Paint> strokes = new LinkedList<Paint>();
-        LinkedList<Double> strokeWidths = new LinkedList<Double>();
-
+        LinkedList<Double> posX = new LinkedList<Double>();
+        LinkedList<Double> posY = new LinkedList<Double>();
+        LinkedList<Double> rots = new LinkedList<Double>();
+        LinkedList<Color> colors = new LinkedList<Color>();
 
         for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
         {
@@ -873,42 +881,34 @@ public abstract class Editor
             if (!renderNode.RenderNode_Selected)
                 continue;
 
-            //if (renderNode.RenderNode_Node.getClass() != Line.class)
-            //{
-            shapesPosX.add(renderNode.RenderNode_Node.getTranslateX() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
-            shapesPosY.add(renderNode.RenderNode_Node.getTranslateY() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
+            posX.add(renderNode.RenderNode_Node.getTranslateX() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
+            posY.add(renderNode.RenderNode_Node.getTranslateY() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
 
+            if ((renderNode.RenderNode_Node.getClass() != Line.class) &&
+                (renderNode.RenderNode_Node.getClass() != Group.class))
+                rots.add(renderNode.RenderNode_Node.getRotate());
 
-            if (renderNode.RenderNode_Node.getClass() != Line.class)
-                shapesRots.add(renderNode.RenderNode_Node.getRotate());
-            //}
-
-            if (renderNode.RenderNode_Node.getClass() == Label.class)
+            if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
-                textContents.add(((Label)renderNode.RenderNode_Node).getText());
-                textFontSizes.add(((Label)renderNode.RenderNode_Node).getFont().getSize());
-                textFontColors.add((Color)((Label)renderNode.RenderNode_Node).getTextFill());
+                colors.add((Color)((Line) renderNode.RenderNode_Node).getStroke());
             }
+            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            {
+                Group group = (Group)renderNode.RenderNode_Node;
 
-            if (renderNode.RenderNode_Node.getClass() == Circle.class)
-            {
-                strokes.add(((Circle)renderNode.RenderNode_Node).getStroke());
-                strokeWidths.add(((Circle)renderNode.RenderNode_Node).getStrokeWidth());
+                if (group.getChildren().size() != 2)
+                    throw new java.lang.Error("ERROR: Attempting to load pin into global properties editor without 2 children!");
+
+                colors.add((Color)((Shape)group.getChildren().get(0)).getStroke());
             }
-            else if (renderNode.RenderNode_Node.getClass() == Rectangle.class)
+            else
             {
-                strokes.add(((Rectangle)renderNode.RenderNode_Node).getStroke());
-                strokeWidths.add(((Rectangle)renderNode.RenderNode_Node).getStrokeWidth());
-            }
-            else if (renderNode.RenderNode_Node.getClass() == Polygon.class)
-            {
-                strokes.add(((Polygon)renderNode.RenderNode_Node).getStroke());
-                strokeWidths.add(((Polygon)renderNode.RenderNode_Node).getStrokeWidth());
+                colors.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
             }
         }
 
         // Creating position box...
-        if (!shapesPosX.isEmpty() && !shapesPosY.isEmpty())
+        if (!posX.isEmpty() && !posY.isEmpty())
         {
             HBox posHBox = new HBox(10);
             posHBox.setId("posBox");
@@ -927,13 +927,13 @@ public abstract class Editor
             posYText.setMaxWidth(100);
             posHBox.getChildren().add(posYText);
 
-            if (EDAmameController.Controller_IsListAllEqual(shapesPosX))
-                posXText.setText(Double.toString(shapesPosX.get(0)));
+            if (EDAmameController.Controller_IsListAllEqual(posX))
+                posXText.setText(Double.toString(posX.get(0)));
             else
                 posXText.setText("<mixed>");
 
-            if (EDAmameController.Controller_IsListAllEqual(shapesPosY))
-                posYText.setText(Double.toString(shapesPosY.get(0)));
+            if (EDAmameController.Controller_IsListAllEqual(posY))
+                posYText.setText(Double.toString(posY.get(0)));
             else
                 posYText.setText("<mixed>");
 
@@ -941,7 +941,7 @@ public abstract class Editor
         }
 
         // Creating rotation box...
-        if (!shapesRots.isEmpty())
+        if (!rots.isEmpty())
         {
             HBox rotHBox = new HBox(10);
             rotHBox.setId("rotBox");
@@ -950,89 +950,31 @@ public abstract class Editor
             rotText.setId("rot");
             rotHBox.getChildren().add(rotText);
 
-            if (EDAmameController.Controller_IsListAllEqual(shapesRots))
-                rotText.setText(Double.toString(shapesRots.get(0)));
+            if (EDAmameController.Controller_IsListAllEqual(rots))
+                rotText.setText(Double.toString(rots.get(0)));
             else
                 rotText.setText("<mixed>");
 
             EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(rotHBox);
         }
 
-        // Creating text box...
-        if (!textFontSizes.isEmpty() && !textFontColors.isEmpty())
+        // Creating color box...
+        if (!colors.isEmpty())
         {
-            HBox textContentHBox = new HBox(10);
-            textContentHBox.setId("textContentBox");
-            textContentHBox.getChildren().add(new Label("Text Contents: "));
-            TextField textContentText = new TextField();
-            textContentText.setId("textContent");
-            textContentHBox.getChildren().add(textContentText);
+            HBox colorHBox = new HBox(10);
+            colorHBox.setId("colorBox");
+            colorHBox.getChildren().add(new Label("Colors: "));
+            ColorPicker colorPicker = new ColorPicker();
+            colorPicker.setId("color");
+            colorHBox.getChildren().add(colorPicker);
 
-            HBox textFontSizeHBox = new HBox(10);
-            textFontSizeHBox.setId("fontSizeBox");
-            textFontSizeHBox.getChildren().add(new Label("Text Font Sizes: "));
-            TextField textFontSizeText = new TextField();
-            textFontSizeText.setId("fontSize");
-            textFontSizeHBox.getChildren().add(textFontSizeText);
-
-            HBox textFontColorHBox = new HBox(10);
-            textFontColorHBox.setId("fontColorBox");
-            textFontColorHBox.getChildren().add(new Label("Text Font Colors: "));
-            ColorPicker textFontColorPicker = new ColorPicker();
-            textFontColorPicker.setId("fontColor");
-            textFontColorHBox.getChildren().add(textFontColorPicker);
-
-            if (EDAmameController.Controller_IsListAllEqual(textContents))
-                textContentText.setText(textContents.get(0));
+            if (EDAmameController.Controller_IsListAllEqual(colors))
+                colorPicker.setValue(colors.get(0));
             else
-                textContentText.setText("<mixed>");
+                colorPicker.setValue(null);
 
-            if (EDAmameController.Controller_IsListAllEqual(textFontSizes))
-                textFontSizeText.setText(Double.toString(textFontSizes.get(0)));
-            else
-                textFontSizeText.setText("<mixed>");
-
-            if (EDAmameController.Controller_IsListAllEqual(textFontColors))
-                textFontColorPicker.setValue(textFontColors.get(0));
-            else
-                textFontColorPicker.setValue(Color.TRANSPARENT);
-
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textContentHBox);
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textFontSizeHBox);
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(textFontColorHBox);
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(colorHBox);
         }
-
-        if (!strokes.isEmpty() && !strokeWidths.isEmpty())
-        {
-            HBox strokesWidthHBox = new HBox(10);
-            strokesWidthHBox.setId("strokesWidthBox");
-            strokesWidthHBox.getChildren().add(new Label("Shape Borders: "));
-            TextField strokesWidthTextBox = new TextField();
-            strokesWidthTextBox.setId("strokeWidth");
-            strokesWidthHBox.getChildren().add(strokesWidthTextBox);
-
-            if (EDAmameController.Controller_IsListAllEqual(strokeWidths))
-                strokesWidthTextBox.setText(Double.toString(strokeWidths.get(0)));
-            else
-                strokesWidthTextBox.setText("<mixed>");
-
-            HBox strokeColorHBox = new HBox(10);
-            strokeColorHBox.setId("strokeColorBox");
-            strokeColorHBox.getChildren().add(new Label("Shape Border Colors: "));
-            ColorPicker strokeColorPicker = new ColorPicker();
-            strokeColorPicker.setId("strokeColor");
-            strokeColorHBox.getChildren().add(strokeColorPicker);
-
-            if (EDAmameController.Controller_IsListAllEqual(strokes))
-                strokeColorPicker.setValue((Color) strokes.get(0));
-            else
-                strokeColorPicker.setValue(Color.TRANSPARENT);
-
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokesWidthHBox);
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(strokeColorHBox);
-        }
-
-
 
         EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Separator());
     }
@@ -1053,7 +995,6 @@ public abstract class Editor
                 continue;
 
             // Applying position...
-            //if (renderNode.RenderNode_Node.getClass() != Line.class)
             {
                 Integer posBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "posBox");
 
@@ -1113,7 +1054,8 @@ public abstract class Editor
             }
 
             // Applying rotation...
-            if (renderNode.RenderNode_Node.getClass() != Line.class)
+            if ((renderNode.RenderNode_Node.getClass() != Line.class) &&
+                (renderNode.RenderNode_Node.getClass() != Group.class))
             {
                 Integer rotBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rotBox");
 
@@ -1138,86 +1080,51 @@ public abstract class Editor
                 }
             }
 
-            // Applying text contents & fonts...
-            if (renderNode.RenderNode_Node.getClass() == Label.class)
+            // Applying color...
             {
-                Integer contentBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "textContentBox");
+                Integer colorBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "colorBox");
 
-                if (contentBoxIdx != -1)
+                if (colorBoxIdx != -1)
                 {
-                    HBox contentBox = (HBox)propsBox.getChildren().get(contentBoxIdx);
-                    TextField contentText = (TextField)EDAmameController.Controller_GetNodeById(contentBox.getChildren(), "textContent");
+                    HBox colorBox = (HBox) propsBox.getChildren().get(colorBoxIdx);
+                    ColorPicker colorPicker = (ColorPicker) EDAmameController.Controller_GetNodeById(colorBox.getChildren(), "color");
 
-                    if (contentText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"textContent\" node in global properties window \"textContentBox\" entry!");
+                    if (colorPicker == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"color\" node in Symbol Editor properties window \"colorBox\" entry!");
 
-                    String content = contentText.getText();
+                    Color color = colorPicker.getValue();
 
-                    if (!content.isEmpty())
+                    if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                     {
-                        if (!content.equals("<mixed>"))
-                            ((Label)renderNode.RenderNode_Node).setText(content);
-                    }
-                    else
-                    {
-                        EDAmameController.Controller_SetStatusBar("Unable to apply text contents because the entered field is empty!");
-                    }
-                }
-
-                Integer fontSizeBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "fontSizeBox");
-
-                if (fontSizeBoxIdx != -1)
-                {
-                    HBox fontSizeBox = (HBox)propsBox.getChildren().get(fontSizeBoxIdx);
-                    TextField fontSizeText = (TextField)EDAmameController.Controller_GetNodeById(fontSizeBox.getChildren(), "fontSize");
-
-                    if (fontSizeText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"fontSize\" node in global properties window \"fontSizeBox\" entry!");
-
-                    String fontSizeStr = fontSizeText.getText();
-
-                    if (EDAmameController.Controller_IsStringNum(fontSizeStr))
-                    {
-                        double fontSize = Double.parseDouble(fontSizeStr);
-
-                        if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
+                        if (renderNode.RenderNode_Node.getClass() == Line.class)
                         {
-                            ((Label)renderNode.RenderNode_Node).setFont(new Font("Arial", fontSize));
+                            ((Line)renderNode.RenderNode_Node).setStroke(color);
+                        }
+                        else if (renderNode.RenderNode_Node.getClass() == Group.class)
+                        {
+                            Group group = (Group)renderNode.RenderNode_Node;
+
+                            if (group.getChildren().size() != 2)
+                                throw new java.lang.Error("ERROR: Attempting to load pin into global properties window without 2 children!");
+
+                            ((Shape)group.getChildren().get(0)).setFill(color);
+                            ((Shape)group.getChildren().get(1)).setFill(color);
                         }
                         else
                         {
-                            EDAmameController.Controller_SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
+                            ((Shape)renderNode.RenderNode_Node).setFill(color);
                         }
-                    }
-                    else if (!fontSizeStr.equals("<mixed>"))
-                    {
-                        EDAmameController.Controller_SetStatusBar("Unable to apply text font size because the entered field is non-numeric!");
-                    }
-                }
-
-                Integer fontColorBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "fontColorBox");
-
-                if (fontColorBoxIdx != -1)
-                {
-                    HBox fontColorBox = (HBox)propsBox.getChildren().get(fontColorBoxIdx);
-                    ColorPicker fontColorPicker = (ColorPicker)EDAmameController.Controller_GetNodeById(fontColorBox.getChildren(), "fontColor");
-
-                    if (fontColorPicker == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"fontColor\" node in Symbol Editor properties window \"fontColorBox\" entry!");
-
-                    Color fontColor = fontColorPicker.getValue();
-
-                    if ((fontColor != Color.TRANSPARENT) && (fontColor.hashCode() != 0x00000000))
-                    {
-                        ((Label)renderNode.RenderNode_Node).setTextFill(fontColor);
                     }
                     else
                     {
-                        EDAmameController.Controller_SetStatusBar("Unable to apply text font color because the entered color is transparent!");
+                        if (color != null)
+                            EDAmameController.Controller_SetStatusBar("Unable to apply shape colors because the entered color is transparent!");
                     }
                 }
             }
         }
+
+        this.UndoRedoSystem.Memento_NodeHistoryUpdate();
     }
 
     abstract public void Editor_PropsLoadSpecific();

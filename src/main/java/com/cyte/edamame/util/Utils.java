@@ -11,14 +11,107 @@ import com.cyte.edamame.render.RenderNode;
 
 import java.util.*;
 
+import javafx.collections.ObservableList;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
+import javafx.scene.text.Text;
 
 public class Utils
 {
+    public static Node Utils_NodeClone(Node oldNode)
+    {
+        Node clonedNode = null;
+
+        if (oldNode.getClass() == Circle.class)
+        {
+            Circle oldCircle = (Circle)oldNode;
+
+            Circle clonedCircle = new Circle();
+            clonedCircle.setRadius(oldCircle.getRadius());
+            clonedCircle.setFill(oldCircle.getFill());
+            clonedCircle.setStroke(oldCircle.getStroke());
+            clonedCircle.setStrokeWidth(oldCircle.getStrokeWidth());
+
+            clonedNode = clonedCircle;
+        }
+        else if (oldNode.getClass() == Rectangle.class)
+        {
+            Rectangle oldRectangle = (Rectangle)oldNode;
+
+            Rectangle clonedRectangle = new Rectangle();
+            clonedRectangle.setWidth(oldRectangle.getWidth());
+            clonedRectangle.setHeight(oldRectangle.getHeight());
+            clonedRectangle.setFill(oldRectangle.getFill());
+            clonedRectangle.setStroke(oldRectangle.getStroke());
+            clonedRectangle.setStrokeWidth(oldRectangle.getStrokeWidth());
+
+            clonedNode = clonedRectangle;
+        }
+        else if (oldNode.getClass() == Polygon.class)
+        {
+            Polygon oldTriangle = (Polygon)oldNode;
+
+            Polygon clonedTriangle = new Polygon();
+            LinkedList<Double> clonedPoints = new LinkedList<Double>(oldTriangle.getPoints());
+            clonedTriangle.getPoints().setAll(clonedPoints);
+            clonedTriangle.setFill(oldTriangle.getFill());
+            clonedTriangle.setStroke(oldTriangle.getStroke());
+            clonedTriangle.setStrokeWidth(oldTriangle.getStrokeWidth());
+
+            clonedNode = clonedTriangle;
+        }
+        else if (oldNode.getClass() == Line.class)
+        {
+            Line oldLine = (Line)oldNode;
+
+            Line clonedLine = new Line();
+            clonedLine.setStartX(oldLine.getStartX());
+            clonedLine.setStartY(oldLine.getStartY());
+            clonedLine.setEndX(oldLine.getEndX());
+            clonedLine.setEndY(oldLine.getEndY());
+            clonedLine.setStroke(oldLine.getStroke());
+            clonedLine.setStrokeWidth(oldLine.getStrokeWidth());
+
+            clonedNode = clonedLine;
+        }
+        else if (oldNode.getClass() == Text.class)
+        {
+            Text oldText = (Text)oldNode;
+
+            Text clonedText = new Text();
+            clonedText.setFont(oldText.getFont());
+            clonedText.setFill(oldText.getFill());
+
+            clonedNode = clonedText;
+        }
+        else if (oldNode.getClass() == Group.class)
+        {
+            Group oldGroup = (Group)oldNode;
+
+            Group clonedGroup = new Group();
+
+            for (int i = 0; i < oldGroup.getChildren().size(); i++)
+                clonedGroup.getChildren().add(Utils.Utils_NodeClone(oldGroup.getChildren().get(i)));
+
+            clonedNode = clonedGroup;
+        }
+        else
+        {
+            throw new java.lang.Error("ERROR: Attempting to clone an unrecognized JavaFX oldNode type!");
+        }
+
+        clonedNode.setTranslateX(oldNode.getTranslateX());
+        clonedNode.setTranslateY(oldNode.getTranslateY());
+        clonedNode.setLayoutX(oldNode.getLayoutX());
+        clonedNode.setLayoutY(oldNode.getLayoutY());
+        clonedNode.setRotate(oldNode.getRotate());
+
+        return clonedNode;
+    }
+
     static public PairMutable GetPosInNodeParent(Node node, PairMutable pos)
     {
         Point2D newPos = node.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
