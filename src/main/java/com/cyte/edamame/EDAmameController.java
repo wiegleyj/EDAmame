@@ -6,7 +6,7 @@
  */
 
 // TODO:
-// Fix undo in schematic editor
+// Fix undo with labels
 // Implement max char limit for all texts
 // Refactor RenderNode FXML function blank color setting
 // Refactor RenderNode cloning into another constructor

@@ -83,6 +83,7 @@ public class Utils
 
             Text clonedText = new Text();
             clonedText.setFont(oldText.getFont());
+            clonedText.setText(oldText.getText());
             clonedText.setFill(oldText.getFill());
 
             clonedNode = clonedText;

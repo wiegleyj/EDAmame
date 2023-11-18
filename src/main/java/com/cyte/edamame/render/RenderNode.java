@@ -593,6 +593,4 @@ public class RenderNode
 
         return str;
     }
-
-
 }
