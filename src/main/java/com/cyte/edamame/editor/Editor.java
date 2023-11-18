@@ -55,6 +55,7 @@ public abstract class Editor
     public Double Editor_MouseDragCheckTimeout;
     public Color Editor_SelectionBoxColor;
     public Double Editor_SelectionBoxWidth;
+    public int Editor_UndoPointer;
 
     // DO NOT EDIT
 
@@ -423,14 +424,15 @@ public abstract class Editor
             this.Editor_LinePreviewUpdate(dropPos);
     }
 
-    public void Editor_OnMousePressedGlobal(MouseEvent event)
-    {
-        if (this.Editor_PressedLMB)
-        {
+    public void Editor_OnMousePressedGlobal(MouseEvent event) {
+        if (this.Editor_PressedLMB) {
+            this.UndoRedoSystem.Memento_NodeHistoryUpdate();
+        } else if (this.Editor_PressedRMB) {
             this.UndoRedoSystem.Memento_NodeHistoryUpdate();
         }
-        else if (this.Editor_PressedRMB)
-        {}
+
+        // Perform redo operation if needed
+        this.UndoRedoSystem.Memento_NodesRedo();
 
         this.Editor_MouseDragFirstPos = null;
         this.Editor_MouseDragPaneFirstPos = null;
@@ -438,6 +440,7 @@ public abstract class Editor
         //if (this.Editor_ShapesHighlighted > 0)
         //    this.Editor_PressedOnShape = true;
     }
+
 
     public void Editor_OnMouseReleasedGlobal(MouseEvent event)
     {
@@ -724,9 +727,13 @@ public abstract class Editor
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.ESCAPE) && (this.EditorSymbol_LinePreview != null))
             Editor_LinePreviewRemove();
 
-        // Handling element redo...
+        // Handling element undo...
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL) && EDAmameController.Controller_IsKeyPressed(KeyCode.Z))
             this.UndoRedoSystem.Memento_NodesUndo();
+
+        // Handling element undo...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL) && EDAmameController.Controller_IsKeyPressed(KeyCode.Y))
+            this.UndoRedoSystem.Memento_NodesRedo();
     }
 
     public void Editor_OnKeyReleasedGlobal(KeyEvent event)
