@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.UUID;
 
 import javafx.scene.canvas.*;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;

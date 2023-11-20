@@ -6,12 +6,9 @@
  */
 
 // TODO:
-// Fix undo with labels
 // Implement max char limit for all texts
 // Refactor RenderNode FXML function blank color setting
 // Refactor RenderNode cloning into another constructor
-// Implement straight-only dragging
-// Implement selection cancellation when ESC pressed
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling

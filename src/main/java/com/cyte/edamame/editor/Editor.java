@@ -187,6 +187,53 @@ public abstract class Editor
 
     //// RENDER FUNCTIONS ////
 
+    public void Editor_NodesDeselectAll()
+    {
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            if (!renderNode.RenderNode_Selected)
+            {
+                if (renderNode.RenderNode_HighlightedMouse || renderNode.RenderNode_HighlightedBox)
+                {
+                    renderNode.RenderNode_Selected = true;
+                    //shape.RenderShape_ShapeSelectedRefresh();
+                    //this.Editor_RenderSystem.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
+                    renderNode.RenderNode_ShapeSelected.setVisible(true);
+                    this.Editor_ShapesSelected++;
+                }
+            }
+            else
+            {
+                if ((!renderNode.RenderNode_HighlightedMouse && !renderNode.RenderNode_HighlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
+                {
+                    renderNode.RenderNode_Selected = false;
+                    //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
+                    renderNode.RenderNode_ShapeSelected.setVisible(false);
+                    this.Editor_ShapesSelected--;
+                }
+            }
+
+            if (renderNode.RenderNode_HighlightedBox && !renderNode.RenderNode_HighlightedMouse)
+                //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
+                renderNode.RenderNode_ShapeHighlighted.setVisible(false);
+
+            renderNode.RenderNode_MousePressPos = null;
+        }
+
+        if (this.Editor_SelectionBox != null)
+        {
+            this.Editor_RenderSystem.RenderSystem_PaneListener.getChildren().remove(this.Editor_SelectionBox);
+            this.Editor_SelectionBox = null;
+            this.Editor_WasSelectionBox = true;
+        }
+        else
+        {
+            this.Editor_WasSelectionBox = false;
+        }
+    }
+
     public void Editor_NodeSnapPointsCheck(PairMutable posEvent)
     {
         PairMutable posMouse = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
@@ -439,7 +486,6 @@ public abstract class Editor
         //    this.Editor_PressedOnShape = true;
     }
 
-
     public void Editor_OnMouseReleasedGlobal(MouseEvent event)
     {
         if (this.Editor_PressedLMB)
@@ -449,54 +495,10 @@ public abstract class Editor
             else
                 this.Editor_ShapesWereSelected = false;
 
-            // Handling shape selection (only if we're not moving any shapes or drawing any lines)
+            // Handling shape deselection (only if we're not moving any shapes or drawing any lines)
             if (!this.Editor_ShapesMoving &&
                 (this.EditorSymbol_LinePreview == null))
-            {
-                for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-                {
-                    RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
-
-                    if (!renderNode.RenderNode_Selected)
-                    {
-                        if (renderNode.RenderNode_HighlightedMouse || renderNode.RenderNode_HighlightedBox)
-                        {
-                            renderNode.RenderNode_Selected = true;
-                            //shape.RenderShape_ShapeSelectedRefresh();
-                            //this.Editor_RenderSystem.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
-                            renderNode.RenderNode_ShapeSelected.setVisible(true);
-                            this.Editor_ShapesSelected++;
-                        }
-                    }
-                    else
-                    {
-                        if ((!renderNode.RenderNode_HighlightedMouse && !renderNode.RenderNode_HighlightedBox) && !EDAmameController.Controller_IsKeyPressed(KeyCode.SHIFT))
-                        {
-                            renderNode.RenderNode_Selected = false;
-                            //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
-                            renderNode.RenderNode_ShapeSelected.setVisible(false);
-                            this.Editor_ShapesSelected--;
-                        }
-                    }
-
-                    if (renderNode.RenderNode_HighlightedBox && !renderNode.RenderNode_HighlightedMouse)
-                        //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
-                        renderNode.RenderNode_ShapeHighlighted.setVisible(false);
-
-                    renderNode.RenderNode_MousePressPos = null;
-                }
-
-                if (this.Editor_SelectionBox != null)
-                {
-                    this.Editor_RenderSystem.RenderSystem_PaneListener.getChildren().remove(this.Editor_SelectionBox);
-                    this.Editor_SelectionBox = null;
-                    this.Editor_WasSelectionBox = true;
-                }
-                else
-                {
-                    this.Editor_WasSelectionBox = false;
-                }
-            }
+                this.Editor_NodesDeselectAll();
         }
         else if (this.Editor_PressedRMB)
         {
@@ -547,7 +549,7 @@ public abstract class Editor
 
                     PairMutable posPressReal = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(new PairMutable(renderNode.RenderNode_MousePressPos.GetLeftDouble(),
                                                                                                                           renderNode.RenderNode_MousePressPos.GetRightDouble()));
-                    PairMutable edgeOffset = new PairMutable(0.0, 0.0);
+                    PairMutable posOffset = new PairMutable(0.0, 0.0);
 
                     /*if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
                         edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
@@ -558,8 +560,17 @@ public abstract class Editor
                     if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
                         edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);*/
 
-                    renderNode.RenderNode_Node.setTranslateX(renderNode.RenderNode_MousePressPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + edgeOffset.GetLeftDouble());
-                    renderNode.RenderNode_Node.setTranslateY(renderNode.RenderNode_MousePressPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + edgeOffset.GetRightDouble());
+                    // Handling straight-only dragging...
+                    if (EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL))
+                    {
+                        if (Math.abs(this.Editor_MouseDragDiffPos.GetLeftDouble()) < Math.abs(this.Editor_MouseDragDiffPos.GetRightDouble()))
+                            posOffset.left = -this.Editor_MouseDragDiffPos.GetLeftDouble();
+                        else
+                            posOffset.right = -this.Editor_MouseDragDiffPos.GetRightDouble();
+                    }
+
+                    renderNode.RenderNode_Node.setTranslateX(renderNode.RenderNode_MousePressPos.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + posOffset.GetLeftDouble());
+                    renderNode.RenderNode_Node.setTranslateY(renderNode.RenderNode_MousePressPos.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + posOffset.GetRightDouble());
                 }
 
                 this.Editor_ShapesMoving = true;
@@ -721,9 +732,14 @@ public abstract class Editor
             }
         }
 
-        // Handling line drawing interruption...
-        if (EDAmameController.Controller_IsKeyPressed(KeyCode.ESCAPE) && (this.EditorSymbol_LinePreview != null))
-            Editor_LinePreviewRemove();
+        // Handling line drawing interruption & element deselection...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.ESCAPE))
+        {
+            if (this.EditorSymbol_LinePreview != null)
+                this.Editor_LinePreviewRemove();
+            else
+                this.Editor_NodesDeselectAll();
+        }
 
         // Handling element undo...
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.CONTROL) && EDAmameController.Controller_IsKeyPressed(KeyCode.Z))
