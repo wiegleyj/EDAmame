@@ -17,6 +17,7 @@ import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
+import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
 public class Utils
@@ -30,9 +31,10 @@ public class Utils
             Circle oldCircle = (Circle)oldNode;
 
             Circle clonedCircle = new Circle();
-            clonedCircle.setRadius(oldCircle.getRadius());
-            clonedCircle.setFill(oldCircle.getFill());
-            clonedCircle.setStroke(oldCircle.getStroke());
+            Color colorFill = (Color)oldCircle.getFill();
+            clonedCircle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldCircle.getStroke();
+            clonedCircle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
             clonedCircle.setStrokeWidth(oldCircle.getStrokeWidth());
 
             clonedNode = clonedCircle;
@@ -44,8 +46,10 @@ public class Utils
             Rectangle clonedRectangle = new Rectangle();
             clonedRectangle.setWidth(oldRectangle.getWidth());
             clonedRectangle.setHeight(oldRectangle.getHeight());
-            clonedRectangle.setFill(oldRectangle.getFill());
-            clonedRectangle.setStroke(oldRectangle.getStroke());
+            Color colorFill = (Color)oldRectangle.getFill();
+            clonedRectangle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldRectangle.getStroke();
+            clonedRectangle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
             clonedRectangle.setStrokeWidth(oldRectangle.getStrokeWidth());
 
             clonedNode = clonedRectangle;
@@ -57,8 +61,10 @@ public class Utils
             Polygon clonedTriangle = new Polygon();
             LinkedList<Double> clonedPoints = new LinkedList<Double>(oldTriangle.getPoints());
             clonedTriangle.getPoints().setAll(clonedPoints);
-            clonedTriangle.setFill(oldTriangle.getFill());
-            clonedTriangle.setStroke(oldTriangle.getStroke());
+            Color colorFill = (Color)oldTriangle.getFill();
+            clonedTriangle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldTriangle.getStroke();
+            clonedTriangle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
             clonedTriangle.setStrokeWidth(oldTriangle.getStrokeWidth());
 
             clonedNode = clonedTriangle;
@@ -72,7 +78,8 @@ public class Utils
             clonedLine.setStartY(oldLine.getStartY());
             clonedLine.setEndX(oldLine.getEndX());
             clonedLine.setEndY(oldLine.getEndY());
-            clonedLine.setStroke(oldLine.getStroke());
+            Color colorStroke = (Color)oldLine.getStroke();
+            clonedLine.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
             clonedLine.setStrokeWidth(oldLine.getStrokeWidth());
 
             clonedNode = clonedLine;
@@ -82,9 +89,10 @@ public class Utils
             Text oldText = (Text)oldNode;
 
             Text clonedText = new Text();
-            clonedText.setFont(oldText.getFont());
-            clonedText.setText(oldText.getText());
-            clonedText.setFill(oldText.getFill());
+            clonedText.setFont(new Font("Arial", clonedText.getFont().getSize()));
+            clonedText.setText(new String(oldText.getText()));
+            Color colorFill = (Color)oldText.getFill();
+            clonedText.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
 
             clonedNode = clonedText;
         }

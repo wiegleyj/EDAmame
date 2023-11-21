@@ -653,6 +653,8 @@ public class EditorSymbol extends Editor
                                     pin.setId("PIN_" + stringPinLabel);
 
                                     Circle pinCircle = new Circle(pinRadius, pinColor);
+                                    pinCircle.setStroke(Color.TRANSPARENT);
+                                    pinCircle.setStrokeWidth(0);
 
                                     Text pinLabel = new Text(stringPinLabel);
                                     pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
