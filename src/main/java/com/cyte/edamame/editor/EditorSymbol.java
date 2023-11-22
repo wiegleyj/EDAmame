@@ -23,6 +23,8 @@ import javafx.scene.shape.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
+//import java.awt.*;
+//import java.awt.event.*;
 
 /**
  * Editor for maintaining Symbol libraries.
@@ -77,6 +79,8 @@ public class EditorSymbol extends Editor
     public TextField EditorSymbol_PinRadius;
     @FXML
     public ColorPicker EditorSymbol_PinColor;
+
+
 
     //// MAIN FUNCTIONS ////
 
@@ -344,49 +348,16 @@ public class EditorSymbol extends Editor
                                 String stringStrokeSize = this.EditorSymbol_CircleBorderSize.getText();
                                 Color fillColor = this.EditorSymbol_CircleColor.getValue();
                                 Paint strokeColor = this.EditorSymbol_CircleBorderColor.getValue();
-                                boolean canDrop = true;
 
-                                if (stringRadius.isEmpty() || !EDAmameController.Controller_IsStringNum(stringRadius))
+                                if (EditorSymbol_checkStringCircleBounds(stringRadius) && EditorSymbol_checkStringBorderSize(stringStrokeSize) && EditorSymbol_checkShapeTransparency(stringStrokeSize, strokeColor, fillColor))
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double radius = Double.parseDouble(stringRadius);
-                                if (!((radius >= EDAmameController.Editor_CircleRadiusMin) && (radius <= EDAmameController.Editor_CircleRadiusMax)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border size is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double strokeSize = Double.parseDouble(stringStrokeSize);
-                                if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
-                                {
-                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
-                                    {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered fill and border is transparent!");
-                                        canDrop = false;
-                                    }
-                                }
-
-                                if (canDrop) {
-                                    Circle circle = new Circle(radius, fillColor);
+                                    Circle circle = new Circle(Double.parseDouble(stringRadius), fillColor);
 
                                     circle.setTranslateX(dropPos.GetLeftDouble());
                                     circle.setTranslateY(dropPos.GetRightDouble());
 
                                     circle.setStroke(strokeColor);
-                                    circle.setStrokeWidth(strokeSize);
+                                    circle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
                                     RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
@@ -401,52 +372,16 @@ public class EditorSymbol extends Editor
                                 String stringStrokeSize = this.EditorSymbol_RectangleBorderSize.getText();
                                 Color fillColor = this.EditorSymbol_RectangleColor.getValue();
                                 Paint strokeColor = this.EditorSymbol_RectangleBorderColor.getValue();
-                                boolean canDrop = true;
 
-                                if ((stringWidth.isEmpty() || stringHeight.isEmpty()) || !(EDAmameController.Controller_IsStringNum(stringWidth) && EDAmameController.Controller_IsStringNum(stringHeight)))
+                                if (EditorSymbol_checkStringRectBounds(stringWidth, stringHeight) && EditorSymbol_checkStringBorderSize(stringStrokeSize) && EditorSymbol_checkShapeTransparency(stringStrokeSize, strokeColor, fillColor))
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double width = Double.parseDouble(stringWidth);
-                                double height = Double.parseDouble(stringHeight);
-                                if (!(((width >= EDAmameController.Editor_RectWidthMin) && (width <= EDAmameController.Editor_RectWidthMax)) &&
-                                        ((height >= EDAmameController.Editor_RectHeightMin) && (height <= EDAmameController.Editor_RectHeightMax))))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border size is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double strokeSize = Double.parseDouble(stringStrokeSize);
-                                if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
-                                {
-                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
-                                    {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered fill and border is transparent!");
-                                        canDrop = false;
-                                    }
-                                }
-
-                                if (canDrop)
-                                {
-                                    Rectangle rectangle = new Rectangle(width, height, fillColor);
+                                    Rectangle rectangle = new Rectangle(Double.parseDouble(stringWidth), Double.parseDouble(stringHeight), fillColor);
 
                                     rectangle.setTranslateX(dropPos.GetLeftDouble());
                                     rectangle.setTranslateY(dropPos.GetRightDouble());
 
                                     rectangle.setStroke(strokeColor);
-                                    rectangle.setStrokeWidth(strokeSize);
+                                    rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
                                     RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
@@ -460,44 +395,11 @@ public class EditorSymbol extends Editor
                                 String stringStrokeSize = this.EditorSymbol_TriangleBorderSize.getText();
                                 Color fillColor = this.EditorSymbol_TriangleColor.getValue();
                                 Paint strokeColor = this.EditorSymbol_TriangleBorderColor.getValue();
-                                boolean canDrop = true;
 
-                                if (stringMiddleHeight.isEmpty() || !EDAmameController.Controller_IsStringNum(stringMiddleHeight))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double middleLength = Double.parseDouble(stringMiddleHeight);
-                                if (!((middleLength >= EDAmameController.Editor_TriLenMin) && (middleLength <= EDAmameController.Editor_TriLenMax)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if (stringStrokeSize.isEmpty() || !EDAmameController.Controller_IsStringNum(stringStrokeSize))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border size is non-numeric!");
-                                    canDrop = false;
-                                }
-                                double strokeSize = Double.parseDouble(stringStrokeSize);
-                                if (!((strokeSize >= EDAmameController.Editor_BorderMin) && (strokeSize <= EDAmameController.Editor_BorderMax)))
-                                {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
-                                    canDrop = false;
-                                }
-
-                                if ((strokeSize == 0) || (!strokeColor.isOpaque()))
-                                {
-                                    if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
-                                    {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered fill and border is transparent!");
-                                        canDrop = false;
-                                    }
-                                }
-
-                                if (canDrop)
+                                if (EditorSymbol_checkStringTriBounds(stringMiddleHeight) && EditorSymbol_checkStringBorderSize(stringStrokeSize) && EditorSymbol_checkShapeTransparency(stringStrokeSize, strokeColor, fillColor))
                                 {
                                     Polygon triangle = new Polygon();
+                                    double middleLength = Double.parseDouble(stringMiddleHeight);
                                     triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
                                             middleLength / 2, middleLength / 2,
                                             0.0, -middleLength / 2);
@@ -507,7 +409,7 @@ public class EditorSymbol extends Editor
                                     triangle.setTranslateY(dropPos.GetRightDouble());
 
                                     triangle.setStroke(strokeColor);
-                                    triangle.setStrokeWidth(strokeSize);
+                                    triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
                                     RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
@@ -1486,6 +1388,121 @@ public class EditorSymbol extends Editor
                     }
                 }
             }
+        }
+    }
+
+    public static boolean EditorSymbol_checkShapeTransparency(String strokeSize, Paint strokeColor, Color fillColor)
+    {
+        if (EDAmameController.Controller_IsStringNum(strokeSize))
+        {
+            double strokeDouble = Double.parseDouble(strokeSize);
+            if ((strokeDouble == 0) || (!strokeColor.isOpaque()))
+            {
+                if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                {
+                    EDAmameController.Controller_SetStatusBar("Unable to drop shape because the entered fill and border is transparent!");
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean EditorSymbol_checkStringBorderSize(String checkString)
+    {
+        if (EDAmameController.Controller_IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.Editor_BorderMin) && (checkDouble <= EDAmameController.Editor_BorderMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.Controller_SetStatusBar("Unable to drop shape because the entered border size field is outside the limits! (Length limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to drop shape because the entered border size is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean EditorSymbol_checkStringCircleBounds(String checkString)
+    {
+        if (EDAmameController.Controller_IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.Editor_CircleRadiusMin) && (checkDouble <= EDAmameController.Editor_CircleRadiusMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean EditorSymbol_checkStringRectBounds(String checkWidth, String checkHeight)
+    {
+        if ((EDAmameController.Controller_IsStringNum(checkWidth)) && (EDAmameController.Controller_IsStringNum(checkHeight)))
+        {
+            double doubleWidth = Double.parseDouble(checkWidth);
+            double doubleHeight = Double.parseDouble(checkHeight);
+            if (!((doubleWidth >= EDAmameController.Editor_RectWidthMin) && (doubleWidth <= EDAmameController.Editor_RectWidthMax)))
+            {
+                EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
+                return false;
+            }
+            else if (!((doubleHeight >= EDAmameController.Editor_RectHeightMin) && (doubleHeight <= EDAmameController.Editor_RectHeightMax)))
+            {
+                EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + " | Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean EditorSymbol_checkStringTriBounds(String checkString)
+    {
+        if (EDAmameController.Controller_IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.Editor_TriLenMin) && (checkDouble <= EDAmameController.Editor_TriLenMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.Controller_SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
+            return false;
         }
     }
 
