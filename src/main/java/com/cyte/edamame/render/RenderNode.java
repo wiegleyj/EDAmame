@@ -429,13 +429,13 @@ public class RenderNode
                 str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
             }
 
-            if (circle.getStroke() != null)
-            {
+            //if (circle.getStroke() != null)
+            //{
                 str += " stroke=\"#" + circle.getStroke().toString().replace("0x", "") + "\"";
                 //str += " strokeType=\"#" + circle.getStrokeType().toString().replace("#", "") + "\"";
                 str += " strokeType=\"INSIDE\"";
                 str += " strokeWidth=\"" + circle.getStrokeWidth()+ "\"";
-            }
+            //}
 
             str += " translateX=\"" + (circle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
             str += " translateY=\"" + (circle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
@@ -465,13 +465,13 @@ public class RenderNode
                 str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
             }
 
-            if (rectangle.getStroke() != null)
-            {
+            //if (rectangle.getStroke() != null)
+            //{
                 str += " stroke=\"#" + rectangle.getStroke().toString().replace("0x", "") + "\"";
                 //str += " strokeType=\"#" + rectangle.getStrokeType().toString().replace("#", "") + "\"";
                 str += " strokeType=\"INSIDE\"";
                 str += " strokeWidth=\"" + rectangle.getStrokeWidth() + "\"";
-            }
+            //}
 
             str += " translateX=\"" + (rectangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
             str += " translateY=\"" + (rectangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
@@ -498,13 +498,13 @@ public class RenderNode
                 str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
             }
 
-            if (triangle.getStroke() != null)
-            {
+            //if (triangle.getStroke() != null)
+            //{
                 str += " stroke=\"#" + triangle.getStroke().toString().replace("0x", "") + "\"";
                 //str += " strokeType=\"#" + triangle.getStrokeType().toString().replace("#", "") + "\"";
                 str += " strokeType=\"INSIDE\"";
                 str += " strokeWidth=\"" + triangle.getStrokeWidth() + "\"";
-            }
+            //}
 
             str += " translateX=\"" + (triangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
             str += " translateY=\"" + (triangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
