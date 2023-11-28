@@ -23,8 +23,11 @@ import javafx.scene.shape.*;
 import javafx.scene.input.*;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
+import javafx.beans.value.*;
 //import java.awt.*;
 //import java.awt.event.*;
+
+//import org.apache.commons.lang.StringUtils;
 
 /**
  * Editor for maintaining Symbol libraries.
@@ -100,6 +103,12 @@ public class EditorSymbol extends Editor
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
         editor.Editor_ListenersInit();
 
+        editor.EditorSymbol_PinRadius.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > EDAmameController.Editor_MaxChars) {
+                editor.EditorSymbol_PinRadius.setText(oldValue);
+            }
+        });
+
         return editor;
     }
 
@@ -113,6 +122,7 @@ public class EditorSymbol extends Editor
     }
 
     //// CALLBACK FUNCTIONS ////
+
 
     @FXML
     public void EditorSymbol_Save()

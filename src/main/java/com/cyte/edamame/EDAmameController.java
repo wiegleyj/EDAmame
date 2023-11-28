@@ -104,6 +104,7 @@ public class EDAmameController implements Initializable
     final static public Double Editor_PinRadiusMax = 10.0;
     final static public Double Editor_WireWidthMin = 3.0;
     final static public Double Editor_WireWidthMax = 10.0;
+    final static public int Editor_MaxChars = 10;
 
     final static public Logger Controller_Logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 
