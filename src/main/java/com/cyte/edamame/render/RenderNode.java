@@ -413,21 +413,7 @@ public class RenderNode
             str += tabStr + "<Circle";
             str += " id=\"" + circle.getId() + "\"";
             str += " radius=\"" + circle.getRadius() + "\"";
-            //str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
-
-            if (Integer.toHexString(circle.getFill().hashCode()).length() < 8)
-            {
-                String addZeros = Integer.toHexString(circle.getFill().hashCode());
-
-                while (addZeros.length() < 8)
-                    addZeros = "0" + addZeros;
-
-                str += " fill=\"#" + addZeros + "\"";
-            }
-            else
-            {
-                str += " fill=\"#" + Integer.toHexString(circle.getFill().hashCode()) + "\"";
-            }
+            str += RenderNode_addLeadingZeros(Integer.toHexString(circle.getFill().hashCode()));
 
             //if (circle.getStroke() != null)
             //{
@@ -449,21 +435,7 @@ public class RenderNode
             str += " id=\"" + rectangle.getId() + "\"";
             str += " width=\"" + rectangle.getWidth() + "\"";
             str += " height=\"" + rectangle.getHeight() + "\"";
-            //str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
-
-            if (Integer.toHexString(rectangle.getFill().hashCode()).length() < 8)
-            {
-                String addZeros = Integer.toHexString(rectangle.getFill().hashCode());
-
-                while (addZeros.length() < 8)
-                    addZeros = "0" + addZeros;
-
-                str += " fill=\"#" + addZeros + "\"";
-            }
-            else
-            {
-                str += " fill=\"#" + Integer.toHexString(rectangle.getFill().hashCode()) + "\"";
-            }
+            str += RenderNode_addLeadingZeros(Integer.toHexString(rectangle.getFill().hashCode()));
 
             //if (rectangle.getStroke() != null)
             //{
@@ -483,20 +455,7 @@ public class RenderNode
 
             str += tabStr + "<Polygon";
             str += " id=\"" + triangle.getId() + "\"";
-
-            if (Integer.toHexString(triangle.getFill().hashCode()).length() < 8)
-            {
-                String addZeros = Integer.toHexString(triangle.getFill().hashCode());
-
-                while (addZeros.length() < 8)
-                    addZeros = "0" + addZeros;
-
-                str += " fill=\"#" + addZeros + "\"";
-            }
-            else
-            {
-                str += " fill=\"#" + Integer.toHexString(triangle.getFill().hashCode()) + "\"";
-            }
+            str += RenderNode_addLeadingZeros(Integer.toHexString(triangle.getFill().hashCode()));
 
             //if (triangle.getStroke() != null)
             //{
@@ -542,20 +501,8 @@ public class RenderNode
             str += tabStr + "<Text";
             str += " id=\"" + text.getId() + "\"";
             str += " text=\"" + text.getText() + "\"";
-
-            if (Integer.toHexString(text.getFill().hashCode()).length() < 8)
-            {
-                String addZeros = Integer.toHexString(text.getFill().hashCode());
-
-                while (addZeros.length() < 8)
-                    addZeros = "0" + addZeros;
-
-                str += " fill=\"#" + addZeros + "\"";
-            }
-            else
-            {
-                str += " fill=\"#" + Integer.toHexString(text.getFill().hashCode()) + "\"";
-            }
+            String addZeros = Integer.toHexString(text.getFill().hashCode());
+            str += RenderNode_addLeadingZeros(addZeros);
 
             str += " translateX=\"" + (text.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
             str += " translateY=\"" + (text.getTranslateY() + posOffset.GetRightDouble()) + "\"";
@@ -592,5 +539,19 @@ public class RenderNode
         }
 
         return str;
+    }
+
+    public static String RenderNode_addLeadingZeros(String addZeros)
+    {
+        if (addZeros.length() < 8)
+        {
+            while (addZeros.length() < 8)
+                addZeros = "0" + addZeros;
+            return " fill=\"#" + addZeros + "\"";
+        }
+        else
+        {
+            return " fill=\"#" + addZeros + "\"";
+        }
     }
 }
