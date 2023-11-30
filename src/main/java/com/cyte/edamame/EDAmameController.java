@@ -6,8 +6,8 @@
  */
 
 // TODO:
-// Implement max char limit for all texts
-// Refactor RenderNode FXML function blank color setting
+// Fix undo circles
+// Implement net lists
 // Refactor RenderNode cloning into another constructor
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
