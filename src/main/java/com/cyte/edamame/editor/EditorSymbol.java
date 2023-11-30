@@ -103,11 +103,20 @@ public class EditorSymbol extends Editor
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
         editor.Editor_ListenersInit();
 
-        editor.EditorSymbol_PinRadius.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > EDAmameController.Editor_MaxChars) {
-                editor.EditorSymbol_PinRadius.setText(oldValue);
-            }
-        });
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_CircleRadius);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_CircleBorderSize);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_RectangleWidth);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_RectangleHeight);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_RectangleBorderSize);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_TriangleBorderSize);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_TriangleHeight);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_LineWidth);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_TextContent);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_TextSize);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_PinLabel);
+        Editor.Editor_TextFieldListenerInit(editor.EditorSymbol_PinRadius);
+
+
 
         return editor;
     }

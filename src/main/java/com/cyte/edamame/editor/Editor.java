@@ -1153,6 +1153,14 @@ public abstract class Editor
 
     //// SUPPORT FUNCTIONS ////
 
+    public static void Editor_TextFieldListenerInit(TextField textField)
+    {
+        textField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue.length() > EDAmameController.Editor_MaxChars)
+                textField.setText(oldValue);
+        });
+    }
+
     public PairMutable Editor_MagneticSnapCheck(PairMutable pos)
     {
         PairMutable posSnapped = new PairMutable(pos);

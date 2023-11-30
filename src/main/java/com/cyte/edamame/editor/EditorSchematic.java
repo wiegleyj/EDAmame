@@ -57,6 +57,8 @@ public class EditorSchematic extends Editor
         editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
         editor.Editor_ListenersInit();
 
+        Editor.Editor_TextFieldListenerInit(editor.EditorSchematic_WireWidth);
+
         return editor;
     }
 
