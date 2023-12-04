@@ -9,25 +9,25 @@ package com.cyte.edamame.netlist;
 
 import java.util.LinkedList;
 
-public class NetListNode<T>
+public class NetListExperimentalNode<T>
 {
-    private T NetListNode_Node;
+    private T NetListNode_Value;
     private LinkedList<T> NetListNode_Connections;
 
-    public void NetListNode(T nodeValue)
+    public NetListExperimentalNode(T nodeValue)
     {
-        this.NetListNode_Node = nodeValue;
+        this.NetListNode_Value = nodeValue;
         this.NetListNode_Connections = new LinkedList<T>();
     }
 
-    public void Set(T nodeValue)
+    public void SetValue(T nodeValue)
     {
-        this.NetListNode_Node = nodeValue;
+        this.NetListNode_Value = nodeValue;
     }
 
-    public T Get()
+    public T GetValue()
     {
-        return this.NetListNode_Node;
+        return this.NetListNode_Value;
     }
 
     public void ConnAppend(T node)
@@ -53,5 +53,15 @@ public class NetListNode<T>
     public T ConnGet(int idx)
     {
         return this.NetListNode_Connections.get(idx);
+    }
+
+    public String ToString()
+    {
+        if (this.NetListNode_Value.getClass() == String.class)
+        {
+            return (String)this.NetListNode_Value;
+        }
+
+        throw new java.lang.Error("ERROR: Attempting to stringify an unrecognized net list node value!");
     }
 }

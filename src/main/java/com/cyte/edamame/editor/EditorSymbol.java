@@ -161,11 +161,13 @@ public class EditorSymbol extends Editor
 
             boolean edgeSnaps = true;
             LinkedList<PairMutable> snapManualPos = null;
+            boolean isPin = false;
 
             if (node.getClass() == Group.class)
             {
                 edgeSnaps = false;
                 snapManualPos = new LinkedList<PairMutable>();
+                isPin = true;
                 Group group = (Group)node;
 
                 for (int j = 0; j < group.getChildren().size(); j++)
@@ -177,7 +179,7 @@ public class EditorSymbol extends Editor
                 }
             }
 
-            RenderNode renderNode = new RenderNode("LoadedNode", node, edgeSnaps, snapManualPos, false, this.Editor_RenderSystem);
+            RenderNode renderNode = new RenderNode("LoadedNode", node, edgeSnaps, snapManualPos, false, isPin, this.Editor_RenderSystem);
             this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
         }
     }
@@ -378,7 +380,7 @@ public class EditorSymbol extends Editor
                                     circle.setStroke(strokeColor);
                                     circle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, this.Editor_RenderSystem);
+                                    RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
@@ -402,7 +404,7 @@ public class EditorSymbol extends Editor
                                     rectangle.setStroke(strokeColor);
                                     rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, this.Editor_RenderSystem);
+                                    RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
@@ -430,7 +432,7 @@ public class EditorSymbol extends Editor
                                     triangle.setStroke(strokeColor);
                                     triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, this.Editor_RenderSystem);
+                                    RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
@@ -476,7 +478,7 @@ public class EditorSymbol extends Editor
                                         this.EditorSymbol_LinePreview.setStrokeWidth(width);
                                         this.EditorSymbol_LinePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
+                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, false, this.Editor_RenderSystem);
                                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
 
                                         lineStarted = true;
@@ -530,7 +532,7 @@ public class EditorSymbol extends Editor
                                     text.setTranslateX(dropPos.GetLeftDouble());
                                     text.setTranslateY(dropPos.GetRightDouble());*/
 
-                                    RenderNode renderNode = new RenderNode("Text", text, true, null, false, this.Editor_RenderSystem);
+                                    RenderNode renderNode = new RenderNode("Text", text, true, null, false, false, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
@@ -596,7 +598,7 @@ public class EditorSymbol extends Editor
                                     LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
                                     snap.add(new PairMutable(0.0, 0.0));
 
-                                    RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, this.Editor_RenderSystem);
+                                    RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, true, this.Editor_RenderSystem);
                                     this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                                 }
                             }
@@ -622,7 +624,7 @@ public class EditorSymbol extends Editor
 
                                 this.Editor_LinePreviewRemove();
 
-                                RenderNode renderNode = new RenderNode("Line", line, true, null, false, this.Editor_RenderSystem);
+                                RenderNode renderNode = new RenderNode("Line", line, true, null, false, false, this.Editor_RenderSystem);
                                 this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                             }
                         }
@@ -662,22 +664,6 @@ public class EditorSymbol extends Editor
         //System.out.println("Symbol key pressed!");
 
         // Handling the shape properties window (only if there's not another properties window already open)...
-        if (EDAmameController.Controller_IsKeyPressed(KeyCode.E) && (EDAmameController.Controller_EditorPropertiesWindow == null))
-        {
-            // Attempting to create the properties window...
-            EditorProps propsWindow = EditorProps.EditorProps_Create();
-
-            if ((propsWindow != null))
-            {
-                propsWindow.EditorProps_Stage.setOnHidden(e -> {
-                    EDAmameController.Controller_EditorPropertiesWindow = null;
-                });
-                propsWindow.EditorProps_Editor = this;
-                propsWindow.EditorProps_Stage.show();
-
-                EDAmameController.Controller_EditorPropertiesWindow = propsWindow;
-            }
-        }
     }
 
     public void Editor_OnKeyReleasedSpecific(KeyEvent event)
@@ -767,7 +753,7 @@ public class EditorSymbol extends Editor
 
                 needHeader = true;
             }
-            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            else if (renderNode.RenderNode_IsPin)
             {
                 Group group = (Group)renderNode.RenderNode_Node;
 
@@ -1315,8 +1301,8 @@ public class EditorSymbol extends Editor
                     }
                 }
             }
-            // Applying circle radius...
-            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            // Applying pins...
+            else if (renderNode.RenderNode_IsPin)
             {
                 Group group = (Group)renderNode.RenderNode_Node;
 
@@ -1352,7 +1338,7 @@ public class EditorSymbol extends Editor
             // Applying borders...
             if (renderNode.RenderNode_Node.getClass() != Line.class &&
                 renderNode.RenderNode_Node.getClass() != Text.class &&
-                renderNode.RenderNode_Node.getClass() != Group.class)
+                !renderNode.RenderNode_IsPin)
             {
                 Integer strokeWidthBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "strokesWidthBox");
 

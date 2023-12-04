@@ -31,6 +31,7 @@ public class Utils
             Circle oldCircle = (Circle)oldNode;
 
             Circle clonedCircle = new Circle();
+            clonedCircle.setRadius(oldCircle.getRadius());
             Color colorFill = (Color)oldCircle.getFill();
             clonedCircle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
             Color colorStroke = (Color)oldCircle.getStroke();
@@ -89,7 +90,7 @@ public class Utils
             Text oldText = (Text)oldNode;
 
             Text clonedText = new Text();
-            clonedText.setFont(new Font("Arial", clonedText.getFont().getSize()));
+            clonedText.setFont(new Font("Arial", oldText.getFont().getSize()));
             clonedText.setText(new String(oldText.getText()));
             Color colorFill = (Color)oldText.getFill();
             clonedText.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));

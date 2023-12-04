@@ -701,6 +701,24 @@ public abstract class Editor
 
     public void Editor_OnKeyPressedGlobal(KeyEvent event)
     {
+        // Handling element properties window...
+        if (EDAmameController.Controller_IsKeyPressed(KeyCode.E) && (EDAmameController.Controller_EditorPropertiesWindow == null))
+        {
+            // Attempting to create the properties window...
+            EditorProps propsWindow = EditorProps.EditorProps_Create();
+
+            if ((propsWindow != null))
+            {
+                propsWindow.EditorProps_Stage.setOnHidden(e -> {
+                    EDAmameController.Controller_EditorPropertiesWindow = null;
+                });
+                propsWindow.EditorProps_Editor = this;
+                propsWindow.EditorProps_Stage.show();
+
+                EDAmameController.Controller_EditorPropertiesWindow = propsWindow;
+            }
+        }
+
         // Handling shape deletion...
         if (EDAmameController.Controller_IsKeyPressed(KeyCode.BACK_SPACE) || EDAmameController.Controller_IsKeyPressed(KeyCode.DELETE))
         {
@@ -890,6 +908,7 @@ public abstract class Editor
             return;
 
         // Reading all global node properties...
+        LinkedList<String> names = new LinkedList<String>();
         LinkedList<Double> posX = new LinkedList<Double>();
         LinkedList<Double> posY = new LinkedList<Double>();
         LinkedList<Double> rots = new LinkedList<Double>();
@@ -902,18 +921,19 @@ public abstract class Editor
             if (!renderNode.RenderNode_Selected)
                 continue;
 
+            names.add(renderNode.RenderNode_Name);
             posX.add(renderNode.RenderNode_Node.getTranslateX() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getWidth() / 2);
             posY.add(renderNode.RenderNode_Node.getTranslateY() - this.Editor_RenderSystem.RenderSystem_PaneHolder.getHeight() / 2);
 
             if ((renderNode.RenderNode_Node.getClass() != Line.class) &&
-                (renderNode.RenderNode_Node.getClass() != Group.class))
+                !renderNode.RenderNode_IsPin)
                 rots.add(renderNode.RenderNode_Node.getRotate());
 
             if (renderNode.RenderNode_Node.getClass() == Line.class)
             {
                 colors.add((Color)((Line) renderNode.RenderNode_Node).getStroke());
             }
-            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            else if (renderNode.RenderNode_IsPin)
             {
                 Group group = (Group)renderNode.RenderNode_Node;
 
@@ -922,10 +942,28 @@ public abstract class Editor
 
                 colors.add((Color)((Shape)group.getChildren().get(0)).getStroke());
             }
-            else
+            else if (renderNode.RenderNode_Node.getClass() != Group.class)
             {
                 colors.add((Color)((Shape)renderNode.RenderNode_Node).getFill());
             }
+        }
+
+        // Creating name box...
+        if (!names.isEmpty())
+        {
+            HBox nameBox = new HBox(10);
+            nameBox.setId("nameBox");
+            nameBox.getChildren().add(new Label("Element Names: "));
+            TextField nameText = new TextField();
+            nameText.setId("name");
+            nameBox.getChildren().add(nameText);
+
+            if (EDAmameController.Controller_IsListAllEqual(names))
+                nameText.setText(names.get(0));
+            else
+                nameText.setText("<mixed>");
+
+            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(nameBox);
         }
 
         // Creating position box...
@@ -1015,6 +1053,31 @@ public abstract class Editor
             if (!renderNode.RenderNode_Selected)
                 continue;
 
+            // Applying name...
+            {
+                Integer nameBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "nameBox");
+
+                if (nameBoxIdx != -1)
+                {
+                    HBox nameBox = (HBox)propsBox.getChildren().get(nameBoxIdx);
+                    TextField nameText = (TextField)EDAmameController.Controller_GetNodeById(nameBox.getChildren(), "name");
+
+                    if (nameText == null)
+                        throw new java.lang.Error("ERROR: Unable to find \"name\" node in global properties window \"nameBox\" entry!");
+
+                    String nameStr = nameText.getText();
+
+                    if (!nameStr.isEmpty())
+                    {
+                        renderNode.RenderNode_Name = nameStr;
+                    }
+                    else if (!nameStr.equals("<mixed>"))
+                    {
+                        EDAmameController.Controller_SetStatusBar("Unable to apply element name because the entered field is empty!");
+                    }
+                }
+            }
+
             // Applying position...
             {
                 Integer posBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "posBox");
@@ -1076,7 +1139,7 @@ public abstract class Editor
 
             // Applying rotation...
             if ((renderNode.RenderNode_Node.getClass() != Line.class) &&
-                (renderNode.RenderNode_Node.getClass() != Group.class))
+                !renderNode.RenderNode_IsPin)
             {
                 Integer rotBoxIdx = EDAmameController.Controller_FindNodeById(propsBox.getChildren(), "rotBox");
 
@@ -1121,7 +1184,7 @@ public abstract class Editor
                         {
                             ((Line)renderNode.RenderNode_Node).setStroke(color);
                         }
-                        else if (renderNode.RenderNode_Node.getClass() == Group.class)
+                        else if (renderNode.RenderNode_IsPin)
                         {
                             Group group = (Group)renderNode.RenderNode_Node;
 
@@ -1131,7 +1194,7 @@ public abstract class Editor
                             ((Shape)group.getChildren().get(0)).setFill(color);
                             ((Shape)group.getChildren().get(1)).setFill(color);
                         }
-                        else
+                        else if (renderNode.RenderNode_Node.getClass() != Group.class)
                         {
                             ((Shape)renderNode.RenderNode_Node).setFill(color);
                         }

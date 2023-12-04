@@ -16,7 +16,8 @@ import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.collections.ObservableList;
-import java.io.PrintWriter;
+
+import java.io.*;
 import java.net.URL;
 
 import javafx.scene.*;
@@ -27,9 +28,6 @@ import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.scene.text.*;
 
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.LinkedList;
 
 public class File
@@ -45,40 +43,29 @@ public class File
         if (file == null)
         {
             EDAmameController.Controller_SetStatusBar("Unable to save FXML because the entered directory is invalid!");
-        }
-        else
-        {
-            try
-            {
-                File_NodesWrite(file.getAbsolutePath(), nodes, center);
 
-                return true;
-            }
-            catch (IOException e)
-            {
-                EDAmameController.Controller_SetStatusBar("Encountered error while saving FXML file!");
-            }
+            return false;
         }
 
-        return false;
+        return File_NodesWrite(file.getAbsolutePath(), nodes, center);
     }
 
-    static public void File_NodesWrite(String filePath, LinkedList<Node> nodes, boolean center) throws IOException
+    static public boolean File_NodesWrite(String filePath, LinkedList<Node> nodes, boolean center)
     {
-        PrintWriter file = new PrintWriter(filePath, "UTF-8");
+        String data = "";
 
-        file.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n");
-        file.println("<?import java.lang.Double?>");
-        file.println("<?import javafx.scene.Group?>");
-        file.println("<?import javafx.scene.shape.Circle?>");
-        file.println("<?import javafx.scene.shape.Rectangle?>");
-        file.println("<?import javafx.scene.shape.Polygon?>");
-        file.println("<?import javafx.scene.shape.Line?>");
-        file.println("<?import javafx.scene.text.Text?>");
-        file.println("<?import javafx.scene.text.Font?>\n");
+        data += "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n\n";
+        data += "<?import java.lang.Double?>\n";
+        data += "<?import javafx.scene.Group?>\n";
+        data += "<?import javafx.scene.shape.Circle?>\n";
+        data += "<?import javafx.scene.shape.Rectangle?>\n";
+        data += "<?import javafx.scene.shape.Polygon?>\n";
+        data += "<?import javafx.scene.shape.Line?>\n";
+        data += "<?import javafx.scene.text.Text?>\n";
+        data += "<?import javafx.scene.text.Font?>\n\n";
 
-        file.println("<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">");
-        file.println("\t<children>");
+        data += "<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">\n";
+        data += "\t<children>\n";
 
         PairMutable childMidPos = new PairMutable(0.0, 0.0);
 
@@ -90,12 +77,12 @@ public class File
         }
 
         for (int i = 0; i < nodes.size(); i++)
-            file.println(RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos, 2));
+            data += RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
 
-        file.println("\t</children>");
-        file.println("</Group>");
+        data += "\t</children>\n";
+        data += "</Group>\n";
 
-        file.close();
+        return File_Write(filePath, data, true);
     }
 
     static public LinkedList<Node> File_NodesLoad(boolean center)
@@ -249,4 +236,20 @@ public class File
         FileWriter fileWriter = new FileWriter(filePath);
         yaml.dump(list, fileWriter);
     }*/
+
+    static public boolean File_Write(String filePath, String data, boolean overwrite)
+    {
+        try
+        {
+            PrintWriter file = new PrintWriter(new FileOutputStream(filePath, !overwrite));
+            file.print(data);
+            file.close();
+        }
+        catch (IOException e)
+        {
+            return false;
+        }
+
+        return true;
+    }
 }

@@ -85,7 +85,7 @@ public class MementoExperimental
         }
     }
 
-    // Function for pushing the current Editor's RenderNodes onto the node history stack (also ensures that the node history stack stays under the limit).
+    // Function for pushing the current Editor's RenderNodes onto the node history stack (also ensures that the node history stack size stays under the limit).
     public void Memento_NodeHistoryUpdate()
     {
         this.Memento_NodeHistoryUndo.push(this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesClone());

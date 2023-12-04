@@ -6,9 +6,8 @@
  */
 
 // TODO:
-// Fix undo circles
 // Implement net lists
-// Refactor RenderNode cloning into another constructor
+// Refactor RenderNode cloning into another constructor+
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling

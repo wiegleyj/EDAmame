@@ -38,9 +38,11 @@ public class RenderNode
     public boolean RenderNode_Passive;
     public boolean RenderNode_AutoSnapPoints;
     public LinkedList<SnapPoint> RenderNode_SnapPoints;
+    public boolean RenderNode_IsPin;
+
     public RenderSystem RenderNode_RenderSystem;
 
-    public RenderNode(String nameValue, Node nodeValue, boolean edgeSnapPoints, LinkedList<PairMutable> manualSnapPointPos, boolean passiveValue, RenderSystem renderSystemValue)
+    public RenderNode(String nameValue, Node nodeValue, boolean edgeSnapPoints, LinkedList<PairMutable> manualSnapPointPos, boolean passiveValue, boolean isPinValue, RenderSystem renderSystemValue)
     {
         this.RenderNode_Name = nameValue;
         this.RenderNode_Node = nodeValue;
@@ -53,6 +55,8 @@ public class RenderNode
         this.RenderNode_Passive = passiveValue;
         this.RenderNode_AutoSnapPoints = edgeSnapPoints;
         this.RenderNode_SnapPoints = new LinkedList<SnapPoint>();
+        this.RenderNode_IsPin = isPinValue;
+
         this.RenderNode_RenderSystem = renderSystemValue;
 
         if (!this.RenderNode_Passive)
@@ -352,6 +356,7 @@ public class RenderNode
                                                this.RenderNode_AutoSnapPoints,
                                                clonedSnapPointManualPos,
                                                this.RenderNode_Passive,
+                                               this.RenderNode_IsPin,
                                                null);
 
         return clonedNode;

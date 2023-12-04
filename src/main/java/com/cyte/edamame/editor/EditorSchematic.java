@@ -12,18 +12,16 @@ import com.cyte.edamame.file.File;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.Utils;
+import com.cyte.edamame.netlist.NetListExperimental;
+import com.cyte.edamame.netlist.NetListExperimentalNode;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.geometry.Bounds;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
-import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -73,13 +71,23 @@ public class EditorSchematic extends Editor
     @FXML
     public void EditorSchematic_Save()
     {
-        System.out.println("Loading schematic!");
+        NetListExperimental<String> netList = new NetListExperimental<String>();
+
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+            NetListExperimentalNode<String> netListNode = new NetListExperimentalNode<String>(renderNode.RenderNode_Name);
+
+            netList.Append(netListNode);
+        }
+
+        File.File_Write("C:\\Users\\SVARUN\\Downloads\\netlist.txt", netList.ToString(), true);
     }
 
     @FXML
     public void EditorSchematic_Load()
     {
-        System.out.println("Saving schematic!");
+        System.out.println("Loading schematic!");
     }
 
     @FXML
@@ -99,7 +107,6 @@ public class EditorSchematic extends Editor
 
         symbolNode.getChildren().addAll(nodes);
 
-        boolean edgeSnaps = false;
         LinkedList<PairMutable> snapsManualPos = null;
 
         for (int i = 0; i < symbolNode.getChildren().size(); i++)
@@ -124,10 +131,6 @@ public class EditorSchematic extends Editor
                     }
                 }
             }
-            else if (node.getClass() == Line.class)
-            {
-                edgeSnaps = true;
-            }
         }
 
         //System.out.println((nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble()) + ", " + (nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble()));
@@ -139,7 +142,7 @@ public class EditorSchematic extends Editor
         symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
         symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
 
-        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, edgeSnaps, snapsManualPos, false, this.Editor_RenderSystem);
+        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this.Editor_RenderSystem);
         this.Editor_RenderSystem.RenderSystem_NodeAdd(symbolRenderNode);
 
         //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);
@@ -208,7 +211,7 @@ public class EditorSchematic extends Editor
                                         this.EditorSymbol_LinePreview.setStrokeWidth(width);
                                         this.EditorSymbol_LinePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, this.Editor_RenderSystem);
+                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, false, this.Editor_RenderSystem);
                                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
 
                                         lineStarted = true;
@@ -251,7 +254,7 @@ public class EditorSchematic extends Editor
 
                         this.Editor_LinePreviewRemove();
 
-                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, this.Editor_RenderSystem);
+                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, false, this.Editor_RenderSystem);
                         this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
                     }
                 }
