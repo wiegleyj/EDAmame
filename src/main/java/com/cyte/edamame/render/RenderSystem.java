@@ -199,6 +199,15 @@ public class RenderSystem
 
     //// NODE FUNCTIONS ////
 
+    public int RenderSystem_NodeFind(String id)
+    {
+        for (int i = 0; i < this.RenderSystem_Nodes.size(); i++)
+            if (this.RenderSystem_Nodes.get(i).RenderNode_ID.equals(id))
+                return i;
+
+        return -1;
+    }
+
     public void RenderSystem_NodesAdd(LinkedList<RenderNode> renderNodes)
     {
         for (int i = 0; i < renderNodes.size(); i++)
@@ -271,7 +280,7 @@ public class RenderSystem
 
     //// TESTING FUNCTIONS ////
 
-    public void RenderSystem_TestShapeAdd(PairMutable pos, Double radius, Color color, boolean passive)
+    public void RenderSystem_TestShapeAdd(PairMutable pos, Double radius, Color color, double opacity, boolean passive)
     {
         Circle testShape = new Circle(radius, color);
 
@@ -282,6 +291,7 @@ public class RenderSystem
 
         testShape.setTranslateX(pos.GetLeftDouble());
         testShape.setTranslateY(pos.GetRightDouble());
+        testShape.setOpacity(opacity);
 
         this.RenderSystem_PaneHolder.getChildren().add(testShape);
     }

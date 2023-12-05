@@ -9,6 +9,8 @@ package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.memento.MementoExperimental;
+import com.cyte.edamame.netlist.NetListExperimental;
+import com.cyte.edamame.netlist.NetListExperimentalNode;
 import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.render.RenderSystem;
 import com.cyte.edamame.util.Utils;
@@ -1215,6 +1217,138 @@ public abstract class Editor
     abstract public void Editor_PropsApplySpecific();
 
     //// SUPPORT FUNCTIONS ////
+
+    public NetListExperimental<String> Editor_ToNetList()
+    {
+        NetListExperimental<String> netList = new NetListExperimental<String>();
+        LinkedList<RenderNode> wires = new LinkedList<RenderNode>();
+        LinkedList<String> pinLabels = new LinkedList<String>();
+        LinkedList<PairMutable> pinPos = new LinkedList<PairMutable>();
+        LinkedList<String> pinSymbolIDs = new LinkedList<String>();
+
+        // Populating the tables above...
+        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
+        {
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
+
+            // If we're reading a wire...
+            if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
+                wires.add(renderNode);
+            }
+            // If we're reading a symbol...
+            else if (renderNode.RenderNode_Node.getClass() == Group.class)
+            {
+                Group symbol = (Group)renderNode.RenderNode_Node;
+
+                for (int j = 0; j < symbol.getChildren().size(); j++)
+                {
+                    Node currSymbolChild = symbol.getChildren().get(j);
+
+                    if (currSymbolChild.getClass() == Group.class)
+                    {
+                        Group pin = (Group)currSymbolChild;
+                        String label = null;
+                        PairMutable pos = null;
+
+                        for (int k = 0; k < pin.getChildren().size(); k++)
+                        {
+                            Node currPinChild = pin.getChildren().get(k);
+
+                            if (currPinChild.getClass() == Text.class)
+                                label = ((Text)currPinChild).getText();
+                            else if (currPinChild.getClass() == Circle.class)
+                                pos = Utils.GetPosInNodeParent(symbol, Utils.GetPosInNodeParent(pin, new PairMutable(currPinChild.getTranslateX(), currPinChild.getTranslateY())));
+                        }
+
+                        if ((label == null) || (pos == null))
+                            throw new java.lang.Error("ERROR: Attempting to load a pin without label or position during a net list conversion!");
+
+                        pinLabels.add(label);
+                        pinPos.add(pos);
+                        pinSymbolIDs.add(renderNode.RenderNode_ID);
+
+                        this.Editor_RenderSystem.RenderSystem_TestShapeAdd(pos, 20.0, Color.BLUE, 0.5, false);
+                    }
+                }
+            }
+        }
+
+        // Iterating through all the wires & checking their start & end connections...
+        LinkedList<PairMutable> wireConnIDs = new LinkedList<PairMutable>();
+
+        for (int i = 0; i < wires.size(); i++)
+        {
+            Line currWire = (Line)wires.get(i).RenderNode_Node;
+
+            String nodeStartID = null;
+            String nodeEndID = null;
+            PairMutable wirePosStart = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getStartX(), currWire.getStartY()));
+            PairMutable wirePosEnd = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getEndX(), currWire.getEndY()));
+
+            this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosStart, 20.0, Color.RED, 0.5, false);
+            this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosEnd, 20.0, Color.RED, 0.5, false);
+
+            // Checking whether the wire is connected to another wire...
+            for (int j = 0; j < wires.size(); j++)
+            {
+                if (j == i)
+                    continue;
+
+                Line checkWire = (Line)wires.get(j).RenderNode_Node;
+
+                PairMutable checkPosStart = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getStartX(), checkWire.getStartY()));
+                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndY(), checkWire.getEndY()));
+
+                if (checkPosStart.EqualsDouble(wirePosStart))
+                    nodeStartID = wires.get(j).RenderNode_ID;
+                if (checkPosEnd.EqualsDouble(wirePosEnd))
+                    nodeEndID = wires.get(j).RenderNode_ID;
+            }
+
+            // Checking whether the wire is connected to a symbol... (overrides the line connections)
+            for (int j = 0; j < pinPos.size(); j++)
+            {
+                PairMutable currPinPos = pinPos.get(j);
+
+                if (currPinPos.EqualsDouble(wirePosStart))
+                    nodeStartID = pinSymbolIDs.get(j);
+                if (currPinPos.EqualsDouble(wirePosEnd))
+                    nodeEndID = pinSymbolIDs.get(j);
+            }
+
+            wireConnIDs.add(new PairMutable(nodeStartID, nodeEndID));
+        }
+
+        // Creating the symbol connection net list...
+        for (int i = 0; i < wires.size(); i++)
+        {
+            //System.out.println("Wire " + i);
+            //System.out.println("\t" + wireConnIDs.get(i).GetLeftString() + ", " + wireConnIDs.get(i).GetRightString());
+
+            PairMutable currWireConnIDs = wireConnIDs.get(i);
+            int nodeStartIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetLeftString());
+            int nodeEndIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetRightString());
+
+            if ((nodeStartIdx == -1) || (nodeEndIdx == -1))
+                continue;
+            if (nodeStartIdx == nodeEndIdx)
+                continue;
+
+            RenderNode nodeStart = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeStartIdx);
+            RenderNode nodeEnd = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeEndIdx);
+
+            NetListExperimentalNode<String> netListNode = new NetListExperimentalNode<String>(wires.get(i).RenderNode_ID);
+            netListNode.ConnAppend(nodeStart.RenderNode_ID);
+            netListNode.ConnAppend(nodeEnd.RenderNode_ID);
+
+            netList.Append(netListNode);
+        }
+
+        //netList.ReplaceNodeIDsWithNames(this.Editor_RenderSystem);
+
+        return netList;
+    }
 
     public static void Editor_TextFieldListenerInit(TextField textField)
     {

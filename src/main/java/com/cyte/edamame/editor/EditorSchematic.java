@@ -71,15 +71,7 @@ public class EditorSchematic extends Editor
     @FXML
     public void EditorSchematic_Save()
     {
-        NetListExperimental<String> netList = new NetListExperimental<String>();
-
-        for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-        {
-            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(i);
-            NetListExperimentalNode<String> netListNode = new NetListExperimentalNode<String>(renderNode.RenderNode_Name);
-
-            netList.Append(netListNode);
-        }
+        NetListExperimental<String> netList = this.Editor_ToNetList();
 
         File.File_Write("C:\\Users\\SVARUN\\Downloads\\netlist.txt", netList.ToString(), true);
     }

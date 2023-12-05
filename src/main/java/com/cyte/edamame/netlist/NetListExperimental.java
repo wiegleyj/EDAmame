@@ -7,6 +7,8 @@
 
 package com.cyte.edamame.netlist;
 
+import com.cyte.edamame.render.RenderSystem;
+
 import java.util.LinkedList;
 
 public class NetListExperimental<T>
@@ -52,13 +54,39 @@ public class NetListExperimental<T>
         return -1;
     }
 
+    public void ReplaceNodeIDsWithNames(RenderSystem renderSystem)
+    {
+        for (int i = 0; i < this.NetList_List.size(); i++)
+        {
+            /*for (int j = 0; j < this.NetList_List.get(i).ConnGetNum(); j++)
+            {
+                String name = renderSystem.RenderSystem_Nodes.get(renderSystem.RenderSystem_NodeFind((String)this.NetList_List.get(i).ConnGet(j))).RenderNode_Name;
+                NetListExperimentalNode<String> newConnNode = new NetListExperimentalNode<String>(name);
+
+                this.NetList_List.set(i, (NetListExperimentalNode<T>)newConnNode);
+            }*/
+
+            String name = renderSystem.RenderSystem_Nodes.get(renderSystem.RenderSystem_NodeFind((String)this.NetList_List.get(i).GetValue())).RenderNode_Name;
+            NetListExperimentalNode<String> newNode = new NetListExperimentalNode<String>(name);
+
+            this.NetList_List.set(i, (NetListExperimentalNode<T>)newNode);
+        }
+
+
+    }
+
     public String ToString()
     {
         String str = "";
 
         for (int i = 0; i < this.NetList_List.size(); i++)
         {
-            str += this.NetList_List.get(i).ToString() + ", ";
+            str += this.NetList_List.get(i).ToString() + " --> ";
+
+            for (int j = 0; j < this.NetList_List.get(i).ConnGetNum(); j++)
+                str += this.NetList_List.get(i).ConnGet(j) + ", ";
+
+            str += "\n\n";
         }
 
         return str;

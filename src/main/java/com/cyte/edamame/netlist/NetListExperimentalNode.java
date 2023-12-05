@@ -55,6 +55,11 @@ public class NetListExperimentalNode<T>
         return this.NetListNode_Connections.get(idx);
     }
 
+    public int ConnGetNum()
+    {
+        return this.NetListNode_Connections.size();
+    }
+
     public String ToString()
     {
         if (this.NetListNode_Value.getClass() == String.class)

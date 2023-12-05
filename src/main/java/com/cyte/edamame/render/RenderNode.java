@@ -39,6 +39,7 @@ public class RenderNode
     public boolean RenderNode_AutoSnapPoints;
     public LinkedList<SnapPoint> RenderNode_SnapPoints;
     public boolean RenderNode_IsPin;
+    public String[] RenderNode_Conns;
 
     public RenderSystem RenderNode_RenderSystem;
 

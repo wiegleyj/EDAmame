@@ -51,6 +51,16 @@ public class PairMutable
         return (Double)right;
     }
 
+    public String GetLeftString()
+    {
+        return (String)left;
+    }
+
+    public String GetRightString()
+    {
+        return (String)right;
+    }
+
     public PairMutable GetLeftPair()
     {
         return (PairMutable)left;
@@ -69,6 +79,11 @@ public class PairMutable
     public RenderNode GetRightRenderShape()
     {
         return (RenderNode)right;
+    }
+
+    public boolean EqualsDouble(PairMutable otherPair)
+    {
+        return this.GetLeftDouble().equals(otherPair.GetLeftDouble()) && this.GetRightDouble().equals(otherPair.GetRightDouble());
     }
 
     public String ToStringDouble()
