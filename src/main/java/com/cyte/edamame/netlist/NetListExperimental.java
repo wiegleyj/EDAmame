@@ -20,6 +20,14 @@ public class NetListExperimental<T>
         this.NetList_List = new LinkedList<NetListExperimentalNode<T>>();
     }
 
+    public NetListExperimental(NetListExperimental<T> otherNetList)
+    {
+        this.NetList_List = new LinkedList<NetListExperimentalNode<T>>();
+
+        for (int i = 0; i < otherNetList.GetNodeNum(); i++)
+            this.NetList_List.add(new NetListExperimentalNode<T>(otherNetList.Get(i)));
+    }
+
     public void Append(NetListExperimentalNode<T> node)
     {
         this.NetList_List.add(node);
@@ -40,6 +48,13 @@ public class NetListExperimental<T>
         this.NetList_List.clear();
     }
 
+    public void Set(int idx, T value)
+    {
+        NetListExperimentalNode<T> node = this.NetList_List.get(idx);
+        node.SetValue(value);
+        this.NetList_List.set(idx, node);
+    }
+
     public NetListExperimentalNode<T> Get(int idx)
     {
         return this.NetList_List.get(idx);
@@ -54,30 +69,18 @@ public class NetListExperimental<T>
         return -1;
     }
 
-    public void ReplaceNodeIDsWithNames(RenderSystem renderSystem)
+    public int GetNodeNum()
     {
-        for (int i = 0; i < this.NetList_List.size(); i++)
-        {
-            /*for (int j = 0; j < this.NetList_List.get(i).ConnGetNum(); j++)
-            {
-                String name = renderSystem.RenderSystem_Nodes.get(renderSystem.RenderSystem_NodeFind((String)this.NetList_List.get(i).ConnGet(j))).RenderNode_Name;
-                NetListExperimentalNode<String> newConnNode = new NetListExperimentalNode<String>(name);
-
-                this.NetList_List.set(i, (NetListExperimentalNode<T>)newConnNode);
-            }*/
-
-            String name = renderSystem.RenderSystem_Nodes.get(renderSystem.RenderSystem_NodeFind((String)this.NetList_List.get(i).GetValue())).RenderNode_Name;
-            NetListExperimentalNode<String> newNode = new NetListExperimentalNode<String>(name);
-
-            this.NetList_List.set(i, (NetListExperimentalNode<T>)newNode);
-        }
-
-
+        return this.NetList_List.size();
     }
 
     public String ToString()
     {
-        String str = "";
+        //for (int i = 0; i < this.NetList_List.size(); i++)
+        //    System.out.print(this.NetList_List.get(i).GetValue());
+        //System.out.println("\n\n");
+
+        String str = "[\n";
 
         for (int i = 0; i < this.NetList_List.size(); i++)
         {
@@ -86,8 +89,10 @@ public class NetListExperimental<T>
             for (int j = 0; j < this.NetList_List.get(i).ConnGetNum(); j++)
                 str += this.NetList_List.get(i).ConnGet(j) + ", ";
 
-            str += "\n\n";
+            str += "\n";
         }
+
+        str += "]";
 
         return str;
     }

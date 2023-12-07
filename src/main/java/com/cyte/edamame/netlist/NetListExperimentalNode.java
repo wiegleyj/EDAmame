@@ -20,6 +20,15 @@ public class NetListExperimentalNode<T>
         this.NetListNode_Connections = new LinkedList<T>();
     }
 
+    public NetListExperimentalNode(NetListExperimentalNode<T> otherNode)
+    {
+        this.NetListNode_Value = otherNode.NetListNode_Value;
+        this.NetListNode_Connections = new LinkedList<T>();
+
+        for (int i = 0; i < otherNode.ConnGetNum(); i++)
+            this.NetListNode_Connections.add(otherNode.ConnGet(i));
+    }
+
     public void SetValue(T nodeValue)
     {
         this.NetListNode_Value = nodeValue;
@@ -48,6 +57,11 @@ public class NetListExperimentalNode<T>
     public void ConnClear()
     {
         this.NetListNode_Connections.clear();
+    }
+
+    public void ConnSet(int idx, T value)
+    {
+        this.NetListNode_Connections.set(idx, value);
     }
 
     public T ConnGet(int idx)

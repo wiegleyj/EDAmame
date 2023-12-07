@@ -244,9 +244,13 @@ public class File
             PrintWriter file = new PrintWriter(new FileOutputStream(filePath, !overwrite));
             file.print(data);
             file.close();
+
+            //System.out.println("Wrote \"" + data + "\".");
         }
         catch (IOException e)
         {
+            System.out.println("Error writing to file \"" + filePath + "\"!");
+
             return false;
         }
 

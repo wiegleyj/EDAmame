@@ -6,8 +6,14 @@
  */
 
 // TODO:
-// Implement net lists
-// Refactor RenderNode cloning into another constructor+
+// Fix net list wire chain recognition
+// Fix selection box appearing while dragging something
+// Implement node copying
+// Implement straight-only line drawing
+// Implement element move snapping
+// Fix snap point shapes not disappearing after deleting node
+// Fix file writing (?)
+// Refactor RenderNode cloning into another constructor
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
@@ -97,7 +103,7 @@ public class EDAmameController implements Initializable
     final static public Double Editor_BorderMax = 10.0;
     final static public Double Editor_TextFontSizeMin = 10.0;
     final static public Double Editor_TextFontSizeMax = 100.0;
-    final static public Double Editor_LineWidthMin = 5.0;
+    final static public Double Editor_LineWidthMin = 1.0;
     final static public Double Editor_LineWidthMax = 20.0;
     final static public Double Editor_PinRadiusMin = 5.0;
     final static public Double Editor_PinRadiusMax = 10.0;

@@ -1220,7 +1220,6 @@ public abstract class Editor
 
     public NetListExperimental<String> Editor_ToNetList()
     {
-        NetListExperimental<String> netList = new NetListExperimental<String>();
         LinkedList<RenderNode> wires = new LinkedList<RenderNode>();
         LinkedList<String> pinLabels = new LinkedList<String>();
         LinkedList<PairMutable> pinPos = new LinkedList<PairMutable>();
@@ -1268,14 +1267,134 @@ public abstract class Editor
                         pinPos.add(pos);
                         pinSymbolIDs.add(renderNode.RenderNode_ID);
 
-                        this.Editor_RenderSystem.RenderSystem_TestShapeAdd(pos, 20.0, Color.BLUE, 0.5, false);
+                        //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(pos, 20.0, Color.BLUE, 0.5, false);
                     }
                 }
             }
         }
 
+        // Creating the wire connections list... (symbol id, pin label)
+        LinkedList<PairMutable> wireConns = new LinkedList<PairMutable>();
+
+        for (int i = 0; i < wires.size(); i++)
+        {
+            Line currWire = (Line)wires.get(i).RenderNode_Node;
+
+            PairMutable nodeStart = null;
+            PairMutable nodeEnd = null;
+            PairMutable wirePosStart = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getStartX(), currWire.getStartY()));
+            PairMutable wirePosEnd = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getEndX(), currWire.getEndY()));
+
+            //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosStart, 20.0, Color.RED, 0.5, false);
+            //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosEnd, 20.0, Color.RED, 0.5, false);
+
+            // Checking whether the wire is connected to another wire...
+            for (int j = 0; j < wires.size(); j++)
+            {
+                if (j == i)
+                    continue;
+
+                Line checkWire = (Line)wires.get(j).RenderNode_Node;
+
+                PairMutable checkPosStart = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getStartX(), checkWire.getStartY()));
+                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndX(), checkWire.getEndY()));
+
+                if (checkPosStart.EqualsDouble(wirePosStart) || checkPosEnd.EqualsDouble(wirePosStart))
+                    nodeStart = new PairMutable(wires.get(j).RenderNode_ID, null);
+                if (checkPosStart.EqualsDouble(wirePosEnd) || checkPosEnd.EqualsDouble(wirePosEnd))
+                    nodeEnd = new PairMutable(wires.get(j).RenderNode_ID, null);
+            }
+
+            // Checking whether the wire is connected to a symbol... (overrides the line connections)
+            for (int j = 0; j < pinPos.size(); j++)
+            {
+                PairMutable currPinPos = pinPos.get(j);
+
+                if (currPinPos.EqualsDouble(wirePosStart))
+                    nodeStart = new PairMutable(pinSymbolIDs.get(j), pinLabels.get(j));
+                if (currPinPos.EqualsDouble(wirePosEnd))
+                    nodeEnd = new PairMutable(pinSymbolIDs.get(j), pinLabels.get(j));
+            }
+
+            if ((nodeStart != null) || (nodeEnd != null))
+                wireConns.add(new PairMutable(nodeStart, nodeEnd));
+        }
+
+        // Creating the initial wire connection net list...
+        NetListExperimental<String> netList = new NetListExperimental<String>();
+
+        for (int i = 0; i < wires.size(); i++)
+        {
+            PairMutable currWireConn = wireConns.get(i);
+
+            if ((currWireConn.GetLeftPair().right != null) && (currWireConn.GetRightPair().right != null))
+            {
+                this.Editor_NetListWireConnAdd(netList,
+                                               currWireConn.GetLeftPair().GetLeftString(),
+                                               currWireConn.GetLeftPair().GetRightString(),
+                                               currWireConn.GetRightPair().GetLeftString(),
+                                               currWireConn.GetRightPair().GetRightString());
+            }
+            else if (currWireConn.GetLeftPair().right != null)
+            {
+                int connectedPinIdx = -1;
+                int nextCheckWireIdx = Editor_NetListWireFind(wires, currWireConn.GetRightPair().GetLeftString());
+
+                while (nextCheckWireIdx != -1)
+                {
+                    PairMutable nextCheckWireConn = wireConns.get(nextCheckWireIdx);
+
+                    if (nextCheckWireConn.GetRightPair().right != null)
+                    {
+                        connectedPinIdx = Editor_NetListPinFind(pinSymbolIDs, nextCheckWireConn.GetRightPair().GetLeftString());
+
+                        break;
+                    }
+
+                    nextCheckWireIdx = Editor_NetListWireFind(wires, nextCheckWireConn.GetRightPair().GetLeftString());
+                }
+
+                if (connectedPinIdx != -1)
+                {
+                    this.Editor_NetListWireConnAdd(netList,
+                                                   currWireConn.GetLeftPair().GetLeftString(),
+                                                   currWireConn.GetLeftPair().GetRightString(),
+                                                   pinSymbolIDs.get(connectedPinIdx),
+                                                   pinLabels.get(connectedPinIdx));
+                }
+            }
+            else if (currWireConn.GetRightPair().right != null)
+            {
+                int connectedPinIdx = -1;
+                int nextCheckWireIdx = Editor_NetListWireFind(wires, currWireConn.GetLeftPair().GetLeftString());
+
+                while (nextCheckWireIdx != -1)
+                {
+                    PairMutable nextCheckWireConn = wireConns.get(nextCheckWireIdx);
+
+                    if (nextCheckWireConn.GetLeftPair().right != null)
+                    {
+                        connectedPinIdx = Editor_NetListPinFind(pinSymbolIDs, nextCheckWireConn.GetLeftPair().GetLeftString());
+
+                        break;
+                    }
+
+                    nextCheckWireIdx = Editor_NetListWireFind(wires, nextCheckWireConn.GetLeftPair().GetLeftString());
+                }
+
+                if (connectedPinIdx != -1)
+                {
+                    this.Editor_NetListWireConnAdd(netList,
+                                                   pinSymbolIDs.get(connectedPinIdx),
+                                                   pinLabels.get(connectedPinIdx),
+                                                   currWireConn.GetRightPair().GetLeftString(),
+                                                   currWireConn.GetRightPair().GetRightString());
+                }
+            }
+        }
+
         // Iterating through all the wires & checking their start & end connections...
-        LinkedList<PairMutable> wireConnIDs = new LinkedList<PairMutable>();
+        /*LinkedList<PairMutable> wireConnIDs = new LinkedList<PairMutable>();
 
         for (int i = 0; i < wires.size(); i++)
         {
@@ -1298,11 +1417,11 @@ public abstract class Editor
                 Line checkWire = (Line)wires.get(j).RenderNode_Node;
 
                 PairMutable checkPosStart = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getStartX(), checkWire.getStartY()));
-                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndY(), checkWire.getEndY()));
+                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndX(), checkWire.getEndY()));
 
-                if (checkPosStart.EqualsDouble(wirePosStart))
+                if (checkPosStart.EqualsDouble(wirePosStart) || checkPosEnd.EqualsDouble(wirePosStart))
                     nodeStartID = wires.get(j).RenderNode_ID;
-                if (checkPosEnd.EqualsDouble(wirePosEnd))
+                if (checkPosStart.EqualsDouble(wirePosEnd) || checkPosEnd.EqualsDouble(wirePosEnd))
                     nodeEndID = wires.get(j).RenderNode_ID;
             }
 
@@ -1345,9 +1464,150 @@ public abstract class Editor
             netList.Append(netListNode);
         }
 
+        // Filtering out all the wires in the created net list...
+        int netListLen = netList.GetNodeNum();
+
+        System.out.println("---- iter 0 ----");
+        System.out.println(netList.ToString());
+        System.out.println(this.Editor_NetListReplaceIDsWithNames(netList).ToString() + "\n");
+
+        for (int i = 0; i < netListLen; i++)
+        {
+            PairMutable currWireConnIDs = wireConnIDs.get(i);
+            int nodeStartIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetLeftString());
+            int nodeEndIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetRightString());
+
+            if ((nodeStartIdx == -1) || (nodeEndIdx == -1))
+                throw new java.lang.Error("ERROR: Encountered a wire with at least one endpoint null while filtering wires out of an Editor net list!");
+            if (nodeStartIdx == nodeEndIdx)
+                throw new java.lang.Error("ERROR: Encountered a wire that connects to itself while filtering wires out of an Editor net list!");
+
+            NetListExperimentalNode<String> nodeID = netList.Get(i);
+            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(this.Editor_RenderSystem.RenderSystem_NodeFind(nodeID.GetValue()));
+            RenderNode renderNodeStart = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeStartIdx);
+            RenderNode renderNodeEnd = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeEndIdx);
+
+            if (renderNode.RenderNode_Node.getClass() == Line.class)
+            {
+                netList.Remove(netList.Find(nodeID.GetValue()));
+
+                int netListNodeStartIdx = netList.Find(renderNodeStart.RenderNode_ID);
+                int netListNodeEndIdx = netList.Find(renderNodeEnd.RenderNode_ID);
+                NetListExperimentalNode<String> netListNodeStart = null;
+                NetListExperimentalNode<String> netListNodeEnd = null;
+
+                if (netListNodeStartIdx == -1)
+                {
+                    netList.Append(new NetListExperimentalNode<String>(renderNodeStart.RenderNode_ID));
+                    netListNodeStart = netList.Get(netList.GetNodeNum() - 1);
+
+                    netListNodeStart.ConnAppend(null);
+                    netListNodeStart.ConnAppend(renderNodeEnd.RenderNode_ID);
+                }
+                else
+                {
+                    //i--;
+                    netListNodeStart = netList.Get(netListNodeStartIdx);
+                    //netListNodeStart.ConnClear();
+
+                    netListNodeStart.ConnSet(1, renderNodeEnd.RenderNode_ID);
+                }
+
+                if (netListNodeEndIdx == -1)
+                {
+                    netList.Append(new NetListExperimentalNode<String>(renderNodeStart.RenderNode_ID));
+                    netListNodeEnd = netList.Get(netList.GetNodeNum() - 1);
+
+                    netListNodeEnd.ConnAppend(renderNodeStart.RenderNode_ID);
+                    netListNodeEnd.ConnAppend(null);
+                }
+                else
+                {
+                    //i--;
+                    netListNodeEnd = netList.Get(netListNodeEndIdx);
+                    //netListNodeEnd.ConnClear();
+
+                    netListNodeEnd.ConnSet(0, renderNodeStart.RenderNode_ID);
+                }
+            }
+
+            System.out.println("---- iter " + (i + 1) + " ----");
+            System.out.println(netList.ToString());
+            System.out.println(this.Editor_NetListReplaceIDsWithNames(netList).ToString() + "\n");
+        }
+
+        // Replacing all the wire & symbol IDs with their names...
+        netList = this.Editor_NetListReplaceIDsWithNames(netList);*/
+
         //netList.ReplaceNodeIDsWithNames(this.Editor_RenderSystem);
 
+        //System.out.println("wires: " + wires.toString());
+        //System.out.println("pinLabels: " + pinLabels.toString());
+        //System.out.println("pinPos: " + pinPos.toString());
+        //System.out.println("pinSymbolIDs: " + pinSymbolIDs.toString());
+        //System.out.println("wireConnIDs: " + wireConnIDs.toString());
+
+        //for (int i = 0; i < netList.GetNodeNum(); i++)
+        //    System.out.print(netList.Get(i).GetValue() + ", ");
+        //System.out.println("::\n\n");
+
         return netList;
+    }
+
+    // REFACTOR THIS!!!
+    public void Editor_NetListWireConnAdd(NetListExperimental<String> netList, String leftSymbolId, String leftPinName, String rightSymbolId, String rightPinName)
+    {
+        String leftSymbolName = this.Editor_RenderSystem.RenderSystem_Nodes.get(this.Editor_RenderSystem.RenderSystem_NodeFind(leftSymbolId)).RenderNode_Name;
+        String rightSymbolName = this.Editor_RenderSystem.RenderSystem_Nodes.get(this.Editor_RenderSystem.RenderSystem_NodeFind(rightSymbolId)).RenderNode_Name;
+
+        String currWireConnStartStr = leftSymbolName + " (" + leftPinName + ")";
+        String currWireConnEndStr = rightSymbolName + " (" + rightPinName + ")";
+        int currWireConnStartNodeIdx = netList.Find(currWireConnStartStr);
+        int currWireConnEndNodeIdx = netList.Find(currWireConnEndStr);
+        NetListExperimentalNode<String> currWireConnStartNode = null;
+        NetListExperimentalNode<String> currWireConnEndNode = null;
+
+        if (currWireConnStartNodeIdx == -1)
+        {
+            currWireConnStartNode = new NetListExperimentalNode<String>(currWireConnStartStr);
+            netList.Append(currWireConnStartNode);
+        }
+        else
+        {
+            currWireConnStartNode = netList.Get(currWireConnStartNodeIdx);
+        }
+        if (currWireConnEndNodeIdx == -1)
+        {
+            currWireConnEndNode = new NetListExperimentalNode<String>(currWireConnEndStr);
+            netList.Append(currWireConnEndNode);
+        }
+        else
+        {
+            currWireConnEndNode = netList.Get(currWireConnEndNodeIdx);
+        }
+
+        currWireConnStartNode.ConnAppend(currWireConnEndStr);
+        currWireConnEndNode.ConnAppend(currWireConnStartStr);
+    }
+
+    // REFACTOR THIS!!!
+    static public int Editor_NetListPinFind(LinkedList<String> pins, String id)
+    {
+        for (int i = 0; i < pins.size(); i++)
+            if (pins.get(i).equals(id))
+                return i;
+
+        return -1;
+    }
+
+    // REFACTOR THIS!!!
+    static public int Editor_NetListWireFind(LinkedList<RenderNode> wires, String id)
+    {
+        for (int i = 0; i < wires.size(); i++)
+            if (wires.get(i).RenderNode_ID.equals(id))
+                return i;
+
+        return -1;
     }
 
     public static void Editor_TextFieldListenerInit(TextField textField)
