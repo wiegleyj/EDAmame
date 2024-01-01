@@ -8,7 +8,6 @@
 package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
-import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -28,20 +27,20 @@ public class EditorPCB extends Editor
     //// GLOBAL VARIABLES ////
 
     @FXML
-    private Button EditorPCB_InnerButton;
+    private Button innerButton;
 
     //// MAIN FUNCTIONS ////
 
-    public static Editor EditorPCB_Create() throws IOException
+    public static Editor Create() throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorPCB.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
         EditorPCB editor = fxmlLoader.getController();
-        editor.Editor_Init(3, "EditorPCB");
-        editor.Editor_Dissect(3, scene);
-        editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
-        editor.Editor_ListenersInit();
+        editor.Init(3, "EditorPCB");
+        editor.Dissect(3, scene);
+        editor.renderSystem.CanvasRenderGrid();
+        editor.ListenersInit();
 
         return editor;
     }
@@ -49,43 +48,43 @@ public class EditorPCB extends Editor
     @FXML
     public void initialize()
     {
-        System.out.println("I was initialized, the button was " + this.EditorPCB_InnerButton);
+        System.out.println("I was initialized, the button was " + this.innerButton);
     }
 
     //// CALLBACK FUNCTIONS ////
 
-    public void Editor_OnDragOverSpecific(DragEvent event)
+    public void OnDragOverSpecific(DragEvent event)
     {}
 
-    public void Editor_OnDragDroppedSpecific(DragEvent event)
+    public void OnDragDroppedSpecific(DragEvent event)
     {}
 
-    public void Editor_OnMouseMovedSpecific(MouseEvent event)
+    public void OnMouseMovedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnMousePressedSpecific(MouseEvent event)
+    public void OnMousePressedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
+    public void OnMouseReleasedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnMouseDraggedSpecific(MouseEvent event)
+    public void OnMouseDraggedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnScrollSpecific(ScrollEvent event)
+    public void OnScrollSpecific(ScrollEvent event)
     {}
 
-    public void Editor_OnKeyPressedSpecific(KeyEvent event)
+    public void OnKeyPressedSpecific(KeyEvent event)
     {}
 
-    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
+    public void OnKeyReleasedSpecific(KeyEvent event)
     {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsLoadSpecific()
+    public void PropsLoadSpecific()
     {}
 
-    public void Editor_PropsApplySpecific()
+    public void PropsApplySpecific()
     {}
 }

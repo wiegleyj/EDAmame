@@ -19,36 +19,37 @@ import java.util.LinkedList;
 public class MementoExperimental
 {
     // Stack that holds the entire history of an Editor's RenderNodes
-    private Stack<LinkedList<RenderNode>> Memento_NodeHistoryUndo;
-    private Stack<LinkedList<RenderNode>> Memento_NodeHistoryRedo; // Redo stack
-    private Editor Memento_Editor;
+    private Stack<LinkedList<RenderNode>> nodeHistoryUndo;
+    private Stack<LinkedList<RenderNode>> nodeHistoryRedo; // Redo stack
+
+    private Editor editor;
 
     // Memento class constructor
     public MementoExperimental(Editor editorValue)
     {
-        this.Memento_NodeHistoryUndo = new Stack<>();
-        this.Memento_NodeHistoryRedo = new Stack<>(); // Initialize the redo stack
-        this.Memento_Editor = editorValue;
+        this.nodeHistoryUndo = new Stack<>();
+        this.nodeHistoryRedo = new Stack<>(); // Initialize the redo stack
+        this.editor = editorValue;
     }
 
     // Function for performing a single undo step by overriding the Editor's current nodes with the latest node history stack entry (and pops it from the history stack).
-    public void Memento_NodesUndo()
+    public void NodesUndo()
     {
-        if (!this.Memento_NodeHistoryUndo.isEmpty())
+        if (!this.nodeHistoryUndo.isEmpty())
         {
             // Pop the change from the undo stack
-            LinkedList<RenderNode> undoneChange = this.Memento_NodeHistoryUndo.pop();
+            LinkedList<RenderNode> undoneChange = this.nodeHistoryUndo.pop();
 
             // Push the undone change onto the redo stack
-            this.Memento_NodeHistoryRedo.push(undoneChange);
+            this.nodeHistoryRedo.push(undoneChange);
 
             // Apply the undone change to the editor's render system
-            this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesClear();
-            this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesAdd(undoneChange);
+            this.editor.renderSystem.NodesClear();
+            this.editor.renderSystem.NodesAdd(undoneChange);
 
             // Reset counters
-            this.Memento_Editor.Editor_ShapesHighlighted = 0;
-            this.Memento_Editor.Editor_ShapesSelected = 0;
+            this.editor.shapesHighlighted = 0;
+            this.editor.shapesSelected = 0;
 
             System.out.println("Undo!");
         }
@@ -59,23 +60,23 @@ public class MementoExperimental
     }
 
     // Function for performing a single redo step by overriding the Editor's current nodes with the next node history stack entry (and pushes it back to the history stack).
-    public void Memento_NodesRedo()
+    public void NodesRedo()
     {
-        if (!this.Memento_NodeHistoryRedo.isEmpty())
+        if (!this.nodeHistoryRedo.isEmpty())
         {
             // Pop the change from the redo stack
-            LinkedList<RenderNode> redoChange = this.Memento_NodeHistoryRedo.pop();
+            LinkedList<RenderNode> redoChange = this.nodeHistoryRedo.pop();
 
             // Push the redo change onto the undo stack
-            this.Memento_NodeHistoryUndo.push(redoChange);
+            this.nodeHistoryUndo.push(redoChange);
 
             // Apply the redo change to the editor's render system
-            this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesClear();
-            this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesAdd(redoChange);
+            this.editor.renderSystem.NodesClear();
+            this.editor.renderSystem.NodesAdd(redoChange);
 
             // Reset counters
-            this.Memento_Editor.Editor_ShapesHighlighted = 0;
-            this.Memento_Editor.Editor_ShapesSelected = 0;
+            this.editor.shapesHighlighted = 0;
+            this.editor.shapesSelected = 0;
 
             System.out.println("Redo!");
         }
@@ -86,13 +87,13 @@ public class MementoExperimental
     }
 
     // Function for pushing the current Editor's RenderNodes onto the node history stack (also ensures that the node history stack size stays under the limit).
-    public void Memento_NodeHistoryUpdate()
+    public void NodeHistoryUpdate()
     {
-        this.Memento_NodeHistoryUndo.push(this.Memento_Editor.Editor_RenderSystem.RenderSystem_NodesClone());
+        this.nodeHistoryUndo.push(this.editor.renderSystem.NodesClone());
 
-        this.Memento_NodeHistoryRedo.clear();
-        while (this.Memento_NodeHistoryUndo.size() > EDAmameController.Editor_UndoStackMaxLen)
-            this.Memento_NodeHistoryUndo.remove(0);
+        this.nodeHistoryRedo.clear();
+        while (this.nodeHistoryUndo.size() > EDAmameController.Editor_UndoStackMaxLen)
+            this.nodeHistoryUndo.remove(0);
 
         System.out.println("Undo pushed!");
     }

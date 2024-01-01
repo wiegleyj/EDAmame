@@ -11,74 +11,74 @@ import java.util.LinkedList;
 
 public class NetListExperimentalNode<T>
 {
-    private T NetListNode_Value;
-    private LinkedList<T> NetListNode_Connections;
+    private T value;
+    private LinkedList<T> conns;
 
     public NetListExperimentalNode(T nodeValue)
     {
-        this.NetListNode_Value = nodeValue;
-        this.NetListNode_Connections = new LinkedList<T>();
+        this.value = nodeValue;
+        this.conns = new LinkedList<T>();
     }
 
     public NetListExperimentalNode(NetListExperimentalNode<T> otherNode)
     {
-        this.NetListNode_Value = otherNode.NetListNode_Value;
-        this.NetListNode_Connections = new LinkedList<T>();
+        this.value = otherNode.value;
+        this.conns = new LinkedList<T>();
 
         for (int i = 0; i < otherNode.ConnGetNum(); i++)
-            this.NetListNode_Connections.add(otherNode.ConnGet(i));
+            this.conns.add(otherNode.ConnGet(i));
     }
 
     public void SetValue(T nodeValue)
     {
-        this.NetListNode_Value = nodeValue;
+        this.value = nodeValue;
     }
 
     public T GetValue()
     {
-        return this.NetListNode_Value;
+        return this.value;
     }
 
     public void ConnAppend(T node)
     {
-        this.NetListNode_Connections.add(node);
+        this.conns.add(node);
     }
 
     public void ConnInsert(int idx, T node)
     {
-        this.NetListNode_Connections.add(idx, node);
+        this.conns.add(idx, node);
     }
 
     public T ConnRemove(int idx)
     {
-        return this.NetListNode_Connections.remove(idx);
+        return this.conns.remove(idx);
     }
 
     public void ConnClear()
     {
-        this.NetListNode_Connections.clear();
+        this.conns.clear();
     }
 
     public void ConnSet(int idx, T value)
     {
-        this.NetListNode_Connections.set(idx, value);
+        this.conns.set(idx, value);
     }
 
     public T ConnGet(int idx)
     {
-        return this.NetListNode_Connections.get(idx);
+        return this.conns.get(idx);
     }
 
     public int ConnGetNum()
     {
-        return this.NetListNode_Connections.size();
+        return this.conns.size();
     }
 
     public String ToString()
     {
-        if (this.NetListNode_Value.getClass() == String.class)
+        if (this.value.getClass() == String.class)
         {
-            return (String)this.NetListNode_Value;
+            return (String)this.value;
         }
 
         throw new java.lang.Error("ERROR: Attempting to stringify an unrecognized net list node value!");

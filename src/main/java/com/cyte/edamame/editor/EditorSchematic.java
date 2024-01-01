@@ -13,7 +13,6 @@ import com.cyte.edamame.render.RenderNode;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.netlist.NetListExperimental;
-import com.cyte.edamame.netlist.NetListExperimentalNode;
 
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -34,28 +33,28 @@ public class EditorSchematic extends Editor
     //// GLOBAL VARIABLES ////
 
     @FXML
-    private Button EditorSchematic_InnerButton;
+    private Button innerButton;
     @FXML
-    public ToggleGroup EditorSchematic_ToggleGroup;
+    public ToggleGroup toggleGroup;
     @FXML
-    public TextField EditorSchematic_WireWidth;
+    public TextField wireWidth;
     @FXML
-    public ColorPicker EditorSchematic_WireColor;
+    public ColorPicker wireColor;
 
     //// MAIN FUNCTIONS ////
 
-    public static Editor EditorSchematic_Create() throws IOException
+    public static Editor Create() throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader(EDAmame.class.getResource("fxml/EditorSchematic.fxml"));
         Scene scene = new Scene(fxmlLoader.load());
 
         EditorSchematic editor = fxmlLoader.getController();
-        editor.Editor_Init(1, "EditorSchematic");
-        editor.Editor_Dissect(1, scene);
-        editor.Editor_RenderSystem.RenderSystem_CanvasRenderGrid();
-        editor.Editor_ListenersInit();
+        editor.Init(1, "EditorSchematic");
+        editor.Dissect(1, scene);
+        editor.renderSystem.CanvasRenderGrid();
+        editor.ListenersInit();
 
-        Editor.Editor_TextFieldListenerInit(editor.EditorSchematic_WireWidth);
+        Editor.TextFieldListenerInit(editor.wireWidth);
 
         return editor;
     }
@@ -63,36 +62,36 @@ public class EditorSchematic extends Editor
     @FXML
     public void initialize()
     {
-        System.out.println("I was initialized, the button was " + this.EditorSchematic_InnerButton);
+        System.out.println("I was initialized, the button was " + this.innerButton);
     }
 
     //// CALLBACK FUNCTIONS ////
 
     @FXML
-    public void EditorSchematic_Save()
+    public void Save()
     {
-        NetListExperimental<String> netList = this.Editor_ToNetList();
+        NetListExperimental<String> netList = this.ToNetList();
 
-        File.File_Write("C:\\Users\\SVARUN\\Downloads\\netlist.txt", netList.ToString(), true);
+        File.Write("C:\\Users\\SVARUN\\Downloads\\netlist.txt", netList.ToString(), true);
     }
 
     @FXML
-    public void EditorSchematic_Load()
+    public void Load()
     {
         System.out.println("Loading schematic!");
     }
 
     @FXML
-    public void EditorSchematic_LoadSymbol()
+    public void LoadSymbol()
     {
-        LinkedList<Node> nodes = File.File_NodesLoad(true);
+        LinkedList<Node> nodes = File.NodesLoad(true);
 
         if ((nodes == null) || nodes.isEmpty())
             return;
 
         Group symbolNode = new Group();
         //symbolNode.setStyle("-fx-background-color:black");
-        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealCenter();
+        PairMutable dropPos = this.renderSystem.PaneHolderGetRealCenter();
 
         symbolNode.setTranslateX(dropPos.GetLeftDouble());
         symbolNode.setTranslateY(dropPos.GetRightDouble());
@@ -134,58 +133,58 @@ public class EditorSchematic extends Editor
         symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
         symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
 
-        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this.Editor_RenderSystem);
-        this.Editor_RenderSystem.RenderSystem_NodeAdd(symbolRenderNode);
+        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this.renderSystem);
+        this.renderSystem.NodeAdd(symbolRenderNode);
 
         //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);
     }
 
-    public void Editor_OnDragOverSpecific(DragEvent event)
+    public void OnDragOverSpecific(DragEvent event)
     {}
 
-    public void Editor_OnDragDroppedSpecific(DragEvent event)
+    public void OnDragDroppedSpecific(DragEvent event)
     {}
 
-    public void Editor_OnMouseMovedSpecific(MouseEvent event)
+    public void OnMouseMovedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnMousePressedSpecific(MouseEvent event)
+    public void OnMousePressedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnMouseReleasedSpecific(MouseEvent event)
+    public void OnMouseReleasedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.Editor_RenderSystem.RenderSystem_PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        dropPos = this.Editor_MagneticSnapCheck(dropPos);
-        PairMutable realPos = this.Editor_RenderSystem.RenderSystem_PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        dropPos = this.MagneticSnapCheck(dropPos);
+        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
 
         // Handling element dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
-        if ((this.Editor_ShapesSelected == 0) &&
-                !this.Editor_ShapesMoving &&
-                (this.Editor_SelectionBox == null) &&
-                !this.Editor_ShapesWereSelected &&
-                !this.Editor_WasSelectionBox)
+        if ((this.shapesSelected == 0) &&
+                !this.shapesMoving &&
+                (this.selectionBox == null) &&
+                !this.shapesWereSelected &&
+                !this.wasSelectionBox)
         {
-            RadioButton selectedShapeButton = (RadioButton)EditorSchematic_ToggleGroup.getSelectedToggle();
+            RadioButton selectedShapeButton = (RadioButton) toggleGroup.getSelectedToggle();
 
             // Only dropping the element within the theater limits...
             if (selectedShapeButton != null)
             {
                 if (!selectedShapeButton.getText().equals("Wire"))
-                    this.EditorSymbol_LinePreview = null;
+                    this.linePreview = null;
 
                 boolean lineStarted = false;
 
-                if (this.Editor_ShapesHighlighted == 0)
+                if (this.shapesHighlighted == 0)
                 {
                     if (selectedShapeButton.getText().equals("Wire"))
                     {
                         // If we're starting the line drawing...
-                        if (this.EditorSymbol_LinePreview == null)
+                        if (this.linePreview == null)
                         {
-                            String stringWidth = this.EditorSchematic_WireWidth.getText();
-                            Color color = this.EditorSchematic_WireColor.getValue();
+                            String stringWidth = this.wireWidth.getText();
+                            Color color = this.wireColor.getValue();
 
-                            if (EDAmameController.Controller_IsStringNum(stringWidth))
+                            if (EDAmameController.IsStringNum(stringWidth))
                             {
                                 double width = Double.parseDouble(stringWidth);
 
@@ -193,34 +192,34 @@ public class EditorSchematic extends Editor
                                 {
                                     if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                                     {
-                                        this.EditorSymbol_LinePreview = new Line();
+                                        this.linePreview = new Line();
 
-                                        this.EditorSymbol_LinePreview.setStartX(dropPos.GetLeftDouble());
-                                        this.EditorSymbol_LinePreview.setStartY(dropPos.GetRightDouble());
-                                        this.EditorSymbol_LinePreview.setEndX(dropPos.GetLeftDouble());
-                                        this.EditorSymbol_LinePreview.setEndY(dropPos.GetRightDouble());
+                                        this.linePreview.setStartX(dropPos.GetLeftDouble());
+                                        this.linePreview.setStartY(dropPos.GetRightDouble());
+                                        this.linePreview.setEndX(dropPos.GetLeftDouble());
+                                        this.linePreview.setEndY(dropPos.GetRightDouble());
 
-                                        this.EditorSymbol_LinePreview.setStrokeWidth(width);
-                                        this.EditorSymbol_LinePreview.setStroke(color);
+                                        this.linePreview.setStrokeWidth(width);
+                                        this.linePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.EditorSymbol_LinePreview, true, null, true, false, this.Editor_RenderSystem);
-                                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                                        RenderNode renderNode = new RenderNode("linePreview", this.linePreview, true, null, true, false, this.renderSystem);
+                                        this.renderSystem.NodeAdd(renderNode);
 
                                         lineStarted = true;
                                     }
                                     else
                                     {
-                                        EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered color field is transparent!");
+                                        EDAmameController.SetStatusBar("Unable to drop wire because the entered color field is transparent!");
                                     }
                                 }
                                 else
                                 {
-                                    EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_WireWidthMin + ", " + EDAmameController.Editor_WireWidthMax + ")");
+                                    EDAmameController.SetStatusBar("Unable to drop wire because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_WireWidthMin + ", " + EDAmameController.Editor_WireWidthMax + ")");
                                 }
                             }
                             else
                             {
-                                EDAmameController.Controller_SetStatusBar("Unable to drop wire because the entered width field is non-numeric!");
+                                EDAmameController.SetStatusBar("Unable to drop wire because the entered width field is non-numeric!");
                             }
                         }
                     }
@@ -233,44 +232,44 @@ public class EditorSchematic extends Editor
                 if (selectedShapeButton.getText().equals("Wire"))
                 {
                     // If we're finishing the line drawing...
-                    if ((this.EditorSymbol_LinePreview != null) && !lineStarted)
+                    if ((this.linePreview != null) && !lineStarted)
                     {
-                        PairMutable posStart = new PairMutable(this.EditorSymbol_LinePreview.getStartX(), this.EditorSymbol_LinePreview.getStartY());
+                        PairMutable posStart = new PairMutable(this.linePreview.getStartX(), this.linePreview.getStartY());
                         PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
 
                         Line line = new Line();
-                        Editor.Editor_LineDropPosCalculate(line, posStart, posEnd);
+                        Editor.LineDropPosCalculate(line, posStart, posEnd);
 
-                        line.setStroke(this.EditorSymbol_LinePreview.getStroke());
-                        line.setStrokeWidth(this.EditorSymbol_LinePreview.getStrokeWidth());
+                        line.setStroke(this.linePreview.getStroke());
+                        line.setStrokeWidth(this.linePreview.getStrokeWidth());
 
-                        this.Editor_LinePreviewRemove();
+                        this.LinePreviewRemove();
 
-                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, false, this.Editor_RenderSystem);
-                        this.Editor_RenderSystem.RenderSystem_NodeAdd(renderNode);
+                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, false, this.renderSystem);
+                        this.renderSystem.NodeAdd(renderNode);
                     }
                 }
             }
         }
     }
 
-    public void Editor_OnMouseDraggedSpecific(MouseEvent event)
+    public void OnMouseDraggedSpecific(MouseEvent event)
     {}
 
-    public void Editor_OnScrollSpecific(ScrollEvent event)
+    public void OnScrollSpecific(ScrollEvent event)
     {}
 
-    public void Editor_OnKeyPressedSpecific(KeyEvent event)
+    public void OnKeyPressedSpecific(KeyEvent event)
     {}
 
-    public void Editor_OnKeyReleasedSpecific(KeyEvent event)
+    public void OnKeyReleasedSpecific(KeyEvent event)
     {}
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void Editor_PropsLoadSpecific()
+    public void PropsLoadSpecific()
     {}
 
-    public void Editor_PropsApplySpecific()
+    public void PropsApplySpecific()
     {}
 }

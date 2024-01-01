@@ -11,9 +11,7 @@ import com.cyte.edamame.render.RenderNode;
 
 import java.util.*;
 
-import javafx.collections.ObservableList;
 import javafx.scene.*;
-import javafx.scene.control.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
@@ -150,7 +148,7 @@ public class Utils
     static public Integer FindCanvasShape(LinkedList<RenderNode> nodes, String name)
     {
         for (int i = 0; i < nodes.size(); i++)
-            if (nodes.get(i).RenderNode_Name.equals(name))
+            if (nodes.get(i).name.equals(name))
                 return i;
 
         return -1;

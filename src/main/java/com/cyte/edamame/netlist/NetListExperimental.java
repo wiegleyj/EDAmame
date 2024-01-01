@@ -7,63 +7,61 @@
 
 package com.cyte.edamame.netlist;
 
-import com.cyte.edamame.render.RenderSystem;
-
 import java.util.LinkedList;
 
 public class NetListExperimental<T>
 {
-    private LinkedList<NetListExperimentalNode<T>> NetList_List;
+    private LinkedList<NetListExperimentalNode<T>> list;
 
     public NetListExperimental()
     {
-        this.NetList_List = new LinkedList<NetListExperimentalNode<T>>();
+        this.list = new LinkedList<NetListExperimentalNode<T>>();
     }
 
     public NetListExperimental(NetListExperimental<T> otherNetList)
     {
-        this.NetList_List = new LinkedList<NetListExperimentalNode<T>>();
+        this.list = new LinkedList<NetListExperimentalNode<T>>();
 
         for (int i = 0; i < otherNetList.GetNodeNum(); i++)
-            this.NetList_List.add(new NetListExperimentalNode<T>(otherNetList.Get(i)));
+            this.list.add(new NetListExperimentalNode<T>(otherNetList.Get(i)));
     }
 
     public void Append(NetListExperimentalNode<T> node)
     {
-        this.NetList_List.add(node);
+        this.list.add(node);
     }
 
     public void Insert(int idx, NetListExperimentalNode<T> node)
     {
-        this.NetList_List.add(idx, node);
+        this.list.add(idx, node);
     }
 
     public NetListExperimentalNode<T> Remove(int idx)
     {
-        return this.NetList_List.remove(idx);
+        return this.list.remove(idx);
     }
 
     public void Clear()
     {
-        this.NetList_List.clear();
+        this.list.clear();
     }
 
     public void Set(int idx, T value)
     {
-        NetListExperimentalNode<T> node = this.NetList_List.get(idx);
+        NetListExperimentalNode<T> node = this.list.get(idx);
         node.SetValue(value);
-        this.NetList_List.set(idx, node);
+        this.list.set(idx, node);
     }
 
     public NetListExperimentalNode<T> Get(int idx)
     {
-        return this.NetList_List.get(idx);
+        return this.list.get(idx);
     }
 
     public int Find(T searchValue)
     {
-        for (int i = 0; i < this.NetList_List.size(); i++)
-            if (this.NetList_List.get(i).GetValue() == searchValue)
+        for (int i = 0; i < this.list.size(); i++)
+            if (this.list.get(i).GetValue() == searchValue)
                 return i;
 
         return -1;
@@ -71,7 +69,7 @@ public class NetListExperimental<T>
 
     public int GetNodeNum()
     {
-        return this.NetList_List.size();
+        return this.list.size();
     }
 
     public String ToString()
@@ -82,12 +80,12 @@ public class NetListExperimental<T>
 
         String str = "[\n";
 
-        for (int i = 0; i < this.NetList_List.size(); i++)
+        for (int i = 0; i < this.list.size(); i++)
         {
-            str += this.NetList_List.get(i).ToString() + " --> ";
+            str += this.list.get(i).ToString() + " --> ";
 
-            for (int j = 0; j < this.NetList_List.get(i).ConnGetNum(); j++)
-                str += this.NetList_List.get(i).ConnGet(j) + ", ";
+            for (int j = 0; j < this.list.get(i).ConnGetNum(); j++)
+                str += this.list.get(i).ConnGet(j) + ", ";
 
             str += "\n";
         }

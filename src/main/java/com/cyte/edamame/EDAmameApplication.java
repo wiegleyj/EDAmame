@@ -9,7 +9,6 @@ package com.cyte.edamame;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
@@ -28,7 +27,7 @@ import java.util.ResourceBundle;
  */
 public class EDAmameApplication extends Application
 {
-    static public EDAmameController App_Controller;
+    static public EDAmameController controller;
 
     /**
      * Override for {@link Application} start method that is called as a result of the launch method.
@@ -48,8 +47,8 @@ public class EDAmameApplication extends Application
         ResourceBundle bundle = ResourceBundle.getBundle("com.cyte.edamame.strings", locale);
         FXMLLoader loader = new FXMLLoader(EDAmame.class.getResource("fxml/EDAmame.fxml"));
         loader.setResources(bundle); // Internationalization is a priority but not well understood.
-        App_Controller = new EDAmameController(Controller_Stage);
-        loader.setControllerFactory(c -> App_Controller);
+        controller = new EDAmameController(Controller_Stage);
+        loader.setControllerFactory(c -> controller);
 
         Scene scene = new Scene(loader.load());
         URL url = EDAmame.class.getResource("css/EDAmame.css");

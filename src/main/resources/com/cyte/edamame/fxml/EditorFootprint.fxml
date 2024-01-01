@@ -32,7 +32,7 @@
          </Menu>
          <Menu mnemonicParsing="false" text="FOOTPRINT">
            <items>
-             <MenuItem mnemonicParsing="false" onAction="#Editor_Close" text="Close" />
+             <MenuItem mnemonicParsing="false" onAction="#Close" text="Close" />
            </items>
          </Menu>
       </menus></MenuBar>

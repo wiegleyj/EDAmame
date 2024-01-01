@@ -7,7 +7,6 @@
 
 package com.cyte.edamame.file;
 
-import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.render.RenderNode;
@@ -21,36 +20,32 @@ import java.io.*;
 import java.net.URL;
 
 import javafx.scene.*;
-import javafx.scene.layout.*;
-import javafx.scene.control.*;
-import javafx.scene.paint.*;
 import javafx.scene.shape.*;
-import javafx.geometry.*;
 import javafx.scene.text.*;
 
 import java.util.LinkedList;
 
 public class File
 {
-    static public boolean File_NodesSave(LinkedList<Node> nodes, boolean center)
+    static public boolean NodesSave(LinkedList<Node> nodes, boolean center)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Symbol");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("FXML File", "*.fxml"));
         fileChooser.setInitialFileName("symbol.fxml");
-        java.io.File file = fileChooser.showSaveDialog(EDAmameApplication.App_Controller.Controller_Stage);
+        java.io.File file = fileChooser.showSaveDialog(EDAmameApplication.controller.stage);
 
         if (file == null)
         {
-            EDAmameController.Controller_SetStatusBar("Unable to save FXML because the entered directory is invalid!");
+            EDAmameController.SetStatusBar("Unable to save FXML because the entered directory is invalid!");
 
             return false;
         }
 
-        return File_NodesWrite(file.getAbsolutePath(), nodes, center);
+        return NodesWrite(file.getAbsolutePath(), nodes, center);
     }
 
-    static public boolean File_NodesWrite(String filePath, LinkedList<Node> nodes, boolean center)
+    static public boolean NodesWrite(String filePath, LinkedList<Node> nodes, boolean center)
     {
         String data = "";
 
@@ -71,47 +66,47 @@ public class File
 
         if (center)
         {
-            childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+            childMidPos = RenderNode.NodesGetMiddlePos(nodes);
             childMidPos.left = -childMidPos.GetLeftDouble();
             childMidPos.right = -childMidPos.GetRightDouble();
         }
 
         for (int i = 0; i < nodes.size(); i++)
-            data += RenderNode.RenderNode_ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
+            data += RenderNode.ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
 
         data += "\t</children>\n";
         data += "</Group>\n";
 
-        return File_Write(filePath, data, true);
+        return Write(filePath, data, true);
     }
 
-    static public LinkedList<Node> File_NodesLoad(boolean center)
+    static public LinkedList<Node> NodesLoad(boolean center)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Symbol");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("FXML File", "*.fxml"));
-        java.io.File file = fileChooser.showOpenDialog(EDAmameApplication.App_Controller.Controller_Stage);
+        java.io.File file = fileChooser.showOpenDialog(EDAmameApplication.controller.stage);
 
         if (file == null)
         {
-            EDAmameController.Controller_SetStatusBar("Unable to load FXML file because the entered directory is invalid!");
+            EDAmameController.SetStatusBar("Unable to load FXML file because the entered directory is invalid!");
         }
         else
         {
             try
             {
-                return File_NodesRead(file.getAbsolutePath(), center);
+                return NodesRead(file.getAbsolutePath(), center);
             }
             catch (IOException e)
             {
-                EDAmameController.Controller_SetStatusBar("Encountered error while loading FXML file!");
+                EDAmameController.SetStatusBar("Encountered error while loading FXML file!");
             }
         }
 
         return null;
     }
 
-    static public LinkedList<Node> File_NodesRead(String filePath, boolean center) throws IOException
+    static public LinkedList<Node> NodesRead(String filePath, boolean center) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader();
         filePath = filePath.replace('\\', '/');
@@ -120,7 +115,7 @@ public class File
 
         if (root.getClass() != Group.class)
         {
-            EDAmameController.Controller_SetStatusBar("Attempting to load FXML file without parent Group node!");
+            EDAmameController.SetStatusBar("Attempting to load FXML file without parent Group node!");
 
             return null;
         }
@@ -143,7 +138,7 @@ public class File
             }
             else
             {
-                EDAmameController.Controller_SetStatusBar("Attempting to load FXML file with unrecognized shape types!");
+                EDAmameController.SetStatusBar("Attempting to load FXML file with unrecognized shape types!");
 
                 return null;
             }
@@ -151,7 +146,7 @@ public class File
 
         if (center)
         {
-            PairMutable childMidPos = RenderNode.RenderNode_NodesGetMiddlePos(nodes);
+            PairMutable childMidPos = RenderNode.NodesGetMiddlePos(nodes);
             childMidPos.left = -childMidPos.GetLeftDouble();
             childMidPos.right = -childMidPos.GetRightDouble();
 
@@ -237,7 +232,7 @@ public class File
         yaml.dump(list, fileWriter);
     }*/
 
-    static public boolean File_Write(String filePath, String data, boolean overwrite)
+    static public boolean Write(String filePath, String data, boolean overwrite)
     {
         try
         {

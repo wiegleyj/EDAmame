@@ -5,17 +5,17 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.VBox?>
 
-<VBox maxHeight="400.0" maxWidth="400.0" minHeight="400.0" minWidth="400.0" onKeyPressed="#EditorProps_KeyPressed" onKeyReleased="#EditorProps_KeyReleased" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorProps">
+<VBox maxHeight="400.0" maxWidth="400.0" minHeight="400.0" minWidth="400.0" onKeyPressed="#KeyPressed" onKeyReleased="#KeyReleased" prefHeight="400.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/20.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.cyte.edamame.editor.EditorProps">
    <children>
       <ToolBar>
         <items>
-          <Button mnemonicParsing="false" onAction="#EditorProps_PropsLoad" text="Load Properties" />
-            <Button mnemonicParsing="false" onAction="#EditorProps_PropsApply" text="Apply Properties" />
+          <Button mnemonicParsing="false" onAction="#PropsLoad" text="Load Properties" />
+            <Button mnemonicParsing="false" onAction="#PropsApply" text="Apply Properties" />
         </items>
       </ToolBar>
       <ScrollPane VBox.vgrow="SOMETIMES">
          <content>
-            <VBox fx:id="EditorProps_PropsBox" />
+            <VBox fx:id="propsBox" />
          </content>
       </ScrollPane>
    </children>

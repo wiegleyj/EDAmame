@@ -37,14 +37,14 @@
          </Menu>
          <Menu mnemonicParsing="false" text="SCHEMATIC">
            <items>
-             <MenuItem mnemonicParsing="false" onAction="#Editor_Close" text="Close" />
+             <MenuItem mnemonicParsing="false" onAction="#Close" text="Close" />
            </items>
          </Menu>
       </menus></MenuBar>
     <ToolBar>
-        <Button mnemonicParsing="false" onAction="#EditorSchematic_Save" text="Save Schematic" />
-      <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorSchematic_Load" text="Load Schematic" />
-      <Button layoutX="112.0" layoutY="10.0" mnemonicParsing="false" onAction="#EditorSchematic_LoadSymbol" text="Load Symbol" />
+        <Button mnemonicParsing="false" onAction="#Save" text="Save Schematic" />
+      <Button layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#Load" text="Load Schematic" />
+      <Button layoutX="112.0" layoutY="10.0" mnemonicParsing="false" onAction="#LoadSymbol" text="Load Symbol" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="EditorTab">
@@ -84,19 +84,19 @@
                <children>
                   <RadioButton mnemonicParsing="false" text="Wire">
                      <toggleGroup>
-                        <ToggleGroup fx:id="EditorSchematic_ToggleGroup" />
+                        <ToggleGroup fx:id="toggleGroup" />
                      </toggleGroup>
                   </RadioButton>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label text="Width: " />
-                        <TextField fx:id="EditorSchematic_WireWidth" />
+                        <TextField fx:id="wireWidth" />
                      </children>
                   </HBox>
                   <HBox prefHeight="100.0" prefWidth="200.0">
                      <children>
                         <Label text="Color: " />
-                        <ColorPicker fx:id="EditorSchematic_WireColor" />
+                        <ColorPicker fx:id="wireColor" />
                      </children>
                   </HBox>
                </children>

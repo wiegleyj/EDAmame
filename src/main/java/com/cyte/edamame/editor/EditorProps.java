@@ -24,14 +24,14 @@ public class EditorProps
     //// GLOBAL VARIABLES ////
 
     @FXML
-    public VBox EditorProps_PropsBox;
+    public VBox propsBox;
 
-    public Stage EditorProps_Stage;
-    public Editor EditorProps_Editor = null;
+    public Stage stage;
+    public Editor editor = null;
 
     //// MAIN FUNCTIONS ////
 
-    static public EditorProps EditorProps_Create()
+    static public EditorProps Create()
     {
         try
         {
@@ -39,13 +39,13 @@ public class EditorProps
             Scene scene = new Scene(loader.load());
             EditorProps propsWindow = loader.getController();
 
-            propsWindow.EditorProps_Stage = new Stage();
-            propsWindow.EditorProps_Stage.setScene(scene);
-            propsWindow.EditorProps_Stage.setTitle("Element Properties");
-            propsWindow.EditorProps_Stage.setAlwaysOnTop(true);
-            propsWindow.EditorProps_Stage.setResizable(false);
-            propsWindow.EditorProps_PropsBox.setSpacing(10);
-            propsWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
+            propsWindow.stage = new Stage();
+            propsWindow.stage.setScene(scene);
+            propsWindow.stage.setTitle("Element Properties");
+            propsWindow.stage.setAlwaysOnTop(true);
+            propsWindow.stage.setResizable(false);
+            propsWindow.propsBox.setSpacing(10);
+            propsWindow.propsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
 
             return propsWindow;
         }
@@ -61,61 +61,61 @@ public class EditorProps
     //// CALLBACK FUNCTIONS ////
 
     @FXML
-    public void EditorProps_PropsLoad()
+    public void PropsLoad()
     {
-        if (this.EditorProps_Editor == null)
+        if (this.editor == null)
             throw new java.lang.Error("ERROR: Attempting to load into properties window with null editor reference!");
 
         // Clearing any existing properties...
-        EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().clear();
+        EDAmameController.editorPropertiesWindow.propsBox.getChildren().clear();
 
         // Only attempting to load node properties if we have some nodes selected...
-        if (this.EditorProps_Editor.Editor_ShapesSelected == 0)
+        if (this.editor.shapesSelected == 0)
         {
-            EDAmameController.Controller_EditorPropertiesWindow.EditorProps_PropsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
-            EDAmameController.Controller_SetStatusBar("Unable to load element properties because no elements are selected!");
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
+            EDAmameController.SetStatusBar("Unable to load element properties because no elements are selected!");
 
             return;
         }
 
         // Loading both the global & editor-specific properties...
-        this.EditorProps_Editor.Editor_PropsLoadGlobal();
-        this.EditorProps_Editor.Editor_PropsLoadSpecific();
+        this.editor.PropsLoadGlobal();
+        this.editor.PropsLoadSpecific();
     }
 
     @FXML
-    public void EditorProps_PropsApply()
+    public void PropsApply()
     {
-        if (this.EditorProps_Editor == null)
+        if (this.editor == null)
             throw new java.lang.Error("ERROR: Attempting to apply from properties window with null editor reference!");
 
         // Only attempting to apply node properties if we have some nodes selected...
-        if (this.EditorProps_Editor.Editor_ShapesSelected == 0)
+        if (this.editor.shapesSelected == 0)
         {
-            EDAmameController.Controller_SetStatusBar("Unable to apply element properties because no elements are selected!");
+            EDAmameController.SetStatusBar("Unable to apply element properties because no elements are selected!");
 
             return;
         }
 
         // Applying both the global & editor-specific properties...
-        this.EditorProps_Editor.Editor_PropsApplyGlobal();
-        this.EditorProps_Editor.Editor_PropsApplySpecific();
+        this.editor.PropsApplyGlobal();
+        this.editor.PropsApplySpecific();
 
         // Refreshing all highlighted & selected shapes...
-        for (int i = 0; i < this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
-            this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_ShapeSelectedRefresh();
+        for (int i = 0; i < this.editor.renderSystem.nodes.size(); i++)
+            this.editor.renderSystem.nodes.get(i).ShapeSelectedRefresh();
             //this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_BoundsRefresh();
     }
 
     @FXML
-    public void EditorProps_KeyPressed(KeyEvent event)
+    public void KeyPressed(KeyEvent event)
     {
-        EDAmameController.Controller_KeyPressed(event.getCode());
+        EDAmameController.KeyPressed(event.getCode());
     }
 
     @FXML
-    public void EditorProps_KeyReleased(KeyEvent event)
+    public void KeyReleased(KeyEvent event)
     {
-        EDAmameController.Controller_KeyReleased(event.getCode());
+        EDAmameController.KeyReleased(event.getCode());
     }
 }
