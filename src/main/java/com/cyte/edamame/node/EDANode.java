@@ -5,8 +5,9 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame.render;
+package com.cyte.edamame.node;
 
+import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.shape.SnapPoint;
@@ -21,7 +22,7 @@ import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.scene.text.*;
 
-public class RenderNode
+public class EDANode
 {
     //// GLOBAL VARIABLES ////
 
@@ -42,11 +43,11 @@ public class RenderNode
     public boolean isPin;
     public String[] conns;
 
-    public RenderSystem renderSystem;
+    public Editor editor;
 
     //// CONSTRUCTORS ////
 
-    public RenderNode(String nameValue, Node nodeValue, boolean edgeSnapPoints, LinkedList<PairMutable> manualSnapPointPos, boolean passiveValue, boolean isPinValue, RenderSystem renderSystemValue)
+    public EDANode(String nameValue, Node nodeValue, boolean edgeSnapPoints, LinkedList<PairMutable> manualSnapPointPos, boolean passiveValue, boolean isPinValue, Editor editorValue)
     {
         this.name = nameValue;
         this.node = nodeValue;
@@ -61,7 +62,7 @@ public class RenderNode
         this.manualSnapPoints = new LinkedList<SnapPoint>();
         this.isPin = isPinValue;
 
-        this.renderSystem = renderSystemValue;
+        this.editor = editorValue;
 
         if (!this.passive)
         {
@@ -391,7 +392,7 @@ public class RenderNode
 
     //// SUPPORT FUNCTIONS ////
 
-    public RenderNode Clone()
+    public EDANode Clone()
     {
         LinkedList<PairMutable> clonedSnapPointManualPos = null;
 
@@ -404,7 +405,7 @@ public class RenderNode
                                                              this.manualSnapPoints.get(i).getTranslateY()));
         }
 
-        RenderNode clonedNode = new RenderNode(this.name,
+        EDANode clonedNode = new EDANode(this.name,
                                                Utils.Utils_NodeClone(this.node),
                                                this.autoSnapPoints,
                                                clonedSnapPointManualPos,

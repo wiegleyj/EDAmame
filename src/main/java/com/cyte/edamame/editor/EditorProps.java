@@ -102,8 +102,8 @@ public class EditorProps
         this.editor.PropsApplySpecific();
 
         // Refreshing all highlighted & selected shapes...
-        for (int i = 0; i < this.editor.renderSystem.nodes.size(); i++)
-            this.editor.renderSystem.nodes.get(i).ShapeSelectedRefresh();
+        for (int i = 0; i < this.editor.nodes.size(); i++)
+            this.editor.nodes.get(i).ShapeSelectedRefresh();
             //this.EditorProps_Editor.Editor_RenderSystem.RenderSystem_Nodes.get(i).RenderNode_BoundsRefresh();
     }
 

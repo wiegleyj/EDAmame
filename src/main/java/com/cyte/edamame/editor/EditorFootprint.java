@@ -39,7 +39,7 @@ public class EditorFootprint extends Editor
         EditorFootprint editor = fxmlLoader.getController();
         editor.Init(2, "EditorFootprint");
         editor.Dissect(2, scene);
-        editor.renderSystem.CanvasRenderGrid();
+        editor.CanvasRenderGrid();
         editor.ListenersInit();
 
         return editor;

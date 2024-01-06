@@ -7,7 +7,7 @@
 
 package com.cyte.edamame.util;
 
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 
 import java.util.*;
 
@@ -145,7 +145,7 @@ public class Utils
         return Math.sqrt(squaredSum);
     }
 
-    static public Integer FindCanvasShape(LinkedList<RenderNode> nodes, String name)
+    static public Integer FindCanvasShape(LinkedList<EDANode> nodes, String name)
     {
         for (int i = 0; i < nodes.size(); i++)
             if (nodes.get(i).name.equals(name))

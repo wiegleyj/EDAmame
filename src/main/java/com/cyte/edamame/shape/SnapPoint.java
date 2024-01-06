@@ -6,7 +6,7 @@
  */
 
 package com.cyte.edamame.shape;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 import com.cyte.edamame.util.PairMutable;
 
 import javafx.scene.paint.*;
@@ -16,9 +16,9 @@ public class SnapPoint extends Circle
 {
     public PairMutable pos;
 
-    public RenderNode renderNode;
+    public EDANode renderNode;
 
-    public SnapPoint(PairMutable posValue, Double radiusValue, Paint colorValue, Double opacityValue, RenderNode renderNodeValue)
+    public SnapPoint(PairMutable posValue, Double radiusValue, Paint colorValue, Double opacityValue, EDANode renderNodeValue)
     {
         this.pos = posValue;
         this.renderNode = renderNodeValue;
@@ -29,7 +29,7 @@ public class SnapPoint extends Circle
         this.setTranslateY(posValue.GetRightDouble());
     }
 
-    public SnapPoint Clone(RenderNode renderNodeValue)
+    public SnapPoint Clone(EDANode renderNodeValue)
     {
         return new SnapPoint(new PairMutable(this.pos),
                              this.getRadius(),

@@ -11,8 +11,7 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.memento.MementoExperimental;
 import com.cyte.edamame.netlist.NetListExperimental;
 import com.cyte.edamame.netlist.NetListExperimentalNode;
-import com.cyte.edamame.render.RenderNode;
-import com.cyte.edamame.render.RenderSystem;
+import com.cyte.edamame.node.EDANode;
 import com.cyte.edamame.util.Utils;
 
 import java.util.*;
@@ -21,6 +20,7 @@ import java.util.logging.Level;
 import com.cyte.edamame.util.PairMutable;
 import javafx.collections.*;
 import javafx.geometry.Bounds;
+import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
 import javafx.scene.input.*;
@@ -50,14 +50,7 @@ public abstract class Editor
 
     public Integer type = -1;
     public String name = null;
-
-    public PairMutable zoomLimits;
-    public Double zoomFactor;
-    public Double mouseDragFactor;
-    public Double mouseDragCheckTimeout;
-    public Color selectionBoxColor;
-    public Double selectionBoxWidth;
-
+    
     // DO NOT EDIT
 
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
@@ -75,8 +68,30 @@ public abstract class Editor
      * match exactly including mneumonic underscores and such. Missing Editor_Menus at the EDAmame level are not created.
      */
     public HashMap<String, ObservableList<MenuItem>> menus = new HashMap<String, ObservableList<MenuItem>>();    // NOTE: We have to use the hash map because a list would cause the menu items to disappear after the first editor dissection
-    public RenderSystem renderSystem;
 
+    public PairMutable zoomLimits;
+    public Double zoomFactor;
+    public Double mouseDragFactor;
+    public Double mouseDragCheckTimeout;
+    public Color selectionBoxColor;
+    public Double selectionBoxWidth;
+
+    public Pane paneListener;
+    public Pane paneHolder;
+    public Pane paneHighlights;
+    public Pane paneSelections;
+    public Pane paneSnaps;
+    public Canvas canvas;
+    public GraphicsContext gc;
+    public Shape crosshair;
+    public PairMutable theaterSize;
+    public Color backgroundColor;
+    public Color gridPointColor;
+    public Color gridBoxColor;
+    public Integer maxShapes;
+    public LinkedList<EDANode> nodes;
+    
+    public PairMutable center;
     public boolean visible = false;
     public boolean pressedLMB = false;
     public boolean pressedRMB = false;
@@ -104,6 +119,14 @@ public abstract class Editor
         this.type = type;
         this.name = name;
 
+        this.theaterSize = EDAmameController.Editor_TheaterSize;
+        this.backgroundColor = EDAmameController.Editor_BackgroundColors[type];
+        this.gridPointColor = EDAmameController.Editor_GridPointColors[type];
+        this.gridBoxColor = EDAmameController.Editor_GridBoxColors[type];
+        this.maxShapes = EDAmameController.Editor_MaxShapes;
+        this.nodes = new LinkedList<EDANode>();
+
+        this.center = new PairMutable(0.0, 0.0);
         this.zoomLimits = EDAmameController.Editor_ZoomLimits;
         this.zoomFactor = EDAmameController.Editor_ZoomFactor;
         this.mouseDragFactor = EDAmameController.Editor_MouseDragFactor;
@@ -131,9 +154,9 @@ public abstract class Editor
         this.TestShapesClear();
 
         // Handling render node highlight, selected & snap shapes refreshing...
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (renderNode.passive)
                 continue;
@@ -144,18 +167,18 @@ public abstract class Editor
 
         // Handling centering of holder pane & crosshair...
         {
-            PairMutable canvasSize = new PairMutable(this.renderSystem.canvas.getWidth(),
-                                                     this.renderSystem.canvas.getHeight());
-            PairMutable paneSize = new PairMutable(this.renderSystem.paneListener.getWidth(),
-                                                   this.renderSystem.paneListener.getHeight());
+            PairMutable canvasSize = new PairMutable(this.canvas.getWidth(),
+                                                     this.canvas.getHeight());
+            PairMutable paneSize = new PairMutable(this.paneListener.getWidth(),
+                                                   this.paneListener.getHeight());
             PairMutable centeredPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
                                                       paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
-            this.renderSystem.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
-            this.renderSystem.paneHolder.setLayoutY(centeredPos.GetRightDouble());
+            this.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
+            this.paneHolder.setLayoutY(centeredPos.GetRightDouble());
 
-            this.renderSystem.crosshair.setTranslateX(this.renderSystem.paneListener.getWidth() / 2);
-            this.renderSystem.crosshair.setTranslateY(this.renderSystem.paneListener.getHeight() / 2);
+            this.crosshair.setTranslateX(this.paneListener.getWidth() / 2);
+            this.crosshair.setTranslateY(this.paneListener.getHeight() / 2);
         }
 
         //for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
@@ -186,13 +209,13 @@ public abstract class Editor
      */
     public ObservableList<Tab> GetControlTabs() { return tabs; }
 
-    //// RENDER FUNCTIONS ////
+    //// RENDERING FUNCTIONS ////
 
     public void NodesDeselectAll()
     {
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (!renderNode.selected)
             {
@@ -225,7 +248,7 @@ public abstract class Editor
 
         if (this.selectionBox != null)
         {
-            this.renderSystem.paneListener.getChildren().remove(this.selectionBox);
+            this.paneListener.getChildren().remove(this.selectionBox);
             this.selectionBox = null;
             this.wasSelectionBox = true;
         }
@@ -237,11 +260,11 @@ public abstract class Editor
 
     public void NodeSnapPointsCheck(PairMutable posEvent)
     {
-        PairMutable posMouse = this.renderSystem.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+        PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
 
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             for (int j = 0; j < renderNode.manualSnapPoints.size(); j++)
             {
@@ -291,17 +314,17 @@ public abstract class Editor
 
     public void LinePreviewRemove()
     {
-        this.renderSystem.NodeRemove("linePreview");
+        this.NodeRemove("linePreview");
         this.linePreview = null;
     }
 
     public void NodeHighlightsCheck(PairMutable posEvent)
     {
-        PairMutable posMouse = this.renderSystem.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+        PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
 
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (renderNode.passive)
                 continue;
@@ -337,8 +360,8 @@ public abstract class Editor
                 if (this.selectionBox != null)
                 {
                     Bounds shapeBounds = renderNode.node.getBoundsInParent();
-                    PairMutable selectionBoxL = this.renderSystem.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
-                    PairMutable selectionBoxH = this.renderSystem.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
+                    PairMutable selectionBoxL = this.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
+                    PairMutable selectionBoxH = this.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
 
                 /*Circle testShapeL = new Circle(5, Color.RED);
                 testShapeL.setId("TESTMARKER");
@@ -419,15 +442,15 @@ public abstract class Editor
     public void MouseDragReset(PairMutable posMouse)
     {
         this.mouseDragFirstPos = new PairMutable(posMouse);
-        this.mouseDragFirstCenter = new PairMutable(this.renderSystem.center.GetLeftDouble(),
-                                                           this.renderSystem.center.GetRightDouble());
-        this.mouseDragPaneFirstPos = new PairMutable(this.renderSystem.PaneHolderGetTranslate());
+        this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
+                                                           this.center.GetRightDouble());
+        this.mouseDragPaneFirstPos = new PairMutable(this.PaneHolderGetTranslate());
 
         if (this.shapesSelected > 0)
         {
-            for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+            for (int i = 0; i < this.nodes.size(); i++)
             {
-                RenderNode renderNode = this.renderSystem.nodes.get(i);
+                EDANode renderNode = this.nodes.get(i);
 
                 if (!renderNode.selected)
                     continue;
@@ -436,6 +459,210 @@ public abstract class Editor
                                                                       renderNode.node.getTranslateY());
             }
         }
+    }
+
+    public void CanvasRenderGrid()
+    {
+        // Clearing the canvas
+        this.CanvasClear();
+
+        // Drawing the points
+        gc.setFill(this.gridPointColor);
+        gc.setGlobalAlpha(1.0);
+        Double width = 3.0;
+
+        Double posX = -2500.0;
+        Double posY = -2500.0;
+
+        for (int i = 0; i < 70; i++)
+        {
+            for (int j = 0; j < 70; j++)
+            {
+                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
+
+                posX += 100.0;
+            }
+
+            posX = -2500.0;
+            posY += 100.0;
+        }
+
+        // Drawing the grid box
+        gc.setStroke(this.gridBoxColor);
+        gc.setGlobalAlpha(1.0);
+        gc.setLineWidth(2.0);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+    }
+
+    public void CanvasClear()
+    {
+        this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        this.gc.setFill(this.backgroundColor);
+        this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
+    //// PANE FUNCTIONS ////
+
+    public PairMutable PaneHolderGetDrawPos(PairMutable pos)
+    {
+        return new PairMutable(pos.GetLeftDouble() + this.paneHolder.getWidth() / 2,
+                pos.GetRightDouble() + this.paneHolder.getHeight() / 2);
+    }
+
+    public PairMutable PaneHolderGetRealPos(PairMutable pos)
+    {
+        return new PairMutable(pos.GetLeftDouble() - this.paneHolder.getWidth() / 2,
+                pos.GetRightDouble() - this.paneHolder.getHeight() / 2);
+    }
+
+    public PairMutable PaneHolderGetRealCenter()
+    {
+        return new PairMutable(-this.center.GetLeftDouble() + this.paneHolder.getWidth() / 2,
+                -this.center.GetRightDouble() + this.paneHolder.getHeight() / 2);
+    }
+
+    public PairMutable PanePosListenerToHolder(PairMutable pos)
+    {
+        Point2D newPos = this.paneHolder.parentToLocal(pos.GetLeftDouble(), pos.GetRightDouble());
+
+        return new PairMutable(newPos.getX(), newPos.getY());
+    }
+
+    public PairMutable PanePosHolderToListener(PairMutable pos)
+    {
+        Point2D newPos = this.paneHolder.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+
+        return new PairMutable(newPos.getX(), newPos.getY());
+    }
+
+    public void PaneHolderSetTranslate(PairMutable pos)
+    {
+        this.paneHolder.setTranslateX(pos.GetLeftDouble());
+        this.paneHolder.setTranslateY(pos.GetRightDouble());
+    }
+
+    public void PaneHolderSetScale(PairMutable scale, boolean compensate)
+    {
+        PairMutable prevScale = this.PaneHolderGetScale();
+
+        this.paneHolder.setScaleX(scale.GetLeftDouble());
+        this.paneHolder.setScaleY(scale.GetRightDouble());
+
+        if (compensate)
+        {
+            PairMutable scaleDelta = new PairMutable(scale.GetLeftDouble() - prevScale.GetLeftDouble(),
+                    scale.GetRightDouble() - prevScale.GetRightDouble());
+            PairMutable newPos = this.PaneHolderGetTranslate();
+
+            newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
+            newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
+
+            this.PaneHolderSetTranslate(newPos);
+        }
+    }
+
+    public PairMutable PaneHolderGetScale()
+    {
+        return new PairMutable(this.paneHolder.getScaleX(), this.paneHolder.getScaleY());
+    }
+
+    public PairMutable PaneHolderGetTranslate()
+    {
+        return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
+    }
+
+    public int NodeFind(String id)
+    {
+        for (int i = 0; i < this.nodes.size(); i++)
+            if (this.nodes.get(i).id.equals(id))
+                return i;
+
+        return -1;
+    }
+
+    public void NodesAdd(LinkedList<EDANode> renderNodes)
+    {
+        for (int i = 0; i < renderNodes.size(); i++)
+            this.NodeAdd(renderNodes.get(i));
+    }
+
+    public void NodeAdd(EDANode renderNode)
+    {
+        if (this.nodes.size() >= this.maxShapes)
+            throw new java.lang.Error("ERROR: Exceeded render system maximum render nodes limit!");
+
+        this.nodes.add(renderNode);
+        this.paneHolder.getChildren().add(1, renderNode.node);
+
+        if (!renderNode.passive)
+        {
+            this.paneHighlights.getChildren().add(renderNode.shapeHighlighted);
+            this.paneSelections.getChildren().add(renderNode.shapeSelected);
+        }
+
+        for (int i = 0; i < renderNode.manualSnapPoints.size(); i++)
+            this.paneSnaps.getChildren().add(renderNode.manualSnapPoints.get(i));
+    }
+
+    public void NodesClear()
+    {
+        while (!this.nodes.isEmpty())
+            NodeRemove(this.nodes.get(0).name);
+    }
+
+    public EDANode NodeRemove(String name)
+    {
+        for (int i = 0; i < this.nodes.size(); i++)
+        {
+            EDANode renderNode = this.nodes.get(i);
+
+            if (renderNode.name.equals(name))
+            {
+                this.nodes.remove(renderNode);
+                this.paneHolder.getChildren().remove(renderNode.node);
+
+                if (!renderNode.passive)
+                {
+                    this.paneHighlights.getChildren().remove(renderNode.shapeHighlighted);
+                    this.paneSelections.getChildren().remove(renderNode.shapeSelected);
+                }
+
+                renderNode.highlighted = false;
+                renderNode.selected = false;
+
+                for (int j = 0; j < renderNode.manualSnapPoints.size(); j++)
+                    this.paneSnaps.getChildren().remove(renderNode.manualSnapPoints.get(j));
+
+                return renderNode;
+            }
+        }
+
+        return null;
+    }
+
+    public LinkedList<EDANode> NodesClone()
+    {
+        LinkedList<EDANode> clonedNodes = new LinkedList<EDANode>();
+
+        for (int i = 0; i < this.nodes.size(); i++)
+            clonedNodes.add(this.nodes.get(i).Clone());
+
+        return clonedNodes;
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -457,8 +684,8 @@ public abstract class Editor
     public void OnMouseMovedGlobal(MouseEvent event)
     {
         PairMutable eventPos = new PairMutable(event.getX(), event.getY());
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(eventPos);
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(eventPos);
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
@@ -506,10 +733,10 @@ public abstract class Editor
             // Handling auto-zoom
             if (EDAmameController.IsKeyPressed(KeyCode.ALT))
             {
-                this.renderSystem.PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
-                this.renderSystem.PaneHolderSetScale(new PairMutable(1.0, 1.0), false);
+                this.PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
+                this.PaneHolderSetScale(new PairMutable(1.0, 1.0), false);
 
-                this.renderSystem.center = new PairMutable(0.0, 0.0);
+                this.center = new PairMutable(0.0, 0.0);
                 this.zoom = 1.0;
             }
         }
@@ -521,8 +748,8 @@ public abstract class Editor
     public void OnMouseDraggedGlobal(MouseEvent event)
     {
         PairMutable eventPos = new PairMutable(event.getX(), event.getY());
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(eventPos);
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(eventPos);
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
@@ -541,14 +768,14 @@ public abstract class Editor
                 !EDAmameController.IsKeyPressed(KeyCode.SHIFT) &&
                 (this.linePreview == null))
             {
-                for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+                for (int i = 0; i < this.nodes.size(); i++)
                 {
-                    RenderNode renderNode = this.renderSystem.nodes.get(i);
+                    EDANode renderNode = this.nodes.get(i);
 
                     if (!renderNode.selected)
                         continue;
 
-                    PairMutable posPressReal = this.renderSystem.PaneHolderGetRealPos(new PairMutable(renderNode.mousePressPos.GetLeftDouble(),
+                    PairMutable posPressReal = this.PaneHolderGetRealPos(new PairMutable(renderNode.mousePressPos.GetLeftDouble(),
                                                                                                                           renderNode.mousePressPos.GetRightDouble()));
                     PairMutable posOffset = new PairMutable(0.0, 0.0);
 
@@ -588,7 +815,7 @@ public abstract class Editor
                     this.selectionBox.setStroke(this.selectionBoxColor);
                     this.selectionBox.setStrokeWidth(this.selectionBoxWidth);
 
-                    this.renderSystem.paneListener.getChildren().add(1, this.selectionBox);
+                    this.paneListener.getChildren().add(1, this.selectionBox);
                 }
 
                 // Adjusting if the width & height are negative...
@@ -633,10 +860,10 @@ public abstract class Editor
                     this.Editor_MouseDragReachedEdge = true;
                 }*/
 
-                this.renderSystem.center.left = this.mouseDragFirstCenter.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble();
-                this.renderSystem.center.right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
+                this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble();
+                this.center.right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
 
-                this.renderSystem.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
+                this.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
                                                                                        this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
             }
         }
@@ -645,15 +872,15 @@ public abstract class Editor
     public void OnScrollGlobal(ScrollEvent event)
     {
         PairMutable eventPos = new PairMutable(event.getX(), event.getY());
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(eventPos);
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(eventPos);
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         // Handling shape rotation (only if we have shapes selected and R is pressed)
         if ((this.shapesSelected > 0) && EDAmameController.IsKeyPressed(KeyCode.R))
         {
-            for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+            for (int i = 0; i < this.nodes.size(); i++)
             {
-                RenderNode renderNode = this.renderSystem.nodes.get(i);
+                EDANode renderNode = this.nodes.get(i);
                 String nodeId = renderNode.node.getId();
 
                 if (!renderNode.selected ||
@@ -686,7 +913,7 @@ public abstract class Editor
             else
                 this.zoom *= this.zoomFactor;
 
-            this.renderSystem.PaneHolderSetScale(new PairMutable(this.zoom, this.zoom), true);
+            this.PaneHolderSetScale(new PairMutable(this.zoom, this.zoom), true);
         }
 
         // Handling shape highlights...
@@ -725,9 +952,9 @@ public abstract class Editor
         {
             if (this.shapesSelected > 0)
             {
-                for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+                for (int i = 0; i < this.nodes.size(); i++)
                 {
-                    RenderNode renderNode = this.renderSystem.nodes.get(i);
+                    EDANode renderNode = this.nodes.get(i);
 
                     if (!renderNode.selected)
                         continue;
@@ -743,8 +970,8 @@ public abstract class Editor
                     renderNode.shapeSelected.setVisible(false);
                     this.shapesSelected--;
 
-                    this.renderSystem.paneHolder.getChildren().remove(renderNode.node);
-                    this.renderSystem.nodes.remove(renderNode);
+                    this.paneHolder.getChildren().remove(renderNode.node);
+                    this.nodes.remove(renderNode);
 
                     i--;
                 }
@@ -785,7 +1012,7 @@ public abstract class Editor
     public void ListenersInit()
     {
         // When we drag the mouse (from outside the viewport)...
-        this.renderSystem.paneListener.setOnDragOver(event -> {
+        this.paneListener.setOnDragOver(event -> {
             // Handling global callback actions
             this.OnDragOverGlobal(event);
 
@@ -796,7 +1023,7 @@ public abstract class Editor
         });
 
         // When we drop something with the cursor (from outside the viewport)...
-        this.renderSystem.paneListener.setOnDragDropped(event -> {
+        this.paneListener.setOnDragDropped(event -> {
             // Handling global callback actions
             this.OnDragDroppedGlobal(event);
 
@@ -808,7 +1035,7 @@ public abstract class Editor
         });
 
         // When we move the mouse...
-        this.renderSystem.paneListener.setOnMouseMoved(event -> {
+        this.paneListener.setOnMouseMoved(event -> {
             // Handling global callback actions
             this.OnMouseMovedGlobal(event);
 
@@ -819,7 +1046,7 @@ public abstract class Editor
         });
 
         // When we press down the mouse...
-        this.renderSystem.paneListener.setOnMousePressed(event -> {
+        this.paneListener.setOnMousePressed(event -> {
             // Updating mouse pressed flags
             if (event.isPrimaryButtonDown())
                 this.pressedLMB = true;
@@ -842,7 +1069,7 @@ public abstract class Editor
         });
 
         // When we release the mouse...
-        this.renderSystem.paneListener.setOnMouseReleased(event -> {
+        this.paneListener.setOnMouseReleased(event -> {
             // Handling global callback actions
             this.OnMouseReleasedGlobal(event);
 
@@ -857,7 +1084,7 @@ public abstract class Editor
         });
 
         // When we drag the mouse (from inside the viewport)...
-        this.renderSystem.paneListener.setOnMouseDragged(event -> {
+        this.paneListener.setOnMouseDragged(event -> {
             // Only execute callback if we're past the check timeout
             if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
                 return;
@@ -884,7 +1111,7 @@ public abstract class Editor
         });
 
         // When we scroll the mouse...
-        this.renderSystem.paneListener.setOnScroll(event -> {
+        this.paneListener.setOnScroll(event -> {
             // Handling global callback actions
             this.OnScrollGlobal(event);
 
@@ -915,16 +1142,16 @@ public abstract class Editor
         LinkedList<Double> rots = new LinkedList<Double>();
         LinkedList<Color> colors = new LinkedList<Color>();
 
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (!renderNode.selected)
                 continue;
 
             names.add(renderNode.name);
-            posX.add(renderNode.node.getTranslateX() - this.renderSystem.paneHolder.getWidth() / 2);
-            posY.add(renderNode.node.getTranslateY() - this.renderSystem.paneHolder.getHeight() / 2);
+            posX.add(renderNode.node.getTranslateX() - this.paneHolder.getWidth() / 2);
+            posY.add(renderNode.node.getTranslateY() - this.paneHolder.getHeight() / 2);
 
             if ((renderNode.node.getClass() != Line.class) &&
                 !renderNode.isPin)
@@ -1047,9 +1274,9 @@ public abstract class Editor
         VBox propsBox = EDAmameController.editorPropertiesWindow.propsBox;
 
         // Iterating over all the nodes & attempting to apply global node properties if selected...
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (!renderNode.selected)
                 continue;
@@ -1104,7 +1331,7 @@ public abstract class Editor
                         /*if ((newPosX >= -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
                             (newPosX <= EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2))
                         {*/
-                            renderNode.node.setTranslateX(newPosX + this.renderSystem.paneHolder.getWidth() / 2);
+                            renderNode.node.setTranslateX(newPosX + this.paneHolder.getWidth() / 2);
                         /*}
                         else
                         {
@@ -1123,7 +1350,7 @@ public abstract class Editor
                         /*if ((newPosY >= -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
                             (newPosY <= EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
                         {*/
-                            renderNode.node.setTranslateY(newPosY + this.renderSystem.paneHolder.getHeight() / 2);
+                            renderNode.node.setTranslateY(newPosY + this.paneHolder.getHeight() / 2);
                         /*}
                         else
                         {
@@ -1219,15 +1446,15 @@ public abstract class Editor
 
     public NetListExperimental<String> ToNetList()
     {
-        LinkedList<RenderNode> wires = new LinkedList<RenderNode>();
+        LinkedList<EDANode> wires = new LinkedList<EDANode>();
         LinkedList<String> pinLabels = new LinkedList<String>();
         LinkedList<PairMutable> pinPos = new LinkedList<PairMutable>();
         LinkedList<String> pinSymbolIDs = new LinkedList<String>();
 
         // Populating the tables above...
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             // If we're reading a wire...
             if (renderNode.node.getClass() == Line.class)
@@ -1556,8 +1783,8 @@ public abstract class Editor
     // REFACTOR THIS!!!
     public void NetListWireConnAdd(NetListExperimental<String> netList, String leftSymbolId, String leftPinName, String rightSymbolId, String rightPinName)
     {
-        String leftSymbolName = this.renderSystem.nodes.get(this.renderSystem.NodeFind(leftSymbolId)).name;
-        String rightSymbolName = this.renderSystem.nodes.get(this.renderSystem.NodeFind(rightSymbolId)).name;
+        String leftSymbolName = this.nodes.get(this.NodeFind(leftSymbolId)).name;
+        String rightSymbolName = this.nodes.get(this.NodeFind(rightSymbolId)).name;
 
         String currWireConnStartStr = leftSymbolName + " (" + leftPinName + ")";
         String currWireConnEndStr = rightSymbolName + " (" + rightPinName + ")";
@@ -1600,7 +1827,7 @@ public abstract class Editor
     }
 
     // REFACTOR THIS!!!
-    static public int NetListWireFind(LinkedList<RenderNode> wires, String id)
+    static public int NetListWireFind(LinkedList<EDANode> wires, String id)
     {
         for (int i = 0; i < wires.size(); i++)
             if (wires.get(i).id.equals(id))
@@ -1623,9 +1850,9 @@ public abstract class Editor
         Double minDist = EDAmameController.Editor_SnapPointRadius;
 
         // Checking for magnetic snap...
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (renderNode.passive)
                 continue;
@@ -1836,32 +2063,48 @@ public abstract class Editor
         if (foundCrosshair == null)
             throw new InvalidClassException("Unable to locate crosshair shape for an editor with name \"" + this.name + "\"!");
 
-        this.renderSystem = new RenderSystem(foundPaneListener,
-                                                    foundPaneHolder,
-                                                    foundPaneHighlights,
-                                                    foundPaneSelections,
-                                                    foundPaneSnaps,
-                                                    foundCanvas,
-                                                    foundCrosshair,
-                                                    EDAmameController.Editor_TheaterSize,
-                                                    EDAmameController.Editor_BackgroundColors[editorType],
-                                                    EDAmameController.Editor_GridPointColors[editorType],
-                                                    EDAmameController.Editor_GridBoxColors[editorType],
-                                                    EDAmameController.Editor_MaxShapes);
+        this.paneListener = foundPaneListener;
+        this.paneHolder = foundPaneHolder;
+        this.paneHighlights = foundPaneHighlights;
+        this.paneSelections = foundPaneSelections;
+        this.paneSnaps = foundPaneSnaps;
+        this.canvas = foundCanvas;
+        this.gc = this.canvas.getGraphicsContext2D();
+        this.crosshair = foundCrosshair;
+
+        this.PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
+        this.paneHolder.prefWidthProperty().bind(this.canvas.widthProperty());
+        this.paneHolder.prefHeightProperty().bind(this.canvas.heightProperty());
     }
 
     //// TESTING FUNCTIONS ////
 
+    public void TestShapeAdd(PairMutable pos, Double radius, Color color, double opacity, boolean passive)
+    {
+        Circle testShape = new Circle(radius, color);
+
+        if (passive)
+            testShape.setId("testShapePassive");
+        else
+            testShape.setId("testShapeActive");
+
+        testShape.setTranslateX(pos.GetLeftDouble());
+        testShape.setTranslateY(pos.GetRightDouble());
+        testShape.setOpacity(opacity);
+
+        this.paneHolder.getChildren().add(testShape);
+    }
+
     public void TestShapesClear()
     {
-        for (int i = 0; i < this.renderSystem.paneHolder.getChildren().size(); i++)
+        for (int i = 0; i < this.paneHolder.getChildren().size(); i++)
         {
-            Node currChild = this.renderSystem.paneHolder.getChildren().get(i);
+            Node currChild = this.paneHolder.getChildren().get(i);
             String currChildId = currChild.getId();
 
             if ((currChildId != null) && currChildId.equals("testShapePassive"))
             {
-                this.renderSystem.paneHolder.getChildren().remove(currChild);
+                this.paneHolder.getChildren().remove(currChild);
                 i--;
             }
         }

@@ -39,7 +39,7 @@ public class EditorPCB extends Editor
         EditorPCB editor = fxmlLoader.getController();
         editor.Init(3, "EditorPCB");
         editor.Dissect(3, scene);
-        editor.renderSystem.CanvasRenderGrid();
+        editor.CanvasRenderGrid();
         editor.ListenersInit();
 
         return editor;

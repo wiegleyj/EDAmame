@@ -9,7 +9,7 @@ package com.cyte.edamame.file;
 
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 
 import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXMLLoader;
@@ -66,13 +66,13 @@ public class File
 
         if (center)
         {
-            childMidPos = RenderNode.NodesGetMiddlePos(nodes);
+            childMidPos = EDANode.NodesGetMiddlePos(nodes);
             childMidPos.left = -childMidPos.GetLeftDouble();
             childMidPos.right = -childMidPos.GetRightDouble();
         }
 
         for (int i = 0; i < nodes.size(); i++)
-            data += RenderNode.ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
+            data += EDANode.ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
 
         data += "\t</children>\n";
         data += "</Group>\n";
@@ -146,7 +146,7 @@ public class File
 
         if (center)
         {
-            PairMutable childMidPos = RenderNode.NodesGetMiddlePos(nodes);
+            PairMutable childMidPos = EDANode.NodesGetMiddlePos(nodes);
             childMidPos.left = -childMidPos.GetLeftDouble();
             childMidPos.right = -childMidPos.GetRightDouble();
 

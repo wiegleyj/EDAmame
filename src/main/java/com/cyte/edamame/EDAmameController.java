@@ -6,8 +6,7 @@
  */
 
 // TODO:
-// Merge RenderSystem into Editor
-// Refactor RenderNode into EDANode
+// Implement Movable and Resizable interfaces into EDANode
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something
 // Implement node copying

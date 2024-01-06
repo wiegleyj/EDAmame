@@ -9,7 +9,7 @@ package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.netlist.NetListExperimental;
@@ -51,7 +51,7 @@ public class EditorSchematic extends Editor
         EditorSchematic editor = fxmlLoader.getController();
         editor.Init(1, "EditorSchematic");
         editor.Dissect(1, scene);
-        editor.renderSystem.CanvasRenderGrid();
+        editor.CanvasRenderGrid();
         editor.ListenersInit();
 
         Editor.TextFieldListenerInit(editor.wireWidth);
@@ -91,7 +91,7 @@ public class EditorSchematic extends Editor
 
         Group symbolNode = new Group();
         //symbolNode.setStyle("-fx-background-color:black");
-        PairMutable dropPos = this.renderSystem.PaneHolderGetRealCenter();
+        PairMutable dropPos = this.PaneHolderGetRealCenter();
 
         symbolNode.setTranslateX(dropPos.GetLeftDouble());
         symbolNode.setTranslateY(dropPos.GetRightDouble());
@@ -133,8 +133,8 @@ public class EditorSchematic extends Editor
         symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
         symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
 
-        RenderNode symbolRenderNode = new RenderNode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this.renderSystem);
-        this.renderSystem.NodeAdd(symbolRenderNode);
+        EDANode symbolRenderNode = new EDANode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this);
+        this.NodeAdd(symbolRenderNode);
 
         //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);
     }
@@ -153,9 +153,9 @@ public class EditorSchematic extends Editor
 
     public void OnMouseReleasedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         dropPos = this.MagneticSnapCheck(dropPos);
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         // Handling element dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
         if ((this.shapesSelected == 0) &&
@@ -202,8 +202,8 @@ public class EditorSchematic extends Editor
                                         this.linePreview.setStrokeWidth(width);
                                         this.linePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.linePreview, true, null, true, false, this.renderSystem);
-                                        this.renderSystem.NodeAdd(renderNode);
+                                        EDANode renderNode = new EDANode("linePreview", this.linePreview, true, null, true, false, this);
+                                        this.NodeAdd(renderNode);
 
                                         lineStarted = true;
                                     }
@@ -245,8 +245,8 @@ public class EditorSchematic extends Editor
 
                         this.LinePreviewRemove();
 
-                        RenderNode renderNode = new RenderNode("Wire", line, true, null, false, false, this.renderSystem);
-                        this.renderSystem.NodeAdd(renderNode);
+                        EDANode renderNode = new EDANode("Wire", line, true, null, false, false, this);
+                        this.NodeAdd(renderNode);
                     }
                 }
             }

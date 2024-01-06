@@ -6,7 +6,7 @@
  */
 
 package com.cyte.edamame.util;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 
 public class PairMutable
 {
@@ -71,14 +71,14 @@ public class PairMutable
         return (PairMutable)right;
     }
 
-    public RenderNode GetLeftRenderShape()
+    public EDANode GetLeftRenderShape()
     {
-        return (RenderNode)left;
+        return (EDANode)left;
     }
 
-    public RenderNode GetRightRenderShape()
+    public EDANode GetRightRenderShape()
     {
-        return (RenderNode)right;
+        return (EDANode)right;
     }
 
     public boolean EqualsDouble(PairMutable otherPair)

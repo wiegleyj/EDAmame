@@ -9,7 +9,7 @@ package com.cyte.edamame.memento;
 
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 
 import java.util.Stack;
 import java.util.LinkedList;
@@ -19,8 +19,8 @@ import java.util.LinkedList;
 public class MementoExperimental
 {
     // Stack that holds the entire history of an Editor's RenderNodes
-    private Stack<LinkedList<RenderNode>> nodeHistoryUndo;
-    private Stack<LinkedList<RenderNode>> nodeHistoryRedo; // Redo stack
+    private Stack<LinkedList<EDANode>> nodeHistoryUndo;
+    private Stack<LinkedList<EDANode>> nodeHistoryRedo; // Redo stack
 
     private Editor editor;
 
@@ -38,14 +38,14 @@ public class MementoExperimental
         if (!this.nodeHistoryUndo.isEmpty())
         {
             // Pop the change from the undo stack
-            LinkedList<RenderNode> undoneChange = this.nodeHistoryUndo.pop();
+            LinkedList<EDANode> undoneChange = this.nodeHistoryUndo.pop();
 
             // Push the undone change onto the redo stack
             this.nodeHistoryRedo.push(undoneChange);
 
             // Apply the undone change to the editor's render system
-            this.editor.renderSystem.NodesClear();
-            this.editor.renderSystem.NodesAdd(undoneChange);
+            this.editor.NodesClear();
+            this.editor.NodesAdd(undoneChange);
 
             // Reset counters
             this.editor.shapesHighlighted = 0;
@@ -65,14 +65,14 @@ public class MementoExperimental
         if (!this.nodeHistoryRedo.isEmpty())
         {
             // Pop the change from the redo stack
-            LinkedList<RenderNode> redoChange = this.nodeHistoryRedo.pop();
+            LinkedList<EDANode> redoChange = this.nodeHistoryRedo.pop();
 
             // Push the redo change onto the undo stack
             this.nodeHistoryUndo.push(redoChange);
 
             // Apply the redo change to the editor's render system
-            this.editor.renderSystem.NodesClear();
-            this.editor.renderSystem.NodesAdd(redoChange);
+            this.editor.NodesClear();
+            this.editor.NodesAdd(redoChange);
 
             // Reset counters
             this.editor.shapesHighlighted = 0;
@@ -89,7 +89,7 @@ public class MementoExperimental
     // Function for pushing the current Editor's RenderNodes onto the node history stack (also ensures that the node history stack size stays under the limit).
     public void NodeHistoryUpdate()
     {
-        this.nodeHistoryUndo.push(this.editor.renderSystem.NodesClone());
+        this.nodeHistoryUndo.push(this.editor.NodesClone());
 
         this.nodeHistoryRedo.clear();
         while (this.nodeHistoryUndo.size() > EDAmameController.Editor_UndoStackMaxLen)

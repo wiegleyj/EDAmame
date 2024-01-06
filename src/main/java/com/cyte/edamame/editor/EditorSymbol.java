@@ -7,7 +7,7 @@
 
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.render.RenderNode;
+import com.cyte.edamame.node.EDANode;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.EDAmame;
@@ -97,7 +97,7 @@ public class EditorSymbol extends Editor
         EditorSymbol editor = fxmlLoader.getController();
         editor.Init(0, "EditorSymbol");
         editor.Dissect(0, scene);
-        editor.renderSystem.CanvasRenderGrid();
+        editor.CanvasRenderGrid();
         editor.ListenersInit();
 
         Editor.TextFieldListenerInit(editor.circleRadius);
@@ -112,9 +112,7 @@ public class EditorSymbol extends Editor
         Editor.TextFieldListenerInit(editor.textSize);
         Editor.TextFieldListenerInit(editor.pinLabel);
         Editor.TextFieldListenerInit(editor.pinRadius);
-
-
-
+        
         return editor;
     }
 
@@ -134,8 +132,8 @@ public class EditorSymbol extends Editor
     {
         LinkedList<Node> nodes = new LinkedList<Node>();
 
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
-            nodes.add(this.renderSystem.nodes.get(i).node);
+        for (int i = 0; i < this.nodes.size(); i++)
+            nodes.add(this.nodes.get(i).node);
 
         File.NodesSave(nodes, true);
     }
@@ -151,7 +149,7 @@ public class EditorSymbol extends Editor
         for (int i = 0; i < nodes.size(); i++)
         {
             Node node = nodes.get(i);
-            PairMutable realPos = this.renderSystem.PaneHolderGetDrawPos(new PairMutable(node.getTranslateX(), node.getTranslateY()));
+            PairMutable realPos = this.PaneHolderGetDrawPos(new PairMutable(node.getTranslateX(), node.getTranslateY()));
             node.setTranslateX(realPos.GetLeftDouble());
             node.setTranslateY(realPos.GetRightDouble());
 
@@ -175,15 +173,15 @@ public class EditorSymbol extends Editor
                 }
             }
 
-            RenderNode renderNode = new RenderNode("LoadedNode", node, edgeSnaps, snapManualPos, false, isPin, this.renderSystem);
-            this.renderSystem.NodeAdd(renderNode);
+            EDANode renderNode = new EDANode("LoadedNode", node, edgeSnaps, snapManualPos, false, isPin, this);
+            this.NodeAdd(renderNode);
         }
     }
 
     public void OnDragOverSpecific(DragEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         /*// Handling symbol dragging preview
         Dragboard db = event.getDragboard();
@@ -232,8 +230,8 @@ public class EditorSymbol extends Editor
 
     public void OnDragDroppedSpecific(DragEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         /*// Handling dropping of symbols
         Dragboard db = event.getDragboard();
@@ -287,14 +285,14 @@ public class EditorSymbol extends Editor
 
     public void OnMouseMovedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
     }
 
     public void OnMousePressedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         if (this.pressedLMB)
         {
@@ -327,9 +325,9 @@ public class EditorSymbol extends Editor
 
     public void OnMouseReleasedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
         dropPos = this.MagneticSnapCheck(dropPos);
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         if (this.pressedLMB)
         {
@@ -376,8 +374,8 @@ public class EditorSymbol extends Editor
                                     circle.setStroke(strokeColor);
                                     circle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Circle", circle, true, null, false, false, this.renderSystem);
-                                    this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Circle", circle, true, null, false, false, this);
+                                    this.NodeAdd(renderNode);
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Rectangle"))
@@ -400,8 +398,8 @@ public class EditorSymbol extends Editor
                                     rectangle.setStroke(strokeColor);
                                     rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Rectangle", rectangle, true, null, false, false, this.renderSystem);
-                                    this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Rectangle", rectangle, true, null, false, false, this);
+                                    this.NodeAdd(renderNode);
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Triangle"))
@@ -428,8 +426,8 @@ public class EditorSymbol extends Editor
                                     triangle.setStroke(strokeColor);
                                     triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
 
-                                    RenderNode renderNode = new RenderNode("Triangle", triangle, true, null, false, false, this.renderSystem);
-                                    this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Triangle", triangle, true, null, false, false, this);
+                                    this.NodeAdd(renderNode);
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Line"))
@@ -474,8 +472,8 @@ public class EditorSymbol extends Editor
                                         this.linePreview.setStrokeWidth(width);
                                         this.linePreview.setStroke(color);
 
-                                        RenderNode renderNode = new RenderNode("linePreview", this.linePreview, true, null, true, false, this.renderSystem);
-                                        this.renderSystem.NodeAdd(renderNode);
+                                        EDANode renderNode = new EDANode("linePreview", this.linePreview, true, null, true, false, this);
+                                        this.NodeAdd(renderNode);
 
                                         lineStarted = true;
                                     }
@@ -528,8 +526,8 @@ public class EditorSymbol extends Editor
                                     text.setTranslateX(dropPos.GetLeftDouble());
                                     text.setTranslateY(dropPos.GetRightDouble());*/
 
-                                    RenderNode renderNode = new RenderNode("Text", text, true, null, false, false, this.renderSystem);
-                                    this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Text", text, true, null, false, false, this);
+                                    this.NodeAdd(renderNode);
                                 }
                             }
                             else if (selectedShapeButton.getText().equals("Pin"))
@@ -594,8 +592,8 @@ public class EditorSymbol extends Editor
                                     LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
                                     snap.add(new PairMutable(0.0, 0.0));
 
-                                    RenderNode renderNode = new RenderNode("Pin", pin, false, snap, false, true, this.renderSystem);
-                                    this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Pin", pin, false, snap, false, true, this);
+                                    this.NodeAdd(renderNode);
                                 }
                             }
                             else
@@ -612,16 +610,19 @@ public class EditorSymbol extends Editor
                                 PairMutable posStart = new PairMutable(this.linePreview.getStartX(), this.linePreview.getStartY());
                                 PairMutable posEnd = new PairMutable(dropPos.GetLeftDouble(), dropPos.GetRightDouble());
 
-                                Line line = new Line();
-                                Editor.LineDropPosCalculate(line, posStart, posEnd);
+                                if (!posStart.EqualsDouble(posEnd))
+                                {
+                                    Line line = new Line();
+                                    Editor.LineDropPosCalculate(line, posStart, posEnd);
 
-                                line.setStroke(this.linePreview.getStroke());
-                                line.setStrokeWidth(this.linePreview.getStrokeWidth());
+                                    line.setStroke(this.linePreview.getStroke());
+                                    line.setStrokeWidth(this.linePreview.getStrokeWidth());
 
-                                this.LinePreviewRemove();
+                                    this.LinePreviewRemove();
 
-                                RenderNode renderNode = new RenderNode("Line", line, true, null, false, false, this.renderSystem);
-                                this.renderSystem.NodeAdd(renderNode);
+                                    EDANode renderNode = new EDANode("Line", line, true, null, false, false, this);
+                                    this.NodeAdd(renderNode);
+                                }
                             }
                         }
                     /*}
@@ -640,8 +641,8 @@ public class EditorSymbol extends Editor
 
     public void OnMouseDraggedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.renderSystem.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
-        PairMutable realPos = this.renderSystem.PaneHolderGetRealPos(dropPos);
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         if (this.pressedLMB)
         {}
@@ -690,9 +691,9 @@ public class EditorSymbol extends Editor
         LinkedList<Double> textFontSizes = new LinkedList<Double>();
         LinkedList<String> pinLabels = new LinkedList<String>();
 
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (!renderNode.selected)
                 continue;
@@ -1019,9 +1020,9 @@ public class EditorSymbol extends Editor
         VBox propsBox = EDAmameController.editorPropertiesWindow.propsBox;
 
         // Iterating over all the shapes & attempting to apply shape properties if selected...
-        for (int i = 0; i < this.renderSystem.nodes.size(); i++)
+        for (int i = 0; i < this.nodes.size(); i++)
         {
-            RenderNode renderNode = this.renderSystem.nodes.get(i);
+            EDANode renderNode = this.nodes.get(i);
 
             if (!renderNode.selected)
                 continue;
