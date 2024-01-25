@@ -72,7 +72,7 @@ public class File
         }
 
         for (int i = 0; i < nodes.size(); i++)
-            data += EDANode.ToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
+            data += EDANode.NodeToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
 
         data += "\t</children>\n";
         data += "</Group>\n";
@@ -124,25 +124,7 @@ public class File
         ObservableList<Node> children = ((Group)root).getChildren();
 
         for (int i = 0; i < children.size(); i++)
-        {
-            Node node = children.get(i);
-
-            if ((node.getClass() == Circle.class) ||
-                (node.getClass() == Rectangle.class) ||
-                (node.getClass() == Polygon.class) ||
-                (node.getClass() == Line.class) ||
-                (node.getClass() == Text.class) ||
-                (node.getClass() == Group.class))
-            {
-                nodes.add(node);
-            }
-            else
-            {
-                EDAmameController.SetStatusBar("Attempting to load FXML file with unrecognized shape types!");
-
-                return null;
-            }
-        }
+            nodes.add(children.get(i));
 
         if (center)
         {
@@ -161,76 +143,6 @@ public class File
 
         return nodes;
     }
-
-    /*static public LinkedList<Object> YAML_ListLoad()
-    {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Load");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("File File", "*.yaml"));
-        java.io.File file = fileChooser.showOpenDialog(EDAmameApplication.App_Controller.Controller_Stage);
-
-        if (file == null)
-        {
-            EDAmameController.Controller_SetStatusBar("Unable to load File file because the entered directory is invalid!");
-        }
-        else
-        {
-            try
-            {
-                return YAML_ListRead(file.getAbsolutePath());
-            }
-            catch (IOException e)
-            {
-                EDAmameController.Controller_SetStatusBar("Encountered error while loading File file!");
-            }
-        }
-
-        return null;
-    }
-
-    static public LinkedList<Object> YAML_ListRead(String filePath) throws IOException
-    {
-        Yaml yaml = new Yaml();
-        FileReader fileReader = new FileReader(filePath);
-
-        return yaml.load(fileReader);
-    }
-
-    static public boolean YAML_ListSave(LinkedList<Object> list)
-    {
-        FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
-        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("File File", "*.yaml"));
-        fileChooser.setInitialFileName("file.yaml");
-        java.io.File file = fileChooser.showSaveDialog(EDAmameApplication.App_Controller.Controller_Stage);
-
-        if (file == null)
-        {
-            EDAmameController.Controller_SetStatusBar("Unable to save File file because the entered directory is invalid!");
-        }
-        else
-        {
-            try
-            {
-                YAML_ListWrite(file.getAbsolutePath(), list);
-
-                return true;
-            }
-            catch (IOException e)
-            {
-                EDAmameController.Controller_SetStatusBar("Encountered error while saving File file!");
-            }
-        }
-
-        return false;
-    }
-
-    static public void YAML_ListWrite(String filePath, LinkedList<Object> list) throws IOException
-    {
-        Yaml yaml = new Yaml();
-        FileWriter fileWriter = new FileWriter(filePath);
-        yaml.dump(list, fileWriter);
-    }*/
 
     static public boolean Write(String filePath, String data, boolean overwrite)
     {

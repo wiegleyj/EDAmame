@@ -11,15 +11,13 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.memento.MementoExperimental;
 import com.cyte.edamame.netlist.NetListExperimental;
 import com.cyte.edamame.netlist.NetListExperimentalNode;
-import com.cyte.edamame.node.EDANode;
-import com.cyte.edamame.util.Utils;
+import com.cyte.edamame.node.*;
 
 import java.util.*;
 import java.util.logging.Level;
 
 import com.cyte.edamame.util.PairMutable;
 import javafx.collections.*;
-import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -155,15 +153,7 @@ public abstract class Editor
 
         // Handling render node highlight, selected & snap shapes refreshing...
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (renderNode.passive)
-                continue;
-
-            renderNode.BoundsRefresh();
-            renderNode.SnapPointsRefresh();
-        }
+            this.nodes.get(i).Heartbeat();
 
         // Handling centering of holder pane & crosshair...
         {
@@ -187,6 +177,9 @@ public abstract class Editor
         //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
 
         //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
+
+        //System.out.println(this.shapesHighlighted + ", " + this.shapesSelected);
+        //System.out.println(this.linePreview);
     }
 
     //// GETTER FUNCTIONS ////
@@ -213,39 +206,11 @@ public abstract class Editor
 
     public void NodesDeselectAll()
     {
+        // Deselecting all the nodes...
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
+            this.nodes.get(i).Deselect();
 
-            if (!renderNode.selected)
-            {
-                if (renderNode.highlightedMouse || renderNode.highlightedBox)
-                {
-                    renderNode.selected = true;
-                    //shape.RenderShape_ShapeSelectedRefresh();
-                    //this.Editor_RenderSystem.RenderSystem_PaneSelections.getChildren().add(renderNode.RenderNode_ShapeSelected);
-                    renderNode.shapeSelected.setVisible(true);
-                    this.shapesSelected++;
-                }
-            }
-            else
-            {
-                if ((!renderNode.highlightedMouse && !renderNode.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
-                {
-                    renderNode.selected = false;
-                    //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
-                    renderNode.shapeSelected.setVisible(false);
-                    this.shapesSelected--;
-                }
-            }
-
-            if (renderNode.highlightedBox && !renderNode.highlightedMouse)
-                //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
-                renderNode.shapeHighlighted.setVisible(false);
-
-            renderNode.mousePressPos = null;
-        }
-
+        // Removing the selection box...
         if (this.selectionBox != null)
         {
             this.paneListener.getChildren().remove(this.selectionBox);
@@ -263,26 +228,7 @@ public abstract class Editor
         PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
 
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            for (int j = 0; j < renderNode.manualSnapPoints.size(); j++)
-            {
-                Shape snapPoint = renderNode.manualSnapPoints.get(j);
-                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
-
-                Double dist = Utils.GetDist(posMouse, snapPos);
-
-                if (dist <= EDAmameController.Editor_SnapPointRadius)
-                {
-                    snapPoint.setVisible(true);
-                }
-                else
-                {
-                    snapPoint.setVisible(false);
-                }
-            }
-        }
+            this.nodes.get(i).SnapPointsCheck(posMouse);
     }
 
     static public void LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
@@ -314,123 +260,14 @@ public abstract class Editor
 
     public void LinePreviewRemove()
     {
-        this.NodeRemove("linePreview");
+        this.nodes.get(this.NodeFindByName("linePreview")).Remove();
         this.linePreview = null;
     }
 
     public void NodeHighlightsCheck(PairMutable posEvent)
     {
-        PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
-
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (renderNode.passive)
-                continue;
-
-            //renderNode.RenderNode_ShapeHighlightedRefresh();
-            boolean onShape = renderNode.PosOnNode(posMouse);
-
-            if (!EDAmameController.IsKeyPressed(KeyCode.CONTROL))
-            {
-                // Checking whether we are highlighting by cursor...
-                if (onShape)
-                {
-                    if (EDAmameController.IsKeyPressed(KeyCode.Q))
-                    {
-                        if ((this.shapesHighlighted > 1) && renderNode.highlightedMouse)
-                            renderNode.highlightedMouse = false;
-                        else if ((this.shapesHighlighted == 0) && !renderNode.highlightedMouse)
-                            renderNode.highlightedMouse = true;
-                    }
-                    else
-                    {
-                        if (!renderNode.highlightedMouse)
-                            renderNode.highlightedMouse = true;
-                    }
-                }
-                else
-                {
-                    if (renderNode.highlightedMouse)
-                        renderNode.highlightedMouse = false;
-                }
-
-                // Checking whether we are highlighting by selection box...
-                if (this.selectionBox != null)
-                {
-                    Bounds shapeBounds = renderNode.node.getBoundsInParent();
-                    PairMutable selectionBoxL = this.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
-                    PairMutable selectionBoxH = this.PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
-
-                /*Circle testShapeL = new Circle(5, Color.RED);
-                testShapeL.setId("TESTMARKER");
-                testShapeL.setTranslateX(shapeBounds.getMinX());
-                testShapeL.setTranslateY(shapeBounds.getMinY());
-                this.paneHolder.getChildren().add(testShapeL);
-
-                Circle testShapeH = new Circle(5, Color.RED);
-                testShapeH.setId("TESTMARKER");
-                testShapeH.setTranslateX(shapeBounds.getMaxX());
-                testShapeH.setTranslateY(shapeBounds.getMaxY());
-                this.paneHolder.getChildren().add(testShapeH);
-
-                Circle testShapeBL = new Circle(5, Color.BLUE);
-                testShapeBL.setId("TESTMARKER");
-                PairMutable boxL = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX(), this.selectionBox.getTranslateY()));
-                testShapeBL.setTranslateX(boxL.GetLeftDouble());
-                testShapeBL.setTranslateY(boxL.GetRightDouble());
-                this.paneHolder.getChildren().add(testShapeBL);
-
-                Circle testShapeBH = new Circle(5, Color.BLUE);
-                testShapeBH.setId("TESTMARKER");
-                PairMutable boxH = this.RenderSystem_PanePosListenerToHolder(new PairMutable(this.selectionBox.getTranslateX() + this.selectionBox.getWidth(), this.selectionBox.getTranslateY() + this.selectionBox.getHeight()));
-                testShapeBH.setTranslateX(boxH.GetLeftDouble());
-                testShapeBH.setTranslateY(boxH.GetRightDouble());
-                this.paneHolder.getChildren().add(testShapeBH);*/
-
-                    if ((selectionBoxL.GetLeftDouble() < shapeBounds.getMaxX()) &&
-                            (selectionBoxH.GetLeftDouble() > shapeBounds.getMinX()) &&
-                            (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
-                            (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
-                    {
-                        if (!renderNode.highlightedBox)
-                            renderNode.highlightedBox = true;
-                    }
-                    else
-                    {
-                        if (renderNode.highlightedBox)
-                            renderNode.highlightedBox = false;
-                    }
-                }
-                else if (renderNode.highlightedBox)
-                {
-                    renderNode.highlightedBox = false;
-                }
-            }
-            else
-            {
-                renderNode.highlightedMouse = false;
-                renderNode.highlightedBox = false;
-            }
-
-            // Adjusting highlights accordingly...
-            if ((renderNode.highlightedMouse || renderNode.highlightedBox) && !renderNode.highlighted)
-            {
-                //shape.RenderShape_ShapeHighlightedRefresh();
-                //this.Editor_RenderSystem.RenderSystem_PaneHighlights.getChildren().add(renderNode.RenderNode_ShapeHighlighted);
-                renderNode.shapeHighlighted.setVisible(true);
-                renderNode.highlighted = true;
-                this.shapesHighlighted++;
-            }
-            else if ((!renderNode.highlightedMouse && !renderNode.highlightedBox) && renderNode.highlighted)
-            {
-                //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
-                renderNode.shapeHighlighted.setVisible(false);
-                renderNode.highlighted = false;
-                this.shapesHighlighted--;
-            }
-        }
+            this.nodes.get(i).HighlightsCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
     }
 
     public void MouseDragUpdate(PairMutable posMouse)
@@ -447,18 +284,8 @@ public abstract class Editor
         this.mouseDragPaneFirstPos = new PairMutable(this.PaneHolderGetTranslate());
 
         if (this.shapesSelected > 0)
-        {
             for (int i = 0; i < this.nodes.size(); i++)
-            {
-                EDANode renderNode = this.nodes.get(i);
-
-                if (!renderNode.selected)
-                    continue;
-
-                renderNode.mousePressPos = new PairMutable(renderNode.node.getTranslateX(),
-                                                                      renderNode.node.getTranslateY());
-            }
-        }
+                this.nodes.get(i).MoveReset();
     }
 
     public void CanvasRenderGrid()
@@ -586,7 +413,9 @@ public abstract class Editor
         return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
     }
 
-    public int NodeFind(String id)
+    //// NODE FUNCTIONS ////
+
+    public int NodeFindByID(String id)
     {
         for (int i = 0; i < this.nodes.size(); i++)
             if (this.nodes.get(i).id.equals(id))
@@ -595,64 +424,25 @@ public abstract class Editor
         return -1;
     }
 
-    public void NodesAdd(LinkedList<EDANode> renderNodes)
+    public int NodeFindByName(String name)
     {
-        for (int i = 0; i < renderNodes.size(); i++)
-            this.NodeAdd(renderNodes.get(i));
+        for (int i = 0; i < this.nodes.size(); i++)
+            if (this.nodes.get(i).name.equals(name))
+                return i;
+
+        return -1;
     }
 
-    public void NodeAdd(EDANode renderNode)
+    public void NodesAdd(LinkedList<EDANode> nodes)
     {
-        if (this.nodes.size() >= this.maxShapes)
-            throw new java.lang.Error("ERROR: Exceeded render system maximum render nodes limit!");
-
-        this.nodes.add(renderNode);
-        this.paneHolder.getChildren().add(1, renderNode.node);
-
-        if (!renderNode.passive)
-        {
-            this.paneHighlights.getChildren().add(renderNode.shapeHighlighted);
-            this.paneSelections.getChildren().add(renderNode.shapeSelected);
-        }
-
-        for (int i = 0; i < renderNode.manualSnapPoints.size(); i++)
-            this.paneSnaps.getChildren().add(renderNode.manualSnapPoints.get(i));
+        for (int i = 0; i < nodes.size(); i++)
+            nodes.get(i).Add();
     }
 
     public void NodesClear()
     {
         while (!this.nodes.isEmpty())
-            NodeRemove(this.nodes.get(0).name);
-    }
-
-    public EDANode NodeRemove(String name)
-    {
-        for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (renderNode.name.equals(name))
-            {
-                this.nodes.remove(renderNode);
-                this.paneHolder.getChildren().remove(renderNode.node);
-
-                if (!renderNode.passive)
-                {
-                    this.paneHighlights.getChildren().remove(renderNode.shapeHighlighted);
-                    this.paneSelections.getChildren().remove(renderNode.shapeSelected);
-                }
-
-                renderNode.highlighted = false;
-                renderNode.selected = false;
-
-                for (int j = 0; j < renderNode.manualSnapPoints.size(); j++)
-                    this.paneSnaps.getChildren().remove(renderNode.manualSnapPoints.get(j));
-
-                return renderNode;
-            }
-        }
-
-        return null;
+            this.nodes.get(0).Remove();
     }
 
     public LinkedList<EDANode> NodesClone()
@@ -769,37 +559,7 @@ public abstract class Editor
                 (this.linePreview == null))
             {
                 for (int i = 0; i < this.nodes.size(); i++)
-                {
-                    EDANode renderNode = this.nodes.get(i);
-
-                    if (!renderNode.selected)
-                        continue;
-
-                    PairMutable posPressReal = this.PaneHolderGetRealPos(new PairMutable(renderNode.mousePressPos.GetLeftDouble(),
-                                                                                                                          renderNode.mousePressPos.GetRightDouble()));
-                    PairMutable posOffset = new PairMutable(0.0, 0.0);
-
-                    /*if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) < -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
-                        edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
-                    if ((posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()) > EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2)
-                        edgeOffset.left = -(posPressReal.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble() - EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2);
-                    if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) < -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
-                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-                    if ((posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()) > EDAmameController.Editor_TheaterSize.GetRightDouble() / 2)
-                        edgeOffset.right = -(posPressReal.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble() - EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);*/
-
-                    // Handling straight-only dragging...
-                    if (EDAmameController.IsKeyPressed(KeyCode.CONTROL))
-                    {
-                        if (Math.abs(this.mouseDragDiffPos.GetLeftDouble()) < Math.abs(this.mouseDragDiffPos.GetRightDouble()))
-                            posOffset.left = -this.mouseDragDiffPos.GetLeftDouble();
-                        else
-                            posOffset.right = -this.mouseDragDiffPos.GetRightDouble();
-                    }
-
-                    renderNode.node.setTranslateX(renderNode.mousePressPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() + posOffset.GetLeftDouble());
-                    renderNode.node.setTranslateY(renderNode.mousePressPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() + posOffset.GetRightDouble());
-                }
+                    this.nodes.get(i).Move();
 
                 this.shapesMoving = true;
             }
@@ -839,32 +599,11 @@ public abstract class Editor
             {
                 this.mouseDragReachedEdge = false;
 
-                /*if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() < 0))
-                {
-                    this.Editor_MouseDragDiffPos.left = this.Editor_MouseDragDiffPos.GetLeftDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()));
-                    this.Editor_MouseDragReachedEdge = true;
-                }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetLeftDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2) && (this.Editor_MouseDragDiffPos.GetLeftDouble() > 0))
-                {
-                    this.Editor_MouseDragDiffPos.left = this.Editor_MouseDragDiffPos.GetLeftDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetLeftDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetLeftDouble() + this.Editor_MouseDragDiffPos.GetLeftDouble()));
-                    this.Editor_MouseDragReachedEdge = true;
-                }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() <= -this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (this.Editor_MouseDragDiffPos.GetRightDouble() < 0))
-                {
-                    this.Editor_MouseDragDiffPos.right = this.Editor_MouseDragDiffPos.GetRightDouble() + (-this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()));
-                    this.Editor_MouseDragReachedEdge = true;
-                }
-                if ((this.Editor_RenderSystem.RenderSystem_Center.GetRightDouble() >= this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2) && (this.Editor_MouseDragDiffPos.GetRightDouble() > 0))
-                {
-                    this.Editor_MouseDragDiffPos.right = this.Editor_MouseDragDiffPos.GetRightDouble() + (this.Editor_RenderSystem.RenderSystem_TheaterSize.GetRightDouble() / 2 - (this.Editor_MouseDragFirstCenter.GetRightDouble() + this.Editor_MouseDragDiffPos.GetRightDouble()));
-                    this.Editor_MouseDragReachedEdge = true;
-                }*/
-
                 this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble();
                 this.center.right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
 
                 this.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
-                                                                                       this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
+                                                            this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
             }
         }
     }
@@ -879,25 +618,7 @@ public abstract class Editor
         if ((this.shapesSelected > 0) && EDAmameController.IsKeyPressed(KeyCode.R))
         {
             for (int i = 0; i < this.nodes.size(); i++)
-            {
-                EDANode renderNode = this.nodes.get(i);
-                String nodeId = renderNode.node.getId();
-
-                if (!renderNode.selected ||
-                    (renderNode.node.getClass() == Line.class) ||
-                    ((nodeId != null) && nodeId.contains("PIN_")))
-                    continue;
-
-                double angle = 10;
-
-                if (event.getDeltaY() < 0)
-                    angle = -10;
-
-                renderNode.node.setRotate(renderNode.node.getRotate() + angle);
-
-                //shape.RenderShape_ShapeSelectedRefresh();
-                //shape.RenderShape_ShapeHighlightedRefresh();
-            }
+                this.nodes.get(i).Rotate(event.getDeltaY());
         }
         // Handling zoom scaling (only if we're not rotating anything)
         else
@@ -954,25 +675,12 @@ public abstract class Editor
             {
                 for (int i = 0; i < this.nodes.size(); i++)
                 {
-                    EDANode renderNode = this.nodes.get(i);
+                    EDANode node = this.nodes.get(i);
 
-                    if (!renderNode.selected)
+                    if (!node.selected)
                         continue;
 
-                    if (renderNode.highlighted)
-                    {
-                        //this.Editor_RenderSystem.RenderSystem_NodeHighlightsRemove(renderNode);
-                        renderNode.shapeHighlighted.setVisible(false);
-                        this.shapesHighlighted--;
-                    }
-
-                    //this.Editor_RenderSystem.RenderSystem_NodeSelectionsRemove(renderNode);
-                    renderNode.shapeSelected.setVisible(false);
-                    this.shapesSelected--;
-
-                    this.paneHolder.getChildren().remove(renderNode.node);
-                    this.nodes.remove(renderNode);
-
+                    node.Remove();
                     i--;
                 }
             }
@@ -1143,38 +851,7 @@ public abstract class Editor
         LinkedList<Color> colors = new LinkedList<Color>();
 
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (!renderNode.selected)
-                continue;
-
-            names.add(renderNode.name);
-            posX.add(renderNode.node.getTranslateX() - this.paneHolder.getWidth() / 2);
-            posY.add(renderNode.node.getTranslateY() - this.paneHolder.getHeight() / 2);
-
-            if ((renderNode.node.getClass() != Line.class) &&
-                !renderNode.isPin)
-                rots.add(renderNode.node.getRotate());
-
-            if (renderNode.node.getClass() == Line.class)
-            {
-                colors.add((Color)((Line) renderNode.node).getStroke());
-            }
-            else if (renderNode.isPin)
-            {
-                Group group = (Group)renderNode.node;
-
-                if (group.getChildren().size() != 2)
-                    throw new java.lang.Error("ERROR: Attempting to load pin into global properties editor without 2 children!");
-
-                colors.add((Color)((Shape)group.getChildren().get(0)).getStroke());
-            }
-            else if (renderNode.node.getClass() != Group.class)
-            {
-                colors.add((Color)((Shape)renderNode.node).getFill());
-            }
-        }
+            this.nodes.get(i).PropsLoadGlobal(names, posX, posY, rots, colors);
 
         // Creating name box...
         if (!names.isEmpty())
@@ -1275,166 +952,7 @@ public abstract class Editor
 
         // Iterating over all the nodes & attempting to apply global node properties if selected...
         for (int i = 0; i < this.nodes.size(); i++)
-        {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (!renderNode.selected)
-                continue;
-
-            // Applying name...
-            {
-                Integer nameBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "nameBox");
-
-                if (nameBoxIdx != -1)
-                {
-                    HBox nameBox = (HBox)propsBox.getChildren().get(nameBoxIdx);
-                    TextField nameText = (TextField)EDAmameController.GetNodeById(nameBox.getChildren(), "name");
-
-                    if (nameText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"name\" node in global properties window \"nameBox\" entry!");
-
-                    String nameStr = nameText.getText();
-
-                    if (!nameStr.isEmpty())
-                    {
-                        renderNode.name = nameStr;
-                    }
-                    else if (!nameStr.equals("<mixed>"))
-                    {
-                        EDAmameController.SetStatusBar("Unable to apply element name because the entered field is empty!");
-                    }
-                }
-            }
-
-            // Applying position...
-            {
-                Integer posBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "posBox");
-
-                if (posBoxIdx != -1)
-                {
-                    HBox posBox = (HBox)propsBox.getChildren().get(posBoxIdx);
-                    TextField posXText = (TextField)EDAmameController.GetNodeById(posBox.getChildren(), "posX");
-                    TextField posYText = (TextField)EDAmameController.GetNodeById(posBox.getChildren(), "posY");
-
-                    if (posXText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"posX\" node in global properties window \"posBox\" entry!");
-                    if (posYText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"posY\" node in global properties window \"posBox\" entry!");
-
-                    String posXStr = posXText.getText();
-                    String posYStr = posYText.getText();
-
-                    if (EDAmameController.IsStringNum(posXStr))
-                    {
-                        Double newPosX = Double.parseDouble(posXStr);
-
-                        /*if ((newPosX >= -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2) &&
-                            (newPosX <= EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2))
-                        {*/
-                            renderNode.node.setTranslateX(newPosX + this.paneHolder.getWidth() / 2);
-                        /*}
-                        else
-                        {
-                            EDAmameController.Controller_SetStatusBar("Unable to apply element X position because the entered field is outside the theater limits!");
-                        }*/
-                    }
-                    else if (!posXStr.equals("<mixed>"))
-                    {
-                        EDAmameController.SetStatusBar("Unable to apply element X position because the entered field is non-numeric!");
-                    }
-
-                    if (EDAmameController.IsStringNum(posYStr))
-                    {
-                        Double newPosY = Double.parseDouble(posYStr);
-
-                        /*if ((newPosY >= -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2) &&
-                            (newPosY <= EDAmameController.Editor_TheaterSize.GetRightDouble() / 2))
-                        {*/
-                            renderNode.node.setTranslateY(newPosY + this.paneHolder.getHeight() / 2);
-                        /*}
-                        else
-                        {
-                            EDAmameController.Controller_SetStatusBar("Unable to apply element Y position because the entered field is outside the theater limits!");
-                        }*/
-                    }
-                    else if (!posYStr.equals("<mixed>"))
-                    {
-                        EDAmameController.SetStatusBar("Unable to apply element Y position because the entered field is non-numeric!");
-                    }
-                }
-
-            }
-
-            // Applying rotation...
-            if ((renderNode.node.getClass() != Line.class) &&
-                !renderNode.isPin)
-            {
-                Integer rotBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "rotBox");
-
-                if (rotBoxIdx != -1)
-                {
-                    HBox rotBox = (HBox)propsBox.getChildren().get(rotBoxIdx);
-                    TextField rotText = (TextField)EDAmameController.GetNodeById(rotBox.getChildren(), "rot");
-
-                    if (rotText == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"rot\" node in global properties window \"rotBox\" entry!");
-
-                    String rotStr = rotText.getText();
-
-                    if (EDAmameController.IsStringNum(rotStr))
-                    {
-                        renderNode.node.setRotate(Double.parseDouble(rotStr));
-                    }
-                    else if (!rotStr.equals("<mixed>"))
-                    {
-                        EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
-                    }
-                }
-            }
-
-            // Applying color...
-            {
-                Integer colorBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "colorBox");
-
-                if (colorBoxIdx != -1)
-                {
-                    HBox colorBox = (HBox) propsBox.getChildren().get(colorBoxIdx);
-                    ColorPicker colorPicker = (ColorPicker) EDAmameController.GetNodeById(colorBox.getChildren(), "color");
-
-                    if (colorPicker == null)
-                        throw new java.lang.Error("ERROR: Unable to find \"color\" node in Symbol Editor properties window \"colorBox\" entry!");
-
-                    Color color = colorPicker.getValue();
-
-                    if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
-                    {
-                        if (renderNode.node.getClass() == Line.class)
-                        {
-                            ((Line)renderNode.node).setStroke(color);
-                        }
-                        else if (renderNode.isPin)
-                        {
-                            Group group = (Group)renderNode.node;
-
-                            if (group.getChildren().size() != 2)
-                                throw new java.lang.Error("ERROR: Attempting to load pin into global properties window without 2 children!");
-
-                            ((Shape)group.getChildren().get(0)).setFill(color);
-                            ((Shape)group.getChildren().get(1)).setFill(color);
-                        }
-                        else if (renderNode.node.getClass() != Group.class)
-                        {
-                            ((Shape)renderNode.node).setFill(color);
-                        }
-                    }
-                    else
-                    {
-                        if (color != null)
-                            EDAmameController.SetStatusBar("Unable to apply shape colors because the entered color is transparent!");
-                    }
-                }
-            }
-        }
+            this.nodes.get(i).PropsApplyGlobal(propsBox);
 
         this.undoRedoSystem.NodeHistoryUpdate();
     }
@@ -1446,7 +964,11 @@ public abstract class Editor
 
     public NetListExperimental<String> ToNetList()
     {
-        LinkedList<EDANode> wires = new LinkedList<EDANode>();
+        System.out.println("Have to refactor!");
+
+        return null;
+
+        /*LinkedList<EDANode> wires = new LinkedList<EDANode>();
         LinkedList<String> pinLabels = new LinkedList<String>();
         LinkedList<PairMutable> pinPos = new LinkedList<PairMutable>();
         LinkedList<String> pinSymbolIDs = new LinkedList<String>();
@@ -1619,152 +1141,6 @@ public abstract class Editor
             }
         }
 
-        // Iterating through all the wires & checking their start & end connections...
-        /*LinkedList<PairMutable> wireConnIDs = new LinkedList<PairMutable>();
-
-        for (int i = 0; i < wires.size(); i++)
-        {
-            Line currWire = (Line)wires.get(i).RenderNode_Node;
-
-            String nodeStartID = null;
-            String nodeEndID = null;
-            PairMutable wirePosStart = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getStartX(), currWire.getStartY()));
-            PairMutable wirePosEnd = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getEndX(), currWire.getEndY()));
-
-            this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosStart, 20.0, Color.RED, 0.5, false);
-            this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosEnd, 20.0, Color.RED, 0.5, false);
-
-            // Checking whether the wire is connected to another wire...
-            for (int j = 0; j < wires.size(); j++)
-            {
-                if (j == i)
-                    continue;
-
-                Line checkWire = (Line)wires.get(j).RenderNode_Node;
-
-                PairMutable checkPosStart = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getStartX(), checkWire.getStartY()));
-                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndX(), checkWire.getEndY()));
-
-                if (checkPosStart.EqualsDouble(wirePosStart) || checkPosEnd.EqualsDouble(wirePosStart))
-                    nodeStartID = wires.get(j).RenderNode_ID;
-                if (checkPosStart.EqualsDouble(wirePosEnd) || checkPosEnd.EqualsDouble(wirePosEnd))
-                    nodeEndID = wires.get(j).RenderNode_ID;
-            }
-
-            // Checking whether the wire is connected to a symbol... (overrides the line connections)
-            for (int j = 0; j < pinPos.size(); j++)
-            {
-                PairMutable currPinPos = pinPos.get(j);
-
-                if (currPinPos.EqualsDouble(wirePosStart))
-                    nodeStartID = pinSymbolIDs.get(j);
-                if (currPinPos.EqualsDouble(wirePosEnd))
-                    nodeEndID = pinSymbolIDs.get(j);
-            }
-
-            wireConnIDs.add(new PairMutable(nodeStartID, nodeEndID));
-        }
-
-        // Creating the symbol connection net list...
-        for (int i = 0; i < wires.size(); i++)
-        {
-            //System.out.println("Wire " + i);
-            //System.out.println("\t" + wireConnIDs.get(i).GetLeftString() + ", " + wireConnIDs.get(i).GetRightString());
-
-            PairMutable currWireConnIDs = wireConnIDs.get(i);
-            int nodeStartIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetLeftString());
-            int nodeEndIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetRightString());
-
-            if ((nodeStartIdx == -1) || (nodeEndIdx == -1))
-                continue;
-            if (nodeStartIdx == nodeEndIdx)
-                continue;
-
-            RenderNode nodeStart = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeStartIdx);
-            RenderNode nodeEnd = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeEndIdx);
-
-            NetListExperimentalNode<String> netListNode = new NetListExperimentalNode<String>(wires.get(i).RenderNode_ID);
-            netListNode.ConnAppend(nodeStart.RenderNode_ID);
-            netListNode.ConnAppend(nodeEnd.RenderNode_ID);
-
-            netList.Append(netListNode);
-        }
-
-        // Filtering out all the wires in the created net list...
-        int netListLen = netList.GetNodeNum();
-
-        System.out.println("---- iter 0 ----");
-        System.out.println(netList.ToString());
-        System.out.println(this.Editor_NetListReplaceIDsWithNames(netList).ToString() + "\n");
-
-        for (int i = 0; i < netListLen; i++)
-        {
-            PairMutable currWireConnIDs = wireConnIDs.get(i);
-            int nodeStartIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetLeftString());
-            int nodeEndIdx = this.Editor_RenderSystem.RenderSystem_NodeFind(currWireConnIDs.GetRightString());
-
-            if ((nodeStartIdx == -1) || (nodeEndIdx == -1))
-                throw new java.lang.Error("ERROR: Encountered a wire with at least one endpoint null while filtering wires out of an Editor net list!");
-            if (nodeStartIdx == nodeEndIdx)
-                throw new java.lang.Error("ERROR: Encountered a wire that connects to itself while filtering wires out of an Editor net list!");
-
-            NetListExperimentalNode<String> nodeID = netList.Get(i);
-            RenderNode renderNode = this.Editor_RenderSystem.RenderSystem_Nodes.get(this.Editor_RenderSystem.RenderSystem_NodeFind(nodeID.GetValue()));
-            RenderNode renderNodeStart = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeStartIdx);
-            RenderNode renderNodeEnd = this.Editor_RenderSystem.RenderSystem_Nodes.get(nodeEndIdx);
-
-            if (renderNode.RenderNode_Node.getClass() == Line.class)
-            {
-                netList.Remove(netList.Find(nodeID.GetValue()));
-
-                int netListNodeStartIdx = netList.Find(renderNodeStart.RenderNode_ID);
-                int netListNodeEndIdx = netList.Find(renderNodeEnd.RenderNode_ID);
-                NetListExperimentalNode<String> netListNodeStart = null;
-                NetListExperimentalNode<String> netListNodeEnd = null;
-
-                if (netListNodeStartIdx == -1)
-                {
-                    netList.Append(new NetListExperimentalNode<String>(renderNodeStart.RenderNode_ID));
-                    netListNodeStart = netList.Get(netList.GetNodeNum() - 1);
-
-                    netListNodeStart.ConnAppend(null);
-                    netListNodeStart.ConnAppend(renderNodeEnd.RenderNode_ID);
-                }
-                else
-                {
-                    //i--;
-                    netListNodeStart = netList.Get(netListNodeStartIdx);
-                    //netListNodeStart.ConnClear();
-
-                    netListNodeStart.ConnSet(1, renderNodeEnd.RenderNode_ID);
-                }
-
-                if (netListNodeEndIdx == -1)
-                {
-                    netList.Append(new NetListExperimentalNode<String>(renderNodeStart.RenderNode_ID));
-                    netListNodeEnd = netList.Get(netList.GetNodeNum() - 1);
-
-                    netListNodeEnd.ConnAppend(renderNodeStart.RenderNode_ID);
-                    netListNodeEnd.ConnAppend(null);
-                }
-                else
-                {
-                    //i--;
-                    netListNodeEnd = netList.Get(netListNodeEndIdx);
-                    //netListNodeEnd.ConnClear();
-
-                    netListNodeEnd.ConnSet(0, renderNodeStart.RenderNode_ID);
-                }
-            }
-
-            System.out.println("---- iter " + (i + 1) + " ----");
-            System.out.println(netList.ToString());
-            System.out.println(this.Editor_NetListReplaceIDsWithNames(netList).ToString() + "\n");
-        }
-
-        // Replacing all the wire & symbol IDs with their names...
-        netList = this.Editor_NetListReplaceIDsWithNames(netList);*/
-
         //netList.ReplaceNodeIDsWithNames(this.Editor_RenderSystem);
 
         //System.out.println("wires: " + wires.toString());
@@ -1777,14 +1153,14 @@ public abstract class Editor
         //    System.out.print(netList.Get(i).GetValue() + ", ");
         //System.out.println("::\n\n");
 
-        return netList;
+        return netList;*/
     }
 
     // REFACTOR THIS!!!
     public void NetListWireConnAdd(NetListExperimental<String> netList, String leftSymbolId, String leftPinName, String rightSymbolId, String rightPinName)
     {
-        String leftSymbolName = this.nodes.get(this.NodeFind(leftSymbolId)).name;
-        String rightSymbolName = this.nodes.get(this.NodeFind(rightSymbolId)).name;
+        String leftSymbolName = this.nodes.get(this.NodeFindByID(leftSymbolId)).name;
+        String rightSymbolName = this.nodes.get(this.NodeFindByID(rightSymbolId)).name;
 
         String currWireConnStartStr = leftSymbolName + " (" + leftPinName + ")";
         String currWireConnEndStr = rightSymbolName + " (" + rightPinName + ")";
@@ -1852,24 +1228,9 @@ public abstract class Editor
         // Checking for magnetic snap...
         for (int i = 0; i < this.nodes.size(); i++)
         {
-            EDANode renderNode = this.nodes.get(i);
-
-            if (renderNode.passive)
-                continue;
-
-            for (int j = 0; j < renderNode.manualSnapPoints.size(); j++)
-            {
-                Shape snapPoint = renderNode.manualSnapPoints.get(j);
-                PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
-
-                Double currDist = Utils.GetDist(pos, snapPos);
-
-                if (currDist <= minDist)
-                {
-                    posSnapped = snapPos;
-                    minDist = currDist;
-                }
-            }
+            PairMutable nodePosSnapped = this.nodes.get(i).MagneticSnapCheck(posSnapped, minDist);
+            posSnapped = nodePosSnapped.GetLeftPair();
+            minDist = nodePosSnapped.GetRightDouble();
         }
 
         return posSnapped;

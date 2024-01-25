@@ -7,8 +7,8 @@
 
 package com.cyte.edamame.node;
 
-import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.shape.SnapPoint;
 
@@ -17,19 +17,20 @@ import java.util.LinkedList;
 
 import com.cyte.edamame.util.Utils;
 import javafx.scene.*;
+import javafx.scene.layout.*;
+import javafx.scene.input.*;
 import javafx.scene.paint.*;
 import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.scene.text.*;
 
-public class EDANode
+public abstract class EDANode
 {
     //// GLOBAL VARIABLES ////
 
     final public String id = UUID.randomUUID().toString();
 
     public String name;
-    public Node node;
     public Rectangle shapeHighlighted;
     public Rectangle shapeSelected;
     public boolean highlighted;
@@ -38,315 +39,577 @@ public class EDANode
     public boolean selected;
     public PairMutable mousePressPos;
     public boolean passive;
-    public boolean autoSnapPoints;
-    public LinkedList<SnapPoint> manualSnapPoints;
-    public boolean isPin;
+    public LinkedList<SnapPoint> snapPoints;
     public String[] conns;
 
     public Editor editor;
 
-    //// CONSTRUCTORS ////
+    //// SETTERS ////
 
-    public EDANode(String nameValue, Node nodeValue, boolean edgeSnapPoints, LinkedList<PairMutable> manualSnapPointPos, boolean passiveValue, boolean isPinValue, Editor editorValue)
+    abstract public void SetTranslate(PairMutable pos);
+    abstract public void SetRotate(double rot);
+    abstract public void SetVisible(boolean visible);
+
+    //// GETTERS ////
+
+    abstract public Node GetNode();
+    abstract public PairMutable GetTranslate();
+    abstract public double GetRotate();
+    abstract public Bounds GetBoundsLocal();
+    abstract public Bounds GetBoundsParent();
+
+    //// EDITOR FUNCTIONS ////
+
+    public void Heartbeat()
     {
-        this.name = nameValue;
-        this.node = nodeValue;
-        //this.RenderNode_Node.setId(nodeValue.getId() + "_" + RenderNode_ID);
-        this.highlighted = false;
-        this.highlightedMouse = false;
-        this.highlightedBox = false;
-        this.selected = false;
-        this.mousePressPos = null;
-        this.passive = passiveValue;
-        this.autoSnapPoints = edgeSnapPoints;
-        this.manualSnapPoints = new LinkedList<SnapPoint>();
-        this.isPin = isPinValue;
+        if (this.passive)
+            return;
 
-        this.editor = editorValue;
+        this.ShapeHighlightedRefresh();
+        this.ShapeSelectedRefresh();
+        this.SnapPointsRefresh();
+    }
+
+    public void Move()
+    {
+        if (!this.selected)
+            return;
+
+        PairMutable posPressReal = this.editor.PaneHolderGetRealPos(new PairMutable(this.mousePressPos.GetLeftDouble(), this.mousePressPos.GetRightDouble()));
+        PairMutable posOffset = new PairMutable(0.0, 0.0);
+
+        // Handling straight-only dragging...
+        if (EDAmameController.IsKeyPressed(KeyCode.CONTROL))
+        {
+            if (Math.abs(this.editor.mouseDragDiffPos.GetLeftDouble()) < Math.abs(this.editor.mouseDragDiffPos.GetRightDouble()))
+                posOffset.left = -this.editor.mouseDragDiffPos.GetLeftDouble();
+            else
+                posOffset.right = -this.editor.mouseDragDiffPos.GetRightDouble();
+        }
+
+        this.SetTranslate(new PairMutable(this.mousePressPos.GetLeftDouble() + this.editor.mouseDragDiffPos.GetLeftDouble() + posOffset.GetLeftDouble(),
+                                          this.mousePressPos.GetRightDouble() + this.editor.mouseDragDiffPos.GetRightDouble() + posOffset.GetRightDouble()));
+    }
+
+    public void MoveReset()
+    {
+        if (!this.selected)
+            return;
+
+        this.mousePressPos = this.GetTranslate();
+    }
+
+    public void Add()
+    {
+        if (this.editor.nodes.size() >= this.editor.maxShapes)
+            throw new java.lang.Error("ERROR: Exceeded editors maximum node limit!");
+
+        this.editor.nodes.add(this);
+        this.NodeAdd();
 
         if (!this.passive)
         {
-            // Creating the highlighted & selected shapes...
-            {
-                this.shapeHighlighted = new Rectangle();
-                this.shapeHighlighted.setFill(Color.GRAY);
-                this.shapeHighlighted.setOpacity(0.5);
-                this.shapeHighlighted.setId(this.id);
-                this.shapeHighlighted.setVisible(false);
-                //this.RenderNode_ShapeHighlighted.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
-                //this.RenderNode_ShapeHighlighted.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
-                //this.RenderNode_ShapeHighlighted.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
+            this.editor.paneHighlights.getChildren().add(this.shapeHighlighted);
+            this.editor.paneSelections.getChildren().add(this.shapeSelected);
+        }
 
-                this.shapeSelected = new Rectangle();
-                this.shapeSelected.setFill(Color.GRAY);
-                this.shapeSelected.setOpacity(0.5);
-                this.shapeSelected.setId(this.id);
-                this.shapeSelected.setVisible(false);
-                //this.RenderNode_ShapeSelected.translateXProperty().bind(this.RenderNode_Node.translateXProperty());
-                //this.RenderNode_ShapeSelected.translateYProperty().bind(this.RenderNode_Node.translateYProperty());
-                //this.RenderNode_ShapeSelected.rotateProperty().bind(this.RenderNode_Node.rotateProperty());
+        for (int i = 0; i < this.snapPoints.size(); i++)
+            this.editor.paneSnaps.getChildren().add(this.snapPoints.get(i));
+    }
+
+    public boolean Remove()
+    {
+        int idx = this.editor.NodeFindByID(this.id);
+
+        if (idx == -1)
+            return false;
+
+        this.editor.nodes.remove(idx);
+        this.NodeRemove();
+
+        if (!this.passive)
+        {
+            this.editor.paneHighlights.getChildren().remove(this.shapeHighlighted);
+            this.editor.paneSelections.getChildren().remove(this.shapeSelected);
+        }
+
+        if (this.highlighted)
+            this.editor.shapesHighlighted--;
+        if (this.selected)
+            this.editor.shapesSelected--;
+
+        this.highlighted = false;
+        this.selected = false;
+
+        for (int j = 0; j < this.snapPoints.size(); j++)
+            this.editor.paneSnaps.getChildren().remove(this.snapPoints.get(j));
+
+        return true;
+    }
+
+    abstract public void Rotate(double deltaY);
+    abstract public void NodeAdd();
+    abstract public void NodeRemove();
+
+    //// POSITION FUNCTIONS ////
+
+    abstract public PairMutable BoundsPosToHolderPane(PairMutable posOffset);
+    abstract public PairMutable PosToHolderPane(PairMutable pos);
+    abstract public boolean PosOnNode(PairMutable pos);
+
+    //// HIGHLIGHT & SELECTION FUNCTIONS ////
+
+    public void HighlightsCheck(PairMutable posMouse)
+    {
+        if (this.passive)
+            return;
+
+        boolean onShape = this.PosOnNode(posMouse);
+
+        if (!EDAmameController.IsKeyPressed(KeyCode.CONTROL))
+        {
+            // Checking whether we are highlighting by cursor...
+            if (onShape)
+            {
+                if (EDAmameController.IsKeyPressed(KeyCode.Q))
+                {
+                    if ((this.editor.shapesHighlighted > 1) && this.highlightedMouse)
+                        this.highlightedMouse = false;
+                    else if ((this.editor.shapesHighlighted == 0) && !this.highlightedMouse)
+                        this.highlightedMouse = true;
+                }
+                else
+                {
+                    if (!this.highlightedMouse)
+                        this.highlightedMouse = true;
+                }
+            }
+            else
+            {
+                if (this.highlightedMouse)
+                    this.highlightedMouse = false;
             }
 
-            // Creating the snap point shapes...
-            if (edgeSnapPoints)
-                this.EdgeSnapPointsCreate();
-            if (manualSnapPointPos != null)
-                this.ManualSnapPointsCreate(manualSnapPointPos);
+            // Checking whether we are highlighting by selection box...
+            if (this.editor.selectionBox != null)
+            {
+                Bounds shapeBounds = this.GetBoundsParent();
+                PairMutable selectionBoxL = this.editor.PanePosListenerToHolder(new PairMutable(this.editor.selectionBox.getTranslateX(), this.editor.selectionBox.getTranslateY()));
+                PairMutable selectionBoxH = this.editor.PanePosListenerToHolder(new PairMutable(this.editor.selectionBox.getTranslateX() + this.editor.selectionBox.getWidth(), this.editor.selectionBox.getTranslateY() + this.editor.selectionBox.getHeight()));
+
+                if ((selectionBoxL.GetLeftDouble() < shapeBounds.getMaxX()) &&
+                        (selectionBoxH.GetLeftDouble() > shapeBounds.getMinX()) &&
+                        (selectionBoxL.GetRightDouble() < shapeBounds.getMaxY()) &&
+                        (selectionBoxH.GetRightDouble() > shapeBounds.getMinY()))
+                {
+                    if (!this.highlightedBox)
+                        this.highlightedBox = true;
+                }
+                else
+                {
+                    if (this.highlightedBox)
+                        this.highlightedBox = false;
+                }
+            }
+            else if (this.highlightedBox)
+            {
+                this.highlightedBox = false;
+            }
+        }
+        else
+        {
+            this.highlightedMouse = false;
+            this.highlightedBox = false;
+        }
+
+        // Adjusting highlights accordingly...
+        if ((this.highlightedMouse || this.highlightedBox) && !this.highlighted)
+        {
+            this.shapeHighlighted.setVisible(true);
+            this.highlighted = true;
+            this.editor.shapesHighlighted++;
+        }
+        else if ((!this.highlightedMouse && !this.highlightedBox) && this.highlighted)
+        {
+            this.shapeHighlighted.setVisible(false);
+            this.highlighted = false;
+            this.editor.shapesHighlighted--;
         }
     }
 
-    //// REFRESH FUNCTIONS ////
+    public void Deselect()
+    {
+        if (!this.selected)
+        {
+            if (this.highlightedMouse || this.highlightedBox)
+            {
+                this.selected = true;
+                this.shapeSelected.setVisible(true);
+                this.editor.shapesSelected++;
+            }
+        }
+        else
+        {
+            if ((!this.highlightedMouse && !this.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
+            {
+                this.selected = false;
+                this.shapeSelected.setVisible(false);
+                this.editor.shapesSelected--;
+            }
+        }
+
+        if (this.highlightedBox && !this.highlightedMouse)
+            this.shapeHighlighted.setVisible(false);
+
+        this.mousePressPos = null;
+    }
 
     public void ShapeHighlightedRefresh()
     {
-        Bounds boundsReal = this.node.getBoundsInParent();
+        Bounds boundsParent = this.GetBoundsParent();
 
-        this.shapeHighlighted.setTranslateX(boundsReal.getMinX());
-        this.shapeHighlighted.setTranslateY(boundsReal.getMinY());
+        this.shapeHighlighted.setTranslateX(boundsParent.getMinX());
+        this.shapeHighlighted.setTranslateY(boundsParent.getMinY());
 
-        this.shapeHighlighted.setWidth(boundsReal.getWidth());
-        this.shapeHighlighted.setHeight(boundsReal.getHeight());
+        this.shapeHighlighted.setWidth(boundsParent.getWidth());
+        this.shapeHighlighted.setHeight(boundsParent.getHeight());
     }
 
     public void ShapeSelectedRefresh()
     {
-        Bounds boundsLocal = this.node.getBoundsInLocal();
+        Bounds boundsLocal = this.GetBoundsLocal();
         PairMutable posBoundsReal = this.BoundsPosToHolderPane(new PairMutable(0.0, 0.0));
 
         this.shapeSelected.setTranslateX(posBoundsReal.GetLeftDouble() - boundsLocal.getWidth() / 2);
         this.shapeSelected.setTranslateY(posBoundsReal.GetRightDouble() - boundsLocal.getHeight() / 2);
 
-        this.shapeSelected.setRotate(this.node.getRotate());
+        this.shapeSelected.setRotate(this.GetRotate());
 
         this.shapeSelected.setWidth(boundsLocal.getWidth());
         this.shapeSelected.setHeight(boundsLocal.getHeight());
     }
 
+    public void ShapeHighlightedCreate()
+    {
+        this.shapeHighlighted = new Rectangle();
+        this.shapeHighlighted.setFill(Color.GRAY);
+        this.shapeHighlighted.setOpacity(0.5);
+        this.shapeHighlighted.setId(this.id);
+        this.shapeHighlighted.setVisible(false);
+    }
+
+    public void ShapeSelectedCreate()
+    {
+        this.shapeSelected = new Rectangle();
+        this.shapeSelected.setFill(Color.GRAY);
+        this.shapeSelected.setOpacity(0.5);
+        this.shapeSelected.setId(this.id);
+        this.shapeSelected.setVisible(false);
+    }
+
     //// SNAP POINT FUNCTIONS ////
 
-    public void SnapPointsRefresh()
+    public PairMutable MagneticSnapCheck(PairMutable pos, double minDist)
     {
-        for (int i = 0; i < this.manualSnapPoints.size(); i++)
+        if (this.passive)
+            return new PairMutable(pos, minDist);
+
+        PairMutable posSnapped = new PairMutable(pos);
+
+        for (int j = 0; j < this.snapPoints.size(); j++)
         {
-            SnapPoint snapPoint = this.manualSnapPoints.get(i);
-            String snapPointId = snapPoint.getId();
+            Shape snapPoint = this.snapPoints.get(j);
+            PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
 
-            Bounds boundsLocal = this.node.getBoundsInLocal();
-            PairMutable posSnapReal = null;
+            Double currDist = Utils.GetDist(pos, snapPos);
 
-            if (snapPointId.equals("snapTopLeft"))
+            if (currDist <= minDist)
             {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(-boundsLocal.getWidth() / 2,
-                        -boundsLocal.getHeight() / 2));
+                posSnapped = snapPos;
+                minDist = currDist;
             }
-            else if (snapPointId.equals("snapTopCenter"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(0.0,
-                        -boundsLocal.getHeight() / 2));
-            }
-            else if (snapPointId.equals("snapTopRight"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(boundsLocal.getWidth() / 2,
-                        -boundsLocal.getHeight() / 2));
-            }
-            else if (snapPointId.equals("snapLeft"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(-boundsLocal.getWidth() / 2,
-                        0.0));
-            }
-            else if (snapPointId.equals("snapCenter"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(0.0,
-                        0.0));
-            }
-            else if (snapPointId.equals("snapRight"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(boundsLocal.getWidth() / 2,
-                        0.0));
-            }
-            else if (snapPointId.equals("snapBottomLeft"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(-boundsLocal.getWidth() / 2,
-                        boundsLocal.getHeight() / 2));
-            }
-            else if (snapPointId.equals("snapBottomCenter"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(0.0,
-                        boundsLocal.getHeight() / 2));
-            }
-            else if (snapPointId.equals("snapBottomRight"))
-            {
-                posSnapReal = this.BoundsPosToHolderPane(new PairMutable(boundsLocal.getWidth() / 2,
-                        boundsLocal.getHeight() / 2));
-            }
-            else if (snapPointId.equals("snapStart"))
-            {
-                posSnapReal = this.PosToHolderPane(new PairMutable(((Line)this.node).getStartX(),
-                        ((Line)this.node).getStartY()));
-            }
-            else if (snapPointId.equals("snapMiddle"))
-            {
-                PairMutable posStart = new PairMutable(((Line)this.node).getStartX(), ((Line)this.node).getStartY());
-                PairMutable posEnd = new PairMutable(((Line)this.node).getEndX(), ((Line)this.node).getEndY());
-                PairMutable posMiddle = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2,
-                        (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
+        }
 
-                posSnapReal = this.PosToHolderPane(posMiddle);
-            }
-            else if (snapPointId.equals("snapEnd"))
-            {
-                posSnapReal = this.PosToHolderPane(new PairMutable(((Line)this.node).getEndX(),
-                        ((Line)this.node).getEndY()));
-            }
-            else if (snapPointId.equals("snapManual"))
-            {
-                posSnapReal = this.PosToHolderPane(new PairMutable(snapPoint.pos.GetLeftDouble(),
-                        snapPoint.pos.GetRightDouble()));
-            }
+        return new PairMutable(posSnapped, minDist);
+    }
+
+    public void SnapPointsCheck(PairMutable posMouse)
+    {
+        for (int j = 0; j < this.snapPoints.size(); j++)
+        {
+            Shape snapPoint = this.snapPoints.get(j);
+            PairMutable snapPos = new PairMutable(snapPoint.getTranslateX(), snapPoint.getTranslateY());
+
+            Double dist = Utils.GetDist(posMouse, snapPos);
+
+            if (dist <= EDAmameController.Editor_SnapPointRadius)
+                snapPoint.setVisible(true);
             else
-            {
-                throw new java.lang.Error("ERROR: Encountered unrecognized snap point when refreshing RenderNode snap points!");
-            }
-
-            snapPoint.setTranslateX(posSnapReal.GetLeftDouble());
-            snapPoint.setTranslateY(posSnapReal.GetRightDouble());
-
-            //this.RenderNode_RenderSystem.RenderSystem_TestShapeAdd(posSnapReal, 5.0, Color.RED, true);
-            //System.out.println(posSnapReal.ToStringDouble());
+                snapPoint.setVisible(false);
         }
     }
 
-    public void BoundsRefresh()
+    abstract public void SnapPointsRefresh();
+
+    //// PROPERTIES FUNCTIONS ////
+
+    abstract public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors);
+    abstract public void PropsApplyGlobal(VBox propsBox);
+    //abstract public void PropsLoadSymbol(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors);
+    abstract public void PropsApplySymbol(VBox propsBox);
+
+    //// SUPPORT FUNCTIONS ////
+
+    abstract public EDANode Clone();
+
+    static public Node NodeClone(Node oldNode)  // ASK!!!
     {
-        /*if (this.RenderNode_Node.getClass() == Label.class)
+        Node clonedNode = null;
+
+        if (oldNode.getClass() == Circle.class)
         {
-            Bounds bounds = this.RenderNode_Node.getBoundsInLocal();
-            EDAmameController.Controller_RenderShapesDelayedBoundsRefresh.add(new PairMutable(new PairMutable(this, 0), new PairMutable(bounds.getWidth(), bounds.getHeight())));
+            Circle oldCircle = (Circle)oldNode;
+
+            Circle clonedCircle = new Circle();
+            clonedCircle.setRadius(oldCircle.getRadius());
+            Color colorFill = (Color)oldCircle.getFill();
+            clonedCircle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldCircle.getStroke();
+            clonedCircle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
+            clonedCircle.setStrokeWidth(oldCircle.getStrokeWidth());
+
+            clonedNode = clonedCircle;
+        }
+        else if (oldNode.getClass() == Rectangle.class)
+        {
+            Rectangle oldRectangle = (Rectangle)oldNode;
+
+            Rectangle clonedRectangle = new Rectangle();
+            clonedRectangle.setWidth(oldRectangle.getWidth());
+            clonedRectangle.setHeight(oldRectangle.getHeight());
+            Color colorFill = (Color)oldRectangle.getFill();
+            clonedRectangle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldRectangle.getStroke();
+            clonedRectangle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
+            clonedRectangle.setStrokeWidth(oldRectangle.getStrokeWidth());
+
+            clonedNode = clonedRectangle;
+        }
+        else if (oldNode.getClass() == Polygon.class)
+        {
+            Polygon oldTriangle = (Polygon)oldNode;
+
+            Polygon clonedTriangle = new Polygon();
+            LinkedList<Double> clonedPoints = new LinkedList<Double>(oldTriangle.getPoints());
+            clonedTriangle.getPoints().setAll(clonedPoints);
+            Color colorFill = (Color)oldTriangle.getFill();
+            clonedTriangle.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+            Color colorStroke = (Color)oldTriangle.getStroke();
+            clonedTriangle.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
+            clonedTriangle.setStrokeWidth(oldTriangle.getStrokeWidth());
+
+            clonedNode = clonedTriangle;
+        }
+        else if (oldNode.getClass() == Line.class)
+        {
+            Line oldLine = (Line)oldNode;
+
+            Line clonedLine = new Line();
+            clonedLine.setStartX(oldLine.getStartX());
+            clonedLine.setStartY(oldLine.getStartY());
+            clonedLine.setEndX(oldLine.getEndX());
+            clonedLine.setEndY(oldLine.getEndY());
+            Color colorStroke = (Color)oldLine.getStroke();
+            clonedLine.setStroke(Color.rgb((int)(colorStroke.getRed() * 255), (int)(colorStroke.getGreen() * 255), (int)(colorStroke.getBlue() * 255), colorStroke.getOpacity()));
+            clonedLine.setStrokeWidth(oldLine.getStrokeWidth());
+
+            clonedNode = clonedLine;
+        }
+        else if (oldNode.getClass() == Text.class)
+        {
+            Text oldText = (Text)oldNode;
+
+            Text clonedText = new Text();
+            clonedText.setFont(new Font("Arial", oldText.getFont().getSize()));
+            clonedText.setText(new String(oldText.getText()));
+            Color colorFill = (Color)oldText.getFill();
+            clonedText.setFill(Color.rgb((int)(colorFill.getRed() * 255), (int)(colorFill.getGreen() * 255), (int)(colorFill.getBlue() * 255), colorFill.getOpacity()));
+
+            clonedNode = clonedText;
+        }
+        else if (oldNode.getClass() == Group.class)
+        {
+            Group oldGroup = (Group)oldNode;
+
+            Group clonedGroup = new Group();
+
+            for (int i = 0; i < oldGroup.getChildren().size(); i++)
+                clonedGroup.getChildren().add(NodeClone(oldGroup.getChildren().get(i)));
+
+            clonedNode = clonedGroup;
         }
         else
-        {*/
-        this.ShapeHighlightedRefresh();
-        this.ShapeSelectedRefresh();
-        //}
-    }
-
-    public void ManualSnapPointsCreate(LinkedList<PairMutable> pos)
-    {
-        for (int i = 0; i < pos.size(); i++)
         {
-            PairMutable currPos = pos.get(i);
-
-            SnapPoint snapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            snapPoint.setId("snapManual");
-            snapPoint.setVisible(false);
-            this.manualSnapPoints.add(snapPoint);
+            throw new java.lang.Error("ERROR: Attempting to clone an unrecognized JavaFX node type!");
         }
+
+        clonedNode.setTranslateX(oldNode.getTranslateX());
+        clonedNode.setTranslateY(oldNode.getTranslateY());
+        clonedNode.setLayoutX(oldNode.getLayoutX());
+        clonedNode.setLayoutY(oldNode.getLayoutY());
+        clonedNode.setRotate(oldNode.getRotate());
+
+        return clonedNode;
     }
 
-    public void EdgeSnapPointsCreate()
+    static public String NodeToFXMLString(Node node, PairMutable posOffset, int tabNum) // ASK!!!
     {
-        PairMutable currPos = new PairMutable(0.0, 0.0);
+        String str = "";
+        String tabStr = "";
 
-        if (this.node.getClass() == Line.class)
+        for (int i = 0; i < tabNum; i++)
+            tabStr += "\t";
+
+        if (node.getClass() == Circle.class)
         {
-            // Creating the start snap point...
-            SnapPoint startSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            startSnapPoint.setId("snapStart");
-            startSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(startSnapPoint);
+            Circle circle = (Circle)node;
 
-            // Creating the middle snap point...
-            SnapPoint middleSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            middleSnapPoint.setId("snapMiddle");
-            middleSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(middleSnapPoint);
+            str += tabStr + "<Circle";
+            str += " id=\"" + circle.getId() + "\"";
+            str += " radius=\"" + circle.getRadius() + "\"";
+            str += FillAddLeadingZeros(Integer.toHexString(circle.getFill().hashCode()));
 
-            // Creating the end snap point...
-            SnapPoint endSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            endSnapPoint.setId("snapEnd");
-            endSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(endSnapPoint);
+            //if (circle.getStroke() != null)
+            //{
+            str += " stroke=\"#" + circle.getStroke().toString().replace("0x", "") + "\"";
+            //str += " strokeType=\"#" + circle.getStrokeType().toString().replace("#", "") + "\"";
+            str += " strokeType=\"INSIDE\"";
+            str += " strokeWidth=\"" + circle.getStrokeWidth()+ "\"";
+            //}
+
+            str += " translateX=\"" + (circle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (circle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " rotate=\"" + circle.getRotate() + "\" />";
+        }
+        else if  (node.getClass() == Rectangle.class)
+        {
+            Rectangle rectangle = (Rectangle)node;
+
+            str += tabStr + "<Rectangle";
+            str += " id=\"" + rectangle.getId() + "\"";
+            str += " width=\"" + rectangle.getWidth() + "\"";
+            str += " height=\"" + rectangle.getHeight() + "\"";
+            str += FillAddLeadingZeros(Integer.toHexString(rectangle.getFill().hashCode()));
+
+            //if (rectangle.getStroke() != null)
+            //{
+            str += " stroke=\"#" + rectangle.getStroke().toString().replace("0x", "") + "\"";
+            //str += " strokeType=\"#" + rectangle.getStrokeType().toString().replace("#", "") + "\"";
+            str += " strokeType=\"INSIDE\"";
+            str += " strokeWidth=\"" + rectangle.getStrokeWidth() + "\"";
+            //}
+
+            str += " translateX=\"" + (rectangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (rectangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " rotate=\"" + rectangle.getRotate() + "\" />";
+        }
+        else if (node.getClass() == Polygon.class)
+        {
+            Polygon triangle = (Polygon)node;
+
+            str += tabStr + "<Polygon";
+            str += " id=\"" + triangle.getId() + "\"";
+            str += FillAddLeadingZeros(Integer.toHexString(triangle.getFill().hashCode()));
+
+            //if (triangle.getStroke() != null)
+            //{
+            str += " stroke=\"#" + triangle.getStroke().toString().replace("0x", "") + "\"";
+            //str += " strokeType=\"#" + triangle.getStrokeType().toString().replace("#", "") + "\"";
+            str += " strokeType=\"INSIDE\"";
+            str += " strokeWidth=\"" + triangle.getStrokeWidth() + "\"";
+            //}
+
+            str += " translateX=\"" + (triangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (triangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " rotate=\"" + triangle.getRotate() + "\" >\n";
+            str += tabStr + "\t<points>\n";
+
+            for (int i = 0; i < triangle.getPoints().size(); i++)
+                str += tabStr + "\t\t<Double fx:value=\"" + triangle.getPoints().get(i) + "\"/>\n";
+
+            str += tabStr + "\t</points>\n";
+            str += tabStr + "</Polygon>";
+        }
+        else if (node.getClass() == Line.class)
+        {
+            Line line = (Line)node;
+
+            str += tabStr + "<Line";
+            str += " id=\"" + line.getId() + "\"";
+            str += " startX=\"" + line.getStartX() + "\"";
+            str += " startY=\"" + line.getStartY() + "\"";
+            str += " endX=\"" + line.getEndX() + "\"";
+            str += " endY=\"" + line.getEndY() + "\"";
+            str += " strokeWidth=\"" + line.getStrokeWidth() + "\"";
+            str += " translateX=\"" + (line.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (line.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " stroke=\"" + line.getStroke().toString().replace("0x", "#") + "\"";
+            //str += " stroke=\"#" + line.getStroke().toString() + "\"";
+            //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
+            str += " />";
+        }
+        else if (node.getClass() == Text.class)
+        {
+            Text text = (Text)node;
+
+            str += tabStr + "<Text";
+            str += " id=\"" + text.getId() + "\"";
+            str += " text=\"" + text.getText() + "\"";
+            String addZeros = Integer.toHexString(text.getFill().hashCode());
+            str += FillAddLeadingZeros(addZeros);
+
+            str += " translateX=\"" + (text.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (text.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " rotate=\"" + text.getRotate() + "\">\n";
+            str += tabStr + "\t<font> \n";
+            str += tabStr + "\t\t<Font";
+            //str += " font=\"" + text.getFont().getName() + "\"";
+            str += " name=\"" + text.getFont().getFamily() + "\"";
+            str += " size=\"" + text.getFont().getSize() + "\" />\n";
+
+            str += tabStr + "\t</font>\n";
+            str += tabStr + "</Text>";
+        }
+        else if (node.getClass() == Group.class)
+        {
+            Group group = (Group)node;
+
+            str += tabStr + "<Group";
+            str += " id=\"" + group.getId() + "\"";
+            str += " translateX=\"" + (group.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
+            str += " translateY=\"" + (group.getTranslateY() + posOffset.GetRightDouble()) + "\"";
+            str += " rotate=\"" + group.getRotate() + "\">\n";
+            str += tabStr + "\t<children>\n";
+
+            for (int i = 0; i < group.getChildren().size(); i++)
+                str += NodeToFXMLString(group.getChildren().get(i), new PairMutable(0.0, 0.0), tabNum + 2) + "\n";
+
+            str += tabStr + "\t</children>\n";
+            str += tabStr + "</Group>";
         }
         else
         {
-            // Creating the top left snap point...
-            SnapPoint topLeftSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            topLeftSnapPoint.setId("snapTopLeft");
-            topLeftSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(topLeftSnapPoint);
-
-            // Creating the top center snap point...
-            SnapPoint topCenterSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            topCenterSnapPoint.setId("snapTopCenter");
-            topCenterSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(topCenterSnapPoint);
-
-            // Creating the top right snap point...
-            SnapPoint topRightSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            topRightSnapPoint.setId("snapTopRight");
-            topRightSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(topRightSnapPoint);
-
-            // Creating the left snap point...
-            SnapPoint leftSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            leftSnapPoint.setId("snapLeft");
-            leftSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(leftSnapPoint);
-
-            // Creating the center snap point...
-            SnapPoint centerSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            centerSnapPoint.setId("snapCenter");
-            centerSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(centerSnapPoint);
-
-            // Creating the right snap point...
-            SnapPoint rightSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            rightSnapPoint.setId("snapRight");
-            rightSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(rightSnapPoint);
-
-            // Creating the bottom left snap point...
-            SnapPoint bottomLeftSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            bottomLeftSnapPoint.setId("snapBottomLeft");
-            bottomLeftSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(bottomLeftSnapPoint);
-
-            // Creating the bottom center snap point...
-            SnapPoint bottomCenterSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            bottomCenterSnapPoint.setId("snapBottomCenter");
-            bottomCenterSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(bottomCenterSnapPoint);
-
-            // Creating the bottom right snap point...
-            SnapPoint bottomRightSnapPoint = new SnapPoint(currPos, EDAmameController.Editor_SnapPointRadius, EDAmameController.Editor_SnapPointShapeColor, EDAmameController.Editor_SnapPointShapeOpacity, this);
-            bottomRightSnapPoint.setId("snapBottomRight");
-            bottomRightSnapPoint.setVisible(false);
-            this.manualSnapPoints.add(bottomRightSnapPoint);
+            throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
         }
+
+        return str;
     }
 
-    //// POSITION FUNCTIONS ////
-
-    public PairMutable BoundsPosToHolderPane(PairMutable posOffset)
+    static public PairMutable GetPosInNodeParent(Node node, PairMutable pos)
     {
-        Bounds boundsLocal = this.node.getBoundsInLocal();
-        PairMutable boundsRealEdgeL = this.PosToHolderPane(new PairMutable(boundsLocal.getMinX() + posOffset.GetLeftDouble(), boundsLocal.getMinY() + posOffset.GetRightDouble()));
-        PairMutable boundsRealEdgeH = this.PosToHolderPane(new PairMutable(boundsLocal.getMaxX() + posOffset.GetLeftDouble(), boundsLocal.getMaxY() + posOffset.GetRightDouble()));
-
-        return new PairMutable((boundsRealEdgeL.GetLeftDouble() + boundsRealEdgeH.GetLeftDouble()) / 2,
-                               (boundsRealEdgeL.GetRightDouble() + boundsRealEdgeH.GetRightDouble()) / 2);
-    }
-
-    public PairMutable PosToHolderPane(PairMutable pos)
-    {
-        Point2D newPos = this.node.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+        Point2D newPos = node.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
 
         return new PairMutable(newPos.getX(), newPos.getY());
-    }
-
-    public boolean PosOnNode(PairMutable pos)
-    {
-        return this.node.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
     }
 
     public static PairMutable NodesGetMiddlePos(LinkedList<Node> nodes)
@@ -390,176 +653,7 @@ public class EDANode
         return new PairMutable(childTotalBoundsX, childTotalBoundsY);
     }
 
-    //// SUPPORT FUNCTIONS ////
-
-    public EDANode Clone()
-    {
-        LinkedList<PairMutable> clonedSnapPointManualPos = null;
-
-        if (!this.manualSnapPoints.isEmpty())
-        {
-            clonedSnapPointManualPos = new LinkedList<PairMutable>();
-
-            for (int i = 0; i < this.manualSnapPoints.size(); i++)
-                clonedSnapPointManualPos.add(new PairMutable(this.manualSnapPoints.get(i).getTranslateX(),
-                                                             this.manualSnapPoints.get(i).getTranslateY()));
-        }
-
-        EDANode clonedNode = new EDANode(this.name,
-                                               Utils.Utils_NodeClone(this.node),
-                                               this.autoSnapPoints,
-                                               clonedSnapPointManualPos,
-                                               this.passive,
-                                               this.isPin,
-                                               null);
-
-        return clonedNode;
-    }
-
-    public static String ToFXMLString(Node node, PairMutable posOffset, int tabNum)
-    {
-        String str = "";
-        String tabStr = "";
-
-        for (int i = 0; i < tabNum; i++)
-            tabStr += "\t";
-
-        if (node.getClass() == Circle.class)
-        {
-            Circle circle = (Circle)node;
-
-            str += tabStr + "<Circle";
-            str += " id=\"" + circle.getId() + "\"";
-            str += " radius=\"" + circle.getRadius() + "\"";
-            str += AddLeadingZeros(Integer.toHexString(circle.getFill().hashCode()));
-
-            //if (circle.getStroke() != null)
-            //{
-                str += " stroke=\"#" + circle.getStroke().toString().replace("0x", "") + "\"";
-                //str += " strokeType=\"#" + circle.getStrokeType().toString().replace("#", "") + "\"";
-                str += " strokeType=\"INSIDE\"";
-                str += " strokeWidth=\"" + circle.getStrokeWidth()+ "\"";
-            //}
-
-            str += " translateX=\"" + (circle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (circle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " rotate=\"" + circle.getRotate() + "\" />";
-        }
-        else if  (node.getClass() == Rectangle.class)
-        {
-            Rectangle rectangle = (Rectangle)node;
-
-            str += tabStr + "<Rectangle";
-            str += " id=\"" + rectangle.getId() + "\"";
-            str += " width=\"" + rectangle.getWidth() + "\"";
-            str += " height=\"" + rectangle.getHeight() + "\"";
-            str += AddLeadingZeros(Integer.toHexString(rectangle.getFill().hashCode()));
-
-            //if (rectangle.getStroke() != null)
-            //{
-                str += " stroke=\"#" + rectangle.getStroke().toString().replace("0x", "") + "\"";
-                //str += " strokeType=\"#" + rectangle.getStrokeType().toString().replace("#", "") + "\"";
-                str += " strokeType=\"INSIDE\"";
-                str += " strokeWidth=\"" + rectangle.getStrokeWidth() + "\"";
-            //}
-
-            str += " translateX=\"" + (rectangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (rectangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " rotate=\"" + rectangle.getRotate() + "\" />";
-        }
-        else if (node.getClass() == Polygon.class)
-        {
-            Polygon triangle = (Polygon)node;
-
-            str += tabStr + "<Polygon";
-            str += " id=\"" + triangle.getId() + "\"";
-            str += AddLeadingZeros(Integer.toHexString(triangle.getFill().hashCode()));
-
-            //if (triangle.getStroke() != null)
-            //{
-                str += " stroke=\"#" + triangle.getStroke().toString().replace("0x", "") + "\"";
-                //str += " strokeType=\"#" + triangle.getStrokeType().toString().replace("#", "") + "\"";
-                str += " strokeType=\"INSIDE\"";
-                str += " strokeWidth=\"" + triangle.getStrokeWidth() + "\"";
-            //}
-
-            str += " translateX=\"" + (triangle.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (triangle.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " rotate=\"" + triangle.getRotate() + "\" >\n";
-            str += tabStr + "\t<points>\n";
-
-            for (int i = 0; i < triangle.getPoints().size(); i++)
-                str += tabStr + "\t\t<Double fx:value=\"" + triangle.getPoints().get(i) + "\"/>\n";
-
-            str += tabStr + "\t</points>\n";
-            str += tabStr + "</Polygon>";
-        }
-        else if (node.getClass() == Line.class)
-        {
-            Line line = (Line)node;
-
-            str += tabStr + "<Line";
-            str += " id=\"" + line.getId() + "\"";
-            str += " startX=\"" + line.getStartX() + "\"";
-            str += " startY=\"" + line.getStartY() + "\"";
-            str += " endX=\"" + line.getEndX() + "\"";
-            str += " endY=\"" + line.getEndY() + "\"";
-            str += " strokeWidth=\"" + line.getStrokeWidth() + "\"";
-            str += " translateX=\"" + (line.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (line.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " stroke=\"" + line.getStroke().toString().replace("0x", "#") + "\"";
-            //str += " stroke=\"#" + line.getStroke().toString() + "\"";
-            //str += " strokeType=\"#" + line.getStrokeType().toString() + "\"";
-            str += " />";
-        }
-        else if (node.getClass() == Text.class)
-        {
-            Text text = (Text)node;
-
-            str += tabStr + "<Text";
-            str += " id=\"" + text.getId() + "\"";
-            str += " text=\"" + text.getText() + "\"";
-            String addZeros = Integer.toHexString(text.getFill().hashCode());
-            str += AddLeadingZeros(addZeros);
-
-            str += " translateX=\"" + (text.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (text.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " rotate=\"" + text.getRotate() + "\">\n";
-            str += tabStr + "\t<font> \n";
-            str += tabStr + "\t\t<Font";
-            //str += " font=\"" + text.getFont().getName() + "\"";
-            str += " name=\"" + text.getFont().getFamily() + "\"";
-            str += " size=\"" + text.getFont().getSize() + "\" />\n";
-
-            str += tabStr + "\t</font>\n";
-            str += tabStr + "</Text>";
-        }
-        else if (node.getClass() == Group.class)
-        {
-            Group group = (Group)node;
-
-            str += tabStr + "<Group";
-            str += " id=\"" + group.getId() + "\"";
-            str += " translateX=\"" + (group.getTranslateX() + posOffset.GetLeftDouble()) + "\"";
-            str += " translateY=\"" + (group.getTranslateY() + posOffset.GetRightDouble()) + "\"";
-            str += " rotate=\"" + group.getRotate() + "\">\n";
-            str += tabStr + "\t<children>\n";
-
-            for (int i = 0; i < group.getChildren().size(); i++)
-                str += ToFXMLString(group.getChildren().get(i), new PairMutable(0.0, 0.0), tabNum + 2) + "\n";
-
-            str += tabStr + "\t</children>\n";
-            str += tabStr + "</Group>";
-        }
-        else
-        {
-            throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
-        }
-
-        return str;
-    }
-
-    public static String AddLeadingZeros(String addZeros)
+    static public String FillAddLeadingZeros(String addZeros)
     {
         if (addZeros.length() < 8)
         {

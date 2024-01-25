@@ -9,7 +9,7 @@ package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
-import com.cyte.edamame.node.EDANode;
+import com.cyte.edamame.node.*;
 import com.cyte.edamame.util.PairMutable;
 import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.netlist.NetListExperimental;
@@ -89,25 +89,24 @@ public class EditorSchematic extends Editor
         if ((nodes == null) || nodes.isEmpty())
             return;
 
-        Group symbolNode = new Group();
-        //symbolNode.setStyle("-fx-background-color:black");
+        Group symbol = new Group();
         PairMutable dropPos = this.PaneHolderGetRealCenter();
 
-        symbolNode.setTranslateX(dropPos.GetLeftDouble());
-        symbolNode.setTranslateY(dropPos.GetRightDouble());
+        symbol.setTranslateX(dropPos.GetLeftDouble());
+        symbol.setTranslateY(dropPos.GetRightDouble());
 
-        symbolNode.getChildren().addAll(nodes);
+        symbol.getChildren().addAll(nodes);
 
-        LinkedList<PairMutable> snapsManualPos = null;
+        LinkedList<PairMutable> snapPointPos = null;
 
-        for (int i = 0; i < symbolNode.getChildren().size(); i++)
+        for (int i = 0; i < symbol.getChildren().size(); i++)
         {
-            Node node = symbolNode.getChildren().get(i);
+            Node node = symbol.getChildren().get(i);
 
             if (node.getClass() == Group.class)
             {
-                if (snapsManualPos == null)
-                    snapsManualPos = new LinkedList<PairMutable>();
+                if (snapPointPos == null)
+                    snapPointPos = new LinkedList<PairMutable>();
 
                 Group group = (Group)node;
 
@@ -116,27 +115,13 @@ public class EditorSchematic extends Editor
                     Node currChild = group.getChildren().get(j);
 
                     if (currChild.getClass() == Circle.class)
-                    {
-                        snapsManualPos.add(Utils.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())));
-                        //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(Utils.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())), 5.0, Color.RED, false);
-                    }
+                        snapPointPos.add(EDANode.GetPosInNodeParent(group, new PairMutable(currChild.getTranslateX(), currChild.getTranslateY())));
                 }
             }
         }
 
-        //System.out.println((nodeBounds.GetLeftPair().GetRightDouble() - nodeBounds.GetLeftPair().GetLeftDouble()) + ", " + (nodeBounds.GetRightPair().GetRightDouble() - nodeBounds.GetRightPair().GetLeftDouble()));
-
-        /*symbolNode.setMinWidth(Pane.USE_COMPUTED_SIZE);
-        symbolNode.setMinHeight(Pane.USE_COMPUTED_SIZE);
-        symbolNode.setMaxWidth(Pane.USE_COMPUTED_SIZE);
-        symbolNode.setMaxHeight(Pane.USE_COMPUTED_SIZE);
-        symbolNode.setPrefWidth(Pane.USE_COMPUTED_SIZE);
-        symbolNode.setPrefHeight(Pane.USE_COMPUTED_SIZE);*/
-
-        EDANode symbolRenderNode = new EDANode("LoadedSymbolNode", symbolNode, false, snapsManualPos, false, false, this);
-        this.NodeAdd(symbolRenderNode);
-
-        //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(dropPos, 15.0, Color.BLUE, false);
+        EDAGroup symbolNode = new EDAGroup("Symbol", symbol, snapPointPos, false, this);
+        symbolNode.Add();
     }
 
     public void OnDragOverSpecific(DragEvent event)
@@ -202,8 +187,8 @@ public class EditorSchematic extends Editor
                                         this.linePreview.setStrokeWidth(width);
                                         this.linePreview.setStroke(color);
 
-                                        EDANode renderNode = new EDANode("linePreview", this.linePreview, true, null, true, false, this);
-                                        this.NodeAdd(renderNode);
+                                        EDALine lineNode = new EDALine("linePreview", this.linePreview, true, this);
+                                        lineNode.Add();
 
                                         lineStarted = true;
                                     }
@@ -245,8 +230,8 @@ public class EditorSchematic extends Editor
 
                         this.LinePreviewRemove();
 
-                        EDANode renderNode = new EDANode("Wire", line, true, null, false, false, this);
-                        this.NodeAdd(renderNode);
+                        EDALine lineNode = new EDALine("Wire", line, false, this);
+                        lineNode.Add();
                     }
                 }
             }

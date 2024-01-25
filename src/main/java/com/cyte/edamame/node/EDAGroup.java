@@ -25,20 +25,20 @@ import javafx.scene.text.Text;
 
 import java.util.LinkedList;
 
-public class EDAPin extends EDANode
+public class EDAGroup extends EDANode
 {
     //// GLOBAL VARIABLES ////
 
-    public Group pin;
+    public Group group;
 
     //// CONSTRUCTORS ////
 
-    public EDAPin(String nameValue, Group nodeValue, LinkedList<PairMutable> snapPointPos, boolean passiveValue, Editor editorValue)
+    public EDAGroup(String nameValue, Group nodeValue, LinkedList<PairMutable> snapPointPos, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
-            throw new java.lang.Error("ERROR: Attempting to create an EDAPin \"" + nameValue + "\" without a supplied editor!");
+            throw new java.lang.Error("ERROR: Attempting to create an EDAGroup \"" + nameValue + "\" without a supplied editor!");
 
-        this.pin = nodeValue;
+        this.group = nodeValue;
 
         this.name = nameValue;
         this.highlighted = false;
@@ -63,66 +63,77 @@ public class EDAPin extends EDANode
 
     public void SetTranslate(PairMutable pos)
     {
-        this.pin.setTranslateX(pos.GetLeftDouble());
-        this.pin.setTranslateY(pos.GetRightDouble());
+        this.group.setTranslateX(pos.GetLeftDouble());
+        this.group.setTranslateY(pos.GetRightDouble());
     };
 
     public void SetRotate(double rot)
     {
-        this.pin.setRotate(rot);
+        this.group.setRotate(rot);
     };
 
     public void SetVisible(boolean visible)
     {
-        this.pin.setVisible(visible);
+        this.group.setVisible(visible);
     };
 
     //// GETTERS ////
 
     public Node GetNode()
     {
-        return this.pin;
+        return this.group;
     }
 
     public PairMutable GetTranslate()
     {
-        return new PairMutable(this.pin.getTranslateX(), this.pin.getTranslateY());
+        return new PairMutable(this.group.getTranslateX(), this.group.getTranslateY());
     };
 
     public double GetRotate()
     {
-        return this.pin.getRotate();
+        return this.group.getRotate();
     };
 
     public Bounds GetBoundsLocal()
     {
-        return this.pin.getBoundsInLocal();
+        return this.group.getBoundsInLocal();
     };
 
     public Bounds GetBoundsParent()
     {
-        return this.pin.getBoundsInParent();
+        return this.group.getBoundsInParent();
     };
 
     //// EDITOR FUNCTIONS ////
 
-    public void Rotate(double deltaY) {}
+    public void Rotate(double deltaY)
+    {
+        if (!this.selected)
+            return;
+
+        double angle = 10;
+
+        if (deltaY < 0)
+            angle = -10;
+
+        this.group.setRotate(this.group.getRotate() + angle);
+    }
 
     public void NodeAdd()
     {
-        this.editor.paneHolder.getChildren().add(1, this.pin);
+        this.editor.paneHolder.getChildren().add(1, this.group);
     };
 
     public void NodeRemove()
     {
-        this.editor.paneHolder.getChildren().remove(this.pin);
+        this.editor.paneHolder.getChildren().remove(this.group);
     };
 
     //// POSITION FUNCTIONS ////
 
     public PairMutable BoundsPosToHolderPane(PairMutable posOffset)
     {
-        Bounds boundsLocal = this.pin.getBoundsInLocal();
+        Bounds boundsLocal = this.group.getBoundsInLocal();
         PairMutable boundsRealEdgeL = this.PosToHolderPane(new PairMutable(boundsLocal.getMinX() + posOffset.GetLeftDouble(), boundsLocal.getMinY() + posOffset.GetRightDouble()));
         PairMutable boundsRealEdgeH = this.PosToHolderPane(new PairMutable(boundsLocal.getMaxX() + posOffset.GetLeftDouble(), boundsLocal.getMaxY() + posOffset.GetRightDouble()));
 
@@ -132,14 +143,14 @@ public class EDAPin extends EDANode
 
     public PairMutable PosToHolderPane(PairMutable pos)
     {
-        Point2D newPos = this.pin.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
+        Point2D newPos = this.group.localToParent(pos.GetLeftDouble(), pos.GetRightDouble());
 
         return new PairMutable(newPos.getX(), newPos.getY());
     }
 
     public boolean PosOnNode(PairMutable pos)
     {
-        return this.pin.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
+        return this.group.getBoundsInParent().contains(new Point2D(pos.GetLeftDouble(), pos.GetRightDouble()));
     }
 
     //// SNAP POINT FUNCTIONS ////
@@ -159,7 +170,7 @@ public class EDAPin extends EDANode
             }
             else
             {
-                throw new java.lang.Error("ERROR: Encountered unrecognized snap point when refreshing EDAPin snap points!");
+                throw new java.lang.Error("ERROR: Encountered unrecognized snap point when refreshing EDAGroup snap points!");
             }
 
             snapPoint.setTranslateX(posSnapReal.GetLeftDouble());
@@ -197,10 +208,7 @@ public class EDAPin extends EDANode
         posX.add(pos.GetLeftDouble() - boundsLocal.getWidth() / 2);
         posY.add(pos.GetRightDouble() - boundsLocal.getHeight() / 2);
 
-        if (this.pin.getChildren().size() != 2)
-            throw new java.lang.Error("ERROR: Attempting to load pin into global properties editor without 2 children!");
-
-        colors.add((Color)((Shape)this.pin.getChildren().get(0)).getStroke());
+        rots.add(this.GetRotate());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -255,7 +263,7 @@ public class EDAPin extends EDANode
                 {
                     Double newPosX = Double.parseDouble(posXStr);
 
-                    this.pin.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
+                    this.group.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
                 }
                 else if (!posXStr.equals("<mixed>"))
                 {
@@ -266,7 +274,7 @@ public class EDAPin extends EDANode
                 {
                     Double newPosY = Double.parseDouble(posYStr);
 
-                    this.pin.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
+                    this.group.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
                 }
                 else if (!posYStr.equals("<mixed>"))
                 {
@@ -276,73 +284,33 @@ public class EDAPin extends EDANode
 
         }
 
-        // Applying color...
+        // Applying rotation...
         {
-            Integer colorBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "colorBox");
+            Integer rotBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "rotBox");
 
-            if (colorBoxIdx != -1)
+            if (rotBoxIdx != -1)
             {
-                HBox colorBox = (HBox) propsBox.getChildren().get(colorBoxIdx);
-                ColorPicker colorPicker = (ColorPicker) EDAmameController.GetNodeById(colorBox.getChildren(), "color");
+                HBox rotBox = (HBox)propsBox.getChildren().get(rotBoxIdx);
+                TextField rotText = (TextField)EDAmameController.GetNodeById(rotBox.getChildren(), "rot");
 
-                if (colorPicker == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"color\" node in Symbol Editor properties window \"colorBox\" entry!");
+                if (rotText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"rot\" node in global properties window \"rotBox\" entry!");
 
-                Color color = colorPicker.getValue();
+                String rotStr = rotText.getText();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if (EDAmameController.IsStringNum(rotStr))
                 {
-                    if (this.pin.getChildren().size() != 2)
-                        throw new java.lang.Error("ERROR: Attempting to load pin into global properties window without 2 children!");
-
-                    ((Shape)this.pin.getChildren().get(0)).setFill(color);
-                    ((Shape)this.pin.getChildren().get(1)).setFill(color);
+                    this.SetRotate(Double.parseDouble(rotStr));
                 }
-                else
+                else if (!rotStr.equals("<mixed>"))
                 {
-                    if (color != null)
-                        EDAmameController.SetStatusBar("Unable to apply shape colors because the entered color is transparent!");
+                    EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
                 }
             }
         }
     }
 
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
-
-        // Applying pins...
-        {
-            if (this.pin.getChildren().size() != 2)
-                throw new java.lang.Error("ERROR: Attempting to apply pin from symbol properties window without 2 children!");
-            if (this.pin.getChildren().get(1).getClass() != Text.class)
-                throw new java.lang.Error("ERROR: Attempting to apply pin from symbol properties window without a text node!");
-
-            Integer pinLabelBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "pinLabelBox");
-
-            if (pinLabelBoxIdx != -1)
-            {
-                HBox pinLabelBox = (HBox)propsBox.getChildren().get(pinLabelBoxIdx);
-                TextField pinLabelText = (TextField)EDAmameController.GetNodeById(pinLabelBox.getChildren(), "pinLabels");
-
-                if (pinLabelText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"pinLabels\" node in global properties window \"pinLabelBox\" entry!");
-
-                String pinLabel = pinLabelText.getText();
-
-                if (!pinLabel.isEmpty())
-                {
-                    if (!pinLabel.equals("<mixed>"))
-                        ((Text)this.pin.getChildren().get(1)).setText(pinLabel);
-                }
-                else
-                {
-                    EDAmameController.SetStatusBar("Unable to apply pin label because the entered field is empty!");
-                }
-            }
-        }
-    }
+    public void PropsApplySymbol(VBox propsBox) {}
 
     //// SUPPORT FUNCTIONS ////
 
@@ -353,6 +321,6 @@ public class EDAPin extends EDANode
         for (int i = 0; i < this.snapPoints.size(); i++)
             clonedSnapPoints.add(new PairMutable(this.snapPoints.get(i).getTranslateX(), this.snapPoints.get(i).getTranslateY()));
 
-        return new EDAPin(this.name, (Group)EDANode.NodeClone(this.pin), clonedSnapPoints, this.passive, this.editor);
+        return new EDAGroup(this.name, (Group)EDANode.NodeClone(this.group), clonedSnapPoints, this.passive, this.editor);
     }
 }

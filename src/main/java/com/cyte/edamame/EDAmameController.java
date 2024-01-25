@@ -6,7 +6,7 @@
  */
 
 // TODO:
-// Implement Movable and Resizable interfaces into EDANode
+// Fix properties window position not applying properly
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something
 // Implement node copying
