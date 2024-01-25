@@ -191,11 +191,10 @@ public class EDAPin extends EDANode
             return;
 
         PairMutable pos = this.GetTranslate();
-        Bounds boundsLocal = this.GetBoundsLocal();
 
         names.add(this.name);
-        posX.add(pos.GetLeftDouble() - boundsLocal.getWidth() / 2);
-        posY.add(pos.GetRightDouble() - boundsLocal.getHeight() / 2);
+        posX.add(pos.GetLeftDouble() - this.editor.paneHolder.getWidth() / 2);
+        posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
 
         if (this.pin.getChildren().size() != 2)
             throw new java.lang.Error("ERROR: Attempting to load pin into global properties editor without 2 children!");
