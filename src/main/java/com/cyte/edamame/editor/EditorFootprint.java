@@ -8,14 +8,19 @@
 package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.EDAmameController;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.input.DragEvent;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Text;
+import javafx.collections.*;
 
 import java.io.IOException;
 
@@ -29,6 +34,8 @@ public class EditorFootprint extends Editor
     @FXML
     private Button innerButton;
 
+    public double snapGridSpacing;
+
     //// MAIN FUNCTIONS ////
 
     public static Editor Create() throws IOException
@@ -39,6 +46,7 @@ public class EditorFootprint extends Editor
         EditorFootprint editor = fxmlLoader.getController();
         editor.Init(2, "EditorFootprint");
         editor.Dissect(2, scene);
+        editor.snapGridSpacing = EDAmameController.Editor_SnapGridSpacings[EDAmameController.Editor_SnapGridSpacings.length / 2];
         editor.CanvasRenderGrid();
         editor.ListenersInit();
 
@@ -52,6 +60,28 @@ public class EditorFootprint extends Editor
     }
 
     //// CALLBACK FUNCTIONS ////
+
+    @FXML
+    public void SettingsKeyPressed()
+    {
+        // Handling element properties window...
+        if (EDAmameController.editorSettingsWindow == null)
+        {
+            // Attempting to create the properties window...
+            EditorSettings settingsWindow = EditorSettings.Create(this);
+
+            if (settingsWindow != null)
+            {
+                settingsWindow.stage.setOnHidden(e -> {
+                    EDAmameController.editorSettingsWindow = null;
+                });
+                settingsWindow.stage.show();
+
+                EDAmameController.editorSettingsWindow = settingsWindow;
+                settingsWindow.SettingsLoad();
+            }
+        }
+    }
 
     public void OnDragOverSpecific(DragEvent event)
     {}
@@ -87,4 +117,49 @@ public class EditorFootprint extends Editor
 
     public void PropsApplySpecific()
     {}
+
+    //// SETTINGS WINDOW FUNCTIONS ////
+
+    public void SettingsLoadSpecific()
+    {
+        Text globalHeader = new Text("Footprint Editor Settings:");
+        globalHeader.setStyle("-fx-font-weight: bold;");
+        globalHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(globalHeader);
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(new Separator());
+
+        // Creating grid spacing distance box...
+        {
+            HBox gridSpacingBox = new HBox(10);
+            gridSpacingBox.setId("gridSpacingBox");
+            gridSpacingBox.getChildren().add(new Label("Grid Spacing Distance: "));
+            ChoiceBox<Double> gridSpacing = new ChoiceBox<Double>();
+
+            for (int i = 0; i < EDAmameController.Editor_SnapGridSpacings.length; i++)
+                gridSpacing.getItems().add(EDAmameController.Editor_SnapGridSpacings[i]);
+
+            gridSpacing.setId("gridSpacing");
+            gridSpacingBox.getChildren().add(gridSpacing);
+
+            gridSpacing.setValue(this.snapGridSpacing);
+
+            EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(gridSpacingBox);
+        }
+    }
+
+    public void SettingsApplySpecific()
+    {
+        // Applying grid spacing distance...
+        {
+            Integer gridSpacingBoxIdx = EDAmameController.FindNodeById(EDAmameController.editorSettingsWindow.settingsBox.getChildren(), "gridSpacingBox");
+
+            if (gridSpacingBoxIdx != -1)
+            {
+                HBox gridSpacingBox = (HBox)EDAmameController.editorSettingsWindow.settingsBox.getChildren().get(gridSpacingBoxIdx);
+                ChoiceBox<Double> choiceBox = (ChoiceBox<Double>)EDAmameController.GetNodeById(gridSpacingBox.getChildren(), "gridSpacing");
+
+                this.snapGridSpacing = choiceBox.getValue();
+            }
+        }
+    }
 }

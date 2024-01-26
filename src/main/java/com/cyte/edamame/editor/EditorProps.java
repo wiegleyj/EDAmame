@@ -31,7 +31,7 @@ public class EditorProps
 
     //// MAIN FUNCTIONS ////
 
-    static public EditorProps Create()
+    static public EditorProps Create(Editor editorValue)
     {
         try
         {
@@ -46,6 +46,7 @@ public class EditorProps
             propsWindow.stage.setResizable(false);
             propsWindow.propsBox.setSpacing(10);
             propsWindow.propsBox.getChildren().add(new Label("Press \"Load Properties\" to load all element type properties\nfrom currently-active editor."));
+            propsWindow.editor = editorValue;
 
             return propsWindow;
         }

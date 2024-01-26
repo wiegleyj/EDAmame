@@ -24,7 +24,7 @@ import javafx.scene.shape.*;
 import javafx.geometry.*;
 import javafx.scene.text.*;
 
-public abstract class EDANode
+abstract public class EDANode
 {
     //// GLOBAL VARIABLES ////
 

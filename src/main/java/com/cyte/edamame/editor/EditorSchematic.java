@@ -21,6 +21,7 @@ import javafx.scene.control.*;
 import javafx.scene.input.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.*;
+import javafx.scene.text.Text;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -122,6 +123,28 @@ public class EditorSchematic extends Editor
 
         EDAGroup symbolNode = new EDAGroup("Symbol", symbol, snapPointPos, false, this);
         symbolNode.Add();
+    }
+
+    @FXML
+    public void SettingsKeyPressed()
+    {
+        // Handling element properties window...
+        if (EDAmameController.editorSettingsWindow == null)
+        {
+            // Attempting to create the properties window...
+            EditorSettings settingsWindow = EditorSettings.Create(this);
+
+            if (settingsWindow != null)
+            {
+                settingsWindow.stage.setOnHidden(e -> {
+                    EDAmameController.editorSettingsWindow = null;
+                });
+                settingsWindow.stage.show();
+
+                EDAmameController.editorSettingsWindow = settingsWindow;
+                settingsWindow.SettingsLoad();
+            }
+        }
     }
 
     public void OnDragOverSpecific(DragEvent event)
@@ -256,5 +279,19 @@ public class EditorSchematic extends Editor
     {}
 
     public void PropsApplySpecific()
+    {}
+
+    //// SETTINGS WINDOW FUNCTIONS ////
+
+    public void SettingsLoadSpecific()
+    {
+        Text globalHeader = new Text("Schematic Editor Settings:");
+        globalHeader.setStyle("-fx-font-weight: bold;");
+        globalHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(globalHeader);
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(new Separator());
+    }
+
+    public void SettingsApplySpecific()
     {}
 }

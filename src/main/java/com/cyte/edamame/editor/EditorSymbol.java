@@ -124,7 +124,7 @@ public class EditorSymbol extends Editor
     //// CALLBACK FUNCTIONS ////
 
     @FXML
-    public void Save()  // ASK!!!
+    public void Save()
     {
         LinkedList<Node> nodes = new LinkedList<Node>();
 
@@ -189,6 +189,32 @@ public class EditorSymbol extends Editor
 
                 EDAPin pin = new EDAPin("Pin", group, snapPointPos, false, this);
                 pin.Add();
+            }
+            else
+            {
+                throw new java.lang.Error("ERROR: Attempting to load a symbol from a FXML file with unrecognized Node types!");
+            }
+        }
+    }
+
+    @FXML
+    public void SettingsKeyPressed()
+    {
+        // Handling element properties window...
+        if (EDAmameController.editorSettingsWindow == null)
+        {
+            // Attempting to create the properties window...
+            EditorSettings settingsWindow = EditorSettings.Create(this);
+
+            if (settingsWindow != null)
+            {
+                settingsWindow.stage.setOnHidden(e -> {
+                    EDAmameController.editorSettingsWindow = null;
+                });
+                settingsWindow.stage.show();
+
+                EDAmameController.editorSettingsWindow = settingsWindow;
+                settingsWindow.SettingsLoad();
             }
         }
     }
@@ -544,7 +570,7 @@ public class EditorSymbol extends Editor
 
     //// PROPERTIES WINDOW FUNCTIONS ////
 
-    public void PropsLoadSpecific() // ASK!!!
+    public void PropsLoadSpecific()
     {
         if (this.shapesSelected == 0)
             return;
@@ -831,6 +857,20 @@ public class EditorSymbol extends Editor
         for (int i = 0; i < this.nodes.size(); i++)
             this.nodes.get(i).PropsApplySymbol(propsBox);
     }
+
+    //// SETTINGS WINDOW FUNCTIONS ////
+
+    public void SettingsLoadSpecific()
+    {
+        Text globalHeader = new Text("Symbol Editor Settings:");
+        globalHeader.setStyle("-fx-font-weight: bold;");
+        globalHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(globalHeader);
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(new Separator());
+    }
+
+    public void SettingsApplySpecific()
+    {}
 
     //// SUPPORT FUNCTIONS ////
 

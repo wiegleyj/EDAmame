@@ -90,6 +90,7 @@ public class EDAmameController implements Initializable
     final static public Double Editor_PinLabelFontSize = 10.0;
     final static public PairMutable Editor_PinLabelOffset = new PairMutable(5.0, 10.0);
     final static public Integer Editor_UndoStackMaxLen = 10;
+    final static public double[] Editor_SnapGridSpacings = {0.254, 0.508, 0.635, 1.27, 2.54, 5.08, 6.35};
 
     final static public Double Editor_CircleRadiusMin = 10.0;
     final static public Double Editor_CircleRadiusMax = 100.0;
@@ -140,6 +141,7 @@ public class EDAmameController implements Initializable
     public Timeline heartbeatTimeline;
     private final ObservableMap<Tab, Editor> editors = FXCollections.observableHashMap();   // All editors instantiated are remembered in a HashMap for fast lookup keyed by their main Editor_Tab.
     static public EditorProps editorPropertiesWindow = null;
+    static public EditorSettings editorSettingsWindow = null;
     static public LinkedList<KeyCode> pressedKeys = new LinkedList<KeyCode>();
     static public Label statusBarGlobal;
 
@@ -444,6 +446,10 @@ public class EDAmameController implements Initializable
         // Removing any active property windows for the active editor...
         if (EDAmameController.editorPropertiesWindow != null)
             EDAmameController.editorPropertiesWindow.stage.close();
+
+        // Removing the editor's settings window (if open)...
+        if (EDAmameController.editorSettingsWindow != null)
+            EDAmameController.editorSettingsWindow.stage.close();
 
         // Removing any active toolbars...
         editor.GetToolBar().setVisible(false);

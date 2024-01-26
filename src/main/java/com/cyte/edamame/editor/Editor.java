@@ -18,6 +18,7 @@ import java.util.logging.Level;
 
 import com.cyte.edamame.util.PairMutable;
 import javafx.collections.*;
+import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -39,7 +40,7 @@ import java.io.InvalidClassException;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-public abstract class Editor
+abstract public class Editor
 {
     //// GLOBAL VARIABLES ////
 
@@ -654,14 +655,13 @@ public abstract class Editor
         if (EDAmameController.IsKeyPressed(KeyCode.E) && (EDAmameController.editorPropertiesWindow == null))
         {
             // Attempting to create the properties window...
-            EditorProps propsWindow = EditorProps.Create();
+            EditorProps propsWindow = EditorProps.Create(this);
 
             if ((propsWindow != null))
             {
                 propsWindow.stage.setOnHidden(e -> {
                     EDAmameController.editorPropertiesWindow = null;
                 });
-                propsWindow.editor = this;
                 propsWindow.stage.show();
 
                 EDAmameController.editorPropertiesWindow = propsWindow;
@@ -960,15 +960,28 @@ public abstract class Editor
     abstract public void PropsLoadSpecific();
     abstract public void PropsApplySpecific();
 
-    //// SUPPORT FUNCTIONS ////
+    //// SETTINGS WINDOW FUNCTIONS ////
 
-    public NetListExperimental<String> ToNetList()
+    public void SettingsLoadGlobal()
     {
-        System.out.println("Have to refactor!");
+        Text globalHeader = new Text("Global Settings:");
+        globalHeader.setStyle("-fx-font-weight: bold;");
+        globalHeader.setStyle("-fx-font-size: 16px;");
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(globalHeader);
+        EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(new Separator());
+    }
 
-        return null;
+    public void SettingsApplyGlobal()
+    {}
 
-        /*LinkedList<EDANode> wires = new LinkedList<EDANode>();
+    abstract public void SettingsLoadSpecific();
+    abstract public void SettingsApplySpecific();
+
+    //// NETLIST FUNCTIONS ////
+
+    public NetListExperimental<String> ToNetList()  // ASK!!!
+    {
+        LinkedList<EDALine> wires = new LinkedList<EDALine>();
         LinkedList<String> pinLabels = new LinkedList<String>();
         LinkedList<PairMutable> pinPos = new LinkedList<PairMutable>();
         LinkedList<String> pinSymbolIDs = new LinkedList<String>();
@@ -976,21 +989,21 @@ public abstract class Editor
         // Populating the tables above...
         for (int i = 0; i < this.nodes.size(); i++)
         {
-            EDANode renderNode = this.nodes.get(i);
+            EDANode node = this.nodes.get(i);
 
             // If we're reading a wire...
-            if (renderNode.node.getClass() == Line.class)
+            if (node.getClass() == EDALine.class)
             {
-                wires.add(renderNode);
+                wires.add((EDALine)node);
             }
             // If we're reading a symbol...
-            else if (renderNode.node.getClass() == Group.class)
+            else if (node.getClass() == EDAGroup.class)
             {
-                Group symbol = (Group)renderNode.node;
+                Group symbolNode = (Group)node.GetNode();
 
-                for (int j = 0; j < symbol.getChildren().size(); j++)
+                for (int j = 0; j < symbolNode.getChildren().size(); j++)
                 {
-                    Node currSymbolChild = symbol.getChildren().get(j);
+                    Node currSymbolChild = symbolNode.getChildren().get(j);
 
                     if (currSymbolChild.getClass() == Group.class)
                     {
@@ -1005,7 +1018,7 @@ public abstract class Editor
                             if (currPinChild.getClass() == Text.class)
                                 label = ((Text)currPinChild).getText();
                             else if (currPinChild.getClass() == Circle.class)
-                                pos = Utils.GetPosInNodeParent(symbol, Utils.GetPosInNodeParent(pin, new PairMutable(currPinChild.getTranslateX(), currPinChild.getTranslateY())));
+                                pos = EDANode.GetPosInNodeParent(symbolNode, EDANode.GetPosInNodeParent(pin, new PairMutable(currPinChild.getTranslateX(), currPinChild.getTranslateY())));
                         }
 
                         if ((label == null) || (pos == null))
@@ -1013,7 +1026,7 @@ public abstract class Editor
 
                         pinLabels.add(label);
                         pinPos.add(pos);
-                        pinSymbolIDs.add(renderNode.id);
+                        pinSymbolIDs.add(node.id);
 
                         //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(pos, 20.0, Color.BLUE, 0.5, false);
                     }
@@ -1026,12 +1039,12 @@ public abstract class Editor
 
         for (int i = 0; i < wires.size(); i++)
         {
-            Line currWire = (Line)wires.get(i).node;
+            Line currWireNode = (Line)wires.get(i).GetNode();
 
             PairMutable nodeStart = null;
             PairMutable nodeEnd = null;
-            PairMutable wirePosStart = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getStartX(), currWire.getStartY()));
-            PairMutable wirePosEnd = Utils.GetPosInNodeParent(currWire, new PairMutable(currWire.getEndX(), currWire.getEndY()));
+            PairMutable wirePosStart = EDANode.GetPosInNodeParent(currWireNode, new PairMutable(currWireNode.getStartX(), currWireNode.getStartY()));
+            PairMutable wirePosEnd = EDANode.GetPosInNodeParent(currWireNode, new PairMutable(currWireNode.getEndX(), currWireNode.getEndY()));
 
             //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosStart, 20.0, Color.RED, 0.5, false);
             //this.Editor_RenderSystem.RenderSystem_TestShapeAdd(wirePosEnd, 20.0, Color.RED, 0.5, false);
@@ -1042,10 +1055,10 @@ public abstract class Editor
                 if (j == i)
                     continue;
 
-                Line checkWire = (Line)wires.get(j).node;
+                Line checkWireNode = (Line)wires.get(j).GetNode();
 
-                PairMutable checkPosStart = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getStartX(), checkWire.getStartY()));
-                PairMutable checkPosEnd = Utils.GetPosInNodeParent(checkWire, new PairMutable(checkWire.getEndX(), checkWire.getEndY()));
+                PairMutable checkPosStart = EDANode.GetPosInNodeParent(checkWireNode, new PairMutable(checkWireNode.getStartX(), checkWireNode.getStartY()));
+                PairMutable checkPosEnd = EDANode.GetPosInNodeParent(checkWireNode, new PairMutable(checkWireNode.getEndX(), checkWireNode.getEndY()));
 
                 if (checkPosStart.EqualsDouble(wirePosStart) || checkPosEnd.EqualsDouble(wirePosStart))
                     nodeStart = new PairMutable(wires.get(j).id, null);
@@ -1131,13 +1144,11 @@ public abstract class Editor
                 }
 
                 if (connectedPinIdx != -1)
-                {
                     this.NetListWireConnAdd(netList,
-                                                   pinSymbolIDs.get(connectedPinIdx),
-                                                   pinLabels.get(connectedPinIdx),
-                                                   currWireConn.GetRightPair().GetLeftString(),
-                                                   currWireConn.GetRightPair().GetRightString());
-                }
+                                            pinSymbolIDs.get(connectedPinIdx),
+                                            pinLabels.get(connectedPinIdx),
+                                            currWireConn.GetRightPair().GetLeftString(),
+                                            currWireConn.GetRightPair().GetRightString());
             }
         }
 
@@ -1153,7 +1164,7 @@ public abstract class Editor
         //    System.out.print(netList.Get(i).GetValue() + ", ");
         //System.out.println("::\n\n");
 
-        return netList;*/
+        return netList;
     }
 
     // REFACTOR THIS!!!
@@ -1203,7 +1214,7 @@ public abstract class Editor
     }
 
     // REFACTOR THIS!!!
-    static public int NetListWireFind(LinkedList<EDANode> wires, String id)
+    static public int NetListWireFind(LinkedList<EDALine> wires, String id)
     {
         for (int i = 0; i < wires.size(); i++)
             if (wires.get(i).id.equals(id))
@@ -1211,6 +1222,8 @@ public abstract class Editor
 
         return -1;
     }
+
+    //// SUPPORT FUNCTIONS ////
 
     public static void TextFieldListenerInit(TextField textField)
     {

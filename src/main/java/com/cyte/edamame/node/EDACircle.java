@@ -306,7 +306,6 @@ public class EDACircle extends EDANode
         if (!this.selected)
             return;
 
-
         // Applying name...
         {
             Integer nameBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "nameBox");

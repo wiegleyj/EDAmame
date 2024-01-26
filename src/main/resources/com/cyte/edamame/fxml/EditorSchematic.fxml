@@ -73,7 +73,7 @@
             </StackPane>
                 <VBox style="-fx-background-color: #dcdcdc;">
                     <Group>
-                        <Button mnemonicParsing="false" rotate="90.0" text="Properties" />
+                        <Button mnemonicParsing="false" onAction="#SettingsKeyPressed" rotate="90.0" text="Settings" />
                     </Group>
                 </VBox>
             </HBox>
