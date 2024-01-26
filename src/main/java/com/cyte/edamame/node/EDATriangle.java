@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -418,6 +419,18 @@ public class EDATriangle extends EDANode
                 }
             }
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+        strokeWidths.add(this.triangle.getStrokeWidth());
+        strokes.add(this.triangle.getStroke());
+
+        return true;
     }
 
     public void PropsApplySymbol(VBox propsBox)

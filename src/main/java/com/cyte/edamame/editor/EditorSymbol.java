@@ -569,70 +569,8 @@ public class EditorSymbol extends Editor
 
         for (int i = 0; i < this.nodes.size(); i++)
         {
-            EDANode node = this.nodes.get(i);
-
-            if (!node.selected)
-                continue;
-
-            Node nodeObj = node.GetNode();
-
-            if (nodeObj.getClass() == Circle.class)
-            {
-                circlesRadii.add(((Circle)nodeObj).getRadius());
-                strokeWidths.add(((Circle)nodeObj).getStrokeWidth());
-                strokes.add(((Circle)nodeObj).getStroke());
-
-                needHeader = true;
-            }
-            else if (nodeObj.getClass() == Rectangle.class)
-            {
-                rectsWidths.add(((Rectangle)nodeObj).getWidth());
-                rectsHeights.add(((Rectangle)nodeObj).getHeight());
-                strokeWidths.add(((Rectangle)nodeObj).getStrokeWidth());
-                strokes.add(((Rectangle)nodeObj).getStroke());
-
-                needHeader = true;
-            }
-            else if (nodeObj.getClass() == Polygon.class)
-            {
-                trisLens.add(((Polygon)nodeObj).getPoints().get(2) - ((Polygon)nodeObj).getPoints().get(0));
-                strokeWidths.add(((Polygon)nodeObj).getStrokeWidth());
-                strokes.add(((Polygon)nodeObj).getStroke());
-
-                needHeader = true;
-            }
-            else if (nodeObj.getClass() == Line.class)
-            {
-                Line line = (Line)nodeObj;
-
-                lineStartPosX.add(line.getStartX());
-                lineStartPosY.add(line.getStartY());
-                lineEndPosX.add(line.getEndX());
-                lineEndPosY.add(line.getEndY());
-                lineWidths.add(line.getStrokeWidth());
-
-                needHeader = true;
-            }
-            else if (nodeObj.getClass() == Text.class)
-            {
-                textContents.add(((Text)nodeObj).getText());
-                textFontSizes.add(((Text)nodeObj).getFont().getSize());
-
-                needHeader = true;
-            }
-            else if (nodeObj.getClass() == Group.class)
-            {
-                Group group = (Group)nodeObj;
-
-                if (group.getChildren().size() != 2)
-                    throw new java.lang.Error("ERROR: Attempting to load pin into symbol properties window without 2 children!");
-                if (group.getChildren().get(1).getClass() != Text.class)
-                    throw new java.lang.Error("ERROR: Attempting to load pin into symbol properties window without a text node!");
-
-                pinLabels.add(((Text)group.getChildren().get(1)).getText());
-
-                needHeader = true;
-            }
+            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadSymbol(circlesRadii, rectsWidths, rectsHeights, trisLens, lineStartPosX, lineStartPosY, lineEndPosX, lineEndPosY, lineWidths, strokeWidths, strokes, textContents, textFontSizes, pinLabels);
+            needHeader = needHeader || shapeNeedHeader;
         }
 
         // Creating header...

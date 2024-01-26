@@ -355,7 +355,7 @@ public abstract class EDANode
 
     abstract public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors);
     abstract public void PropsApplyGlobal(VBox propsBox);
-    //abstract public void PropsLoadSymbol(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors);
+    abstract public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels);
     abstract public void PropsApplySymbol(VBox propsBox);
 
     //// SUPPORT FUNCTIONS ////

@@ -19,6 +19,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
@@ -421,12 +422,22 @@ public class EDACircle extends EDANode
         }
     }
 
+    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        circlesRadii.add(this.circle.getRadius());
+        strokeWidths.add(this.circle.getStrokeWidth());
+        strokes.add(this.circle.getStroke());
+
+        return true;
+    }
+
     public void PropsApplySymbol(VBox propsBox)
     {
         if (!this.selected)
             return;
-
-
         // Applying circle radius...
         {
             Integer circleBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "circleBox");
