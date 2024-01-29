@@ -6,6 +6,9 @@
  */
 
 // TODO:
+// Implement holes and vias
+// Implement footprint editor properties window
+// Fix canvas actually rendering the grid spacing
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something
 // Implement node copying
@@ -20,7 +23,6 @@
 // Refactor all editor Panes to Groups
 // Fix 3+ editors crashing
 // Fix mouse-specific release callback function
-// Implement undo-redo functionalities
 // Implement proper getters & setters for all class fields
 
 package com.cyte.edamame;
@@ -75,7 +77,6 @@ public class EDAmameController implements Initializable
     final static public PairMutable Editor_TheaterSize = new PairMutable(1000.0, 1000.0);
     final static public Color[] Editor_BackgroundColors = {Color.BEIGE, Color.LIGHTBLUE, Color.DARKBLUE, Color.MAROON};
     final static public Color[] Editor_GridPointColors = {Color.GRAY, Color.GRAY, Color.YELLOW, Color.YELLOW};
-    final static public Color[] Editor_GridBoxColors = {Color.BLACK,Color.BLACK, Color.YELLOW, Color.YELLOW};
     final static public Integer Editor_MaxShapes = 10000;
     final static public PairMutable Editor_ZoomLimits = new PairMutable(0.35, 5.0);
     final static public Double Editor_ZoomFactor = 1.5;
@@ -91,26 +92,30 @@ public class EDAmameController implements Initializable
     final static public PairMutable Editor_PinLabelOffset = new PairMutable(5.0, 10.0);
     final static public Integer Editor_UndoStackMaxLen = 10;
     final static public double[] Editor_SnapGridSpacings = {0.254, 0.508, 0.635, 1.27, 2.54, 5.08, 6.35};
+    final static public double Editor_CursorPreviewRadius = 5;
+    final static public double Editor_CursorPreviewBorderWidth = 2;
+    final static public String[] Editor_PCBLayers = {"Copper Front", "Copper Rear", "Edge Cuts", "Silkscreen"};
+    final static public Color[] Editor_PCBLayerColors = {Color.RED, Color.LIGHTBLUE, Color.WHITE, Color.YELLOW};
 
-    final static public Double Editor_CircleRadiusMin = 10.0;
-    final static public Double Editor_CircleRadiusMax = 100.0;
-    final static public Double Editor_RectWidthMin = 10.0;
-    final static public Double Editor_RectWidthMax = 500.0;
-    final static public Double Editor_RectHeightMin = 10.0;
-    final static public Double Editor_RectHeightMax = 500.0;
-    final static public Double Editor_TriLenMin = 10.0;
-    final static public Double Editor_TriLenMax = 500.0;
-    final static public Double Editor_BorderMin = 0.0;
-    final static public Double Editor_BorderMax = 10.0;
-    final static public Double Editor_TextFontSizeMin = 10.0;
-    final static public Double Editor_TextFontSizeMax = 100.0;
-    final static public Double Editor_LineWidthMin = 1.0;
-    final static public Double Editor_LineWidthMax = 20.0;
-    final static public Double Editor_PinRadiusMin = 5.0;
-    final static public Double Editor_PinRadiusMax = 10.0;
-    final static public Double Editor_WireWidthMin = 3.0;
-    final static public Double Editor_WireWidthMax = 10.0;
-    final static public int Editor_MaxChars = 10;
+    final static public Double EditorSymbol_CircleRadiusMin = 10.0;
+    final static public Double EditorSymbol_CircleRadiusMax = 100.0;
+    final static public Double EditorSymbol_RectWidthMin = 10.0;
+    final static public Double EditorSymbol_RectWidthMax = 500.0;
+    final static public Double EditorSymbol_RectHeightMin = 10.0;
+    final static public Double EditorSymbol_RectHeightMax = 500.0;
+    final static public Double EditorSymbol_TriLenMin = 10.0;
+    final static public Double EditorSymbol_TriLenMax = 500.0;
+    final static public Double EditorSymbol_BorderMin = 0.0;
+    final static public Double EditorSymbol_BorderMax = 10.0;
+    final static public Double EditorSymbol_TextFontSizeMin = 10.0;
+    final static public Double EditorSymbol_TextFontSizeMax = 100.0;
+    final static public Double EditorSymbol_LineWidthMin = 1.0;
+    final static public Double EditorSymbol_LineWidthMax = 20.0;
+    final static public Double EditorSymbol_PinRadiusMin = 5.0;
+    final static public Double EditorSymbol_PinRadiusMax = 10.0;
+    final static public Double EditorSymbol_WireWidthMin = 3.0;
+    final static public Double EditorSymbol_WireWidthMax = 10.0;
+    final static public int EditorSymbol_MaxChars = 10;
 
     final static public Logger logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

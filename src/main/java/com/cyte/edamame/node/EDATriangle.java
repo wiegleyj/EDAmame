@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ColorPicker;
@@ -21,8 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.LinkedList;
 
@@ -34,7 +31,7 @@ public class EDATriangle extends EDANode
 
     //// CONSTRUCTORS ////
 
-    public EDATriangle(String nameValue, Polygon nodeValue, boolean passiveValue, Editor editorValue)
+    public EDATriangle(String nameValue, Polygon nodeValue, boolean createSnapPoints, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDATriangle \"" + nameValue + "\" without a supplied editor!");
@@ -56,7 +53,9 @@ public class EDATriangle extends EDANode
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate();
+
+            if (createSnapPoints)
+                this.SnapPointsCreate();
         }
     }
 
@@ -285,7 +284,7 @@ public class EDATriangle extends EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors)
+    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots)
     {
         if (!this.selected)
             return;
@@ -297,8 +296,6 @@ public class EDATriangle extends EDANode
         posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
 
         rots.add(this.GetRotate());
-
-        colors.add((Color)this.triangle.getFill());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -393,6 +390,27 @@ public class EDATriangle extends EDANode
                     EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
             }
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        colors.add(this.triangle.getFill());
+
+        strokeWidths.add(this.triangle.getStrokeWidth());
+        strokes.add(this.triangle.getStroke());
+
+        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+
+        return true;
+    }
+
+    public void PropsApplySymbol(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
 
         // Applying color...
         {
@@ -419,54 +437,6 @@ public class EDATriangle extends EDANode
                 }
             }
         }
-    }
-
-    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
-    {
-        if (!this.selected)
-            return false;
-
-        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
-        strokeWidths.add(this.triangle.getStrokeWidth());
-        strokes.add(this.triangle.getStroke());
-
-        return true;
-    }
-
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
-
-        // Applying triangle length...
-        {
-            Integer triBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "triBox");
-
-            if (triBoxIdx != -1)
-            {
-                HBox triBox = (HBox) propsBox.getChildren().get(triBoxIdx);
-                TextField lensText = (TextField) EDAmameController.GetNodeById(triBox.getChildren(), "triLens");
-
-                if (lensText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"triLens\" node in Symbol Editor properties window \"triBox\" entry!");
-
-                String lenStr = lensText.getText();
-
-                if (EDAmameController.IsStringNum(lenStr))
-                {
-                    Double newLen = Double.parseDouble(lenStr);
-
-                    if ((newLen >= EDAmameController.Editor_TriLenMin) && (newLen <= EDAmameController.Editor_TriLenMax))
-                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
-                    else
-                        EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.Editor_TriLenMin + ", " + EDAmameController.Editor_TriLenMax + ")");
-                }
-                else if (!lenStr.equals("<mixed>"))
-                {
-                    EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is non-numeric!");
-                }
-            }
-        }
 
         // Applying borders...
         {
@@ -486,10 +456,10 @@ public class EDATriangle extends EDANode
                 {
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
-                    if ((newStrokeWidth >= EDAmameController.Editor_BorderMin) && (newStrokeWidth <= EDAmameController.Editor_BorderMax))
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
                         this.triangle.setStrokeWidth(newStrokeWidth);
                     else
-                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
                 else if (!strokeWidthStr.equals("<mixed>"))
                 {
@@ -520,12 +490,42 @@ public class EDATriangle extends EDANode
                 }
             }
         }
+
+        // Applying triangle length...
+        {
+            Integer triBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "triBox");
+
+            if (triBoxIdx != -1)
+            {
+                HBox triBox = (HBox) propsBox.getChildren().get(triBoxIdx);
+                TextField lensText = (TextField) EDAmameController.GetNodeById(triBox.getChildren(), "triLens");
+
+                if (lensText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"triLens\" node in Symbol Editor properties window \"triBox\" entry!");
+
+                String lenStr = lensText.getText();
+
+                if (EDAmameController.IsStringNum(lenStr))
+                {
+                    Double newLen = Double.parseDouble(lenStr);
+
+                    if ((newLen >= EDAmameController.EditorSymbol_TriLenMin) && (newLen <= EDAmameController.EditorSymbol_TriLenMax))
+                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
+                }
+                else if (!lenStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is non-numeric!");
+                }
+            }
+        }
     }
 
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()
     {
-        return new EDATriangle(this.name, (Polygon)EDANode.NodeClone(this.triangle), this.passive, this.editor);
+        return new EDATriangle(this.name, (Polygon)EDANode.NodeClone(this.triangle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
 }

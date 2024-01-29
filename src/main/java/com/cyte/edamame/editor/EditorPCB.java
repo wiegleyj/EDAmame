@@ -9,6 +9,7 @@ package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
+import com.cyte.edamame.util.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
@@ -18,6 +19,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
+import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
 import javafx.collections.*;
 
@@ -31,9 +33,9 @@ public class EditorPCB extends Editor
     //// GLOBAL VARIABLES ////
 
     @FXML
-    private Button innerButton;
-
-    public double snapGridSpacing;
+    public Button innerButton;
+    @FXML
+    public Circle cursorPreview;
 
     //// MAIN FUNCTIONS ////
 
@@ -49,6 +51,10 @@ public class EditorPCB extends Editor
         editor.CanvasRenderGrid();
         editor.ListenersInit();
 
+        editor.cursorPreview.setRadius(EDAmameController.Editor_CursorPreviewRadius);
+        editor.cursorPreview.setStroke(EDAmameController.Editor_GridPointColors[3]);
+        editor.cursorPreview.setStrokeWidth(EDAmameController.Editor_CursorPreviewBorderWidth);
+
         return editor;
     }
 
@@ -56,6 +62,22 @@ public class EditorPCB extends Editor
     public void initialize()
     {
         System.out.println("I was initialized, the button was " + this.innerButton);
+    }
+
+    //// CURSOR FUNCTIONS ////
+
+    public PairMutable CursorPreviewGetPos()
+    {
+        return new PairMutable(this.cursorPreview.getTranslateX(), this.cursorPreview.getTranslateY());
+    }
+
+    public void CursorPreviewUpdate(PairMutable pos)
+    {
+        PairMutable realPos = this.PaneHolderGetRealPos(this.PanePosListenerToHolder(pos));
+        PairMutable snappedPos = this.PanePosHolderToListener(this.PaneHolderGetDrawPos(this.PosSnapToGridPoint(realPos)));
+
+        this.cursorPreview.setTranslateX(snappedPos.GetLeftDouble());
+        this.cursorPreview.setTranslateY(snappedPos.GetRightDouble());
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -131,7 +153,7 @@ public class EditorPCB extends Editor
         {
             HBox gridSpacingBox = new HBox(10);
             gridSpacingBox.setId("gridSpacingBox");
-            gridSpacingBox.getChildren().add(new Label("Grid Spacing Distance: "));
+            gridSpacingBox.getChildren().add(new Label("Grid Spacing Distance (mm): "));
             ChoiceBox<Double> gridSpacing = new ChoiceBox<Double>();
 
             for (int i = 0; i < EDAmameController.Editor_SnapGridSpacings.length; i++)

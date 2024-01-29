@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.node.*;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import com.cyte.edamame.netlist.NetListExperimental;
 
 import javafx.fxml.FXML;
@@ -34,7 +33,9 @@ public class EditorSchematic extends Editor
     //// GLOBAL VARIABLES ////
 
     @FXML
-    private Button innerButton;
+    public Button innerButton;
+    @FXML
+    public Circle cursorPreview;
     @FXML
     public ToggleGroup toggleGroup;
     @FXML
@@ -57,6 +58,10 @@ public class EditorSchematic extends Editor
 
         Editor.TextFieldListenerInit(editor.wireWidth);
 
+        editor.cursorPreview.setRadius(EDAmameController.Editor_CursorPreviewRadius);
+        editor.cursorPreview.setStroke(EDAmameController.Editor_GridPointColors[1]);
+        editor.cursorPreview.setStrokeWidth(EDAmameController.Editor_CursorPreviewBorderWidth);
+
         return editor;
     }
 
@@ -64,6 +69,19 @@ public class EditorSchematic extends Editor
     public void initialize()
     {
         System.out.println("I was initialized, the button was " + this.innerButton);
+    }
+
+    //// CURSOR FUNCTIONS ////
+
+    public PairMutable CursorPreviewGetPos()
+    {
+        return new PairMutable(this.cursorPreview.getTranslateX(), this.cursorPreview.getTranslateY());
+    }
+
+    public void CursorPreviewUpdate(PairMutable pos)
+    {
+        this.cursorPreview.setTranslateX(pos.GetLeftDouble());
+        this.cursorPreview.setTranslateY(pos.GetRightDouble());
     }
 
     //// CALLBACK FUNCTIONS ////
@@ -121,7 +139,7 @@ public class EditorSchematic extends Editor
             }
         }
 
-        EDAGroup symbolNode = new EDAGroup("Symbol", symbol, snapPointPos, false, this);
+        EDASymbol symbolNode = new EDASymbol("Symbol", symbol, snapPointPos, false, this);
         symbolNode.Add();
     }
 
@@ -161,16 +179,12 @@ public class EditorSchematic extends Editor
 
     public void OnMouseReleasedSpecific(MouseEvent event)
     {
-        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(event.getX(), event.getY()));
+        PairMutable dropPos = this.PanePosListenerToHolder(new PairMutable(this.cursorPreview.getTranslateX(), this.cursorPreview.getTranslateY()));
         dropPos = this.MagneticSnapCheck(dropPos);
         PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
         // Handling element dropping (only if we're not hovering over, selecting, moving any shapes or box selecting)
-        if ((this.shapesSelected == 0) &&
-                !this.shapesMoving &&
-                (this.selectionBox == null) &&
-                !this.shapesWereSelected &&
-                !this.wasSelectionBox)
+        if (this.CanDropSomething())
         {
             RadioButton selectedShapeButton = (RadioButton) toggleGroup.getSelectedToggle();
 
@@ -196,7 +210,7 @@ public class EditorSchematic extends Editor
                             {
                                 double width = Double.parseDouble(stringWidth);
 
-                                if (((width >= EDAmameController.Editor_WireWidthMin) && (width <= EDAmameController.Editor_WireWidthMax)))
+                                if (((width >= EDAmameController.EditorSymbol_WireWidthMin) && (width <= EDAmameController.EditorSymbol_WireWidthMax)))
                                 {
                                     if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
                                     {
@@ -210,7 +224,7 @@ public class EditorSchematic extends Editor
                                         this.linePreview.setStrokeWidth(width);
                                         this.linePreview.setStroke(color);
 
-                                        EDALine lineNode = new EDALine("linePreview", this.linePreview, true, this);
+                                        EDALine lineNode = new EDALine("linePreview", this.linePreview, false, true, this);
                                         lineNode.Add();
 
                                         lineStarted = true;
@@ -222,7 +236,7 @@ public class EditorSchematic extends Editor
                                 }
                                 else
                                 {
-                                    EDAmameController.SetStatusBar("Unable to drop wire because the entered width is outside the limits! (Width limits: " + EDAmameController.Editor_WireWidthMin + ", " + EDAmameController.Editor_WireWidthMax + ")");
+                                    EDAmameController.SetStatusBar("Unable to drop wire because the entered width is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_WireWidthMin + ", " + EDAmameController.EditorSymbol_WireWidthMax + ")");
                                 }
                             }
                             else
@@ -253,7 +267,7 @@ public class EditorSchematic extends Editor
 
                         this.LinePreviewRemove();
 
-                        EDALine lineNode = new EDALine("Wire", line, false, this);
+                        EDALine lineNode = new EDALine("Wire", line, true, false, this);
                         lineNode.Add();
                     }
                 }

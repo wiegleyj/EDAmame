@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ColorPicker;
@@ -20,7 +19,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
-import javafx.scene.shape.*;
 import javafx.scene.text.*;
 
 import java.util.LinkedList;
@@ -33,7 +31,7 @@ public class EDAText extends EDANode
 
     //// CONSTRUCTORS ////
 
-    public EDAText(String nameValue, Text nodeValue, boolean passiveValue, Editor editorValue)
+    public EDAText(String nameValue, Text nodeValue, boolean createSnapPoints, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDAText \"" + nameValue + "\" without a supplied editor!");
@@ -55,7 +53,9 @@ public class EDAText extends EDANode
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate();
+
+            if (createSnapPoints)
+                this.SnapPointsCreate();
         }
     }
 
@@ -289,7 +289,7 @@ public class EDAText extends EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors)
+    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots)
     {
         if (!this.selected)
             return;
@@ -297,12 +297,11 @@ public class EDAText extends EDANode
         PairMutable pos = this.GetTranslate();
 
         names.add(this.name);
+
         posX.add(pos.GetLeftDouble() - this.editor.paneHolder.getWidth() / 2);
         posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
 
         rots.add(this.GetRotate());
-
-        colors.add((Color)this.text.getFill());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -397,6 +396,25 @@ public class EDAText extends EDANode
                     EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
             }
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        colors.add(this.text.getFill());
+
+        textContents.add(this.text.getText());
+        textFontSizes.add(this.text.getFont().getSize());
+
+        return true;
+    }
+
+    public void PropsApplySymbol(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
 
         // Applying color...
         {
@@ -423,23 +441,6 @@ public class EDAText extends EDANode
                 }
             }
         }
-    }
-
-    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
-    {
-        if (!this.selected)
-            return false;
-
-        textContents.add(this.text.getText());
-        textFontSizes.add(this.text.getFont().getSize());
-
-        return true;
-    }
-
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
 
         // Applying texts...
         {
@@ -482,10 +483,10 @@ public class EDAText extends EDANode
                 {
                     double fontSize = Double.parseDouble(fontSizeStr);
 
-                    if (((fontSize >= EDAmameController.Editor_TextFontSizeMin) && (fontSize <= EDAmameController.Editor_TextFontSizeMax)))
+                    if (((fontSize >= EDAmameController.EditorSymbol_TextFontSizeMin) && (fontSize <= EDAmameController.EditorSymbol_TextFontSizeMax)))
                         this.text.setFont(new Font("Arial", fontSize));
                     else
-                        EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.Editor_TextFontSizeMin + ", " + EDAmameController.Editor_TextFontSizeMax + ")");
+                        EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_TextFontSizeMin + ", " + EDAmameController.EditorSymbol_TextFontSizeMax + ")");
                 }
                 else if (!fontSizeStr.equals("<mixed>"))
                 {
@@ -499,6 +500,6 @@ public class EDAText extends EDANode
 
     public EDANode Clone()
     {
-        return new EDAText(this.name, (Text)EDANode.NodeClone(this.text), this.passive, this.editor);
+        return new EDAText(this.name, (Text)EDANode.NodeClone(this.text), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
 }

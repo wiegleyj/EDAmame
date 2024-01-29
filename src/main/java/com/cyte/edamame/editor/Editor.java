@@ -18,7 +18,6 @@ import java.util.logging.Level;
 
 import com.cyte.edamame.util.PairMutable;
 import javafx.collections.*;
-import javafx.fxml.FXML;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
 import javafx.scene.control.*;
@@ -82,7 +81,6 @@ abstract public class Editor
     public Pane paneSnaps;
     public Canvas canvas;
     public GraphicsContext gc;
-    public Shape crosshair;
     public PairMutable theaterSize;
     public Color backgroundColor;
     public Color gridPointColor;
@@ -108,6 +106,7 @@ abstract public class Editor
     public Rectangle selectionBox = null;
     public boolean wasSelectionBox = false;
     public Line linePreview = null;
+    public double snapGridSpacing = -1;
 
     public MementoExperimental undoRedoSystem = null;
 
@@ -118,13 +117,6 @@ abstract public class Editor
         this.type = type;
         this.name = name;
 
-        this.theaterSize = EDAmameController.Editor_TheaterSize;
-        this.backgroundColor = EDAmameController.Editor_BackgroundColors[type];
-        this.gridPointColor = EDAmameController.Editor_GridPointColors[type];
-        this.gridBoxColor = EDAmameController.Editor_GridBoxColors[type];
-        this.maxShapes = EDAmameController.Editor_MaxShapes;
-        this.nodes = new LinkedList<EDANode>();
-
         this.center = new PairMutable(0.0, 0.0);
         this.zoomLimits = EDAmameController.Editor_ZoomLimits;
         this.zoomFactor = EDAmameController.Editor_ZoomFactor;
@@ -132,6 +124,13 @@ abstract public class Editor
         this.mouseDragCheckTimeout = EDAmameController.Editor_MouseCheckTimeout;
         this.selectionBoxColor = EDAmameController.Editor_SelectionBoxColors[this.type];
         this.selectionBoxWidth = EDAmameController.Editor_SelectionBoxWidth;
+
+        this.theaterSize = EDAmameController.Editor_TheaterSize;
+        this.backgroundColor = EDAmameController.Editor_BackgroundColors[type];
+        this.gridPointColor = EDAmameController.Editor_GridPointColors[type];
+        this.gridBoxColor = EDAmameController.Editor_GridPointColors[type];
+        this.maxShapes = EDAmameController.Editor_MaxShapes;
+        this.nodes = new LinkedList<EDANode>();
 
         this.undoRedoSystem = new MementoExperimental(this);
     }
@@ -167,9 +166,6 @@ abstract public class Editor
 
             this.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
             this.paneHolder.setLayoutY(centeredPos.GetRightDouble());
-
-            this.crosshair.setTranslateX(this.paneListener.getWidth() / 2);
-            this.crosshair.setTranslateY(this.paneListener.getHeight() / 2);
         }
 
         //for (int i = 0; i < this.Editor_RenderSystem.RenderSystem_Nodes.size(); i++)
@@ -202,147 +198,6 @@ abstract public class Editor
      * @return A (possibly empty) list of control Editor_Tabs.
      */
     public ObservableList<Tab> GetControlTabs() { return tabs; }
-
-    //// RENDERING FUNCTIONS ////
-
-    public void NodesDeselectAll()
-    {
-        // Deselecting all the nodes...
-        for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).Deselect();
-
-        // Removing the selection box...
-        if (this.selectionBox != null)
-        {
-            this.paneListener.getChildren().remove(this.selectionBox);
-            this.selectionBox = null;
-            this.wasSelectionBox = true;
-        }
-        else
-        {
-            this.wasSelectionBox = false;
-        }
-    }
-
-    public void NodeSnapPointsCheck(PairMutable posEvent)
-    {
-        PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
-
-        for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).SnapPointsCheck(posMouse);
-    }
-
-    static public void LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
-    {
-        PairMutable posAvg = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2, (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
-
-        line.setStartX(posStart.GetLeftDouble() - posAvg.GetLeftDouble());
-        line.setStartY(posStart.GetRightDouble() - posAvg.GetRightDouble());
-        line.setEndX(posEnd.GetLeftDouble() - posAvg.GetLeftDouble());
-        line.setEndY(posEnd.GetRightDouble() - posAvg.GetRightDouble());
-
-        line.setTranslateX(posAvg.GetLeftDouble());
-        line.setTranslateY(posAvg.GetRightDouble());
-    }
-
-    static public PairMutable LineEndPointsCalculate(Line line, boolean start)
-    {
-        if (start)
-            return new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY());
-
-        return new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY());
-    }
-
-    public void LinePreviewUpdate(PairMutable dropPos)
-    {
-        this.linePreview.setEndX(dropPos.GetLeftDouble());
-        this.linePreview.setEndY(dropPos.GetRightDouble());
-    }
-
-    public void LinePreviewRemove()
-    {
-        this.nodes.get(this.NodeFindByName("linePreview")).Remove();
-        this.linePreview = null;
-    }
-
-    public void NodeHighlightsCheck(PairMutable posEvent)
-    {
-        for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).HighlightsCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
-    }
-
-    public void MouseDragUpdate(PairMutable posMouse)
-    {
-        this.mouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.mouseDragFactor / this.zoom,
-                                                       (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
-    }
-
-    public void MouseDragReset(PairMutable posMouse)
-    {
-        this.mouseDragFirstPos = new PairMutable(posMouse);
-        this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(),
-                                                           this.center.GetRightDouble());
-        this.mouseDragPaneFirstPos = new PairMutable(this.PaneHolderGetTranslate());
-
-        if (this.shapesSelected > 0)
-            for (int i = 0; i < this.nodes.size(); i++)
-                this.nodes.get(i).MoveReset();
-    }
-
-    public void CanvasRenderGrid()
-    {
-        // Clearing the canvas
-        this.CanvasClear();
-
-        // Drawing the points
-        gc.setFill(this.gridPointColor);
-        gc.setGlobalAlpha(1.0);
-        Double width = 3.0;
-
-        Double posX = -2500.0;
-        Double posY = -2500.0;
-
-        for (int i = 0; i < 70; i++)
-        {
-            for (int j = 0; j < 70; j++)
-            {
-                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
-
-                posX += 100.0;
-            }
-
-            posX = -2500.0;
-            posY += 100.0;
-        }
-
-        // Drawing the grid box
-        gc.setStroke(this.gridBoxColor);
-        gc.setGlobalAlpha(1.0);
-        gc.setLineWidth(2.0);
-        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
-                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
-                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
-    }
-
-    public void CanvasClear()
-    {
-        this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
-        this.gc.setFill(this.backgroundColor);
-        this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
-    }
 
     //// PANE FUNCTIONS ////
 
@@ -414,7 +269,98 @@ abstract public class Editor
         return new PairMutable(this.paneHolder.getTranslateX(), this.paneHolder.getTranslateY());
     }
 
+    //// CANVAS FUNCTIONS ////
+
+    public void CanvasRenderGrid()
+    {
+        // Clearing the canvas
+        this.CanvasClear();
+
+        // Drawing the points
+        gc.setFill(this.gridPointColor);
+        gc.setGlobalAlpha(1.0);
+        Double width = 3.0;
+
+        double spacing = 100;
+        Double posX = -2500.0;
+        Double posY = -2500.0;
+
+        for (int i = 0; i < 70; i++)
+        {
+            for (int j = 0; j < 70; j++)
+            {
+                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
+
+                posX += spacing;
+            }
+
+            posX = -2500.0;
+            posY += spacing;
+        }
+
+        // Drawing the grid box
+        gc.setStroke(this.gridBoxColor);
+        gc.setGlobalAlpha(1.0);
+        gc.setLineWidth(2.0);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+        gc.strokeLine(this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + EDAmameController.Editor_TheaterSize.GetRightDouble() / 2,
+                this.canvas.getWidth() / 2 + -EDAmameController.Editor_TheaterSize.GetLeftDouble() / 2,
+                this.canvas.getHeight() / 2 + -EDAmameController.Editor_TheaterSize.GetRightDouble() / 2);
+    }
+
+    public void CanvasClear()
+    {
+        this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+        this.gc.setFill(this.backgroundColor);
+        this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
     //// NODE FUNCTIONS ////
+
+    public void NodesDeselectAll()
+    {
+        // Deselecting all the nodes...
+        for (int i = 0; i < this.nodes.size(); i++)
+            this.nodes.get(i).Deselect();
+
+        // Removing the selection box...
+        if (this.selectionBox != null)
+        {
+            this.paneListener.getChildren().remove(this.selectionBox);
+            this.selectionBox = null;
+            this.wasSelectionBox = true;
+        }
+        else
+        {
+            this.wasSelectionBox = false;
+        }
+    }
+
+    public void NodeSnapPointsCheck(PairMutable posEvent)
+    {
+        PairMutable posMouse = this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble()));
+
+        for (int i = 0; i < this.nodes.size(); i++)
+            this.nodes.get(i).SnapPointsCheck(posMouse);
+    }
+
+    public void NodeHighlightsCheck(PairMutable posEvent)
+    {
+        for (int i = 0; i < this.nodes.size(); i++)
+            this.nodes.get(i).HighlightsCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
+    }
 
     public int NodeFindByID(String id)
     {
@@ -456,11 +402,52 @@ abstract public class Editor
         return clonedNodes;
     }
 
+    //// CURSOR FUNCTIONS ////
+
+    abstract public PairMutable CursorPreviewGetPos();
+    abstract public void CursorPreviewUpdate(PairMutable pos);
+
+    public void MouseDragUpdate(PairMutable posMouse)
+    {
+        this.mouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.mouseDragFactor / this.zoom,
+                                                (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
+    }
+
+    public void MouseDragReset(PairMutable posMouse)
+    {
+        this.mouseDragFirstPos = new PairMutable(posMouse);
+        this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(), this.center.GetRightDouble());
+        this.mouseDragPaneFirstPos = new PairMutable(this.PaneHolderGetTranslate());
+
+        if (this.shapesSelected > 0)
+            for (int i = 0; i < this.nodes.size(); i++)
+                this.nodes.get(i).MoveReset();
+    }
+
+    //// LINE PREVIEW FUNCTIONS ////
+
+    public void LinePreviewUpdate()
+    {
+        PairMutable dropPos = this.PanePosListenerToHolder(this.CursorPreviewGetPos());
+
+        this.linePreview.setEndX(dropPos.GetLeftDouble());
+        this.linePreview.setEndY(dropPos.GetRightDouble());
+    }
+
+    public void LinePreviewRemove()
+    {
+        this.nodes.get(this.NodeFindByName("linePreview")).Remove();
+        this.linePreview = null;
+    }
+
     //// CALLBACK FUNCTIONS ////
 
     public void OnDragOverGlobal(DragEvent event)
     {
         PairMutable eventPos = new PairMutable(event.getX(), event.getY());
+
+        // Handling cursor preview...
+        this.CursorPreviewUpdate(eventPos);
 
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
@@ -478,6 +465,9 @@ abstract public class Editor
         PairMutable dropPos = this.PanePosListenerToHolder(eventPos);
         PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
+        // Handling cursor preview...
+        this.CursorPreviewUpdate(eventPos);
+
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
 
@@ -486,7 +476,7 @@ abstract public class Editor
 
         // Handling line drawing preview...
         if (this.linePreview != null)
-            this.LinePreviewUpdate(dropPos);
+            this.LinePreviewUpdate();
     }
 
     public void OnMousePressedGlobal(MouseEvent event)
@@ -542,6 +532,9 @@ abstract public class Editor
         PairMutable dropPos = this.PanePosListenerToHolder(eventPos);
         PairMutable realPos = this.PaneHolderGetRealPos(dropPos);
 
+        // Handling cursor preview...
+        this.CursorPreviewUpdate(eventPos);
+
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
 
@@ -550,7 +543,7 @@ abstract public class Editor
 
         // Handling line drawing preview...
         if (this.linePreview != null)
-            this.LinePreviewUpdate(dropPos);
+            this.LinePreviewUpdate();
 
         if (this.pressedLMB)
         {
@@ -638,6 +631,9 @@ abstract public class Editor
             this.PaneHolderSetScale(new PairMutable(this.zoom, this.zoom), true);
         }
 
+        // Handling cursor preview...
+        this.CursorPreviewUpdate(eventPos);
+
         // Handling shape highlights...
         this.NodeHighlightsCheck(eventPos);
 
@@ -646,7 +642,7 @@ abstract public class Editor
 
         // Handling line drawing preview...
         if (this.linePreview != null)
-            this.LinePreviewUpdate(dropPos);
+            this.LinePreviewUpdate();
     }
 
     public void OnKeyPressedGlobal(KeyEvent event)
@@ -848,10 +844,9 @@ abstract public class Editor
         LinkedList<Double> posX = new LinkedList<Double>();
         LinkedList<Double> posY = new LinkedList<Double>();
         LinkedList<Double> rots = new LinkedList<Double>();
-        LinkedList<Color> colors = new LinkedList<Color>();
 
         for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).PropsLoadGlobal(names, posX, posY, rots, colors);
+            this.nodes.get(i).PropsLoadGlobal(names, posX, posY, rots);
 
         // Creating name box...
         if (!names.isEmpty())
@@ -920,24 +915,6 @@ abstract public class Editor
                 rotText.setText("<mixed>");
 
             EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(rotHBox);
-        }
-
-        // Creating color box...
-        if (!colors.isEmpty())
-        {
-            HBox colorHBox = new HBox(10);
-            colorHBox.setId("colorBox");
-            colorHBox.getChildren().add(new Label("Colors: "));
-            ColorPicker colorPicker = new ColorPicker();
-            colorPicker.setId("color");
-            colorHBox.getChildren().add(colorPicker);
-
-            if (EDAmameController.IsListAllEqual(colors))
-                colorPicker.setValue(colors.get(0));
-            else
-                colorPicker.setValue(null);
-
-            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(colorHBox);
         }
 
         EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
@@ -1225,10 +1202,56 @@ abstract public class Editor
 
     //// SUPPORT FUNCTIONS ////
 
+    public static Color GetPCBLayerColor(String layer)
+    {
+        for (int i = 0; i < EDAmameController.Editor_PCBLayers.length; i++)
+            if (EDAmameController.Editor_PCBLayers[i].equals(layer))
+                return EDAmameController.Editor_PCBLayerColors[i];
+
+        return null;
+    }
+
+    public boolean CanDropSomething()
+    {
+        return (this.shapesSelected == 0) && !this.shapesMoving && (this.selectionBox == null) && !this.shapesWereSelected && !this.wasSelectionBox;
+    }
+
+    public PairMutable PosSnapToGridPoint(PairMutable pos)
+    {
+        if (this.snapGridSpacing < 0)
+            return pos;
+
+        double scaledSpacing = this.snapGridSpacing * 10;
+
+        return new PairMutable(Math.round(pos.GetLeftDouble() / scaledSpacing) * scaledSpacing,
+                               Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
+    }
+
+    static public void LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
+    {
+        PairMutable posAvg = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2, (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
+
+        line.setStartX(posStart.GetLeftDouble() - posAvg.GetLeftDouble());
+        line.setStartY(posStart.GetRightDouble() - posAvg.GetRightDouble());
+        line.setEndX(posEnd.GetLeftDouble() - posAvg.GetLeftDouble());
+        line.setEndY(posEnd.GetRightDouble() - posAvg.GetRightDouble());
+
+        line.setTranslateX(posAvg.GetLeftDouble());
+        line.setTranslateY(posAvg.GetRightDouble());
+    }
+
+    static public PairMutable LineEndPointsCalculate(Line line, boolean start)
+    {
+        if (start)
+            return new PairMutable(line.getStartX() + line.getTranslateX(), line.getStartY() + line.getTranslateY());
+
+        return new PairMutable(line.getEndX() + line.getTranslateX(), line.getEndY() + line.getTranslateY());
+    }
+
     public static void TextFieldListenerInit(TextField textField)
     {
         textField.textProperty().addListener((observable, oldValue, newValue) -> {
-            if (newValue.length() > EDAmameController.Editor_MaxChars)
+            if (newValue.length() > EDAmameController.EditorSymbol_MaxChars)
                 textField.setText(oldValue);
         });
     }
@@ -1275,7 +1298,6 @@ abstract public class Editor
         Pane foundPaneSelections = null;
         Pane foundPaneSnaps = null;
         Canvas foundCanvas = null;
-        Shape foundCrosshair = null;
 
         while (nodeIterator.hasNext())
         {
@@ -1392,11 +1414,7 @@ abstract public class Editor
                                                     }
                                                 }
                                             }
-                                            else if (nextNodeC.getClass() == Circle.class)
-                                            {
-                                                foundCrosshair = (Circle)nextNodeC;
-                                            }
-                                            else
+                                            else if (nextNodeC.getClass() != Circle.class)
                                             {
                                                 throw new java.lang.Error("ERROR: Encountered unknown child under the listener pane!");
                                             }
@@ -1434,8 +1452,6 @@ abstract public class Editor
             throw new InvalidClassException("Unable to locate snaps pane for an editor with name \"" + this.name + "\"!");
         if (foundCanvas == null)
             throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.name + "\"!");
-        if (foundCrosshair == null)
-            throw new InvalidClassException("Unable to locate crosshair shape for an editor with name \"" + this.name + "\"!");
 
         this.paneListener = foundPaneListener;
         this.paneHolder = foundPaneHolder;
@@ -1444,11 +1460,125 @@ abstract public class Editor
         this.paneSnaps = foundPaneSnaps;
         this.canvas = foundCanvas;
         this.gc = this.canvas.getGraphicsContext2D();
-        this.crosshair = foundCrosshair;
 
         this.PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
         this.paneHolder.prefWidthProperty().bind(this.canvas.widthProperty());
         this.paneHolder.prefHeightProperty().bind(this.canvas.heightProperty());
+    }
+
+    public static boolean CheckShapeTransparency(String strokeSize, Paint strokeColor, Color fillColor)
+    {
+        if (EDAmameController.IsStringNum(strokeSize))
+        {
+            double strokeDouble = Double.parseDouble(strokeSize);
+            if ((strokeDouble == 0) || (!strokeColor.isOpaque()))
+            {
+                if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                {
+                    EDAmameController.SetStatusBar("Unable to drop shape because the entered fill and border is transparent!");
+                    return false;
+                }
+            }
+        }
+        else
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public static boolean CheckStringBorderSize(String checkString)
+    {
+        if (EDAmameController.IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.EditorSymbol_BorderMin) && (checkDouble <= EDAmameController.EditorSymbol_BorderMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.SetStatusBar("Unable to drop shape because the entered border size field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.SetStatusBar("Unable to drop shape because the entered border size is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean CheckStringCircleBounds(String checkString)
+    {
+        if (EDAmameController.IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.EditorSymbol_CircleRadiusMin) && (checkDouble <= EDAmameController.EditorSymbol_CircleRadiusMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.SetStatusBar("Unable to drop circle because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.SetStatusBar("Unable to drop circle because the entered radius field is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean CheckStringRectBounds(String checkWidth, String checkHeight)
+    {
+        if ((EDAmameController.IsStringNum(checkWidth)) && (EDAmameController.IsStringNum(checkHeight)))
+        {
+            double doubleWidth = Double.parseDouble(checkWidth);
+            double doubleHeight = Double.parseDouble(checkHeight);
+            if (!((doubleWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (doubleWidth <= EDAmameController.EditorSymbol_RectWidthMax)))
+            {
+                EDAmameController.SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + " | Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
+                return false;
+            }
+            else if (!((doubleHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (doubleHeight <= EDAmameController.EditorSymbol_RectHeightMax)))
+            {
+                EDAmameController.SetStatusBar("Unable to drop rectangle because the entered width or height field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + " | Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
+        else
+        {
+            EDAmameController.SetStatusBar("Unable to drop rectangle because the entered width or height field is non-numeric!");
+            return false;
+        }
+    }
+
+    public static boolean CheckStringTriBounds(String checkString)
+    {
+        if (EDAmameController.IsStringNum(checkString))
+        {
+            double checkDouble = Double.parseDouble(checkString);
+            if (((checkDouble >= EDAmameController.EditorSymbol_TriLenMin) && (checkDouble <= EDAmameController.EditorSymbol_TriLenMax)))
+            {
+                return true;
+            }
+            else
+            {
+                EDAmameController.SetStatusBar("Unable to drop triangle because the entered length field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
+                return false;
+            }
+        }
+        else
+        {
+            EDAmameController.SetStatusBar("Unable to drop triangle because the entered length field is non-numeric!");
+            return false;
+        }
     }
 
     //// TESTING FUNCTIONS ////

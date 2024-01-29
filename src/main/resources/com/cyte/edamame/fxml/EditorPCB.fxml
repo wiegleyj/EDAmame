@@ -54,7 +54,7 @@
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                            </children>
                         </Pane>
-                        <Circle fill="#1f93ff00" radius="1.0" stroke="RED" strokeType="INSIDE" />
+                        <Circle fx:id="cursorPreview" fill="#1f93ff00" radius="1.0" stroke="RED" strokeType="INSIDE" />
                      </children>
                   </Pane>
                   <ToolBar>

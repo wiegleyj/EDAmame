@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ColorPicker;
@@ -21,8 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.LinkedList;
 
@@ -34,7 +31,7 @@ public class EDALine extends EDANode
 
     //// CONSTRUCTORS ////
 
-    public EDALine(String nameValue, Line nodeValue, boolean passiveValue, Editor editorValue)
+    public EDALine(String nameValue, Line nodeValue, boolean createSnapPoints, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDALine \"" + nameValue + "\" without a supplied editor!");
@@ -56,7 +53,9 @@ public class EDALine extends EDANode
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate();
+
+            if (createSnapPoints)
+                this.SnapPointsCreate();
         }
     }
 
@@ -210,7 +209,7 @@ public class EDALine extends EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors)
+    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots)
     {
         if (!this.selected)
             return;
@@ -220,8 +219,6 @@ public class EDALine extends EDANode
         names.add(this.name);
         posX.add(pos.GetLeftDouble() - this.editor.paneHolder.getWidth() / 2);
         posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
-
-        colors.add((Color)this.line.getStroke());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -296,6 +293,28 @@ public class EDALine extends EDANode
             }
 
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        colors.add(this.line.getStroke());
+
+        lineStartPosX.add(this.line.getStartX());
+        lineStartPosY.add(this.line.getStartY());
+        lineEndPosX.add(this.line.getEndX());
+        lineEndPosY.add(this.line.getEndY());
+        lineWidths.add(this.line.getStrokeWidth());
+
+        return true;
+    }
+
+    public void PropsApplySymbol(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
 
         // Applying color...
         {
@@ -322,26 +341,6 @@ public class EDALine extends EDANode
                 }
             }
         }
-    }
-
-    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
-    {
-        if (!this.selected)
-            return false;
-
-        lineStartPosX.add(this.line.getStartX());
-        lineStartPosY.add(this.line.getStartY());
-        lineEndPosX.add(this.line.getEndX());
-        lineEndPosY.add(this.line.getEndY());
-        lineWidths.add(this.line.getStrokeWidth());
-
-        return true;
-    }
-
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
 
         // Applying lines...
         {
@@ -415,10 +414,10 @@ public class EDALine extends EDANode
                 {
                     Double newWidth = Double.parseDouble(widthStr);
 
-                    if ((newWidth >= EDAmameController.Editor_LineWidthMin) && (newWidth <= EDAmameController.Editor_LineWidthMax))
+                    if ((newWidth >= EDAmameController.EditorSymbol_LineWidthMin) && (newWidth <= EDAmameController.EditorSymbol_LineWidthMax))
                         this.line.setStrokeWidth(newWidth);
                     else
-                        EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.Editor_LineWidthMin + ", " + EDAmameController.Editor_LineWidthMax + ")");
+                        EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_LineWidthMin + ", " + EDAmameController.EditorSymbol_LineWidthMax + ")");
                 }
                 else if (!widthStr.equals("<mixed>"))
                 {
@@ -432,6 +431,6 @@ public class EDALine extends EDANode
 
     public EDANode Clone()
     {
-        return new EDALine(this.name, (Line)EDANode.NodeClone(this.line), this.passive, this.editor);
+        return new EDALine(this.name, (Line)EDANode.NodeClone(this.line), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
 }

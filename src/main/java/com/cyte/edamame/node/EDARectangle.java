@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ColorPicker;
@@ -21,8 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.LinkedList;
 
@@ -34,7 +31,7 @@ public class EDARectangle extends EDANode
 
     //// CONSTRUCTORS ////
 
-    public EDARectangle(String nameValue, Rectangle nodeValue, boolean passiveValue, Editor editorValue)
+    public EDARectangle(String nameValue, Rectangle nodeValue, boolean createSnapPoints, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDARectangle \"" + nameValue + "\" without a supplied editor!");
@@ -56,7 +53,9 @@ public class EDARectangle extends EDANode
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate();
+
+            if (createSnapPoints)
+                this.SnapPointsCreate();
         }
     }
 
@@ -285,7 +284,7 @@ public class EDARectangle extends EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors)
+    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots)
     {
         if (!this.selected)
             return;
@@ -293,12 +292,11 @@ public class EDARectangle extends EDANode
         PairMutable pos = this.GetTranslate();
 
         names.add(this.name);
+
         posX.add(pos.GetLeftDouble() - this.editor.paneHolder.getWidth() / 2);
         posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
 
         rots.add(this.GetRotate());
-
-        colors.add((Color)this.rectangle.getFill());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -393,6 +391,28 @@ public class EDARectangle extends EDANode
                     EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
             }
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        colors.add(this.rectangle.getFill());
+
+        strokeWidths.add(this.rectangle.getStrokeWidth());
+        strokes.add(this.rectangle.getStroke());
+
+        rectsWidths.add(this.rectangle.getWidth());
+        rectsHeights.add(this.rectangle.getHeight());
+
+        return true;
+    }
+
+    public void PropsApplySymbol(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
 
         // Applying color...
         {
@@ -419,73 +439,6 @@ public class EDARectangle extends EDANode
                 }
             }
         }
-    }
-
-    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
-    {
-        if (!this.selected)
-            return false;
-
-        rectsWidths.add(this.rectangle.getWidth());
-        rectsHeights.add(this.rectangle.getHeight());
-        strokeWidths.add(this.rectangle.getStrokeWidth());
-        strokes.add(this.rectangle.getStroke());
-
-        return true;
-    }
-
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
-
-        // Applying rectangle width & height...
-        {
-            Integer rectBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "rectBox");
-
-            if (rectBoxIdx != -1)
-            {
-                HBox rectBox = (HBox) propsBox.getChildren().get(rectBoxIdx);
-                TextField widthText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectWidths");
-                TextField heightText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectHeights");
-
-                if (widthText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"rectWidths\" node in Symbol Editor properties window \"rectBox\" entry!");
-                if (heightText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"rectHeights\" node in Symbol Editor properties window \"rectBox\" entry!");
-
-                String widthStr = widthText.getText();
-                String heightStr = heightText.getText();
-
-                if (EDAmameController.IsStringNum(widthStr))
-                {
-                    Double newWidth = Double.parseDouble(widthStr);
-
-                    if ((newWidth >= EDAmameController.Editor_RectWidthMin) && (newWidth <= EDAmameController.Editor_RectWidthMax))
-                        this.rectangle.setWidth(newWidth);
-                    else
-                        EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.Editor_RectWidthMin + ", " + EDAmameController.Editor_RectWidthMax + ")");
-                }
-                else if (!widthStr.equals("<mixed>"))
-                {
-                    EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is non-numeric!");
-                }
-
-                if (EDAmameController.IsStringNum(heightStr))
-                {
-                    Double newHeight = Double.parseDouble(heightStr);
-
-                    if ((newHeight >= EDAmameController.Editor_RectHeightMin) && (newHeight <= EDAmameController.Editor_RectHeightMax))
-                        this.rectangle.setHeight(newHeight);
-                    else
-                        EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.Editor_RectHeightMin + ", " + EDAmameController.Editor_RectHeightMax + ")");
-                }
-                else if (!heightStr.equals("<mixed>"))
-                {
-                    EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is non-numeric!");
-                }
-            }
-        }
 
         // Applying borders...
         {
@@ -505,10 +458,10 @@ public class EDARectangle extends EDANode
                 {
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
-                    if ((newStrokeWidth >= EDAmameController.Editor_BorderMin) && (newStrokeWidth <= EDAmameController.Editor_BorderMax))
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
                         this.rectangle.setStrokeWidth(newStrokeWidth);
                     else
-                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
                 else if (!strokeWidthStr.equals("<mixed>"))
                 {
@@ -539,12 +492,60 @@ public class EDARectangle extends EDANode
                 }
             }
         }
+
+        // Applying rectangle width & height...
+        {
+            Integer rectBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "rectBox");
+
+            if (rectBoxIdx != -1)
+            {
+                HBox rectBox = (HBox) propsBox.getChildren().get(rectBoxIdx);
+                TextField widthText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectWidths");
+                TextField heightText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectHeights");
+
+                if (widthText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"rectWidths\" node in Symbol Editor properties window \"rectBox\" entry!");
+                if (heightText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"rectHeights\" node in Symbol Editor properties window \"rectBox\" entry!");
+
+                String widthStr = widthText.getText();
+                String heightStr = heightText.getText();
+
+                if (EDAmameController.IsStringNum(widthStr))
+                {
+                    Double newWidth = Double.parseDouble(widthStr);
+
+                    if ((newWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (newWidth <= EDAmameController.EditorSymbol_RectWidthMax))
+                        this.rectangle.setWidth(newWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + ")");
+                }
+                else if (!widthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is non-numeric!");
+                }
+
+                if (EDAmameController.IsStringNum(heightStr))
+                {
+                    Double newHeight = Double.parseDouble(heightStr);
+
+                    if ((newHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (newHeight <= EDAmameController.EditorSymbol_RectHeightMax))
+                        this.rectangle.setHeight(newHeight);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
+                }
+                else if (!heightStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is non-numeric!");
+                }
+            }
+        }
     }
 
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()
     {
-        return new EDARectangle(this.name, (Rectangle)EDANode.NodeClone(this.rectangle), this.passive, this.editor);
+        return new EDARectangle(this.name, (Rectangle)EDANode.NodeClone(this.rectangle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
 }

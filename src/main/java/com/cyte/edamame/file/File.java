@@ -32,7 +32,7 @@ public class File
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Symbol");
         fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("FXML File", "*.fxml"));
-        fileChooser.setInitialFileName("symbol.fxml");
+        fileChooser.setInitialFileName("file.fxml");
         java.io.File file = fileChooser.showSaveDialog(EDAmameApplication.controller.stage);
 
         if (file == null)

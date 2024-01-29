@@ -75,7 +75,6 @@ abstract public class EDANode
         if (!this.selected)
             return;
 
-        PairMutable posPressReal = this.editor.PaneHolderGetRealPos(new PairMutable(this.mousePressPos.GetLeftDouble(), this.mousePressPos.GetRightDouble()));
         PairMutable posOffset = new PairMutable(0.0, 0.0);
 
         // Handling straight-only dragging...
@@ -87,8 +86,10 @@ abstract public class EDANode
                 posOffset.right = -this.editor.mouseDragDiffPos.GetRightDouble();
         }
 
-        this.SetTranslate(new PairMutable(this.mousePressPos.GetLeftDouble() + this.editor.mouseDragDiffPos.GetLeftDouble() + posOffset.GetLeftDouble(),
-                                          this.mousePressPos.GetRightDouble() + this.editor.mouseDragDiffPos.GetRightDouble() + posOffset.GetRightDouble()));
+        PairMutable newPos = new PairMutable(this.mousePressPos.GetLeftDouble() + this.editor.mouseDragDiffPos.GetLeftDouble() + posOffset.GetLeftDouble(),
+                                             this.mousePressPos.GetRightDouble() + this.editor.mouseDragDiffPos.GetRightDouble() + posOffset.GetRightDouble());
+
+        this.SetTranslate(this.editor.PaneHolderGetDrawPos(this.editor.PosSnapToGridPoint(this.editor.PaneHolderGetRealPos(newPos))));
     }
 
     public void MoveReset()
@@ -353,9 +354,9 @@ abstract public class EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    abstract public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors);
+    abstract public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots);
     abstract public void PropsApplyGlobal(VBox propsBox);
-    abstract public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels);
+    abstract public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels);
     abstract public void PropsApplySymbol(VBox propsBox);
 
     //// SUPPORT FUNCTIONS ////

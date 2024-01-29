@@ -3,15 +3,18 @@
 <?import javafx.scene.Group?>
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
@@ -41,7 +44,8 @@
          </Menu>
       </menus></MenuBar>
     <ToolBar>
-        <Button mnemonicParsing="false" text="Footprint Button 1" />
+        <Button mnemonicParsing="false" onAction="#Save" text="Save Footprint" />
+      <Button mnemonicParsing="false" onAction="#Load" text="Load Footprint" />
     </ToolBar>
     <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
         <Tab text="EditorTab">
@@ -58,12 +62,17 @@
                               <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" />
                            </children>
                         </Pane>
-                        <Circle fill="#1f93ff00" radius="1.0" stroke="RED" strokeType="INSIDE" />
+                        <Circle fx:id="cursorPreview" fill="#1f93ff00" radius="1.0" stroke="RED" strokeType="INSIDE" />
                      </children>
                   </Pane>
                   <ToolBar>
                     <items>
-                      <Button mnemonicParsing="false" text="Button" />
+                        <HBox>
+                           <children>
+                              <Label text="Layer: " />
+                              <ChoiceBox fx:id="layerBox" prefWidth="100.0" />
+                           </children>
+                        </HBox>
                     </items>
                   </ToolBar>
                </children>
@@ -75,40 +84,157 @@
                 </VBox>
             </HBox>
         </Tab>
-        <Tab text="Pads">
+      <Tab text="Shapes">
          <content>
-            <VBox prefHeight="200.0" prefWidth="100.0">
+            <VBox>
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
-                        <RadioButton mnemonicParsing="false" text="Through-Hole" />
+                        <RadioButton mnemonicParsing="false" text="Circle">
+                           <toggleGroup>
+                              <ToggleGroup fx:id="toggleGroup" />
+                           </toggleGroup>
+                        </RadioButton>
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Label text="Inner Radius: " />
-                              <TextField />
+                              <Label text="Radius: " />
+                              <TextField fx:id="circleRadius" />
                            </children>
                         </HBox>
-                        <HBox layoutX="10.0" layoutY="28.0" prefHeight="100.0" prefWidth="200.0">
+                        <HBox layoutX="10.0" layoutY="53.0" prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Label text="Outer Radius: " />
-                              <TextField />
+                              <Label text="Fill: " />
+                              <CheckBox fx:id="circleFill" mnemonicParsing="false" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Border Width: " />
+                              <TextField fx:id="circleBorderSize" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Rectangle" toggleGroup="$toggleGroup" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Width: " />
+                              <TextField fx:id="rectangleWidth" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Height: " />
+                              <TextField fx:id="rectangleHeight" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Fill: " />
+                              <CheckBox fx:id="rectangleFill" mnemonicParsing="false" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Border Width: " />
+                              <TextField fx:id="rectangleBorderSize" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Triangle" toggleGroup="$toggleGroup" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Height: " />
+                              <TextField fx:id="triangleHeight" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Fill: " />
+                              <CheckBox fx:id="triangleFill" mnemonicParsing="false" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Border Width: " />
+                              <TextField fx:id="triangleBorderSize" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <Separator prefWidth="200.0" />
+                        <RadioButton mnemonicParsing="false" text="Line" toggleGroup="$toggleGroup" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Width " />
+                              <TextField fx:id="lineWidth" />
                            </children>
                         </HBox>
                      </children>
                   </VBox>
                </children>
             </VBox>
-         </content></Tab>
-      <Tab text="Settings">
+         </content>
+      </Tab>
+      <Tab text="Text">
+         <content>
+            <VBox prefHeight="200.0" prefWidth="100.0">
+               <children>
+                  <RadioButton mnemonicParsing="false" text="Text" toggleGroup="$toggleGroup" />
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Text Content: " />
+                        <TextField fx:id="textContent" />
+                     </children>
+                  </HBox>
+                  <HBox prefHeight="100.0" prefWidth="200.0">
+                     <children>
+                        <Label text="Font Size: " />
+                        <TextField fx:id="textSize" />
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
+         </content>
+      </Tab>
+      <Tab text="Pads">
          <content>
             <VBox prefHeight="200.0" prefWidth="100.0">
                <children>
                   <VBox prefHeight="200.0" prefWidth="100.0">
                      <children>
+                        <RadioButton mnemonicParsing="false" text="Through-Hole" toggleGroup="$toggleGroup" />
                         <HBox prefHeight="100.0" prefWidth="200.0">
                            <children>
-                              <Label text="Snap Grid Spacing: " />
-                              <ChoiceBox fx:id="snapSpacing" prefWidth="150.0" />
+                              <Label text="Outer Radius: " />
+                              <TextField fx:id="holeRadiusOuter" />
+                           </children>
+                        </HBox>
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Inner Radius: " />
+                              <TextField fx:id="holeRadiusInner" />
+                           </children>
+                        </HBox>
+                        <Separator prefWidth="200.0" />
+                     </children>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" prefHeight="200.0" prefWidth="100.0">
+                     <children>
+                        <RadioButton mnemonicParsing="false" text="Via" toggleGroup="$toggleGroup" />
+                        <HBox prefHeight="100.0" prefWidth="200.0">
+                           <children>
+                              <Label text="Radius: " />
+                              <TextField fx:id="viaRadius" />
                            </children>
                         </HBox>
                      </children>

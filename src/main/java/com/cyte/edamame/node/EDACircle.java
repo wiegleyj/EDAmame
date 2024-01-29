@@ -11,7 +11,6 @@ import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
-import com.cyte.edamame.util.Utils;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ColorPicker;
@@ -21,8 +20,6 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 import java.util.LinkedList;
 
@@ -34,7 +31,7 @@ public class EDACircle extends EDANode
 
     //// CONSTRUCTORS ////
 
-    public EDACircle(String nameValue, Circle nodeValue, boolean passiveValue, Editor editorValue)
+    public EDACircle(String nameValue, Circle nodeValue, boolean createSnapPoints, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDACircle \"" + nameValue + "\" without a supplied editor!");
@@ -56,7 +53,9 @@ public class EDACircle extends EDANode
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate();
+
+            if (createSnapPoints)
+                this.SnapPointsCreate();
         }
     }
 
@@ -285,7 +284,7 @@ public class EDACircle extends EDANode
 
     //// PROPERTIES FUNCTIONS ////
 
-    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots, LinkedList<Color> colors)
+    public void PropsLoadGlobal(LinkedList<String> names, LinkedList<Double> posX, LinkedList<Double> posY, LinkedList<Double> rots)
     {
         if (!this.selected)
             return;
@@ -293,12 +292,11 @@ public class EDACircle extends EDANode
         PairMutable pos = this.GetTranslate();
 
         names.add(this.name);
+
         posX.add(pos.GetLeftDouble() - this.editor.paneHolder.getWidth() / 2);
         posY.add(pos.GetRightDouble() - this.editor.paneHolder.getHeight() / 2);
 
         rots.add(this.GetRotate());
-
-        colors.add((Color)this.circle.getFill());
     }
 
     public void PropsApplyGlobal(VBox propsBox)
@@ -393,6 +391,27 @@ public class EDACircle extends EDANode
                     EDAmameController.SetStatusBar("Unable to apply element rotation because the entered field is non-numeric!");
             }
         }
+    }
+
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    {
+        if (!this.selected)
+            return false;
+
+        colors.add(this.circle.getFill());
+
+        strokeWidths.add(this.circle.getStrokeWidth());
+        strokes.add(this.circle.getStroke());
+
+        circlesRadii.add(this.circle.getRadius());
+
+        return true;
+    }
+
+    public void PropsApplySymbol(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
 
         // Applying color...
         {
@@ -419,53 +438,6 @@ public class EDACircle extends EDANode
                 }
             }
         }
-    }
-
-    public boolean PropsLoadSymbol(LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
-    {
-        if (!this.selected)
-            return false;
-
-        circlesRadii.add(this.circle.getRadius());
-        strokeWidths.add(this.circle.getStrokeWidth());
-        strokes.add(this.circle.getStroke());
-
-        return true;
-    }
-
-    public void PropsApplySymbol(VBox propsBox)
-    {
-        if (!this.selected)
-            return;
-        // Applying circle radius...
-        {
-            Integer circleBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "circleBox");
-
-            if (circleBoxIdx != -1)
-            {
-                HBox circleBox = (HBox) propsBox.getChildren().get(circleBoxIdx);
-                TextField radiiText = (TextField) EDAmameController.GetNodeById(circleBox.getChildren(), "circleRadii");
-
-                if (radiiText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"circleRadii\" node in Symbol Editor properties window \"circleBox\" entry!");
-
-                String radiusStr = radiiText.getText();
-
-                if (EDAmameController.IsStringNum(radiusStr))
-                {
-                    Double newRadius = Double.parseDouble(radiusStr);
-
-                    if ((newRadius >= EDAmameController.Editor_CircleRadiusMin) && (newRadius <= EDAmameController.Editor_CircleRadiusMax))
-                        this.circle.setRadius(newRadius);
-                    else
-                        EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.Editor_CircleRadiusMin + ", " + EDAmameController.Editor_CircleRadiusMax + ")");
-                }
-                else if (!radiusStr.equals("<mixed>"))
-                {
-                    EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is non-numeric!");
-                }
-            }
-        }
 
         // Applying borders...
         {
@@ -485,10 +457,10 @@ public class EDACircle extends EDANode
                 {
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
-                    if ((newStrokeWidth >= EDAmameController.Editor_BorderMin) && (newStrokeWidth <= EDAmameController.Editor_BorderMax))
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
                         this.circle.setStrokeWidth(newStrokeWidth);
                     else
-                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.Editor_BorderMin + ", " + EDAmameController.Editor_BorderMax + ")");
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
                 else if (!strokeWidthStr.equals("<mixed>"))
                 {
@@ -519,12 +491,42 @@ public class EDACircle extends EDANode
                 }
             }
         }
+
+        // Applying circle radius...
+        {
+            Integer circleBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "circleBox");
+
+            if (circleBoxIdx != -1)
+            {
+                HBox circleBox = (HBox) propsBox.getChildren().get(circleBoxIdx);
+                TextField radiiText = (TextField) EDAmameController.GetNodeById(circleBox.getChildren(), "circleRadii");
+
+                if (radiiText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"circleRadii\" node in Symbol Editor properties window \"circleBox\" entry!");
+
+                String radiusStr = radiiText.getText();
+
+                if (EDAmameController.IsStringNum(radiusStr))
+                {
+                    Double newRadius = Double.parseDouble(radiusStr);
+
+                    if ((newRadius >= EDAmameController.EditorSymbol_CircleRadiusMin) && (newRadius <= EDAmameController.EditorSymbol_CircleRadiusMax))
+                        this.circle.setRadius(newRadius);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
+                }
+                else if (!radiusStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is non-numeric!");
+                }
+            }
+        }
     }
 
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()
     {
-        return new EDACircle(this.name, (Circle)EDANode.NodeClone(this.circle), this.passive, this.editor);
+        return new EDACircle(this.name, (Circle)EDANode.NodeClone(this.circle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
 }
