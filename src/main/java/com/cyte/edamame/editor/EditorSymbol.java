@@ -469,62 +469,64 @@ public class EditorSymbol extends Editor
                             EDAmameController.SetStatusBar("EDAmame Status Area");
 
                             String stringPinLabel = this.pinLabel.getText();
-                            boolean canDrop = true;
 
                             if (stringPinLabel.isEmpty())
                             {
                                 EDAmameController.SetStatusBar("Unable to drop pin because the entered label field is empty!");
-                                canDrop = false;
                             }
-                            String stringPinRadius = this.pinRadius.getText();
-
-                            if (stringPinRadius.isEmpty() || !EDAmameController.IsStringNum(stringPinRadius))
+                            else
                             {
-                                EDAmameController.SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
-                                canDrop = false;
-                            }
+                                String stringPinRadius = this.pinRadius.getText();
 
-                            double pinRadius = Double.parseDouble(stringPinRadius);
-                            Color pinColor = this.pinColor.getValue();
+                                if (stringPinRadius.isEmpty() || !EDAmameController.IsStringNum(stringPinRadius))
+                                {
+                                    EDAmameController.SetStatusBar("Unable to drop pin because the entered radius field is non-numeric!");
+                                }
+                                else
+                                {
+                                    double pinRadius = Double.parseDouble(stringPinRadius);
+                                    Color pinColor = this.pinColor.getValue();
 
-                            if (!((pinRadius >= EDAmameController.EditorSymbol_PinRadiusMin) && (pinRadius <= EDAmameController.EditorSymbol_PinRadiusMax)))
-                            {
-                                EDAmameController.SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_PinRadiusMin + ", " + EDAmameController.EditorSymbol_PinRadiusMax + ")");
-                                canDrop = false;
-                            }
-                            if (!((pinColor != null) && (pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
-                            {
-                                EDAmameController.SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
-                                canDrop = false;
-                            }
+                                    if (!((pinRadius >= EDAmameController.EditorSymbol_PinRadiusMin) && (pinRadius <= EDAmameController.EditorSymbol_PinRadiusMax)))
+                                    {
+                                        EDAmameController.SetStatusBar("Unable to drop pin because the entered radius field is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_PinRadiusMin + ", " + EDAmameController.EditorSymbol_PinRadiusMax + ")");
+                                    }
+                                    else
+                                    {
+                                        if (!((pinColor != null) && (pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
+                                        {
+                                            EDAmameController.SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
+                                        }
+                                        else
+                                        {
+                                            Group pin = new Group();
+                                            //pin.setId("PIN_" + stringPinLabel);
 
-                            if (canDrop)
-                            {
-                                Group pin = new Group();
-                                //pin.setId("PIN_" + stringPinLabel);
+                                            Circle pinCircle = new Circle(pinRadius, pinColor);
+                                            pinCircle.setStroke(Color.TRANSPARENT);
+                                            pinCircle.setStrokeWidth(0);
 
-                                Circle pinCircle = new Circle(pinRadius, pinColor);
-                                pinCircle.setStroke(Color.TRANSPARENT);
-                                pinCircle.setStrokeWidth(0);
+                                            Text pinLabel = new Text(stringPinLabel);
+                                            pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
+                                            pinLabel.setFill(pinColor);
 
-                                Text pinLabel = new Text(stringPinLabel);
-                                pinLabel.setFont(new Font("Arial", EDAmameController.Editor_PinLabelFontSize));
-                                pinLabel.setFill(pinColor);
+                                            pin.getChildren().add(pinCircle);
+                                            pin.getChildren().add(pinLabel);
 
-                                pin.getChildren().add(pinCircle);
-                                pin.getChildren().add(pinLabel);
+                                            pin.setTranslateX(dropPos.GetLeftDouble());
+                                            pin.setTranslateY(dropPos.GetRightDouble());
 
-                                pin.setTranslateX(dropPos.GetLeftDouble());
-                                pin.setTranslateY(dropPos.GetRightDouble());
+                                            pinLabel.setTranslateX(EDAmameController.Editor_PinLabelOffset.GetLeftDouble());
+                                            pinLabel.setTranslateY(EDAmameController.Editor_PinLabelOffset.GetRightDouble());
 
-                                pinLabel.setTranslateX(EDAmameController.Editor_PinLabelOffset.GetLeftDouble());
-                                pinLabel.setTranslateY(EDAmameController.Editor_PinLabelOffset.GetRightDouble());
+                                            LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
+                                            snap.add(new PairMutable(0.0, 0.0));
 
-                                LinkedList<PairMutable> snap = new LinkedList<PairMutable>();
-                                snap.add(new PairMutable(0.0, 0.0));
-
-                                EDAPin pinNode = new EDAPin("Pin", pin, snap, false, this);
-                                pinNode.Add();
+                                            EDAPin pinNode = new EDAPin("Pin", pin, snap, false, this);
+                                            pinNode.Add();
+                                        }
+                                    }
+                                }
                             }
                         }
                         else

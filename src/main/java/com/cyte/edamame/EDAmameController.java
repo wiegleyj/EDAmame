@@ -6,17 +6,13 @@
  */
 
 // TODO:
-// Implement holes and vias
 // Implement footprint editor properties window
 // Fix canvas actually rendering the grid spacing
+// Fix holes overlaying traces completely
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something
-// Implement node copying
-// Implement straight-only line drawing
-// Implement element move snapping
 // Fix snap point shapes not disappearing after deleting node
 // Fix file writing (?)
-// Refactor RenderNode cloning into another constructor
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
 // Refactor viewport mouse diff pos scaling
@@ -96,6 +92,8 @@ public class EDAmameController implements Initializable
     final static public double Editor_CursorPreviewBorderWidth = 2;
     final static public String[] Editor_PCBLayers = {"Copper Front", "Copper Rear", "Edge Cuts", "Silkscreen"};
     final static public Color[] Editor_PCBLayerColors = {Color.RED, Color.LIGHTBLUE, Color.WHITE, Color.YELLOW};
+    final static public Color Editor_PCBExposedColor = Color.ORANGE;
+    final static public Color Editor_PCBViaColor = Color.WHITE;
 
     final static public Double EditorSymbol_CircleRadiusMin = 10.0;
     final static public Double EditorSymbol_CircleRadiusMax = 100.0;
@@ -116,6 +114,13 @@ public class EDAmameController implements Initializable
     final static public Double EditorSymbol_WireWidthMin = 3.0;
     final static public Double EditorSymbol_WireWidthMax = 10.0;
     final static public int EditorSymbol_MaxChars = 10;
+
+    final static public Double EditorFootprint_HoleRadiusOuterMin = 5.0;
+    final static public Double EditorFootprint_HoleRadiusOuterMax = 10.0;
+    final static public Double EditorFootprint_HoleRadiusInnerMin = 5.0;
+    final static public Double EditorFootprint_HoleRadiusInnerMax = 10.0;
+    final static public Double EditorFootprint_ViaRadiusMin = 1.0;
+    final static public Double EditorFootprint_ViaRadiusMax = 5.0;
 
     final static public Logger logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

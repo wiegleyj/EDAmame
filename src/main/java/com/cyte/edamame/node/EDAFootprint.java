@@ -30,7 +30,7 @@ public class EDAFootprint extends EDAGroup
 {
     //// CONSTRUCTORS ////
 
-    public EDAFootprint(String nameValue, Group nodeValue, LinkedList<PairMutable> snapPointPos, boolean passiveValue, Editor editorValue)
+    public EDAFootprint(String nameValue, Group nodeValue, boolean passiveValue, Editor editorValue)
     {
         if (editorValue == null)
             throw new java.lang.Error("ERROR: Attempting to create an EDAFootprint \"" + nameValue + "\" without a supplied editor!");
@@ -52,7 +52,6 @@ public class EDAFootprint extends EDAGroup
         {
             this.ShapeHighlightedCreate();
             this.ShapeSelectedCreate();
-            this.SnapPointsCreate(snapPointPos);
         }
     }
 
@@ -73,11 +72,6 @@ public class EDAFootprint extends EDAGroup
 
     public EDANode Clone()
     {
-        LinkedList<PairMutable> clonedSnapPoints = new LinkedList<PairMutable>();
-
-        for (int i = 0; i < this.snapPoints.size(); i++)
-            clonedSnapPoints.add(new PairMutable(this.snapPoints.get(i).getTranslateX(), this.snapPoints.get(i).getTranslateY()));
-
-        return new EDAFootprint(this.name, (Group)EDANode.NodeClone(this.group), clonedSnapPoints, this.passive, this.editor);
+        return new EDAFootprint(this.name, (Group)EDANode.NodeClone(this.group), this.passive, this.editor);
     }
 }

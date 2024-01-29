@@ -443,13 +443,113 @@ public class EditorFootprint extends Editor
                         {
                             EDAmameController.SetStatusBar("EDAmame Status Area");
 
-                            System.out.println("droppin hole!");
+                            String stringRadiusOuter = this.holeRadiusOuter.getText();
+
+                            if (stringRadiusOuter.isEmpty() || !EDAmameController.IsStringNum(stringRadiusOuter))
+                            {
+                                EDAmameController.SetStatusBar("Unable to drop hole because the entered outer radius field is non-numeric!");
+                            }
+                            else
+                            {
+                                double radiusOuter = Double.parseDouble(stringRadiusOuter);
+
+                                if (!((radiusOuter >= EDAmameController.EditorFootprint_HoleRadiusOuterMin) && (radiusOuter <= EDAmameController.EditorFootprint_HoleRadiusOuterMax)))
+                                {
+                                    EDAmameController.SetStatusBar("Unable to drop hole because the entered outer radius field is outside the limits! (Outer radius limits: " + EDAmameController.EditorFootprint_HoleRadiusOuterMin + ", " + EDAmameController.EditorFootprint_HoleRadiusOuterMax + ")");
+                                }
+                                else
+                                {
+                                    String stringRadiusInner = this.holeRadiusInner.getText();
+
+                                    if (stringRadiusInner.isEmpty() || !EDAmameController.IsStringNum(stringRadiusInner))
+                                    {
+                                        EDAmameController.SetStatusBar("Unable to drop hole because the entered inner radius field is non-numeric!");
+                                    }
+                                    else
+                                    {
+                                        double radiusInner = Double.parseDouble(stringRadiusInner);
+
+                                        if (!((radiusInner >= EDAmameController.EditorFootprint_HoleRadiusInnerMin) && (radiusInner <= EDAmameController.EditorFootprint_HoleRadiusInnerMax)))
+                                        {
+                                            EDAmameController.SetStatusBar("Unable to drop hole because the entered inner radius field is outside the limits! (Inner radius limits: " + EDAmameController.EditorFootprint_HoleRadiusInnerMin + ", " + EDAmameController.EditorFootprint_HoleRadiusInnerMax + ")");
+                                        }
+                                        else
+                                        {
+                                            if (radiusOuter <= radiusInner)
+                                            {
+                                                EDAmameController.SetStatusBar("Unable to drop hole because the entered outer radius field is smaller than or equal to the entered inner radius field!");
+                                            }
+                                            else
+                                            {
+                                                Group hole = new Group();
+
+                                                Circle holeCircle = new Circle();
+                                                holeCircle.setFill(Color.TRANSPARENT);
+                                                holeCircle.setRadius((radiusOuter + radiusInner) / 2);
+                                                holeCircle.setStrokeWidth(radiusOuter - radiusInner);
+                                                holeCircle.setStroke(EDAmameController.Editor_PCBExposedColor);
+
+                                                hole.getChildren().add(holeCircle);
+
+                                                hole.setTranslateX(dropPos.GetLeftDouble());
+                                                hole.setTranslateY(dropPos.GetRightDouble());
+
+                                                hole.setId(this.layerBox.getValue());
+
+                                                EDAHole holeNode = new EDAHole("Hole", hole, false, this);
+                                                holeNode.Add();
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         }
                         else if (selectedShapeButton.getText().equals("Via"))
                         {
                             EDAmameController.SetStatusBar("EDAmame Status Area");
 
-                            System.out.println("droppin via!");
+                            String stringRadius = this.viaRadius.getText();
+
+                            if (stringRadius.isEmpty() || !EDAmameController.IsStringNum(stringRadius))
+                            {
+                                EDAmameController.SetStatusBar("Unable to drop via because the entered radius field is non-numeric!");
+                            }
+                            else
+                            {
+                                double radius = Double.parseDouble(stringRadius);
+
+                                if (!((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax)))
+                                {
+                                    EDAmameController.SetStatusBar("Unable to drop via because the entered radius field is outside the limits! (Radius limits: " + EDAmameController.EditorFootprint_ViaRadiusMin + ", " + EDAmameController.EditorFootprint_ViaRadiusMax + ")");
+                                }
+                                else
+                                {
+                                    Group via = new Group();
+
+                                    Circle viaOuterCircle = new Circle();
+                                    viaOuterCircle.setFill(EDAmameController.Editor_PCBExposedColor);
+                                    viaOuterCircle.setRadius(radius);
+                                    viaOuterCircle.setStrokeWidth(0);
+                                    viaOuterCircle.setStroke(Color.TRANSPARENT);
+
+                                    Circle viaInnerCircle = new Circle();
+                                    viaInnerCircle.setFill(EDAmameController.Editor_PCBViaColor);
+                                    viaInnerCircle.setRadius(radius / 2);
+                                    viaInnerCircle.setStrokeWidth(0);
+                                    viaInnerCircle.setStroke(Color.TRANSPARENT);
+
+                                    via.getChildren().add(viaOuterCircle);
+                                    via.getChildren().add(viaInnerCircle);
+
+                                    via.setTranslateX(dropPos.GetLeftDouble());
+                                    via.setTranslateY(dropPos.GetRightDouble());
+
+                                    via.setId(this.layerBox.getValue());
+
+                                    EDAVia viaNode = new EDAVia("Via", via, false, this);
+                                    viaNode.Add();
+                                }
+                            }
                         }
                         else
                         {
