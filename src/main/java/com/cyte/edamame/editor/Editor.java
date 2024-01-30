@@ -271,32 +271,34 @@ abstract public class Editor
 
     //// CANVAS FUNCTIONS ////
 
-    public void CanvasRenderGrid()
+    public void CanvasDraw()
     {
         // Clearing the canvas
         this.CanvasClear();
 
         // Drawing the points
         gc.setFill(this.gridPointColor);
-        gc.setGlobalAlpha(1.0);
-        Double width = 3.0;
+        gc.setGlobalAlpha(0.5);
 
+        double width = 2;
         double spacing = 100;
-        Double posX = -2500.0;
-        Double posY = -2500.0;
 
-        for (int i = 0; i < 70; i++)
-        {
-            for (int j = 0; j < 70; j++)
-            {
-                gc.fillOval(posX - (width / 2), posY - (width / 2), width, width);
+        if (this.snapGridSpacing != -1)
+            spacing = this.snapGridSpacing * 10;
 
-                posX += spacing;
-            }
-
-            posX = -2500.0;
-            posY += spacing;
-        }
+        for (int i = 0; i < 100; i++)
+            for (int j = 0; j < 100; j++)
+                gc.fillOval(i * spacing + this.canvas.getWidth() / 2 - width / 2, j * spacing + this.canvas.getHeight() / 2 - width / 2, width, width);
+        for (int i = 1; i < 100; i++)
+            for (int j = 1; j < 100; j++)
+                gc.fillOval(-i * spacing + this.canvas.getWidth() / 2 - width / 2, j * spacing + this.canvas.getHeight() / 2 - width / 2, width, width);
+        for (int i = 1; i < 100; i++)
+            for (int j = 1; j < 100; j++)
+                gc.fillOval(i * spacing + this.canvas.getWidth() / 2 - width / 2, -j * spacing + this.canvas.getHeight() / 2 - width / 2, width, width);
+        for (int i = 0; i < 100; i++)
+            for (int j = 0; j < 100; j++)
+                if ((i != 0) || (j != 0))
+                    gc.fillOval(-i * spacing + this.canvas.getWidth() / 2 - width / 2, -j * spacing + this.canvas.getHeight() / 2 - width / 2, width, width);
 
         // Drawing the grid box
         gc.setStroke(this.gridBoxColor);
@@ -325,6 +327,12 @@ abstract public class Editor
         this.gc.clearRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
         this.gc.setFill(this.backgroundColor);
         this.gc.fillRect(0, 0, this.canvas.getWidth(), this.canvas.getHeight());
+    }
+
+    public void CanvasRedraw()
+    {
+        this.CanvasClear();
+        this.CanvasDraw();
     }
 
     //// NODE FUNCTIONS ////

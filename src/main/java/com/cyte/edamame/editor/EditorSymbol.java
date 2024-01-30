@@ -95,7 +95,7 @@ public class EditorSymbol extends Editor
         EditorSymbol editor = fxmlLoader.getController();
         editor.Init(0, "EditorSymbol");
         editor.Dissect(0, scene);
-        editor.CanvasRenderGrid();
+        editor.CanvasDraw();
         editor.ListenersInit();
 
         Editor.TextFieldListenerInit(editor.circleRadius);

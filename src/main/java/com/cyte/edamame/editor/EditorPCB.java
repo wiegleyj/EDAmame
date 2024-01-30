@@ -21,7 +21,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Text;
-import javafx.collections.*;
 
 import java.io.IOException;
 
@@ -48,7 +47,7 @@ public class EditorPCB extends Editor
         editor.Init(3, "EditorPCB");
         editor.Dissect(3, scene);
         editor.snapGridSpacing = EDAmameController.Editor_SnapGridSpacings[EDAmameController.Editor_SnapGridSpacings.length / 2];
-        editor.CanvasRenderGrid();
+        editor.CanvasDraw();
         editor.ListenersInit();
 
         editor.cursorPreview.setRadius(EDAmameController.Editor_CursorPreviewRadius);

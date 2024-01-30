@@ -53,7 +53,7 @@ public class EditorSchematic extends Editor
         EditorSchematic editor = fxmlLoader.getController();
         editor.Init(1, "EditorSchematic");
         editor.Dissect(1, scene);
-        editor.CanvasRenderGrid();
+        editor.CanvasDraw();
         editor.ListenersInit();
 
         Editor.TextFieldListenerInit(editor.wireWidth);

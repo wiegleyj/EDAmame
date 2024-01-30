@@ -24,14 +24,12 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
-import javafx.collections.*;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -95,7 +93,7 @@ public class EditorFootprint extends Editor
         editor.Init(2, "EditorFootprint");
         editor.Dissect(2, scene);
         editor.snapGridSpacing = EDAmameController.Editor_SnapGridSpacings[EDAmameController.Editor_SnapGridSpacings.length / 2];
-        editor.CanvasRenderGrid();
+        editor.CanvasDraw();
         editor.ListenersInit();
 
         editor.cursorPreview.setRadius(EDAmameController.Editor_CursorPreviewRadius);
@@ -1001,5 +999,7 @@ public class EditorFootprint extends Editor
                 this.snapGridSpacing = choiceBox.getValue();
             }
         }
+
+        this.CanvasRedraw();
     }
 }
