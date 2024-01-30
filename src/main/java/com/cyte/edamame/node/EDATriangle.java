@@ -13,6 +13,8 @@ import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
 import javafx.geometry.*;
 import javafx.scene.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -348,7 +350,7 @@ public class EDATriangle extends EDANode
 
                 if (EDAmameController.IsStringNum(posXStr))
                 {
-                    Double newPosX = Double.parseDouble(posXStr);
+                    Double newPosX = this.editor.PosSnapToGridPoint(Double.parseDouble(posXStr));
 
                     this.triangle.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
                 }
@@ -359,7 +361,7 @@ public class EDATriangle extends EDANode
 
                 if (EDAmameController.IsStringNum(posYStr))
                 {
-                    Double newPosY = Double.parseDouble(posYStr);
+                    Double newPosY = this.editor.PosSnapToGridPoint(Double.parseDouble(posYStr));
 
                     this.triangle.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
                 }
@@ -488,6 +490,141 @@ public class EDATriangle extends EDANode
                     if (color != null)
                         EDAmameController.SetStatusBar("Unable to apply shape border color because the entered color is transparent!");
                 }
+            }
+        }
+
+        // Applying triangle length...
+        {
+            Integer triBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "triBox");
+
+            if (triBoxIdx != -1)
+            {
+                HBox triBox = (HBox) propsBox.getChildren().get(triBoxIdx);
+                TextField lensText = (TextField) EDAmameController.GetNodeById(triBox.getChildren(), "triLens");
+
+                if (lensText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"triLens\" node in Symbol Editor properties window \"triBox\" entry!");
+
+                String lenStr = lensText.getText();
+
+                if (EDAmameController.IsStringNum(lenStr))
+                {
+                    Double newLen = Double.parseDouble(lenStr);
+
+                    if ((newLen >= EDAmameController.EditorSymbol_TriLenMin) && (newLen <= EDAmameController.EditorSymbol_TriLenMax))
+                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
+                }
+                else if (!lenStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
+    public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        layers.add(this.triangle.getId());
+
+        if (this.triangle.getFill() == Color.TRANSPARENT)
+            fills.add(false);
+        else
+            fills.add(true);
+
+        strokeWidths.add(this.triangle.getStrokeWidth());
+
+        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+
+        return true;
+    }
+
+    public void PropsApplyFootprint(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        // Applying layers...
+        {
+            Integer layerBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "layerBox");
+
+            if (layerBoxIdx != -1)
+            {
+                HBox layerBox = (HBox)propsBox.getChildren().get(layerBoxIdx);
+                ChoiceBox<String> layerChoiceBox = (ChoiceBox<String>)EDAmameController.GetNodeById(layerBox.getChildren(), "layers");
+
+                if (layerChoiceBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"layers\" node in global properties window \"layerBox\" entry!");
+
+                int layerIdx = Editor.FindPCBLayer(layerChoiceBox.getValue());
+
+                if (layerIdx != -1)
+                {
+                    String layer = EDAmameController.Editor_PCBLayers[layerIdx];
+
+                    this.triangle.setId(layer);
+                    this.triangle.setStroke(Editor.GetPCBLayerColor(layer));
+
+                    if (this.triangle.getFill() != Color.TRANSPARENT)
+                        this.triangle.setFill(Editor.GetPCBLayerColor(layer));
+                }
+                else if (!layerChoiceBox.getValue().equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply layer because the entered field is invalid!");
+                }
+            }
+        }
+
+        // Applying borders...
+        {
+            Integer strokeWidthBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "strokesWidthBox");
+
+            if (strokeWidthBoxIdx != -1)
+            {
+                HBox strokeWidthBox = (HBox)propsBox.getChildren().get(strokeWidthBoxIdx);
+                TextField strokeWidthText = (TextField) EDAmameController.GetNodeById(strokeWidthBox.getChildren(), "strokeWidth");
+
+                if (strokeWidthText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"strokeWidth\" node in Symbol Editor properties window \"strokesWidthBox\" entry!");
+
+                String strokeWidthStr = strokeWidthText.getText();
+
+                if (EDAmameController.IsStringNum(strokeWidthStr))
+                {
+                    Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
+
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
+                        this.triangle.setStrokeWidth(newStrokeWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
+                }
+                else if (!strokeWidthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is non-numeric!");
+                }
+            }
+        }
+
+        // Applying fills...
+        {
+            Integer fillBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "fillBox");
+
+            if (fillBoxIdx != -1)
+            {
+                HBox fillBox = (HBox)propsBox.getChildren().get(fillBoxIdx);
+                CheckBox fillCheckBox = (CheckBox)EDAmameController.GetNodeById(fillBox.getChildren(), "fills");
+
+                if (fillCheckBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"fills\" node in global properties window \"fillBox\" entry!");
+
+                if (fillCheckBox.isSelected())
+                    this.triangle.setFill(Editor.GetPCBLayerColor(this.triangle.getId()));
+                else
+                    this.triangle.setFill(Color.TRANSPARENT);
             }
         }
 

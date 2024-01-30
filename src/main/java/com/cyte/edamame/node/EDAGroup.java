@@ -234,7 +234,7 @@ abstract public class EDAGroup extends EDANode
 
                 if (EDAmameController.IsStringNum(posXStr))
                 {
-                    Double newPosX = Double.parseDouble(posXStr);
+                    Double newPosX = this.editor.PosSnapToGridPoint(Double.parseDouble(posXStr));
 
                     this.group.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
                 }
@@ -245,7 +245,7 @@ abstract public class EDAGroup extends EDANode
 
                 if (EDAmameController.IsStringNum(posYStr))
                 {
-                    Double newPosY = Double.parseDouble(posYStr);
+                    Double newPosY = this.editor.PosSnapToGridPoint(Double.parseDouble(posYStr));
 
                     this.group.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
                 }
@@ -285,4 +285,6 @@ abstract public class EDAGroup extends EDANode
 
     abstract public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels);
     abstract public void PropsApplySymbol(VBox propsBox);
+    abstract public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii);
+    abstract public void PropsApplyFootprint(VBox propsBox);
 }

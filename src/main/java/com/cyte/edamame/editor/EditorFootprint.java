@@ -606,10 +606,357 @@ public class EditorFootprint extends Editor
     //// PROPERTIES WINDOW FUNCTIONS ////
 
     public void PropsLoadSpecific()
-    {}
+    {
+        if (this.shapesSelected == 0)
+            return;
+
+        boolean needHeader = false;
+
+        // Reading all shape type properties...
+        LinkedList<String> layers = new LinkedList<String>();
+        LinkedList<Boolean> fills = new LinkedList<Boolean>();
+        LinkedList<Double> strokeWidths = new LinkedList<Double>();
+        LinkedList<Double> circlesRadii = new LinkedList<Double>();
+        LinkedList<Double> rectsWidths = new LinkedList<Double>();
+        LinkedList<Double> rectsHeights = new LinkedList<Double>();
+        LinkedList<Double> trisLens = new LinkedList<Double>();
+        LinkedList<Double> lineStartPosX = new LinkedList<Double>();
+        LinkedList<Double> lineStartPosY = new LinkedList<Double>();
+        LinkedList<Double> lineEndPosX = new LinkedList<Double>();
+        LinkedList<Double> lineEndPosY = new LinkedList<Double>();
+        LinkedList<Double> lineWidths = new LinkedList<Double>();
+        LinkedList<String> textContents = new LinkedList<String>();
+        LinkedList<Double> textFontSizes = new LinkedList<Double>();
+        LinkedList<Double> holeOuterRadii = new LinkedList<Double>();
+        LinkedList<Double> holeInnerRadii = new LinkedList<Double>();
+        LinkedList<Double> viaRadii = new LinkedList<Double>();
+
+        for (int i = 0; i < this.nodes.size(); i++)
+        {
+            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadFootprint(layers, fills, strokeWidths, circlesRadii, rectsWidths, rectsHeights, trisLens, lineStartPosX, lineStartPosY, lineEndPosX, lineEndPosY, lineWidths, textContents, textFontSizes, holeOuterRadii, holeInnerRadii, viaRadii);
+            needHeader = needHeader || shapeNeedHeader;
+        }
+
+        // Creating header...
+        if (needHeader)
+        {
+            Text shapeHeader = new Text("Footprint Editor Properties:");
+            shapeHeader.setStyle("-fx-font-weight: bold;");
+            shapeHeader.setStyle("-fx-font-size: 16px;");
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(shapeHeader);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating layer box...
+        if (!layers.isEmpty())
+        {
+            HBox layerHBox = new HBox(10);
+            layerHBox.setId("layerBox");
+            layerHBox.getChildren().add(new Label("Layer: "));
+            ChoiceBox<String> layerBox = new ChoiceBox<String>();
+
+            for (int i = 0; i < EDAmameController.Editor_PCBLayers.length; i++)
+                layerBox.getItems().add(EDAmameController.Editor_PCBLayers[i]);
+
+            layerBox.setId("layers");
+            layerHBox.getChildren().add(layerBox);
+
+            if (EDAmameController.IsListAllEqual(layers))
+                layerBox.setValue(layers.get(0));
+            else
+                layerBox.setValue("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(layerHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating fill box...
+        if (!fills.isEmpty())
+        {
+            HBox fillHBox = new HBox(10);
+            fillHBox.setId("fillBox");
+            fillHBox.getChildren().add(new Label("Fill: "));
+            CheckBox fillBox = new CheckBox();
+            fillBox.setId("fills");
+            fillHBox.getChildren().add(fillBox);
+
+            if (EDAmameController.IsListAllEqual(fills))
+                fillBox.setSelected(fills.get(0));
+            else
+                fillBox.setSelected(false);
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(fillHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating border box...
+        if (!strokeWidths.isEmpty())
+        {
+            HBox strokesWidthHBox = new HBox(10);
+            strokesWidthHBox.setId("strokesWidthBox");
+            strokesWidthHBox.getChildren().add(new Label("Shape Borders: "));
+            TextField strokesWidthTextBox = new TextField();
+            strokesWidthTextBox.setId("strokeWidth");
+            strokesWidthHBox.getChildren().add(strokesWidthTextBox);
+
+            if (EDAmameController.IsListAllEqual(strokeWidths))
+                strokesWidthTextBox.setText(Double.toString(strokeWidths.get(0)));
+            else
+                strokesWidthTextBox.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(strokesWidthHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating circle radius box...
+        if (!circlesRadii.isEmpty())
+        {
+            HBox circleHBox = new HBox(10);
+            circleHBox.setId("circleBox");
+            circleHBox.getChildren().add(new Label("Circle Radii: "));
+            TextField radiusText = new TextField();
+            radiusText.setId("circleRadii");
+            circleHBox.getChildren().add(radiusText);
+
+            if (EDAmameController.IsListAllEqual(circlesRadii))
+                radiusText.setText(Double.toString(circlesRadii.get(0)));
+            else
+                radiusText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(circleHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating rectangle width & height box...
+        if (!rectsWidths.isEmpty() && !rectsHeights.isEmpty())
+        {
+            HBox rectHBox = new HBox(10);
+            rectHBox.setId("rectBox");
+            rectHBox.getChildren().add(new Label("Rectangle Widths: "));
+            TextField widthText = new TextField();
+            widthText.setMinWidth(100);
+            widthText.setPrefWidth(100);
+            widthText.setMaxWidth(100);
+            widthText.setId("rectWidths");
+            rectHBox.getChildren().add(widthText);
+            rectHBox.getChildren().add(new Label("Heights: "));
+            TextField heightText = new TextField();
+            heightText.setId("rectHeights");
+            heightText.setMinWidth(100);
+            heightText.setPrefWidth(100);
+            heightText.setMaxWidth(100);
+            rectHBox.getChildren().add(heightText);
+
+            if (EDAmameController.IsListAllEqual(rectsWidths))
+                widthText.setText(Double.toString(rectsWidths.get(0)));
+            else
+                widthText.setText("<mixed>");
+
+            if (EDAmameController.IsListAllEqual(rectsHeights))
+                heightText.setText(Double.toString(rectsHeights.get(0)));
+            else
+                heightText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(rectHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating triangle lengths box...
+        if (!trisLens.isEmpty())
+        {
+            HBox triLenHBox = new HBox(10);
+            triLenHBox.setId("triBox");
+            triLenHBox.getChildren().add(new Label("Triangle Lengths: "));
+            TextField triLenText = new TextField();
+            triLenText.setId("triLens");
+            triLenHBox.getChildren().add(triLenText);
+
+            if (EDAmameController.IsListAllEqual(trisLens))
+                triLenText.setText(Double.toString(trisLens.get(0)));
+            else
+                triLenText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(triLenHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating line box...
+        if (!lineStartPosX.isEmpty() && !lineStartPosY.isEmpty() && !lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
+        {
+            // Start point
+            HBox lineStartPointsHBox = new HBox(10);
+            lineStartPointsHBox.setId("lineStartPointsBox");
+            lineStartPointsHBox.getChildren().add(new Label("Line Start Points X: "));
+            TextField lineStartPointsXText = new TextField();
+            lineStartPointsXText.setMinWidth(100);
+            lineStartPointsXText.setPrefWidth(100);
+            lineStartPointsXText.setMaxWidth(100);
+            lineStartPointsXText.setId("lineStartPointsX");
+            lineStartPointsHBox.getChildren().add(lineStartPointsXText);
+            lineStartPointsHBox.getChildren().add(new Label("Y: "));
+            TextField lineStartPointsYText = new TextField();
+            lineStartPointsYText.setId("lineStartPointsY");
+            lineStartPointsYText.setMinWidth(100);
+            lineStartPointsYText.setPrefWidth(100);
+            lineStartPointsYText.setMaxWidth(100);
+            lineStartPointsHBox.getChildren().add(lineStartPointsYText);
+
+            if (EDAmameController.IsListAllEqual(lineStartPosX))
+                lineStartPointsXText.setText(Double.toString(lineStartPosX.get(0)));
+            else
+                lineStartPointsXText.setText("<mixed>");
+
+            if (EDAmameController.IsListAllEqual(lineStartPosY))
+                lineStartPointsYText.setText(Double.toString(lineStartPosY.get(0)));
+            else
+                lineStartPointsYText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(lineStartPointsHBox);
+
+            // End point
+            HBox lineEndPointsHBox = new HBox(10);
+            lineEndPointsHBox.setId("lineEndPointsBox");
+            lineEndPointsHBox.getChildren().add(new Label("Line End Points X: "));
+            TextField lineEndPointsXText = new TextField();
+            lineEndPointsXText.setMinWidth(100);
+            lineEndPointsXText.setPrefWidth(100);
+            lineEndPointsXText.setMaxWidth(100);
+            lineEndPointsXText.setId("lineEndPointsX");
+            lineEndPointsHBox.getChildren().add(lineEndPointsXText);
+            lineEndPointsHBox.getChildren().add(new Label("Y: "));
+            TextField lineEndPointsYText = new TextField();
+            lineEndPointsYText.setId("lineEndPointsY");
+            lineEndPointsYText.setMinWidth(100);
+            lineEndPointsYText.setPrefWidth(100);
+            lineEndPointsYText.setMaxWidth(100);
+            lineEndPointsHBox.getChildren().add(lineEndPointsYText);
+
+            if (EDAmameController.IsListAllEqual(lineEndPosX))
+                lineEndPointsXText.setText(Double.toString(lineEndPosX.get(0)));
+            else
+                lineEndPointsXText.setText("<mixed>");
+
+            if (EDAmameController.IsListAllEqual(lineEndPosY))
+                lineEndPointsYText.setText(Double.toString(lineEndPosY.get(0)));
+            else
+                lineEndPointsYText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(lineEndPointsHBox);
+
+            // Width
+            HBox lineWidthsHBox = new HBox(10);
+            lineWidthsHBox.setId("lineWidthsBox");
+            lineWidthsHBox.getChildren().add(new Label("Line Widths: "));
+            TextField lineWidthsText = new TextField();
+            lineWidthsText.setId("lineWidths");
+            lineWidthsHBox.getChildren().add(lineWidthsText);
+
+            if (EDAmameController.IsListAllEqual(lineWidths))
+                lineWidthsText.setText(Double.toString(lineWidths.get(0)));
+            else
+                lineWidthsText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(lineWidthsHBox);
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating text box...
+        if (!textFontSizes.isEmpty())
+        {
+            HBox textContentHBox = new HBox(10);
+            textContentHBox.setId("textContentBox");
+            textContentHBox.getChildren().add(new Label("Text Contents: "));
+            TextField textContentText = new TextField();
+            textContentText.setId("textContent");
+            textContentHBox.getChildren().add(textContentText);
+
+            HBox textFontSizeHBox = new HBox(10);
+            textFontSizeHBox.setId("fontSizeBox");
+            textFontSizeHBox.getChildren().add(new Label("Text Font Sizes: "));
+            TextField textFontSizeText = new TextField();
+            textFontSizeText.setId("fontSize");
+            textFontSizeHBox.getChildren().add(textFontSizeText);
+
+            if (EDAmameController.IsListAllEqual(textContents))
+                textContentText.setText(textContents.get(0));
+            else
+                textContentText.setText("<mixed>");
+
+            if (EDAmameController.IsListAllEqual(textFontSizes))
+                textFontSizeText.setText(Double.toString(textFontSizes.get(0)));
+            else
+                textFontSizeText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(textContentHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(textFontSizeHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating hole box...
+        if (!holeOuterRadii.isEmpty() && !holeInnerRadii.isEmpty())
+        {
+            HBox holeHBox = new HBox(10);
+            holeHBox.setId("holeBox");
+            holeHBox.getChildren().add(new Label("Hole Outer Radii: "));
+            TextField outerRadiiText = new TextField();
+            outerRadiiText.setMinWidth(100);
+            outerRadiiText.setPrefWidth(100);
+            outerRadiiText.setMaxWidth(100);
+            outerRadiiText.setId("holeOuterRadii");
+            holeHBox.getChildren().add(outerRadiiText);
+            holeHBox.getChildren().add(new Label("Inner Radii: "));
+            TextField innerRadiiText = new TextField();
+            innerRadiiText.setId("holeInnerRadii");
+            innerRadiiText.setMinWidth(100);
+            innerRadiiText.setPrefWidth(100);
+            innerRadiiText.setMaxWidth(100);
+            holeHBox.getChildren().add(innerRadiiText);
+
+            if (EDAmameController.IsListAllEqual(holeOuterRadii))
+                outerRadiiText.setText(Double.toString(holeOuterRadii.get(0)));
+            else
+                outerRadiiText.setText("<mixed>");
+
+            if (EDAmameController.IsListAllEqual(holeInnerRadii))
+                innerRadiiText.setText(Double.toString(holeInnerRadii.get(0)));
+            else
+                innerRadiiText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(holeHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+
+        // Creating via box...
+        if (!viaRadii.isEmpty())
+        {
+            HBox viaHBox = new HBox(10);
+            viaHBox.setId("viaBox");
+            viaHBox.getChildren().add(new Label("Via Radii: "));
+            TextField radiusText = new TextField();
+            radiusText.setId("viaRadii");
+            viaHBox.getChildren().add(radiusText);
+
+            if (EDAmameController.IsListAllEqual(viaRadii))
+                radiusText.setText(Double.toString(viaRadii.get(0)));
+            else
+                radiusText.setText("<mixed>");
+
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(viaHBox);
+            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(new Separator());
+        }
+    }
 
     public void PropsApplySpecific()
-    {}
+    {
+        if (this.shapesSelected == 0)
+            return;
+
+        VBox propsBox = EDAmameController.editorPropertiesWindow.propsBox;
+
+        for (int i = 0; i < this.nodes.size(); i++)
+            this.nodes.get(i).PropsApplyFootprint(propsBox);
+    }
 
     //// SETTINGS WINDOW FUNCTIONS ////
 

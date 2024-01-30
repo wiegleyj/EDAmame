@@ -6,8 +6,8 @@
  */
 
 // TODO:
-// Implement footprint editor properties window
 // Fix canvas actually rendering the grid spacing
+// Implement PCB editor
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something

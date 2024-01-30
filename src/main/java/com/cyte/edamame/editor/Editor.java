@@ -1202,6 +1202,15 @@ abstract public class Editor
 
     //// SUPPORT FUNCTIONS ////
 
+    public static int FindPCBLayer(String layer)
+    {
+        for (int i = 0; i < EDAmameController.Editor_PCBLayers.length; i++)
+            if (EDAmameController.Editor_PCBLayers[i].equals(layer))
+                return i;
+
+        return -1;
+    }
+
     public static Color GetPCBLayerColor(String layer)
     {
         for (int i = 0; i < EDAmameController.Editor_PCBLayers.length; i++)
@@ -1225,6 +1234,16 @@ abstract public class Editor
 
         return new PairMutable(Math.round(pos.GetLeftDouble() / scaledSpacing) * scaledSpacing,
                                Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
+    }
+
+    public double PosSnapToGridPoint(double pos)
+    {
+        if (this.snapGridSpacing < 0)
+            return pos;
+
+        double scaledSpacing = this.snapGridSpacing * 10;
+
+        return Math.round(pos / scaledSpacing) * scaledSpacing;
     }
 
     static public void LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)

@@ -13,13 +13,13 @@ import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
 import javafx.geometry.*;
 import javafx.scene.*;
-import javafx.scene.control.ColorPicker;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.*;
+import javafx.scene.text.Font;
 
 import java.util.LinkedList;
 
@@ -349,7 +349,7 @@ public class EDACircle extends EDANode
 
                 if (EDAmameController.IsStringNum(posXStr))
                 {
-                    Double newPosX = Double.parseDouble(posXStr);
+                    Double newPosX = this.editor.PosSnapToGridPoint(Double.parseDouble(posXStr));
 
                     this.circle.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
                 }
@@ -360,7 +360,7 @@ public class EDACircle extends EDANode
 
                 if (EDAmameController.IsStringNum(posYStr))
                 {
-                    Double newPosY = Double.parseDouble(posYStr);
+                    Double newPosY = this.editor.PosSnapToGridPoint(Double.parseDouble(posYStr));
 
                     this.circle.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
                 }
@@ -489,6 +489,141 @@ public class EDACircle extends EDANode
                     if (color != null)
                         EDAmameController.SetStatusBar("Unable to apply shape border color because the entered color is transparent!");
                 }
+            }
+        }
+
+        // Applying circle radius...
+        {
+            Integer circleBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "circleBox");
+
+            if (circleBoxIdx != -1)
+            {
+                HBox circleBox = (HBox) propsBox.getChildren().get(circleBoxIdx);
+                TextField radiiText = (TextField) EDAmameController.GetNodeById(circleBox.getChildren(), "circleRadii");
+
+                if (radiiText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"circleRadii\" node in Symbol Editor properties window \"circleBox\" entry!");
+
+                String radiusStr = radiiText.getText();
+
+                if (EDAmameController.IsStringNum(radiusStr))
+                {
+                    Double newRadius = Double.parseDouble(radiusStr);
+
+                    if ((newRadius >= EDAmameController.EditorSymbol_CircleRadiusMin) && (newRadius <= EDAmameController.EditorSymbol_CircleRadiusMax))
+                        this.circle.setRadius(newRadius);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
+                }
+                else if (!radiusStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
+    public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        layers.add(this.circle.getId());
+
+        if (this.circle.getFill() == Color.TRANSPARENT)
+            fills.add(false);
+        else
+            fills.add(true);
+
+        strokeWidths.add(this.circle.getStrokeWidth());
+
+        circlesRadii.add(this.circle.getRadius());
+
+        return true;
+    }
+
+    public void PropsApplyFootprint(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        // Applying layers...
+        {
+            Integer layerBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "layerBox");
+
+            if (layerBoxIdx != -1)
+            {
+                HBox layerBox = (HBox)propsBox.getChildren().get(layerBoxIdx);
+                ChoiceBox<String> layerChoiceBox = (ChoiceBox<String>)EDAmameController.GetNodeById(layerBox.getChildren(), "layers");
+
+                if (layerChoiceBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"layers\" node in global properties window \"layerBox\" entry!");
+
+                int layerIdx = Editor.FindPCBLayer(layerChoiceBox.getValue());
+
+                if (layerIdx != -1)
+                {
+                    String layer = EDAmameController.Editor_PCBLayers[layerIdx];
+
+                    this.circle.setId(layer);
+                    this.circle.setStroke(Editor.GetPCBLayerColor(layer));
+
+                    if (this.circle.getFill() != Color.TRANSPARENT)
+                        this.circle.setFill(Editor.GetPCBLayerColor(layer));
+                }
+                else if (!layerChoiceBox.getValue().equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply layer because the entered field is invalid!");
+                }
+            }
+        }
+
+        // Applying borders...
+        {
+            Integer strokeWidthBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "strokesWidthBox");
+
+            if (strokeWidthBoxIdx != -1)
+            {
+                HBox strokeWidthBox = (HBox)propsBox.getChildren().get(strokeWidthBoxIdx);
+                TextField strokeWidthText = (TextField) EDAmameController.GetNodeById(strokeWidthBox.getChildren(), "strokeWidth");
+
+                if (strokeWidthText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"strokeWidth\" node in Symbol Editor properties window \"strokesWidthBox\" entry!");
+
+                String strokeWidthStr = strokeWidthText.getText();
+
+                if (EDAmameController.IsStringNum(strokeWidthStr))
+                {
+                    Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
+
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
+                        this.circle.setStrokeWidth(newStrokeWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
+                }
+                else if (!strokeWidthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is non-numeric!");
+                }
+            }
+        }
+
+        // Applying fills...
+        {
+            Integer fillBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "fillBox");
+
+            if (fillBoxIdx != -1)
+            {
+                HBox fillBox = (HBox)propsBox.getChildren().get(fillBoxIdx);
+                CheckBox fillCheckBox = (CheckBox)EDAmameController.GetNodeById(fillBox.getChildren(), "fills");
+
+                if (fillCheckBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"fills\" node in global properties window \"fillBox\" entry!");
+
+                if (fillCheckBox.isSelected())
+                    this.circle.setFill(Editor.GetPCBLayerColor(this.circle.getId()));
+                else
+                    this.circle.setFill(Color.TRANSPARENT);
             }
         }
 

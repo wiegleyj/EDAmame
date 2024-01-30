@@ -13,6 +13,8 @@ import com.cyte.edamame.shape.SnapPoint;
 import com.cyte.edamame.util.PairMutable;
 import javafx.geometry.*;
 import javafx.scene.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
@@ -349,7 +351,7 @@ public class EDARectangle extends EDANode
 
                 if (EDAmameController.IsStringNum(posXStr))
                 {
-                    Double newPosX = Double.parseDouble(posXStr);
+                    Double newPosX = this.editor.PosSnapToGridPoint(Double.parseDouble(posXStr));
 
                     this.rectangle.setTranslateX(newPosX + this.editor.paneHolder.getWidth() / 2);
                 }
@@ -360,7 +362,7 @@ public class EDARectangle extends EDANode
 
                 if (EDAmameController.IsStringNum(posYStr))
                 {
-                    Double newPosY = Double.parseDouble(posYStr);
+                    Double newPosY = this.editor.PosSnapToGridPoint(Double.parseDouble(posYStr));
 
                     this.rectangle.setTranslateY(newPosY + this.editor.paneHolder.getHeight() / 2);
                 }
@@ -490,6 +492,160 @@ public class EDARectangle extends EDANode
                     if (color != null)
                         EDAmameController.SetStatusBar("Unable to apply shape border color because the entered color is transparent!");
                 }
+            }
+        }
+
+        // Applying rectangle width & height...
+        {
+            Integer rectBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "rectBox");
+
+            if (rectBoxIdx != -1)
+            {
+                HBox rectBox = (HBox) propsBox.getChildren().get(rectBoxIdx);
+                TextField widthText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectWidths");
+                TextField heightText = (TextField) EDAmameController.GetNodeById(rectBox.getChildren(), "rectHeights");
+
+                if (widthText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"rectWidths\" node in Symbol Editor properties window \"rectBox\" entry!");
+                if (heightText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"rectHeights\" node in Symbol Editor properties window \"rectBox\" entry!");
+
+                String widthStr = widthText.getText();
+                String heightStr = heightText.getText();
+
+                if (EDAmameController.IsStringNum(widthStr))
+                {
+                    Double newWidth = Double.parseDouble(widthStr);
+
+                    if ((newWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (newWidth <= EDAmameController.EditorSymbol_RectWidthMax))
+                        this.rectangle.setWidth(newWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + ")");
+                }
+                else if (!widthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is non-numeric!");
+                }
+
+                if (EDAmameController.IsStringNum(heightStr))
+                {
+                    Double newHeight = Double.parseDouble(heightStr);
+
+                    if ((newHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (newHeight <= EDAmameController.EditorSymbol_RectHeightMax))
+                        this.rectangle.setHeight(newHeight);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
+                }
+                else if (!heightStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
+    public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        layers.add(this.rectangle.getId());
+
+        if (this.rectangle.getFill() == Color.TRANSPARENT)
+            fills.add(false);
+        else
+            fills.add(true);
+
+        strokeWidths.add(this.rectangle.getStrokeWidth());
+
+        rectsWidths.add(this.rectangle.getWidth());
+        rectsHeights.add(this.rectangle.getHeight());
+
+        return true;
+    }
+
+    public void PropsApplyFootprint(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        // Applying layers...
+        {
+            Integer layerBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "layerBox");
+
+            if (layerBoxIdx != -1)
+            {
+                HBox layerBox = (HBox)propsBox.getChildren().get(layerBoxIdx);
+                ChoiceBox<String> layerChoiceBox = (ChoiceBox<String>)EDAmameController.GetNodeById(layerBox.getChildren(), "layers");
+
+                if (layerChoiceBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"layers\" node in global properties window \"layerBox\" entry!");
+
+                int layerIdx = Editor.FindPCBLayer(layerChoiceBox.getValue());
+
+                if (layerIdx != -1)
+                {
+                    String layer = EDAmameController.Editor_PCBLayers[layerIdx];
+
+                    this.rectangle.setId(layer);
+                    this.rectangle.setStroke(Editor.GetPCBLayerColor(layer));
+
+                    if (this.rectangle.getFill() != Color.TRANSPARENT)
+                        this.rectangle.setFill(Editor.GetPCBLayerColor(layer));
+                }
+                else if (!layerChoiceBox.getValue().equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply layer because the entered field is invalid!");
+                }
+            }
+        }
+
+        // Applying borders...
+        {
+            Integer strokeWidthBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "strokesWidthBox");
+
+            if (strokeWidthBoxIdx != -1)
+            {
+                HBox strokeWidthBox = (HBox)propsBox.getChildren().get(strokeWidthBoxIdx);
+                TextField strokeWidthText = (TextField) EDAmameController.GetNodeById(strokeWidthBox.getChildren(), "strokeWidth");
+
+                if (strokeWidthText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"strokeWidth\" node in Symbol Editor properties window \"strokesWidthBox\" entry!");
+
+                String strokeWidthStr = strokeWidthText.getText();
+
+                if (EDAmameController.IsStringNum(strokeWidthStr))
+                {
+                    Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
+
+                    if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
+                        this.rectangle.setStrokeWidth(newStrokeWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
+                }
+                else if (!strokeWidthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is non-numeric!");
+                }
+            }
+        }
+
+        // Applying fills...
+        {
+            Integer fillBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "fillBox");
+
+            if (fillBoxIdx != -1)
+            {
+                HBox fillBox = (HBox)propsBox.getChildren().get(fillBoxIdx);
+                CheckBox fillCheckBox = (CheckBox)EDAmameController.GetNodeById(fillBox.getChildren(), "fills");
+
+                if (fillCheckBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"fills\" node in global properties window \"fillBox\" entry!");
+
+                if (fillCheckBox.isSelected())
+                    this.rectangle.setFill(Editor.GetPCBLayerColor(this.rectangle.getId()));
+                else
+                    this.rectangle.setFill(Color.TRANSPARENT);
             }
         }
 
