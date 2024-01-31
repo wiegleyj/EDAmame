@@ -506,7 +506,7 @@ public class EditorFootprint extends Editor
                                                 hole.setTranslateX(dropPos.GetLeftDouble());
                                                 hole.setTranslateY(dropPos.GetRightDouble());
 
-                                                hole.setId(this.layerBox.getValue());
+                                                hole.setId("Through-Hole");
 
                                                 EDAHole holeNode = new EDAHole("Hole", hole, false, this);
                                                 holeNode.Add();
@@ -556,7 +556,7 @@ public class EditorFootprint extends Editor
                                     via.setTranslateX(dropPos.GetLeftDouble());
                                     via.setTranslateY(dropPos.GetRightDouble());
 
-                                    via.setId(this.layerBox.getValue());
+                                    via.setId("Via");
 
                                     EDAVia viaNode = new EDAVia("Via", via, false, this);
                                     viaNode.Add();

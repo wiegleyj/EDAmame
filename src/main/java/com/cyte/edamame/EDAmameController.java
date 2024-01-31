@@ -6,8 +6,8 @@
  */
 
 // TODO:
-// Fix canvas actually rendering the grid spacing
-// Implement PCB editor
+// Fix PCB line moving
+// Implement gerber & drill file exports
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
 // Fix selection box appearing while dragging something

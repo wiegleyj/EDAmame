@@ -149,6 +149,17 @@ public class EDAPin extends EDAGroup
     public void PropsApplyFootprint(VBox propsBox)
     {}
 
+    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        return true;
+    }
+
+    public void PropsApplyPCB(VBox propsBox)
+    {}
+
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()

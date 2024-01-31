@@ -119,6 +119,63 @@ public class EDAVia extends EDAGroup
         }
     }
 
+    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        if (this.group.getChildren().size() != 2)
+            throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have 2 children!");
+
+        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()));
+
+        return true;
+    }
+
+    public void PropsApplyPCB(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        if (this.group.getChildren().size() != 2)
+            throw new java.lang.Error("ERROR: Attempting to apply a via from the footprint editor properties window that doesn't have 2 children!");
+
+        // Applying via radii...
+        {
+            Integer viaBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "viaBox");
+
+            if (viaBoxIdx != -1)
+            {
+                HBox viaBox = (HBox) propsBox.getChildren().get(viaBoxIdx);
+                TextField radiiText = (TextField) EDAmameController.GetNodeById(viaBox.getChildren(), "viaRadii");
+
+                if (radiiText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"viaRadii\" node in Footprint Editor properties window \"viaBox\" entry!");
+
+                String radiusStr = radiiText.getText();
+
+                if (EDAmameController.IsStringNum(radiusStr))
+                {
+                    Double radius = Double.parseDouble(radiusStr);
+
+                    if ((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax))
+                    {
+                        ((Circle)this.group.getChildren().get(0)).setRadius(radius);
+                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2);
+                    }
+                    else
+                    {
+                        EDAmameController.SetStatusBar("Unable to apply via radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorFootprint_ViaRadiusMin + ", " + EDAmameController.EditorFootprint_ViaRadiusMax + ")");
+                    }
+                }
+                else if (!radiusStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply via radii because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()

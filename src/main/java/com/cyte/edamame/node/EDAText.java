@@ -597,6 +597,106 @@ public class EDAText extends EDANode
         }
     }
 
+    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        layers.add(this.text.getId());
+
+        textContents.add(this.text.getText());
+        textFontSizes.add(this.text.getFont().getSize());
+
+        return true;
+    }
+
+    public void PropsApplyPCB(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        // Applying layers...
+        {
+            Integer layerBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "layerBox");
+
+            if (layerBoxIdx != -1)
+            {
+                HBox layerBox = (HBox)propsBox.getChildren().get(layerBoxIdx);
+                ChoiceBox<String> layerChoiceBox = (ChoiceBox<String>)EDAmameController.GetNodeById(layerBox.getChildren(), "layers");
+
+                if (layerChoiceBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"layers\" node in global properties window \"layerBox\" entry!");
+
+                int layerIdx = Editor.FindPCBLayer(layerChoiceBox.getValue());
+
+                if (layerIdx != -1)
+                {
+                    String layer = EDAmameController.Editor_PCBLayers[layerIdx];
+
+                    this.text.setId(layer);
+                    this.text.setFill(Editor.GetPCBLayerColor(layer));
+                }
+                else if (!layerChoiceBox.getValue().equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply layer because the entered field is invalid!");
+                }
+            }
+        }
+
+        // Applying texts...
+        {
+            Integer contentBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "textContentBox");
+
+            if (contentBoxIdx != -1)
+            {
+                HBox contentBox = (HBox)propsBox.getChildren().get(contentBoxIdx);
+                TextField contentText = (TextField)EDAmameController.GetNodeById(contentBox.getChildren(), "textContent");
+
+                if (contentText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"textContent\" node in global properties window \"textContentBox\" entry!");
+
+                String content = contentText.getText();
+
+                if (!content.isEmpty())
+                {
+                    if (!content.equals("<mixed>"))
+                        this.text.setText(content);
+                }
+                else
+                {
+                    EDAmameController.SetStatusBar("Unable to apply text contents because the entered field is empty!");
+                }
+            }
+
+            Integer fontSizeBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "fontSizeBox");
+
+            if (fontSizeBoxIdx != -1)
+            {
+                HBox fontSizeBox = (HBox)propsBox.getChildren().get(fontSizeBoxIdx);
+                TextField fontSizeText = (TextField)EDAmameController.GetNodeById(fontSizeBox.getChildren(), "fontSize");
+
+                if (fontSizeText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"fontSize\" node in global properties window \"fontSizeBox\" entry!");
+
+                String fontSizeStr = fontSizeText.getText();
+
+                if (EDAmameController.IsStringNum(fontSizeStr))
+                {
+                    double fontSize = Double.parseDouble(fontSizeStr);
+
+                    if (((fontSize >= EDAmameController.EditorSymbol_TextFontSizeMin) && (fontSize <= EDAmameController.EditorSymbol_TextFontSizeMax)))
+                        this.text.setFont(new Font("Arial", fontSize));
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_TextFontSizeMin + ", " + EDAmameController.EditorSymbol_TextFontSizeMax + ")");
+                }
+                else if (!fontSizeStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()

@@ -563,6 +563,140 @@ public class EDALine extends EDANode
         }
     }
 
+    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    {
+        if (!this.selected)
+            return false;
+
+        layers.add(this.line.getId());
+
+        lineStartPosX.add(this.line.getStartX());
+        lineStartPosY.add(this.line.getStartY());
+        lineEndPosX.add(this.line.getEndX());
+        lineEndPosY.add(this.line.getEndY());
+        lineWidths.add(this.line.getStrokeWidth());
+
+        return true;
+    }
+
+    public void PropsApplyPCB(VBox propsBox)
+    {
+        if (!this.selected)
+            return;
+
+        // Applying layers...
+        {
+            Integer layerBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "layerBox");
+
+            if (layerBoxIdx != -1)
+            {
+                HBox layerBox = (HBox)propsBox.getChildren().get(layerBoxIdx);
+                ChoiceBox<String> layerChoiceBox = (ChoiceBox<String>)EDAmameController.GetNodeById(layerBox.getChildren(), "layers");
+
+                if (layerChoiceBox == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"layers\" node in global properties window \"layerBox\" entry!");
+
+                int layerIdx = Editor.FindPCBLayer(layerChoiceBox.getValue());
+
+                if (layerIdx != -1)
+                {
+                    String layer = EDAmameController.Editor_PCBLayers[layerIdx];
+
+                    this.line.setId(layer);
+                    this.line.setStroke(Editor.GetPCBLayerColor(layer));
+                }
+                else if (!layerChoiceBox.getValue().equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply layer because the entered field is invalid!");
+                }
+            }
+        }
+
+        // Applying lines...
+        {
+            Integer lineStartPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineStartPointsBox");
+
+            if (lineStartPointsBoxIdx != -1)
+            {
+                HBox lineStartPointsBox = (HBox) propsBox.getChildren().get(lineStartPointsBoxIdx);
+                TextField startPointXText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsX");
+                TextField startPointYText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsY");
+
+                if (startPointXText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsX\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
+                if (startPointYText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsY\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
+
+                String startPointXStr = startPointXText.getText();
+                String startPointYStr = startPointYText.getText();
+
+                if (EDAmameController.IsStringNum(startPointXStr))
+                    this.line.setStartX(Double.parseDouble(startPointXStr));
+                else if (!startPointXStr.equals("<mixed>"))
+                    EDAmameController.SetStatusBar("Unable to apply line start point X because the entered field is non-numeric!");
+
+                if (EDAmameController.IsStringNum(startPointYStr))
+                    this.line.setStartY(Double.parseDouble(startPointYStr));
+                else if (!startPointYStr.equals("<mixed>"))
+                    EDAmameController.SetStatusBar("Unable to apply line start point Y because the entered field is non-numeric!");
+            }
+
+            Integer lineEndPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineEndPointsBox");
+
+            if (lineEndPointsBoxIdx != -1)
+            {
+                HBox lineEndPointsBox = (HBox) propsBox.getChildren().get(lineEndPointsBoxIdx);
+                TextField endPointXText = (TextField) EDAmameController.GetNodeById(lineEndPointsBox.getChildren(), "lineEndPointsX");
+                TextField endPointYText = (TextField) EDAmameController.GetNodeById(lineEndPointsBox.getChildren(), "lineEndPointsY");
+
+                if (endPointXText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"lineEndPointsX\" node in Symbol Editor properties window \"lineEndPointsBox\" entry!");
+                if (endPointYText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"lineEndPointsY\" node in Symbol Editor properties window \"lineEndPointsBox\" entry!");
+
+                String endPointXStr = endPointXText.getText();
+                String endPointYStr = endPointYText.getText();
+
+                if (EDAmameController.IsStringNum(endPointXStr))
+                    this.line.setEndX(Double.parseDouble(endPointXStr));
+                else if (!endPointXStr.equals("<mixed>"))
+                    EDAmameController.SetStatusBar("Unable to apply line end point X because the entered field is non-numeric!");
+
+                if (EDAmameController.IsStringNum(endPointYStr))
+                    this.line.setEndY(Double.parseDouble(endPointYStr));
+                else if (!endPointYStr.equals("<mixed>"))
+                    EDAmameController.SetStatusBar("Unable to apply line end point Y because the entered field is non-numeric!");
+            }
+
+            Integer lineWidthsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineWidthsBox");
+
+            if (lineWidthsBoxIdx != -1)
+            {
+                HBox lineWidthsBox = (HBox) propsBox.getChildren().get(lineWidthsBoxIdx);
+                TextField lineWidthsText = (TextField) EDAmameController.GetNodeById(lineWidthsBox.getChildren(), "lineWidths");
+
+                if (lineWidthsText == null)
+                    throw new java.lang.Error("ERROR: Unable to find \"lineWidths\" node in Symbol Editor properties window \"lineWidthsBox\" entry!");
+
+                String widthStr = lineWidthsText.getText();
+
+                if (EDAmameController.IsStringNum(widthStr))
+                {
+                    Double newWidth = Double.parseDouble(widthStr);
+
+                    if ((newWidth >= EDAmameController.EditorSymbol_LineWidthMin) && (newWidth <= EDAmameController.EditorSymbol_LineWidthMax))
+                        this.line.setStrokeWidth(newWidth);
+                    else
+                        EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_LineWidthMin + ", " + EDAmameController.EditorSymbol_LineWidthMax + ")");
+                }
+                else if (!widthStr.equals("<mixed>"))
+                {
+                    EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is non-numeric!");
+                }
+            }
+        }
+    }
+
     //// SUPPORT FUNCTIONS ////
 
     public EDANode Clone()
