@@ -96,6 +96,20 @@ public class EditorFootprint extends Editor
         editor.CanvasDraw();
         editor.ListenersInit();
 
+        Editor.TextFieldListenerInit(editor.circleRadius);
+        Editor.TextFieldListenerInit(editor.circleBorderSize);
+        Editor.TextFieldListenerInit(editor.rectangleWidth);
+        Editor.TextFieldListenerInit(editor.rectangleHeight);
+        Editor.TextFieldListenerInit(editor.rectangleBorderSize);
+        Editor.TextFieldListenerInit(editor.triangleHeight);
+        Editor.TextFieldListenerInit(editor.triangleBorderSize);
+        Editor.TextFieldListenerInit(editor.lineWidth);
+        Editor.TextFieldListenerInit(editor.textContent);
+        Editor.TextFieldListenerInit(editor.textSize);
+        Editor.TextFieldListenerInit(editor.holeRadiusOuter);
+        Editor.TextFieldListenerInit(editor.holeRadiusInner);
+        Editor.TextFieldListenerInit(editor.viaRadius);
+
         editor.cursorPreview.setRadius(EDAmameController.Editor_CursorPreviewRadius);
         editor.cursorPreview.setStroke(EDAmameController.Editor_GridPointColors[2]);
         editor.cursorPreview.setStrokeWidth(EDAmameController.Editor_CursorPreviewBorderWidth);
