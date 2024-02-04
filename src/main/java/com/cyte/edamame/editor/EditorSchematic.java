@@ -10,7 +10,7 @@ import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.node.*;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import com.cyte.edamame.netlist.NetListExperimental;
 
 import javafx.fxml.FXML;
@@ -89,6 +89,9 @@ public class EditorSchematic extends Editor
     @FXML
     public void Save()
     {
+        if (this.nodes.isEmpty())
+            return;
+
         NetListExperimental<String> netList = this.ToNetList();
 
         File.Write("C:\\Users\\SVARUN\\Downloads\\netlist.txt", netList.ToString(), true);
@@ -103,17 +106,15 @@ public class EditorSchematic extends Editor
     @FXML
     public void LoadSymbol()
     {
-        LinkedList<Node> nodes = File.NodesLoad(true);
+        PairMutable groupPos = new PairMutable();
+        LinkedList<Node> nodes = File.NodesLoad(groupPos);
 
         if ((nodes == null) || nodes.isEmpty())
             return;
 
         Group symbol = new Group();
-        PairMutable dropPos = this.PaneHolderGetRealCenter();
-
-        symbol.setTranslateX(dropPos.GetLeftDouble());
-        symbol.setTranslateY(dropPos.GetRightDouble());
-
+        symbol.setTranslateX(groupPos.GetLeftDouble());
+        symbol.setTranslateY(groupPos.GetRightDouble());
         symbol.getChildren().addAll(nodes);
 
         LinkedList<PairMutable> snapPointPos = null;

@@ -5,18 +5,11 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame.util;
+package com.cyte.edamame.misc;
 
 import com.cyte.edamame.node.EDANode;
 
 import java.util.*;
-
-import javafx.scene.*;
-import javafx.scene.paint.*;
-import javafx.scene.shape.*;
-import javafx.geometry.*;
-import javafx.scene.text.Font;
-import javafx.scene.text.Text;
 
 public class Utils
 {

@@ -9,8 +9,8 @@ package com.cyte.edamame.node;
 
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.editor.Editor;
-import com.cyte.edamame.shape.SnapPoint;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.SnapPoint;
+import com.cyte.edamame.misc.PairMutable;
 import javafx.geometry.*;
 import javafx.scene.*;
 import javafx.scene.control.ChoiceBox;
@@ -89,6 +89,13 @@ public class EDALine extends EDANode
     {
         return new PairMutable(this.line.getTranslateX(), this.line.getTranslateY());
     };
+
+    public PairMutable GetSnapPos()
+    {
+        PairMutable pos = this.GetTranslate();
+
+        return new PairMutable(this.line.getStartX() + pos.GetLeftDouble(), this.line.getStartY() + pos.GetRightDouble());
+    }
 
     public double GetRotate()
     {
@@ -242,7 +249,7 @@ public class EDALine extends EDANode
 
                 String nameStr = nameText.getText();
 
-                if (!nameStr.isEmpty())
+                if (!nameStr.isEmpty() && !nameStr.equals("<mixed>"))
                 {
                     this.name = nameStr;
                 }
@@ -297,15 +304,13 @@ public class EDALine extends EDANode
         }
     }
 
-    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
+    public boolean PropsLoadSymbol(LinkedList<Paint> colors, LinkedList<Double> strokeWidths, LinkedList<Paint> strokes, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<String> pinLabels)
     {
         if (!this.selected)
             return false;
 
         colors.add(this.line.getStroke());
 
-        lineStartPosX.add(this.line.getStartX());
-        lineStartPosY.add(this.line.getStartY());
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
         lineWidths.add(this.line.getStrokeWidth());
@@ -346,33 +351,6 @@ public class EDALine extends EDANode
 
         // Applying lines...
         {
-            Integer lineStartPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineStartPointsBox");
-
-            if (lineStartPointsBoxIdx != -1)
-            {
-                HBox lineStartPointsBox = (HBox) propsBox.getChildren().get(lineStartPointsBoxIdx);
-                TextField startPointXText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsX");
-                TextField startPointYText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsY");
-
-                if (startPointXText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsX\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-                if (startPointYText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsY\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-
-                String startPointXStr = startPointXText.getText();
-                String startPointYStr = startPointYText.getText();
-
-                if (EDAmameController.IsStringNum(startPointXStr))
-                    this.line.setStartX(Double.parseDouble(startPointXStr));
-                else if (!startPointXStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point X because the entered field is non-numeric!");
-
-                if (EDAmameController.IsStringNum(startPointYStr))
-                    this.line.setStartY(Double.parseDouble(startPointYStr));
-                else if (!startPointYStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point Y because the entered field is non-numeric!");
-            }
-
             Integer lineEndPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineEndPointsBox");
 
             if (lineEndPointsBoxIdx != -1)
@@ -429,15 +407,13 @@ public class EDALine extends EDANode
         }
     }
 
-    public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    public boolean PropsLoadFootprint(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
     {
         if (!this.selected)
             return false;
 
         layers.add(this.line.getId());
 
-        lineStartPosX.add(this.line.getStartX());
-        lineStartPosY.add(this.line.getStartY());
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
         lineWidths.add(this.line.getStrokeWidth());
@@ -480,33 +456,6 @@ public class EDALine extends EDANode
 
         // Applying lines...
         {
-            Integer lineStartPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineStartPointsBox");
-
-            if (lineStartPointsBoxIdx != -1)
-            {
-                HBox lineStartPointsBox = (HBox) propsBox.getChildren().get(lineStartPointsBoxIdx);
-                TextField startPointXText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsX");
-                TextField startPointYText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsY");
-
-                if (startPointXText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsX\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-                if (startPointYText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsY\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-
-                String startPointXStr = startPointXText.getText();
-                String startPointYStr = startPointYText.getText();
-
-                if (EDAmameController.IsStringNum(startPointXStr))
-                    this.line.setStartX(Double.parseDouble(startPointXStr));
-                else if (!startPointXStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point X because the entered field is non-numeric!");
-
-                if (EDAmameController.IsStringNum(startPointYStr))
-                    this.line.setStartY(Double.parseDouble(startPointYStr));
-                else if (!startPointYStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point Y because the entered field is non-numeric!");
-            }
-
             Integer lineEndPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineEndPointsBox");
 
             if (lineEndPointsBoxIdx != -1)
@@ -563,15 +512,13 @@ public class EDALine extends EDANode
         }
     }
 
-    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineStartPosX, LinkedList<Double> lineStartPosY, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
+    public boolean PropsLoadPCB(LinkedList<String> layers, LinkedList<Boolean> fills, LinkedList<Double> strokeWidths, LinkedList<Double> circlesRadii, LinkedList<Double> rectsWidths, LinkedList<Double> rectsHeights, LinkedList<Double> trisLens, LinkedList<Double> lineEndPosX, LinkedList<Double> lineEndPosY, LinkedList<Double> lineWidths, LinkedList<String> textContents, LinkedList<Double> textFontSizes, LinkedList<Double> holeOuterRadii, LinkedList<Double> holeInnerRadii, LinkedList<Double> viaRadii)
     {
         if (!this.selected)
             return false;
 
         layers.add(this.line.getId());
 
-        lineStartPosX.add(this.line.getStartX());
-        lineStartPosY.add(this.line.getStartY());
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
         lineWidths.add(this.line.getStrokeWidth());
@@ -614,33 +561,6 @@ public class EDALine extends EDANode
 
         // Applying lines...
         {
-            Integer lineStartPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineStartPointsBox");
-
-            if (lineStartPointsBoxIdx != -1)
-            {
-                HBox lineStartPointsBox = (HBox) propsBox.getChildren().get(lineStartPointsBoxIdx);
-                TextField startPointXText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsX");
-                TextField startPointYText = (TextField) EDAmameController.GetNodeById(lineStartPointsBox.getChildren(), "lineStartPointsY");
-
-                if (startPointXText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsX\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-                if (startPointYText == null)
-                    throw new java.lang.Error("ERROR: Unable to find \"lineStartPointsY\" node in Symbol Editor properties window \"lineStartPointsBox\" entry!");
-
-                String startPointXStr = startPointXText.getText();
-                String startPointYStr = startPointYText.getText();
-
-                if (EDAmameController.IsStringNum(startPointXStr))
-                    this.line.setStartX(Double.parseDouble(startPointXStr));
-                else if (!startPointXStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point X because the entered field is non-numeric!");
-
-                if (EDAmameController.IsStringNum(startPointYStr))
-                    this.line.setStartY(Double.parseDouble(startPointYStr));
-                else if (!startPointYStr.equals("<mixed>"))
-                    EDAmameController.SetStatusBar("Unable to apply line start point Y because the entered field is non-numeric!");
-            }
-
             Integer lineEndPointsBoxIdx = EDAmameController.FindNodeById(propsBox.getChildren(), "lineEndPointsBox");
 
             if (lineEndPointsBoxIdx != -1)

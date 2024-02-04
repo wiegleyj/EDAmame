@@ -11,7 +11,7 @@ import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.node.*;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -149,18 +149,26 @@ public class EditorFootprint extends Editor
     @FXML
     public void Save()
     {
+        if (this.nodes.isEmpty())
+            return;
+
         LinkedList<Node> nodes = new LinkedList<Node>();
 
         for (int i = 0; i < this.nodes.size(); i++)
             nodes.add(this.nodes.get(i).GetNode());
 
-        File.NodesSave(nodes, true);
+        PairMutable groupSnappedPos = this.PaneHolderGetDrawPos(this.PosSnapToGridPoint(this.PaneHolderGetRealPos(EDANode.NodesGetMiddlePos(nodes))));
+
+        System.out.println(groupSnappedPos.ToStringDouble());
+
+        File.NodesSave(nodes, groupSnappedPos);
     }
 
     @FXML
     public void Load()
     {
-        LinkedList<Node> nodes = File.NodesLoad(true);
+        PairMutable groupPos = new PairMutable();
+        LinkedList<Node> nodes = File.NodesLoad(groupPos);
 
         if (nodes == null)
             return;
@@ -168,9 +176,9 @@ public class EditorFootprint extends Editor
         for (int i = 0; i < nodes.size(); i++)
         {
             Node node = nodes.get(i);
-            PairMutable realPos = this.PaneHolderGetDrawPos(new PairMutable(node.getTranslateX(), node.getTranslateY()));
-            node.setTranslateX(realPos.GetLeftDouble());
-            node.setTranslateY(realPos.GetRightDouble());
+
+            node.setTranslateX(node.getTranslateX() + groupPos.GetLeftDouble());
+            node.setTranslateY(node.getTranslateY() + groupPos.GetRightDouble());
 
             if (node.getClass() == Circle.class)
             {
@@ -200,17 +208,27 @@ public class EditorFootprint extends Editor
             else if (node.getClass() == Group.class)
             {
                 Group group = (Group)node;
-                LinkedList<PairMutable> snapPointPos = new LinkedList<PairMutable>();
 
-                for (int j = 0; j < group.getChildren().size(); j++)
+                if ((group.getId() != null) && group.getId().equals("Through-Hole"))
                 {
-                    Node currChild = group.getChildren().get(j);
+                    if (group.getChildren().size() != 1)
+                        throw new java.lang.Error("ERROR: Attempting to load a hole into footprint editor without 1 child!");
 
-                    if (currChild.getClass() == Circle.class)
-                        snapPointPos.add(new PairMutable(currChild.getTranslateX(), currChild.getTranslateY()));
+                    EDAHole hole = new EDAHole("Through-Hole", group, false, this);
+                    hole.Add();
                 }
+                else if ((group.getId() != null) && group.getId().equals("Via"))
+                {
+                    if (group.getChildren().size() != 2)
+                        throw new java.lang.Error("ERROR: Attempting to load a via into footprint editor without 2 children!");
 
-                System.out.println("loadin hole or via!");
+                    EDAVia via = new EDAVia("Via", group, false, this);
+                    via.Add();
+                }
+                else
+                {
+                    throw new java.lang.Error("ERROR: Attempting to load unrecognized Group node into footprint editor!");
+                }
             }
             else
             {
@@ -632,8 +650,6 @@ public class EditorFootprint extends Editor
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
         LinkedList<Double> trisLens = new LinkedList<Double>();
-        LinkedList<Double> lineStartPosX = new LinkedList<Double>();
-        LinkedList<Double> lineStartPosY = new LinkedList<Double>();
         LinkedList<Double> lineEndPosX = new LinkedList<Double>();
         LinkedList<Double> lineEndPosY = new LinkedList<Double>();
         LinkedList<Double> lineWidths = new LinkedList<Double>();
@@ -645,7 +661,7 @@ public class EditorFootprint extends Editor
 
         for (int i = 0; i < this.nodes.size(); i++)
         {
-            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadFootprint(layers, fills, strokeWidths, circlesRadii, rectsWidths, rectsHeights, trisLens, lineStartPosX, lineStartPosY, lineEndPosX, lineEndPosY, lineWidths, textContents, textFontSizes, holeOuterRadii, holeInnerRadii, viaRadii);
+            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadFootprint(layers, fills, strokeWidths, circlesRadii, rectsWidths, rectsHeights, trisLens, lineEndPosX, lineEndPosY, lineWidths, textContents, textFontSizes, holeOuterRadii, holeInnerRadii, viaRadii);
             needHeader = needHeader || shapeNeedHeader;
         }
 
@@ -793,38 +809,8 @@ public class EditorFootprint extends Editor
         }
 
         // Creating line box...
-        if (!lineStartPosX.isEmpty() && !lineStartPosY.isEmpty() && !lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
+        if (!lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
         {
-            // Start point
-            HBox lineStartPointsHBox = new HBox(10);
-            lineStartPointsHBox.setId("lineStartPointsBox");
-            lineStartPointsHBox.getChildren().add(new Label("Line Start Points X: "));
-            TextField lineStartPointsXText = new TextField();
-            lineStartPointsXText.setMinWidth(100);
-            lineStartPointsXText.setPrefWidth(100);
-            lineStartPointsXText.setMaxWidth(100);
-            lineStartPointsXText.setId("lineStartPointsX");
-            lineStartPointsHBox.getChildren().add(lineStartPointsXText);
-            lineStartPointsHBox.getChildren().add(new Label("Y: "));
-            TextField lineStartPointsYText = new TextField();
-            lineStartPointsYText.setId("lineStartPointsY");
-            lineStartPointsYText.setMinWidth(100);
-            lineStartPointsYText.setPrefWidth(100);
-            lineStartPointsYText.setMaxWidth(100);
-            lineStartPointsHBox.getChildren().add(lineStartPointsYText);
-
-            if (EDAmameController.IsListAllEqual(lineStartPosX))
-                lineStartPointsXText.setText(Double.toString(lineStartPosX.get(0)));
-            else
-                lineStartPointsXText.setText("<mixed>");
-
-            if (EDAmameController.IsListAllEqual(lineStartPosY))
-                lineStartPointsYText.setText(Double.toString(lineStartPosY.get(0)));
-            else
-                lineStartPointsYText.setText("<mixed>");
-
-            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(lineStartPointsHBox);
-
             // End point
             HBox lineEndPointsHBox = new HBox(10);
             lineEndPointsHBox.setId("lineEndPointsBox");

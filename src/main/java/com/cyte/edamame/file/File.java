@@ -11,7 +11,7 @@ import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.node.EDANode;
 
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import javafx.fxml.FXMLLoader;
 import javafx.stage.FileChooser;
 import javafx.collections.ObservableList;
@@ -20,14 +20,12 @@ import java.io.*;
 import java.net.URL;
 
 import javafx.scene.*;
-import javafx.scene.shape.*;
-import javafx.scene.text.*;
 
 import java.util.LinkedList;
 
 public class File
 {
-    static public boolean NodesSave(LinkedList<Node> nodes, boolean center)
+    static public boolean NodesSave(LinkedList<Node> nodes, PairMutable groupPos)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save Symbol");
@@ -42,10 +40,10 @@ public class File
             return false;
         }
 
-        return NodesWrite(file.getAbsolutePath(), nodes, center);
+        return NodesWrite(file.getAbsolutePath(), nodes, groupPos);
     }
 
-    static public boolean NodesWrite(String filePath, LinkedList<Node> nodes, boolean center)
+    static public boolean NodesWrite(String filePath, LinkedList<Node> nodes, PairMutable groupPos)
     {
         String data = "";
 
@@ -59,20 +57,13 @@ public class File
         data += "<?import javafx.scene.text.Text?>\n";
         data += "<?import javafx.scene.text.Font?>\n\n";
 
-        data += "<Group xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">\n";
+        data += "<Group";
+        data += " translateX=\"" + groupPos.GetLeftDouble() + "\" translateY=\"" + groupPos.GetRightDouble() + "\"";
+        data += " xmlns=\"http://javafx.com/javafx/20.0.1\" xmlns:fx=\"http://javafx.com/fxml/1\">\n";
         data += "\t<children>\n";
 
-        PairMutable childMidPos = new PairMutable(0.0, 0.0);
-
-        if (center)
-        {
-            childMidPos = EDANode.NodesGetMiddlePos(nodes);
-            childMidPos.left = -childMidPos.GetLeftDouble();
-            childMidPos.right = -childMidPos.GetRightDouble();
-        }
-
         for (int i = 0; i < nodes.size(); i++)
-            data += EDANode.NodeToFXMLString(nodes.get(i), childMidPos, 2) + "\n";
+            data += EDANode.NodeToFXMLString(nodes.get(i), new PairMutable(-groupPos.GetLeftDouble(), -groupPos.GetRightDouble()), 2) + "\n";
 
         data += "\t</children>\n";
         data += "</Group>\n";
@@ -80,7 +71,7 @@ public class File
         return Write(filePath, data, true);
     }
 
-    static public LinkedList<Node> NodesLoad(boolean center)
+    static public LinkedList<Node> NodesLoad(PairMutable groupPos)
     {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Load Symbol");
@@ -95,7 +86,7 @@ public class File
         {
             try
             {
-                return NodesRead(file.getAbsolutePath(), center);
+                return NodesRead(file.getAbsolutePath(), groupPos);
             }
             catch (IOException e)
             {
@@ -106,7 +97,7 @@ public class File
         return null;
     }
 
-    static public LinkedList<Node> NodesRead(String filePath, boolean center) throws IOException
+    static public LinkedList<Node> NodesRead(String filePath, PairMutable groupPos) throws IOException
     {
         FXMLLoader fxmlLoader = new FXMLLoader();
         filePath = filePath.replace('\\', '/');
@@ -124,22 +115,17 @@ public class File
         ObservableList<Node> children = ((Group)root).getChildren();
 
         for (int i = 0; i < children.size(); i++)
-            nodes.add(children.get(i));
-
-        if (center)
         {
-            PairMutable childMidPos = EDANode.NodesGetMiddlePos(nodes);
-            childMidPos.left = -childMidPos.GetLeftDouble();
-            childMidPos.right = -childMidPos.GetRightDouble();
+            Node currChild = children.get(i);
 
-            for (int i = 0; i < nodes.size(); i++)
-            {
-                Node node = nodes.get(i);
+            currChild.setTranslateX(currChild.getTranslateX());
+            currChild.setTranslateY(currChild.getTranslateY());
 
-                node.setTranslateX(node.getTranslateX() + childMidPos.GetLeftDouble());
-                node.setTranslateY(node.getTranslateY() + childMidPos.GetRightDouble());
-            }
+            nodes.add(currChild);
         }
+
+        groupPos.left = root.getTranslateX();
+        groupPos.right = root.getTranslateY();
 
         return nodes;
     }
@@ -151,8 +137,6 @@ public class File
             PrintWriter file = new PrintWriter(new FileOutputStream(filePath, !overwrite));
             file.print(data);
             file.close();
-
-            //System.out.println("Wrote \"" + data + "\".");
         }
         catch (IOException e)
         {

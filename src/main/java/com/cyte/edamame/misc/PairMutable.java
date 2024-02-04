@@ -5,7 +5,7 @@
  * in the LICENSE.TXT file included in the EDAmame sources.
  */
 
-package com.cyte.edamame.util;
+package com.cyte.edamame.misc;
 import com.cyte.edamame.node.EDANode;
 
 public class PairMutable

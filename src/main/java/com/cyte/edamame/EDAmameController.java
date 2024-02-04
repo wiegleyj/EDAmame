@@ -6,10 +6,10 @@
  */
 
 // TODO:
-// Fix PCB line moving
 // Implement gerber & drill file exports
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
+// Implement some way of reordering drawn nodes
 // Fix selection box appearing while dragging something
 // Fix snap point shapes not disappearing after deleting node
 // Fix file writing (?)
@@ -23,7 +23,7 @@
 
 package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import com.cyte.edamame.memento.TextAreaHandler;
 
 import java.util.*;

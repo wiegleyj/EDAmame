@@ -16,7 +16,7 @@ import com.cyte.edamame.node.*;
 import java.util.*;
 import java.util.logging.Level;
 
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import javafx.collections.*;
 import javafx.geometry.Point2D;
 import javafx.scene.*;
@@ -211,12 +211,6 @@ abstract public class Editor
     {
         return new PairMutable(pos.GetLeftDouble() - this.paneHolder.getWidth() / 2,
                 pos.GetRightDouble() - this.paneHolder.getHeight() / 2);
-    }
-
-    public PairMutable PaneHolderGetRealCenter()
-    {
-        return new PairMutable(-this.center.GetLeftDouble() + this.paneHolder.getWidth() / 2,
-                -this.center.GetRightDouble() + this.paneHolder.getHeight() / 2);
     }
 
     public PairMutable PanePosListenerToHolder(PairMutable pos)
@@ -1256,15 +1250,13 @@ abstract public class Editor
 
     static public void LineDropPosCalculate(Line line, PairMutable posStart, PairMutable posEnd)
     {
-        PairMutable posAvg = new PairMutable((posStart.GetLeftDouble() + posEnd.GetLeftDouble()) / 2, (posStart.GetRightDouble() + posEnd.GetRightDouble()) / 2);
+        line.setStartX(0);
+        line.setStartY(0);
+        line.setEndX(posEnd.GetLeftDouble() - posStart.GetLeftDouble());
+        line.setEndY(posEnd.GetRightDouble() - posStart.GetRightDouble());
 
-        line.setStartX(posStart.GetLeftDouble() - posAvg.GetLeftDouble());
-        line.setStartY(posStart.GetRightDouble() - posAvg.GetRightDouble());
-        line.setEndX(posEnd.GetLeftDouble() - posAvg.GetLeftDouble());
-        line.setEndY(posEnd.GetRightDouble() - posAvg.GetRightDouble());
-
-        line.setTranslateX(posAvg.GetLeftDouble());
-        line.setTranslateY(posAvg.GetRightDouble());
+        line.setTranslateX(posStart.GetLeftDouble());
+        line.setTranslateY(posStart.GetRightDouble());
     }
 
     static public PairMutable LineEndPointsCalculate(Line line, boolean start)

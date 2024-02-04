@@ -11,7 +11,7 @@ import com.cyte.edamame.EDAmame;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.node.*;
-import com.cyte.edamame.util.PairMutable;
+import com.cyte.edamame.misc.PairMutable;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
@@ -161,17 +161,15 @@ public class EditorPCB extends Editor
     @FXML
     public void LoadFootprint()
     {
-        LinkedList<Node> nodes = File.NodesLoad(true);
+        PairMutable groupPos = new PairMutable();
+        LinkedList<Node> nodes = File.NodesLoad(groupPos);
 
         if ((nodes == null) || nodes.isEmpty())
             return;
 
         Group footprint = new Group();
-        PairMutable dropPos = this.PaneHolderGetRealCenter();
-
-        footprint.setTranslateX(dropPos.GetLeftDouble());
-        footprint.setTranslateY(dropPos.GetRightDouble());
-
+        footprint.setTranslateX(groupPos.GetLeftDouble());
+        footprint.setTranslateY(groupPos.GetLeftDouble());
         footprint.getChildren().addAll(nodes);
 
         EDAFootprint footprintNode = new EDAFootprint("Footprint", footprint, false, this);
@@ -524,7 +522,7 @@ public class EditorPCB extends Editor
                         }
                         else
                         {
-                            throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a Footprint Editor!");
+                            throw new java.lang.Error("ERROR: Attempt to drop an unrecognized shape in a PCB Editor!");
                         }
                     }
 
@@ -591,8 +589,6 @@ public class EditorPCB extends Editor
         LinkedList<Double> rectsWidths = new LinkedList<Double>();
         LinkedList<Double> rectsHeights = new LinkedList<Double>();
         LinkedList<Double> trisLens = new LinkedList<Double>();
-        LinkedList<Double> lineStartPosX = new LinkedList<Double>();
-        LinkedList<Double> lineStartPosY = new LinkedList<Double>();
         LinkedList<Double> lineEndPosX = new LinkedList<Double>();
         LinkedList<Double> lineEndPosY = new LinkedList<Double>();
         LinkedList<Double> lineWidths = new LinkedList<Double>();
@@ -604,14 +600,14 @@ public class EditorPCB extends Editor
 
         for (int i = 0; i < this.nodes.size(); i++)
         {
-            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadPCB(layers, fills, strokeWidths, circlesRadii, rectsWidths, rectsHeights, trisLens, lineStartPosX, lineStartPosY, lineEndPosX, lineEndPosY, lineWidths, textContents, textFontSizes, holeOuterRadii, holeInnerRadii, viaRadii);
+            boolean shapeNeedHeader = this.nodes.get(i).PropsLoadPCB(layers, fills, strokeWidths, circlesRadii, rectsWidths, rectsHeights, trisLens, lineEndPosX, lineEndPosY, lineWidths, textContents, textFontSizes, holeOuterRadii, holeInnerRadii, viaRadii);
             needHeader = needHeader || shapeNeedHeader;
         }
 
         // Creating header...
         if (needHeader)
         {
-            Text shapeHeader = new Text("Footprint Editor Properties:");
+            Text shapeHeader = new Text("PCB Editor Properties:");
             shapeHeader.setStyle("-fx-font-weight: bold;");
             shapeHeader.setStyle("-fx-font-size: 16px;");
             EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(shapeHeader);
@@ -752,38 +748,8 @@ public class EditorPCB extends Editor
         }
 
         // Creating line box...
-        if (!lineStartPosX.isEmpty() && !lineStartPosY.isEmpty() && !lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
+        if (!lineEndPosX.isEmpty() && !lineEndPosY.isEmpty() && !lineWidths.isEmpty())
         {
-            // Start point
-            HBox lineStartPointsHBox = new HBox(10);
-            lineStartPointsHBox.setId("lineStartPointsBox");
-            lineStartPointsHBox.getChildren().add(new Label("Line Start Points X: "));
-            TextField lineStartPointsXText = new TextField();
-            lineStartPointsXText.setMinWidth(100);
-            lineStartPointsXText.setPrefWidth(100);
-            lineStartPointsXText.setMaxWidth(100);
-            lineStartPointsXText.setId("lineStartPointsX");
-            lineStartPointsHBox.getChildren().add(lineStartPointsXText);
-            lineStartPointsHBox.getChildren().add(new Label("Y: "));
-            TextField lineStartPointsYText = new TextField();
-            lineStartPointsYText.setId("lineStartPointsY");
-            lineStartPointsYText.setMinWidth(100);
-            lineStartPointsYText.setPrefWidth(100);
-            lineStartPointsYText.setMaxWidth(100);
-            lineStartPointsHBox.getChildren().add(lineStartPointsYText);
-
-            if (EDAmameController.IsListAllEqual(lineStartPosX))
-                lineStartPointsXText.setText(Double.toString(lineStartPosX.get(0)));
-            else
-                lineStartPointsXText.setText("<mixed>");
-
-            if (EDAmameController.IsListAllEqual(lineStartPosY))
-                lineStartPointsYText.setText(Double.toString(lineStartPosY.get(0)));
-            else
-                lineStartPointsYText.setText("<mixed>");
-
-            EDAmameController.editorPropertiesWindow.propsBox.getChildren().add(lineStartPointsHBox);
-
             // End point
             HBox lineEndPointsHBox = new HBox(10);
             lineEndPointsHBox.setId("lineEndPointsBox");
