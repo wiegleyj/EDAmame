@@ -8,6 +8,7 @@
 package com.cyte.edamame.editor;
 
 import com.cyte.edamame.EDAmame;
+import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
 import com.cyte.edamame.file.File;
 import com.cyte.edamame.node.*;
@@ -30,6 +31,7 @@ import javafx.scene.shape.Polygon;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
+import javafx.stage.FileChooser;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -149,7 +151,59 @@ public class EditorPCB extends Editor
     @FXML
     public void Save()
     {
-        System.out.println("Saving PCB!");
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save PCB");
+        fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Gerber File", "*.gbr"));
+        fileChooser.setInitialFileName("file.gbr");
+        java.io.File file = fileChooser.showSaveDialog(EDAmameApplication.controller.stage);
+
+        if (file == null)
+        {
+            EDAmameController.SetStatusBar("Unable to save Gerber File because the entered directory is invalid!");
+            return;
+        }
+
+        for (int layerCount = 0; layerCount < 4; layerCount++)
+        {
+            String data = "";
+
+            data += "%TF.GenerationSoftware,EDAmame,1.0*%\n";
+            //creation date
+            data += "%TF.SameCoordinates,Original*%\n";
+            String layerName = "";
+            switch(layerCount)
+            {
+                case 0:
+                    data += "%TF.FileFunction,Copper,L1,Top*%\n";
+                    layerName = "Copper Front";
+                    break;
+                case 1:
+                    data += "%TF.FileFunction,Copper,L2,Bot*%\n";
+                    layerName = "Copper Rear";
+                    break;
+                case 2:
+                    data += "%TF.FileFunction,Legend,Bot*%\n";
+                    layerName = "Silkscreen";
+                    break;
+                case 3:
+                    data += "%TF.FileFunction,Profile,NP*%\n";
+                    layerName = "Edge Cuts";
+                    break;
+            }
+            data += "%FSLAX46Y46*%\n";
+            data += "%MOMM*%\n";
+            data += "%LPD*%\n";
+
+            for (int i = 0; i < this.nodes.size(); i++)
+                data += this.nodes.get(i).ToGerberStr(layerName) + "\n";
+
+            data += "M02*";
+
+            String FileAsString = file.getAbsolutePath();
+            String FileNameSubstring = FileAsString.substring(0, FileAsString.length()-4);
+            File.Write(FileNameSubstring + "-" + layerName + ".gbr", data, true);
+        }
+
     }
 
     @FXML

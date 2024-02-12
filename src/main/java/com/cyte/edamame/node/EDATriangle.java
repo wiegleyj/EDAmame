@@ -805,4 +805,9 @@ public class EDATriangle extends EDANode
     {
         return new EDATriangle(this.name, (Polygon)EDANode.NodeClone(this.triangle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
+
+    public String ToGerberStr(String layerName)
+    {
+        return EDANode.NodeToGerberStr(this.triangle, layerName);
+    }
 }

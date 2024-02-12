@@ -107,6 +107,7 @@ abstract public class Editor
     public boolean wasSelectionBox = false;
     public Line linePreview = null;
     public double snapGridSpacing = -1;
+    static public int GerberApertureCounter = 10;
 
     public MementoExperimental undoRedoSystem = null;
 

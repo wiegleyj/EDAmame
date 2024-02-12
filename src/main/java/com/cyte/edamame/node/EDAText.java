@@ -708,4 +708,9 @@ public class EDAText extends EDANode
     {
         return new EDAText(this.name, (Text)EDANode.NodeClone(this.text), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
+
+    public String ToGerberStr(String layerName)
+    {
+        return EDANode.NodeToGerberStr(this.text, layerName);
+    }
 }

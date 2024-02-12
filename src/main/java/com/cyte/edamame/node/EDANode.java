@@ -367,6 +367,7 @@ abstract public class EDANode
     //// SUPPORT FUNCTIONS ////
 
     abstract public EDANode Clone();
+    abstract public String ToGerberStr(String layerName);
 
     static public Node NodeClone(Node oldNode)  // ASK!!!
     {
@@ -606,6 +607,85 @@ abstract public class EDANode
         else
         {
             throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
+        }
+
+        return str;
+    }
+
+    static public String NodeToGerberStr(Node node, String layer)
+    {
+        String str = "";
+        if (node.getClass() == Circle.class)
+        {
+            Circle circle = (Circle)node;
+            if (!circle.getId().equals(layer))
+                return "";
+
+            if (circle.getFill() != Color.TRANSPARENT)
+            {
+                return "%ADD" + Editor.GerberApertureCounter++ + "C," + (2 * ((Circle) node).getRadius()) + "*%";
+            }
+            else
+            {
+
+            }
+        }
+        else if  (node.getClass() == Rectangle.class)
+        {
+            Rectangle rectangle = (Rectangle)node;
+            if (!rectangle.getId().equals(layer))
+                return "";
+
+            if (rectangle.getFill() != Color.TRANSPARENT)
+            {
+                return "%ADD" + Editor.GerberApertureCounter++ + "R," + ((Rectangle) node).getWidth() + "X" + ((Rectangle) node).getHeight() + "*%";
+            }
+            else
+            {
+
+            }
+        }
+        else if (node.getClass() == Polygon.class)
+        {
+            Polygon triangle = (Polygon)node;
+            if (!triangle.getId().equals(layer))
+                return "";
+
+            if (triangle.getFill() != Color.TRANSPARENT)
+            {
+
+            }
+            else
+            {
+
+            }
+        }
+        else if (node.getClass() == Line.class)
+        {
+            Line line = (Line)node;
+            if (!line.getId().equals(layer))
+                return "";
+
+            String newStr = "";
+            newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + line.getStrokeWidth() + "*%\n";
+            newStr += "G01*\n";
+            newStr += "X" + line.getStartX() + "Y" + line.getStartY() + "D03*\n";
+            newStr += "X" + line.getEndX() + "Y" + line.getEndY() + "D03*\n";
+            return newStr;
+        }
+        else if (node.getClass() == Text.class)
+        {
+            Text text = (Text)node;
+
+        }
+        else if (node.getClass() == Group.class)
+        {
+            Group group = (Group)node;
+
+        }
+        else
+        {
+            throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to Gerber string!");
         }
 
         return str;
