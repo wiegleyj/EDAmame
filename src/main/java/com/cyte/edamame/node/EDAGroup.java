@@ -290,6 +290,6 @@ abstract public class EDAGroup extends EDANode
 
     public String ToGerberStr(String layerName)
     {
-        return EDANode.NodeToGerberStr(this.group, layerName);
+        return EDANode.NodeToGerberStr(this.group, layerName, this.editor);
     }
 }

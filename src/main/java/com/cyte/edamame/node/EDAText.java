@@ -711,6 +711,6 @@ public class EDAText extends EDANode
 
     public String ToGerberStr(String layerName)
     {
-        return EDANode.NodeToGerberStr(this.text, layerName);
+        return EDANode.NodeToGerberStr(this.text, layerName, this.editor);
     }
 }

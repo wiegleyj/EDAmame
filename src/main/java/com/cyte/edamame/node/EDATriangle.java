@@ -808,6 +808,6 @@ public class EDATriangle extends EDANode
 
     public String ToGerberStr(String layerName)
     {
-        return EDANode.NodeToGerberStr(this.triangle, layerName);
+        return EDANode.NodeToGerberStr(this.triangle, layerName, this.editor);
     }
 }

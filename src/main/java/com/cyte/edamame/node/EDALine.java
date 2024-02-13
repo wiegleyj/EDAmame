@@ -626,6 +626,6 @@ public class EDALine extends EDANode
 
     public String ToGerberStr(String layerName)
     {
-        return EDANode.NodeToGerberStr(this.line, layerName);
+        return EDANode.NodeToGerberStr(this.line, layerName, this.editor);
     }
 }

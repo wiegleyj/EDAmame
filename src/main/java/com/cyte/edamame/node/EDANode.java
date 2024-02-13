@@ -612,12 +612,14 @@ abstract public class EDANode
         return str;
     }
 
-    static public String NodeToGerberStr(Node node, String layer)
+    static public String NodeToGerberStr(Node node, String layer, Editor editor)
     {
         String str = "";
+
         if (node.getClass() == Circle.class)
         {
             Circle circle = (Circle)node;
+
             if (!circle.getId().equals(layer))
                 return "";
 
@@ -633,8 +635,23 @@ abstract public class EDANode
         else if  (node.getClass() == Rectangle.class)
         {
             Rectangle rectangle = (Rectangle)node;
+
             if (!rectangle.getId().equals(layer))
                 return "";
+
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, 0.0)));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), 0.0)));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), rectangle.getHeight())));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, rectangle.getHeight())));
+
+            if (((Node)rectangle.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(rectangle.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(rectangle.getParent(), points.get(1)));
+                points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
+                points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
+            }
 
             if (rectangle.getFill() != Color.TRANSPARENT)
             {
@@ -647,14 +664,26 @@ abstract public class EDANode
                 newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + rectangle.getStrokeWidth() + "*%";
 
 
-
             }
         }
         else if (node.getClass() == Polygon.class)
         {
             Polygon triangle = (Polygon)node;
+
             if (!triangle.getId().equals(layer))
                 return "";
+
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(0), triangle.getPoints().get(1))));
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(2), triangle.getPoints().get(3))));
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(4), triangle.getPoints().get(5))));
+
+            if (((Node)triangle.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(triangle.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(triangle.getParent(), points.get(1)));
+                points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
+            }
 
             if (triangle.getFill() != Color.TRANSPARENT)
             {
@@ -668,6 +697,7 @@ abstract public class EDANode
         else if (node.getClass() == Line.class)
         {
             Line line = (Line)node;
+
             if (!line.getId().equals(layer))
                 return "";
 
@@ -682,23 +712,24 @@ abstract public class EDANode
         {
             Text text = (Text)node;
 
+            throw new java.lang.Error("ERROR: Converting Text Nodes to Gerber string is not supported yet!");
         }
         else if (node.getClass() == Group.class)
         {
             Group group = (Group)node;
 
-            if (node.getId().equals("Through-Hole"))
+            if ((node.getId() != null) && node.getId().equals("Through-Hole"))
             {
                 // do the hole
             }
-            else if (node.getId().equals("Via"))
+            else if ((node.getId() != null) && node.getId().equals("Via"))
             {
                 // do the via
             }
             else
             {
                 for (int i = 0; i < group.getChildren().size(); i++)
-                    NodeToGerberStr(group.getChildren().get(i), layer);
+                    NodeToGerberStr(group.getChildren().get(i), layer, editor);
             }
         }
         else
