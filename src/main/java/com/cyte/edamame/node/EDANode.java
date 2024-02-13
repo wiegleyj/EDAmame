@@ -642,6 +642,11 @@ abstract public class EDANode
             }
             else
             {
+                String newStr = "";
+                rectangle.getStrokeWidth();
+                newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + rectangle.getStrokeWidth() + "*%";
+
+
 
             }
         }
@@ -682,6 +687,19 @@ abstract public class EDANode
         {
             Group group = (Group)node;
 
+            if (node.getId().equals("Through-Hole"))
+            {
+                // do the hole
+            }
+            else if (node.getId().equals("Via"))
+            {
+                // do the via
+            }
+            else
+            {
+                for (int i = 0; i < group.getChildren().size(); i++)
+                    NodeToGerberStr(group.getChildren().get(i), layer);
+            }
         }
         else
         {
