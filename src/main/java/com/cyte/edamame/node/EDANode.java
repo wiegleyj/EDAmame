@@ -653,18 +653,30 @@ abstract public class EDANode
                 points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
             }
 
+            String newStr = "";
+
+            newStr += "G01*\n";
+
             if (rectangle.getFill() != Color.TRANSPARENT)
-            {
-                return "%ADD" + Editor.GerberApertureCounter++ + "R," + ((Rectangle) node).getWidth() + "X" + ((Rectangle) node).getHeight() + "*%";
+                newStr += "G36*\n";
+            else {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + rectangle.getStrokeWidth() + "*%\n";
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
             }
-            else
+            for (int i = 0; i < points.size(); i++)
             {
-                String newStr = "";
-                rectangle.getStrokeWidth();
-                newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + rectangle.getStrokeWidth() + "*%";
-
-
+                if (i == 0) {
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    if (rectangle.getFill() != Color.TRANSPARENT)
+                        newStr += "G01*\n";
+                } else
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
             }
+
+            if (rectangle.getFill() != Color.TRANSPARENT)
+                newStr += "G37*\n";
+
+            return newStr;
         }
         else if (node.getClass() == Polygon.class)
         {
@@ -685,14 +697,30 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
             }
 
+            String newStr = "";
+
+            newStr += "G01*\n";
+
             if (triangle.getFill() != Color.TRANSPARENT)
-            {
-
+                newStr += "G36*\n";
+            else {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + triangle.getStrokeWidth() + "*%\n";
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
             }
-            else
+            for (int i = 0; i < points.size(); i++)
             {
-
+                if (i == 0) {
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    if (triangle.getFill() != Color.TRANSPARENT)
+                        newStr += "G01*\n";
+                } else
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
             }
+
+            if (triangle.getFill() != Color.TRANSPARENT)
+                newStr += "G37*\n";
+
+            return newStr;
         }
         else if (node.getClass() == Line.class)
         {
