@@ -623,6 +623,13 @@ abstract public class EDANode
             if (!circle.getId().equals(layer))
                 return "";
 
+            PairMutable point = GetPosInNodeParent(circle, new PairMutable(0.0, 0.0));
+
+            if (((Node)circle.getParent()).getClass() == Group.class)
+                point = GetPosInNodeParent(circle.getParent(), point);
+
+            editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
             if (circle.getFill() != Color.TRANSPARENT)
             {
                 return "%ADD" + Editor.GerberApertureCounter++ + "C," + (2 * ((Circle) node).getRadius()) + "*%";
@@ -652,6 +659,11 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
                 points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
             }
+
+            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
 
@@ -697,6 +709,10 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
             }
 
+            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+
             String newStr = "";
 
             newStr += "G01*\n";
@@ -729,18 +745,33 @@ abstract public class EDANode
             if (!line.getId().equals(layer))
                 return "";
 
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(line, new PairMutable(line.getStartX(), line.getStartY())));
+            points.add(GetPosInNodeParent(line, new PairMutable(line.getEndX(), line.getEndY())));
+
+            if (((Node)line.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(line.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
+            }
+
+            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+
             String newStr = "";
+
             newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + line.getStrokeWidth() + "*%\n";
             newStr += "G01*\n";
             newStr += "X" + line.getStartX() + "Y" + line.getStartY() + "D03*\n";
             newStr += "X" + line.getEndX() + "Y" + line.getEndY() + "D03*\n";
+
             return newStr;
         }
         else if (node.getClass() == Text.class)
         {
             Text text = (Text)node;
 
-            throw new java.lang.Error("ERROR: Converting Text Nodes to Gerber string is not supported yet!");
+            // TODO
         }
         else if (node.getClass() == Group.class)
         {
@@ -748,11 +779,31 @@ abstract public class EDANode
 
             if ((node.getId() != null) && node.getId().equals("Through-Hole"))
             {
-                // do the hole
+                if (group.getChildren().size() != 1)
+                    throw new java.lang.Error("ERROR: Attempting to convert a hole without 1 child to a Gerber string!");
+
+                PairMutable point = GetPosInNodeParent(group, GetPosInNodeParent(group.getChildren().get(0), new PairMutable(0.0, 0.0)));
+
+                if (((Node)group.getParent()).getClass() == Group.class)
+                    point = GetPosInNodeParent(group.getParent(), point);
+
+                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                // TODO
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
             {
-                // do the via
+                if (group.getChildren().size() != 2)
+                    throw new java.lang.Error("ERROR: Attempting to convert a via without 2 children to a Gerber string!");
+
+                PairMutable point = GetPosInNodeParent(group, GetPosInNodeParent(group.getChildren().get(0), new PairMutable(0.0, 0.0)));
+
+                if (((Node)group.getParent()).getClass() == Group.class)
+                    point = GetPosInNodeParent(group.getParent(), point);
+
+                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                // TODO
             }
             else
             {
