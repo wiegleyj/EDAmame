@@ -660,10 +660,10 @@ abstract public class EDANode
                 points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
             }
 
-            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
 
@@ -684,6 +684,7 @@ abstract public class EDANode
                 } else
                     newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
             }
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
 
             if (rectangle.getFill() != Color.TRANSPARENT)
                 newStr += "G37*\n";
@@ -709,9 +710,9 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
             }
 
-            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
 
@@ -732,6 +733,7 @@ abstract public class EDANode
                 } else
                     newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
             }
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
 
             if (triangle.getFill() != Color.TRANSPARENT)
                 newStr += "G37*\n";
@@ -755,15 +757,17 @@ abstract public class EDANode
                 points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
             }
 
-            editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
 
-            newStr += "%ADD" + Editor.GerberApertureCounter++ + "C," + line.getStrokeWidth() + "*%\n";
             newStr += "G01*\n";
-            newStr += "X" + line.getStartX() + "Y" + line.getStartY() + "D03*\n";
-            newStr += "X" + line.getEndX() + "Y" + line.getEndY() + "D03*\n";
+            newStr += "%ADD" + Editor.GerberApertureCounter + "C," + line.getStrokeWidth() + "*%\n";
+            newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D02*\n";
+            newStr += "X" + points.get(1).GetLeftDouble() + "Y" + points.get(1).GetRightDouble() + "D01*\n";
 
             return newStr;
         }
