@@ -628,7 +628,7 @@ abstract public class EDANode
             if (((Node)circle.getParent()).getClass() == Group.class)
                 point = GetPosInNodeParent(circle.getParent(), point);
 
-            editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
 
@@ -638,20 +638,18 @@ abstract public class EDANode
                 newStr += "G36*\n";
             else {
                 newStr += "%ADD" + Editor.GerberApertureCounter + "C," + circle.getStrokeWidth() + "*%\n";
-                System.out.println("1");
                 newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
-                System.out.println("2");
             }
 
             newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
             newStr += "G75*\nG03*\n";
             newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble()
-                    + "I" + (circle.getRadius() * -1) + "J0" + "D01*\n";
+                    + "I" + (circle.getRadius() * -1) + "J0D01*\n";
             newStr += "G01*\n";
             newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
             newStr += "G75*\nG03*\n";
             newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble()
-                    + "I" + circle.getRadius() + "J0" + "D01*\n";
+                    + "I" + circle.getRadius() + "J0D01*\n";
             newStr += "G01*\n";
 
             if (circle.getFill() != Color.TRANSPARENT)
@@ -659,7 +657,7 @@ abstract public class EDANode
 
             return newStr;
         }
-        else if  (node.getClass() == Rectangle.class)
+        else if (node.getClass() == Rectangle.class)
         {
             Rectangle rectangle = (Rectangle)node;
 
