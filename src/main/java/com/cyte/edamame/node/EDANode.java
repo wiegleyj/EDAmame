@@ -161,7 +161,7 @@ abstract public class EDANode
 
     //// HIGHLIGHT & SELECTION FUNCTIONS ////
 
-    public void HighlightsCheck(PairMutable posMouse)
+    public void HighlightCheck(PairMutable posMouse)
     {
         if (this.passive)
             return;
@@ -226,44 +226,50 @@ abstract public class EDANode
 
         // Adjusting highlights accordingly...
         if ((this.highlightedMouse || this.highlightedBox) && !this.highlighted)
-        {
-            this.shapeHighlighted.setVisible(true);
-            this.highlighted = true;
-            this.editor.shapesHighlighted++;
-        }
+            this.Highlight();
         else if ((!this.highlightedMouse && !this.highlightedBox) && this.highlighted)
-        {
-            this.shapeHighlighted.setVisible(false);
-            this.highlighted = false;
-            this.editor.shapesHighlighted--;
-        }
+            this.Unhighlight();
     }
 
-    public void Deselect()
+    public void Highlight()
     {
-        if (!this.selected)
-        {
-            if (this.highlightedMouse || this.highlightedBox)
-            {
-                this.selected = true;
-                this.shapeSelected.setVisible(true);
-                this.editor.shapesSelected++;
-            }
-        }
-        else
-        {
-            if ((!this.highlightedMouse && !this.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
-            {
-                this.selected = false;
-                this.shapeSelected.setVisible(false);
-                this.editor.shapesSelected--;
-            }
-        }
+        this.shapeHighlighted.setVisible(true);
+        this.highlighted = true;
+        this.editor.shapesHighlighted++;
+    }
+
+    public void Unhighlight()
+    {
+        this.shapeHighlighted.setVisible(false);
+        this.highlighted = false;
+        this.editor.shapesHighlighted--;
+    }
+
+    public void SelectCheck()
+    {
+        if (!this.selected && (this.highlightedMouse || this.highlightedBox))
+            this.Select();
+        else if (this.selected && (!this.highlightedMouse && !this.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
+            this.Unselect();
 
         if (this.highlightedBox && !this.highlightedMouse)
-            this.shapeHighlighted.setVisible(false);
+            this.Unhighlight();
 
         this.mousePressPos = null;
+    }
+
+    public void Select()
+    {
+        this.selected = true;
+        this.shapeSelected.setVisible(true);
+        this.editor.shapesSelected++;
+    }
+
+    public void Unselect()
+    {
+        this.selected = false;
+        this.shapeSelected.setVisible(false);
+        this.editor.shapesSelected--;
     }
 
     public void ShapeHighlightedRefresh()
