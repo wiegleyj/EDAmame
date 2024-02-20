@@ -53,7 +53,8 @@
        <VBox BorderPane.alignment="CENTER">
            <StackPane />
            <HBox style="-fx-background-color: #dcdcdc;">
-               <Label fx:id="statusBar" text="EDAmame Status Area" />
+               <Label fx:id="statusBar" text="EDAmame Status Area  " />
+               <Button fx:id="errorButton" onAction="#onButtonClick" prefHeight="25.0" prefWidth="114.0" text="Show Error Popup" />
            </HBox>
        </VBox>
    </bottom>

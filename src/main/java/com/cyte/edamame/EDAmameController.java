@@ -25,12 +25,13 @@ package com.cyte.edamame;
 import com.cyte.edamame.editor.*;
 import com.cyte.edamame.misc.PairMutable;
 import com.cyte.edamame.memento.TextAreaHandler;
-
+import javafx.scene.control.Alert;
 import java.util.*;
 import java.util.Map.*;
 import java.util.stream.*;
 
 import javafx.collections.*;
+import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.stage.*;
 import javafx.scene.*;
@@ -144,7 +145,8 @@ public class EDAmameController implements Initializable
     private MenuBar menuBar;                     // The main EDAmame menu bar.
     @FXML
     public Label statusBar;                      // Load the menu config loader...
-
+    @FXML
+    private Button errorButton;                  // The error button.
     // DO NOT EDIT
 
     public final Stage stage;                                                              // The stage hosting this controller.
@@ -211,6 +213,28 @@ public class EDAmameController implements Initializable
         // correct the text in the show log menu item
         LogToggleItemText();
         logger.log(Level.INFO, "Initialization Complete\n");
+    }
+        /*public void showErrorPopup() {
+            Popup errorPopup = new Popup();
+            errorPopup.getContent().add(new Label("Error: Something went wrong."));
+            errorPopup.show(errorButton.getScene().getWindow());
+        }
+        @FXML
+        public void onButtonClick(ActionEvent actionEvent) {
+            showErrorPopup();
+        }*/
+
+    public void showErrorPopup() {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText("Something went wrong.");
+        alert.showAndWait();
+    }
+
+    @FXML
+    public void onButtonClick(ActionEvent actionEvent) {
+        showErrorPopup();
     }
 
     /**
