@@ -22,9 +22,4 @@ public interface Memento {
      * //@return a new {@link Memento} that represents the state of the {@link Originator} prior to restoration.
      */
     Memento restore();
-
-    // We need to ensure that no changes were made.
-    // IFF no changes were not made then we push to the stack.
-    // This is because the clicking is very finicky.
-
 }

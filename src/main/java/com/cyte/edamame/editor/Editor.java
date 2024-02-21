@@ -48,7 +48,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
     public Integer type = -1;
     public String name = null;
-    
+
     // DO NOT EDIT
 
     // holders for the UI elements. The UI elements are instantiated in a single FXML file/load
@@ -87,7 +87,6 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     public Color gridBoxColor;
     public Integer maxShapes;
     public LinkedList<EDANode> nodes;
-    
     public PairMutable center;
     public boolean visible = false;
     public boolean pressedLMB = false;
@@ -135,10 +134,9 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         this.maxShapes = EDAmameController.Editor_MaxShapes;
         this.nodes = new LinkedList<EDANode>();
 
-        this.recorder = new Recorder();
+        this.recorder = new Recorder(this);
         registerRecorder(recorder);
         //this.undoRedoSystem = new MementoExperimental(this);
-
     }
 
     /**
@@ -164,11 +162,11 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         // Handling centering of holder pane & crosshair...
         {
             PairMutable canvasSize = new PairMutable(this.canvas.getWidth(),
-                                                     this.canvas.getHeight());
+                    this.canvas.getHeight());
             PairMutable paneSize = new PairMutable(this.paneListener.getWidth(),
-                                                   this.paneListener.getHeight());
+                    this.paneListener.getHeight());
             PairMutable centeredPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
-                                                      paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
+                    paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
             this.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
             this.paneHolder.setLayoutY(centeredPos.GetRightDouble());
@@ -418,7 +416,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     public void MouseDragUpdate(PairMutable posMouse)
     {
         this.mouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.mouseDragFactor / this.zoom,
-                                                (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
+                (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
     }
 
     public void MouseDragReset(PairMutable posMouse)
@@ -491,7 +489,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     {
         if (this.pressedLMB)
         {
-            this.NodeHistoryUpdate();
+            recorder.update();
         }
         else if (this.pressedRMB)
         {}
@@ -514,7 +512,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
             // Handling shape deselection (only if we're not moving any shapes or drawing any lines)
             if (!this.shapesMoving &&
-                (this.linePreview == null))
+                    (this.linePreview == null))
                 this.NodesDeselectAll();
         }
         else if (this.pressedRMB)
@@ -557,8 +555,8 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         {
             // Handling moving of the shapes (only if we have some shapes selected, we're not holding the box selection key and we're not drawing any lines)
             if ((this.shapesSelected > 0) &&
-                !EDAmameController.IsKeyPressed(KeyCode.SHIFT) &&
-                (this.linePreview == null))
+                    !EDAmameController.IsKeyPressed(KeyCode.SHIFT) &&
+                    (this.linePreview == null))
             {
                 for (int i = 0; i < this.nodes.size(); i++)
                     this.nodes.get(i).Move();
@@ -568,7 +566,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
             // Handling the box selection (only if we have no shapes selected, we are not moving the viewport and we're not drawing any lines)
             if (((this.shapesSelected == 0) || EDAmameController.IsKeyPressed(KeyCode.SHIFT)) &&
-                (this.linePreview == null))
+                    (this.linePreview == null))
             {
                 if (this.selectionBox == null)
                 {
@@ -605,7 +603,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
                 this.center.right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
 
                 this.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
-                                                            this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
+                        this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
             }
         }
     }
@@ -706,13 +704,11 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Z))
-            this.NodesUndo();
-            //this.recorder.undo();
+            recorder.undo();
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Y))
-            this.NodesRedo();
-            //this.recorder.redo();
+            recorder.redo();
     }
 
     public void OnKeyReleasedGlobal(KeyEvent event)
@@ -946,7 +942,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         for (int i = 0; i < this.nodes.size(); i++)
             this.nodes.get(i).PropsApplyGlobal(propsBox);
 
-        this.NodeHistoryUpdate();
+        recorder.update();
     }
 
     abstract public void PropsLoadSpecific();
@@ -1083,10 +1079,10 @@ abstract public class Editor implements Originator, Recorded, StateHashable
             if ((currWireConn.GetLeftPair().right != null) && (currWireConn.GetRightPair().right != null))
             {
                 this.NetListWireConnAdd(netList,
-                                               currWireConn.GetLeftPair().GetLeftString(),
-                                               currWireConn.GetLeftPair().GetRightString(),
-                                               currWireConn.GetRightPair().GetLeftString(),
-                                               currWireConn.GetRightPair().GetRightString());
+                        currWireConn.GetLeftPair().GetLeftString(),
+                        currWireConn.GetLeftPair().GetRightString(),
+                        currWireConn.GetRightPair().GetLeftString(),
+                        currWireConn.GetRightPair().GetRightString());
             }
             else if (currWireConn.GetLeftPair().right != null)
             {
@@ -1110,10 +1106,10 @@ abstract public class Editor implements Originator, Recorded, StateHashable
                 if (connectedPinIdx != -1)
                 {
                     this.NetListWireConnAdd(netList,
-                                                   currWireConn.GetLeftPair().GetLeftString(),
-                                                   currWireConn.GetLeftPair().GetRightString(),
-                                                   pinSymbolIDs.get(connectedPinIdx),
-                                                   pinLabels.get(connectedPinIdx));
+                            currWireConn.GetLeftPair().GetLeftString(),
+                            currWireConn.GetLeftPair().GetRightString(),
+                            pinSymbolIDs.get(connectedPinIdx),
+                            pinLabels.get(connectedPinIdx));
                 }
             }
             else if (currWireConn.GetRightPair().right != null)
@@ -1137,10 +1133,10 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
                 if (connectedPinIdx != -1)
                     this.NetListWireConnAdd(netList,
-                                            pinSymbolIDs.get(connectedPinIdx),
-                                            pinLabels.get(connectedPinIdx),
-                                            currWireConn.GetRightPair().GetLeftString(),
-                                            currWireConn.GetRightPair().GetRightString());
+                            pinSymbolIDs.get(connectedPinIdx),
+                            pinLabels.get(connectedPinIdx),
+                            currWireConn.GetRightPair().GetLeftString(),
+                            currWireConn.GetRightPair().GetRightString());
             }
         }
 
@@ -1248,7 +1244,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         double scaledSpacing = this.snapGridSpacing * 10;
 
         return new PairMutable(Math.round(pos.GetLeftDouble() / scaledSpacing) * scaledSpacing,
-                               Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
+                Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
     }
 
     public double PosSnapToGridPoint(double pos)
@@ -1648,7 +1644,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
     //// MEMENTO IMPLEMENTATION ////
 
-    // Method to save the current state of the editor
+    /// ORIGINATOR IMPLEMENTATION ///
     @Override
     public Memento saveToMemento() {
         return new Memento() {
@@ -1663,43 +1659,24 @@ abstract public class Editor implements Originator, Recorded, StateHashable
         };
     }
 
-    public void NodesUndo() {
-        recorder.undo();
-        resetCounters();
-        System.out.println("Undo!");
-    }
-
-    public void NodesRedo() {
-        recorder.redo();
-        resetCounters();
-        System.out.println("Redo!");
-    }
-
-    public void NodeHistoryUpdate() {
+    @Override
+    public boolean hasStateChanged() {
         int currentHash = StateHashUtil.generateStateHash(this);
-
-        if (currentHash != lastNodesHash) {
-            Memento memento = saveToMemento();
-            recorder.record(memento);
-            System.out.println("State recorded!");
-            lastNodesHash = currentHash;
-        } else {
-            System.out.println("Change was not recorded.");
-        }
+        return currentHash != lastNodesHash;
     }
 
-    private void resetCounters() {
-        this.shapesHighlighted = 0;
-        this.shapesSelected = 0;
+    @Override
+    public void stateRecorded() {
+        this.lastNodesHash = StateHashUtil.generateStateHash(this);
     }
 
-    /// RECORDER IMPLEMENTATION
+    /// RECORDER IMPLEMENTATION ///
     @Override
     public void registerRecorder(Recorder recorder) {
         this.recorder = recorder;
     }
 
-    /// HASH IMPLEMENTATION
+    /// HASH IMPLEMENTATION ///
     @Override
     public Collection<?> getState() {
         return this.nodes;
