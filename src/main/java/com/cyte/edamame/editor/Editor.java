@@ -39,7 +39,7 @@ import java.io.InvalidClassException;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-abstract public class Editor implements Originator
+abstract public class Editor implements Originator, Recorded, StateHashable
 {
     //// GLOBAL VARIABLES ////
 
@@ -109,17 +109,8 @@ abstract public class Editor implements Originator
     public double snapGridSpacing = -1;
 
     //public MementoExperimental undoRedoSystem = null;
-    public Recorder recorder = new Recorder();
-    private final Stack<Memento> nodeStack;
-    private final Stack<Memento> nodeHistoryUndo;
-    private final Stack<Memento> nodeHistoryRedo;
-
-    protected Editor() {
-        this.nodeStack = new Stack<>();
-        this.nodeHistoryUndo = new Stack<>();
-        this.nodeHistoryRedo = new Stack<>();
-        // Recorder recorder = new Recorder();
-    }
+    private Recorder recorder;
+    private int lastNodesHash = 0;
 
     //// MAIN FUNCTIONS ////
 
@@ -144,6 +135,7 @@ abstract public class Editor implements Originator
         this.nodes = new LinkedList<EDANode>();
 
         this.recorder = new Recorder();
+        registerRecorder(recorder);
         //this.undoRedoSystem = new MementoExperimental(this);
 
     }
@@ -1666,41 +1658,44 @@ abstract public class Editor implements Originator
     }
 
     public void NodesUndo() {
-        if (!this.nodeHistoryUndo.isEmpty()) {
-            Memento undoneChange = this.nodeHistoryUndo.pop();
-            this.nodeHistoryRedo.push(undoneChange);
-            undoneChange.restore();
-            resetCounters();
-            System.out.println("Undo!");
-        } else {
-            System.out.println("Nothing to undo.");
-        }
+        recorder.undo();
+        resetCounters();
+        System.out.println("Undo!");
     }
 
     public void NodesRedo() {
-        if (!this.nodeHistoryRedo.isEmpty()) {
-            Memento redoChange = this.nodeHistoryRedo.pop();
-            this.nodeHistoryUndo.push(redoChange);
-            redoChange.restore();
-            resetCounters();
-            System.out.println("Redo!");
-        } else {
-            System.out.println("Nothing to redo.");
-        }
+        recorder.redo();
+        resetCounters();
+        System.out.println("Redo!");
     }
 
     public void NodeHistoryUpdate() {
-        Memento memento = saveToMemento();
-        this.nodeHistoryUndo.push(memento);
-        this.nodeHistoryRedo.clear();
-        while (this.nodeHistoryUndo.size() > EDAmameController.Editor_UndoStackMaxLen)
-            this.nodeHistoryUndo.remove(0);
+        int currentHash = StateHashUtil.generateStateHash(this);
 
-        System.out.println("Undo pushed!");
+        if (currentHash != lastNodesHash) {
+            Memento memento = saveToMemento();
+            recorder.record(memento);
+            System.out.println("State recorded!");
+            lastNodesHash = currentHash;
+        } else {
+            System.out.println("Change was not recorded.");
+        }
     }
 
     private void resetCounters() {
         this.shapesHighlighted = 0;
         this.shapesSelected = 0;
+    }
+
+    /// RECORDER IMPLEMENTATION
+    @Override
+    public void registerRecorder(Recorder recorder) {
+        this.recorder = recorder;
+    }
+
+    /// HASH IMPLEMENTATION
+    @Override
+    public Collection<?> getState() {
+        return this.nodes;
     }
 }
