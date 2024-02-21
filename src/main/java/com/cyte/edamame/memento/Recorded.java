@@ -7,8 +7,6 @@
 
 package com.cyte.edamame.memento;
 
-import com.cyte.edamame.memento.Recorder;
-
 public interface Recorded {
     void registerRecorder(Recorder recorder);
 }

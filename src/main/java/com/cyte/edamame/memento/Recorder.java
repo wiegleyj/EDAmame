@@ -7,7 +7,7 @@
 
 package com.cyte.edamame.memento;
 
-import com.cyte.edamame.memento.Memento;
+import com.cyte.edamame.editor.Editor;
 
 import java.util.Stack;
 
@@ -16,11 +16,21 @@ public class Recorder {
     private final Stack<Memento> future = new Stack<>();
 
     public void undo() {
-        future.push(history.pop().restore());
+        if (!history.isEmpty()) {
+            Memento memento = history.pop(); // Pop the memento
+            future.push(memento.restore()); // Restore the state and push it to future
+        } else {
+            System.out.println("Nothing to undo.");
+        }
     }
 
     public void redo() {
-        history.push(future.pop().restore());
+        if (!future.isEmpty()) {
+            Memento memento = future.pop(); // Pop the memento
+            history.push(memento.restore()); // Restore the state and push it to history
+        } else {
+            System.out.println("Nothing to redo.");
+        }
     }
 
     public void record(Memento memento) {

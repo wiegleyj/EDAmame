@@ -8,7 +8,7 @@
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.memento.MementoExperimental;
+import com.cyte.edamame.memento.*;
 import com.cyte.edamame.netlist.NetListExperimental;
 import com.cyte.edamame.netlist.NetListExperimentalNode;
 import com.cyte.edamame.node.*;
@@ -39,7 +39,7 @@ import java.io.InvalidClassException;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-abstract public class Editor
+abstract public class Editor implements Originator
 {
     //// GLOBAL VARIABLES ////
 
@@ -108,7 +108,18 @@ abstract public class Editor
     public Line linePreview = null;
     public double snapGridSpacing = -1;
 
-    public MementoExperimental undoRedoSystem = null;
+    //public MementoExperimental undoRedoSystem = null;
+    public Recorder recorder = new Recorder();
+    private final Stack<Memento> nodeStack;
+    private final Stack<Memento> nodeHistoryUndo;
+    private final Stack<Memento> nodeHistoryRedo;
+
+    protected Editor() {
+        this.nodeStack = new Stack<>();
+        this.nodeHistoryUndo = new Stack<>();
+        this.nodeHistoryRedo = new Stack<>();
+        // Recorder recorder = new Recorder();
+    }
 
     //// MAIN FUNCTIONS ////
 
@@ -132,7 +143,9 @@ abstract public class Editor
         this.maxShapes = EDAmameController.Editor_MaxShapes;
         this.nodes = new LinkedList<EDANode>();
 
-        this.undoRedoSystem = new MementoExperimental(this);
+        this.recorder = new Recorder();
+        //this.undoRedoSystem = new MementoExperimental(this);
+
     }
 
     /**
@@ -485,7 +498,7 @@ abstract public class Editor
     {
         if (this.pressedLMB)
         {
-            this.undoRedoSystem.NodeHistoryUpdate();
+            this.NodeHistoryUpdate();
         }
         else if (this.pressedRMB)
         {}
@@ -695,11 +708,13 @@ abstract public class Editor
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Z))
-            this.undoRedoSystem.NodesUndo();
+            this.NodesUndo();
+            //this.recorder.undo();
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Y))
-            this.undoRedoSystem.NodesRedo();
+            this.NodesRedo();
+            //this.recorder.redo();
     }
 
     public void OnKeyReleasedGlobal(KeyEvent event)
@@ -933,7 +948,7 @@ abstract public class Editor
         for (int i = 0; i < this.nodes.size(); i++)
             this.nodes.get(i).PropsApplyGlobal(propsBox);
 
-        this.undoRedoSystem.NodeHistoryUpdate();
+        this.NodeHistoryUpdate();
     }
 
     abstract public void PropsLoadSpecific();
@@ -1631,5 +1646,61 @@ abstract public class Editor
                 i--;
             }
         }
+    }
+
+    //// MEMENTO IMPLEMENTATION ////
+
+    // Method to save the current state of the editor
+    @Override
+    public Memento saveToMemento() {
+        return new Memento() {
+            private final LinkedList<EDANode> nodes = new LinkedList<>(Editor.this.NodesClone());
+
+            @Override
+            public Memento restore() {
+                Editor.this.NodesClear();
+                Editor.this.NodesAdd(nodes);
+                return this;
+            }
+        };
+    }
+
+    public void NodesUndo() {
+        if (!this.nodeHistoryUndo.isEmpty()) {
+            Memento undoneChange = this.nodeHistoryUndo.pop();
+            this.nodeHistoryRedo.push(undoneChange);
+            undoneChange.restore();
+            resetCounters();
+            System.out.println("Undo!");
+        } else {
+            System.out.println("Nothing to undo.");
+        }
+    }
+
+    public void NodesRedo() {
+        if (!this.nodeHistoryRedo.isEmpty()) {
+            Memento redoChange = this.nodeHistoryRedo.pop();
+            this.nodeHistoryUndo.push(redoChange);
+            redoChange.restore();
+            resetCounters();
+            System.out.println("Redo!");
+        } else {
+            System.out.println("Nothing to redo.");
+        }
+    }
+
+    public void NodeHistoryUpdate() {
+        Memento memento = saveToMemento();
+        this.nodeHistoryUndo.push(memento);
+        this.nodeHistoryRedo.clear();
+        while (this.nodeHistoryUndo.size() > EDAmameController.Editor_UndoStackMaxLen)
+            this.nodeHistoryUndo.remove(0);
+
+        System.out.println("Undo pushed!");
+    }
+
+    private void resetCounters() {
+        this.shapesHighlighted = 0;
+        this.shapesSelected = 0;
     }
 }
