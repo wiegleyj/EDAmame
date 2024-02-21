@@ -107,6 +107,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     public boolean wasSelectionBox = false;
     public Line linePreview = null;
     public double snapGridSpacing = -1;
+    static public int GerberApertureCounter = 10;
 
     //public MementoExperimental undoRedoSystem = null;
     private Recorder recorder;
@@ -180,7 +181,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
 
         //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
 
-        //System.out.println(this.shapesHighlighted + ", " + this.shapesSelected);
+        System.out.println(this.shapesHighlighted + ", " + this.shapesSelected);
         //System.out.println(this.linePreview);
     }
 
@@ -340,7 +341,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     {
         // Deselecting all the nodes...
         for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).Deselect();
+            this.nodes.get(i).SelectCheck();
 
         // Removing the selection box...
         if (this.selectionBox != null)
@@ -366,7 +367,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
     public void NodeHighlightsCheck(PairMutable posEvent)
     {
         for (int i = 0; i < this.nodes.size(); i++)
-            this.nodes.get(i).HighlightsCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
+            this.nodes.get(i).HighlightCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
     }
 
     public int NodeFindByID(String id)
@@ -670,6 +671,11 @@ abstract public class Editor implements Originator, Recorded, StateHashable
                 EDAmameController.editorPropertiesWindow = propsWindow;
             }
         }
+
+        // Handling all-shape selection...
+        if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.A))
+            for (int i = 0; i < this.nodes.size(); i++)
+                this.nodes.get(i).Select();
 
         // Handling shape deletion...
         if (EDAmameController.IsKeyPressed(KeyCode.BACK_SPACE) || EDAmameController.IsKeyPressed(KeyCode.DELETE))

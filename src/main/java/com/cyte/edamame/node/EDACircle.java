@@ -803,4 +803,9 @@ public class EDACircle extends EDANode
     {
         return new EDACircle(this.name, (Circle)EDANode.NodeClone(this.circle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
+
+    public String ToGerberStr(String layerName)
+    {
+        return EDANode.NodeToGerberStr(this.circle, layerName, this.editor);
+    }
 }

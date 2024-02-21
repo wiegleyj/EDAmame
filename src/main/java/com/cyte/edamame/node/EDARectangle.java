@@ -863,4 +863,9 @@ public class EDARectangle extends EDANode
     {
         return new EDARectangle(this.name, (Rectangle)EDANode.NodeClone(this.rectangle), !this.snapPoints.isEmpty(), this.passive, this.editor);
     }
+
+    public String ToGerberStr(String layerName)
+    {
+        return EDANode.NodeToGerberStr(this.rectangle, layerName, this.editor);
+    }
 }

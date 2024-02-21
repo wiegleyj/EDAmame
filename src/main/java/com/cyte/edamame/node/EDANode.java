@@ -167,7 +167,7 @@ abstract public class EDANode
 
     //// HIGHLIGHT & SELECTION FUNCTIONS ////
 
-    public void HighlightsCheck(PairMutable posMouse)
+    public void HighlightCheck(PairMutable posMouse)
     {
         if (this.passive)
             return;
@@ -232,44 +232,50 @@ abstract public class EDANode
 
         // Adjusting highlights accordingly...
         if ((this.highlightedMouse || this.highlightedBox) && !this.highlighted)
-        {
-            this.shapeHighlighted.setVisible(true);
-            this.highlighted = true;
-            this.editor.shapesHighlighted++;
-        }
+            this.Highlight();
         else if ((!this.highlightedMouse && !this.highlightedBox) && this.highlighted)
-        {
-            this.shapeHighlighted.setVisible(false);
-            this.highlighted = false;
-            this.editor.shapesHighlighted--;
-        }
+            this.Unhighlight();
     }
 
-    public void Deselect()
+    public void Highlight()
     {
-        if (!this.selected)
-        {
-            if (this.highlightedMouse || this.highlightedBox)
-            {
-                this.selected = true;
-                this.shapeSelected.setVisible(true);
-                this.editor.shapesSelected++;
-            }
-        }
-        else
-        {
-            if ((!this.highlightedMouse && !this.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
-            {
-                this.selected = false;
-                this.shapeSelected.setVisible(false);
-                this.editor.shapesSelected--;
-            }
-        }
+        this.shapeHighlighted.setVisible(true);
+        this.highlighted = true;
+        this.editor.shapesHighlighted++;
+    }
+
+    public void Unhighlight()
+    {
+        this.shapeHighlighted.setVisible(false);
+        this.highlighted = false;
+        this.editor.shapesHighlighted--;
+    }
+
+    public void SelectCheck()
+    {
+        if (!this.selected && (this.highlightedMouse || this.highlightedBox))
+            this.Select();
+        else if (this.selected && (!this.highlightedMouse && !this.highlightedBox) && !EDAmameController.IsKeyPressed(KeyCode.SHIFT))
+            this.Unselect();
 
         if (this.highlightedBox && !this.highlightedMouse)
-            this.shapeHighlighted.setVisible(false);
+            this.Unhighlight();
 
         this.mousePressPos = null;
+    }
+
+    public void Select()
+    {
+        this.selected = true;
+        this.shapeSelected.setVisible(true);
+        this.editor.shapesSelected++;
+    }
+
+    public void Unselect()
+    {
+        this.selected = false;
+        this.shapeSelected.setVisible(false);
+        this.editor.shapesSelected--;
     }
 
     public void ShapeHighlightedRefresh()
@@ -373,6 +379,7 @@ abstract public class EDANode
     //// SUPPORT FUNCTIONS ////
 
     abstract public EDANode Clone();
+    abstract public String ToGerberStr(String layerName);
 
     static public Node NodeClone(Node oldNode)  // ASK!!!
     {
@@ -612,6 +619,235 @@ abstract public class EDANode
         else
         {
             throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to FXML string!");
+        }
+
+        return str;
+    }
+
+    static public String NodeToGerberStr(Node node, String layer, Editor editor)
+    {
+        String str = "";
+
+        if (node.getClass() == Circle.class)
+        {
+            Circle circle = (Circle)node;
+
+            if (!circle.getId().equals(layer))
+                return "";
+
+            PairMutable point = GetPosInNodeParent(circle, new PairMutable(0.0, 0.0));
+
+            if (((Node)circle.getParent()).getClass() == Group.class)
+                point = GetPosInNodeParent(circle.getParent(), point);
+
+            //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+            String newStr = "";
+
+            newStr += "G01*\n";
+
+            if (circle.getFill() != Color.TRANSPARENT)
+                newStr += "G36*\n";
+            else {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + circle.getStrokeWidth() + "*%\n";
+                newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+            }
+
+            newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
+            newStr += "G75*\nG03*\n";
+            newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble()
+                    + "I" + (circle.getRadius() * -1) + "J0D01*\n";
+            newStr += "G01*\n";
+            newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
+            newStr += "G75*\nG03*\n";
+            newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble()
+                    + "I" + circle.getRadius() + "J0D01*\n";
+            newStr += "G01*\n";
+
+            if (circle.getFill() != Color.TRANSPARENT)
+                newStr += "G37*\n";
+
+            return newStr;
+        }
+        else if (node.getClass() == Rectangle.class)
+        {
+            Rectangle rectangle = (Rectangle)node;
+
+            if (!rectangle.getId().equals(layer))
+                return "";
+
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, 0.0)));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), 0.0)));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), rectangle.getHeight())));
+            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, rectangle.getHeight())));
+
+            if (((Node)rectangle.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(rectangle.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(rectangle.getParent(), points.get(1)));
+                points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
+                points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
+            }
+
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
+
+            String newStr = "";
+
+            newStr += "G01*\n";
+
+            if (rectangle.getFill() != Color.TRANSPARENT)
+                newStr += "G36*\n";
+            else {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + rectangle.getStrokeWidth() + "*%\n";
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+            }
+            for (int i = 0; i < points.size(); i++)
+            {
+                if (i == 0) {
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    if (rectangle.getFill() != Color.TRANSPARENT)
+                        newStr += "G01*\n";
+                } else
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
+            }
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
+
+            if (rectangle.getFill() != Color.TRANSPARENT)
+                newStr += "G37*\n";
+
+            return newStr;
+        }
+        else if (node.getClass() == Polygon.class)
+        {
+            Polygon triangle = (Polygon)node;
+
+            if (!triangle.getId().equals(layer))
+                return "";
+
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(0), triangle.getPoints().get(1))));
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(2), triangle.getPoints().get(3))));
+            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(4), triangle.getPoints().get(5))));
+
+            if (((Node)triangle.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(triangle.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(triangle.getParent(), points.get(1)));
+                points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
+            }
+
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+
+            String newStr = "";
+
+            newStr += "G01*\n";
+
+            if (triangle.getFill() != Color.TRANSPARENT)
+                newStr += "G36*\n";
+            else {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + triangle.getStrokeWidth() + "*%\n";
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+            }
+            for (int i = 0; i < points.size(); i++)
+            {
+                if (i == 0) {
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    if (triangle.getFill() != Color.TRANSPARENT)
+                        newStr += "G01*\n";
+                } else
+                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
+            }
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
+
+            if (triangle.getFill() != Color.TRANSPARENT)
+                newStr += "G37*\n";
+
+            return newStr;
+        }
+        else if (node.getClass() == Line.class)
+        {
+            Line line = (Line)node;
+
+            if (!line.getId().equals(layer))
+                return "";
+
+            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+            points.add(GetPosInNodeParent(line, new PairMutable(line.getStartX(), line.getStartY())));
+            points.add(GetPosInNodeParent(line, new PairMutable(line.getEndX(), line.getEndY())));
+
+            if (((Node)line.getParent()).getClass() == Group.class)
+            {
+                points.set(0, GetPosInNodeParent(line.getParent(), points.get(0)));
+                points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
+            }
+
+            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+
+            String newStr = "";
+
+            newStr += "G01*\n";
+            newStr += "%ADD" + Editor.GerberApertureCounter + "C," + line.getStrokeWidth() + "*%\n";
+            newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D02*\n";
+            newStr += "X" + points.get(1).GetLeftDouble() + "Y" + points.get(1).GetRightDouble() + "D01*\n";
+
+            return newStr;
+        }
+        else if (node.getClass() == Text.class)
+        {
+            Text text = (Text)node;
+
+            // TODO
+        }
+        else if (node.getClass() == Group.class)
+        {
+            Group group = (Group)node;
+
+            if ((node.getId() != null) && node.getId().equals("Through-Hole"))
+            {
+                if (group.getChildren().size() != 1)
+                    throw new java.lang.Error("ERROR: Attempting to convert a hole without 1 child to a Gerber string!");
+
+                PairMutable point = GetPosInNodeParent(group, GetPosInNodeParent(group.getChildren().get(0), new PairMutable(0.0, 0.0)));
+
+                if (((Node)group.getParent()).getClass() == Group.class)
+                    point = GetPosInNodeParent(group.getParent(), point);
+
+                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                // TODO
+            }
+            else if ((node.getId() != null) && node.getId().equals("Via"))
+            {
+                if (group.getChildren().size() != 2)
+                    throw new java.lang.Error("ERROR: Attempting to convert a via without 2 children to a Gerber string!");
+
+                PairMutable point = GetPosInNodeParent(group, GetPosInNodeParent(group.getChildren().get(0), new PairMutable(0.0, 0.0)));
+
+                if (((Node)group.getParent()).getClass() == Group.class)
+                    point = GetPosInNodeParent(group.getParent(), point);
+
+                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                // TODO
+            }
+            else
+            {
+                for (int i = 0; i < group.getChildren().size(); i++)
+                    NodeToGerberStr(group.getChildren().get(i), layer, editor);
+            }
+        }
+        else
+        {
+            throw new java.lang.Error("ERROR: Attempting to convert an unknown node type to Gerber string!");
         }
 
         return str;
