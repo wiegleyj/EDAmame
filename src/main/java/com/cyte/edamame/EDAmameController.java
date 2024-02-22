@@ -29,8 +29,16 @@ import javafx.scene.control.Alert;
 import java.util.*;
 import java.util.Map.*;
 import java.util.stream.*;
-
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
 import javafx.collections.*;
+import javafx.application.Application;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 import javafx.event.ActionEvent;
 import javafx.fxml.*;
 import javafx.stage.*;
@@ -54,6 +62,8 @@ import javafx.animation.Animation;
 import javafx.animation.Timeline;
 import javafx.animation.KeyFrame;
 import javafx.util.Duration;
+
+import static javafx.application.Application.launch;
 
 /**
  * Main Controller for the {@link EDAmame} Application.<p>
@@ -214,6 +224,75 @@ public class EDAmameController implements Initializable
         LogToggleItemText();
         logger.log(Level.INFO, "Initialization Complete\n");
     }
+        private boolean showErrorPopup = true;
+
+    @FXML
+    private Label statusLabel;
+
+        public void start(Stage primaryStage) {
+            Label statusLabel = new Label("");
+            Button toggleButton = new Button("Toggle Error Display");
+            Button errorButton = new Button("Generate Error");
+
+            toggleButton.setOnAction(e -> {
+                showErrorPopup = !showErrorPopup;
+                statusLabel.setText(" Error display mode toggled : " + (showErrorPopup ? "ON" : "OFF"));
+            });
+
+            errorButton.setOnAction(e -> {
+                try {
+                    // Simulate an error
+                    int result = 5 / 0;
+                } catch (Exception ex) {
+                    if (showErrorPopup) {
+                        showErrorPopup(ex.getMessage());
+                    }
+                    statusLabel.setText(" Error : " + ex.getMessage());
+                }
+            });
+
+            VBox root = new VBox(statusLabel, toggleButton, errorButton);
+            Scene scene = new Scene(root, 300, 200);
+
+            primaryStage.setTitle("Error Display App");
+            primaryStage.setScene(scene);
+            primaryStage.show();
+        }
+
+    public void toggleButton() {
+        showErrorPopup = !showErrorPopup;
+        statusLabel.setText(" Error display mode toggled : " + (showErrorPopup ? "ON" : "OFF"));
+    }
+
+    public void generateError(String errorMessage) {
+        try {
+            // Simulate an error
+            int result = 5 / 0;
+        } catch (Exception ex) {
+            if (showErrorPopup) {
+                showErrorPopup(errorMessage);
+            }
+            statusLabel.setText(" Error : " + errorMessage);
+        }
+    }
+
+    public void generateError()
+    {
+        generateError("ERROR DETECTED!");
+    }
+
+        private void showErrorPopup(String message) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+        }
+
+        public static void main(String[] args) {
+            launch(args);
+        }
+
         /*public void showErrorPopup() {
             Popup errorPopup = new Popup();
             errorPopup.getContent().add(new Label("Error: Something went wrong."));
@@ -224,7 +303,7 @@ public class EDAmameController implements Initializable
             showErrorPopup();
         }*/
 
-    public void showErrorPopup() {
+    /*public void showErrorPopup() {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Error");
         alert.setHeaderText(null);
@@ -236,7 +315,7 @@ public class EDAmameController implements Initializable
     public void onButtonClick(ActionEvent actionEvent) {
         showErrorPopup();
     }
-
+*/
     /**
      * Execute activites required to be done once the main Application Controller_Stage is finally shown. (Activities
      * performed in the {@link EDAmameController#initialize(URL, ResourceBundle)} happen before the various
