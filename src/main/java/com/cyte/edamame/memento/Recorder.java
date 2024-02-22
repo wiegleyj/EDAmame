@@ -11,13 +11,22 @@ import com.cyte.edamame.editor.Editor;
 
 import java.util.Stack;
 
+/**
+ * Manages the undo and redo operations for an application by keeping a history of changes in Memento objects.
+ * This class supports undoing and redoing actions up to a specified stack size limit.
+ * It operates on an Editor instance to track and revert state changes.
+ */
 public class Recorder {
     private final Stack<Memento> history;
     private final Stack<Memento> future;
     private final Editor editor;
     private final int maxStackSize = 10;
 
-    // Recorder class constructor
+    /**
+     * Initializes a new Recorder instance with a reference to an Editor.
+     *
+     * @param editorValue The Editor instance whose states are to be managed.
+     */
     public Recorder(Editor editorValue)
     {
         this.history = new Stack<>();
@@ -25,6 +34,10 @@ public class Recorder {
         this.editor = editorValue;
     }
 
+    /**
+     * Performs an undo operation by reverting the Editor's state to the previous state.
+     * This method transfers the current state to the future stack for potential redo operations.
+     */
     public void undo() {
         if (!history.isEmpty()) {
             Memento memento = history.pop();
@@ -40,6 +53,10 @@ public class Recorder {
         }
     }
 
+    /**
+     * Performs a redo operation by re-applying an action that was previously undone.
+     * This method transfers the state from the future stack back to the history stack.
+     */
     public void redo() {
         if (!future.isEmpty()) {
             Memento memento = future.pop();
@@ -55,6 +72,10 @@ public class Recorder {
         }
     }
 
+    /**
+     * Updates the current state by creating a new Memento from the Editor's state and recording it.
+     * This is typically called after a state change in the Editor.
+     */
     public void update() {
         if (editor.hasStateChanged()) {
             Memento memento = editor.saveToMemento();
@@ -66,6 +87,11 @@ public class Recorder {
         }
     }
 
+    /**
+     * Records a new state into the history, ensuring the history does not exceed the maximum stack size.
+     *
+     * @param memento The Memento object representing the current state to be recorded.
+     */
     public void record(Memento memento) {
         while (history.size() >= maxStackSize) {
             history.remove(0); // Remove the oldest entries to enforce max stack size
@@ -74,6 +100,9 @@ public class Recorder {
         future.clear(); // Clear the future stack whenever a new state is recorded
     }
 
+    /**
+     * Resets counters or states within the Editor as part of the undo/redo process.
+     */
     private void resetCounters() {
         this.editor.shapesHighlighted = 0;
         this.editor.shapesSelected = 0;

@@ -9,7 +9,18 @@ package com.cyte.edamame.memento;
 
 import java.util.Collection;
 
+/**
+ * Provides utility methods for working with objects that implement the StateHashable interface.
+ * This class includes a method for generating a hash code based on the state of a StateHashable object.
+ */
 public class StateHashUtil {
+
+    /**
+     * Generates a hash code for the state of a given StateHashable object.
+     *
+     * @param stateHashable The object whose state hash is to be generated.
+     * @return An int representing the hash code of the object's state.
+     */
     public static int generateStateHash(StateHashable stateHashable) {
         Collection<?> stateObjects = stateHashable.getState();
 
