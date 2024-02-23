@@ -33,6 +33,7 @@ import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Rectangle2D;
@@ -43,8 +44,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
+import javafx.stage.Modality;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
+import javafx.stage.Window;
 import javafx.util.Duration;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -155,6 +158,7 @@ public class EDAmameController implements Initializable
     @FXML
     private MenuBar menuBar;                     // The main EDAmame menu bar.
     @FXML
+    //public Label statusBar;
     public Label statusBar = new Label("EDAmame Status Area:");                      // Load the menu config loader...
     @FXML
     private Button errorButton;                  // The error button.
@@ -265,42 +269,20 @@ public class EDAmameController implements Initializable
 
     private String showErrorPopup = "ON";  // "ON" or "OFF" initial state
         public void showErrorPopup(String errorMessage) throws InterruptedException {
-            if (showErrorPopup.equals("ON")) {
+            if (showErrorPopup.equals("ON") && !errorMessage.contains("EDAmame Status Area")) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
                 alert.setContentText(errorMessage);
+                // Centering the alert window
+                Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+                double centerX = screenBounds.getMinX() + (screenBounds.getWidth() - 450) / 2;
+                double centerY = screenBounds.getMinY() + (screenBounds.getHeight() - 125) / 2;
+                alert.setX(centerX);
+                alert.setY(centerY);
                 alert.showAndWait();
             }
             }
-
-        public void start(Stage primaryStage) {
-            StackPane root = new StackPane();
-            root.getChildren().add(statusBar);
-
-            Scene scene = new Scene(root, 200, 100);
-            primaryStage.setScene(scene);
-            primaryStage.setTitle("Error Popup Example");
-            primaryStage.show();
-
-            // Simulating updating the statusBar message
-            new Thread(() -> {
-                try {
-                    while (true) {
-                        String newMessage = "New status message at " + System.currentTimeMillis();
-                        statusBar.setText(newMessage);
-                        showErrorPopup(newMessage);
-                        Thread.sleep(3000); // Update every 3 seconds
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }).start();
-        }
-
-        public static void main(String[] args) {
-            launch(args);
-        }
 
     @FXML
     public void userSettingsMenuItem() throws InterruptedException {
@@ -309,6 +291,9 @@ public class EDAmameController implements Initializable
         if(showErrorPopup.equals("ON")){
             showErrorPopup(statusBar.getText()); // Call showErrorPopup() with the message from statusBar
         }
+    }
+    public static void main(String[] args) {
+        launch(args);
     }
 
     //// EDITOR FUNCTIONS ////
