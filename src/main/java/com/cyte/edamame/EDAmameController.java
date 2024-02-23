@@ -22,46 +22,47 @@
 // Implement proper getters & setters for all class fields
 
 package com.cyte.edamame;
-import com.cyte.edamame.editor.*;
-import com.cyte.edamame.misc.PairMutable;
-import com.cyte.edamame.memento.TextAreaHandler;
-import javafx.scene.control.Alert;
-import java.util.*;
-import java.util.Map.*;
-import java.util.stream.*;
-import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.collections.*;
-import javafx.application.Application;
-import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
-import javafx.stage.Stage;
-import javafx.event.ActionEvent;
-import javafx.fxml.*;
-import javafx.stage.*;
-import javafx.scene.*;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.scene.input.*;
-import javafx.application.*;
-import javafx.geometry.*;
 
+import com.cyte.edamame.editor.*;
+import com.cyte.edamame.memento.TextAreaHandler;
+import com.cyte.edamame.misc.PairMutable;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.Scene;
+import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.Screen;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
+
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
-
-import javafx.animation.Animation;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.util.Duration;
+import java.util.stream.Stream;
 
 import static javafx.application.Application.launch;
 
@@ -154,9 +155,11 @@ public class EDAmameController implements Initializable
     @FXML
     private MenuBar menuBar;                     // The main EDAmame menu bar.
     @FXML
-    public Label statusBar;                      // Load the menu config loader...
+    public Label statusBar = new Label("EDAmame Status Area:");                      // Load the menu config loader...
     @FXML
     private Button errorButton;                  // The error button.
+    @FXML
+    private MenuItem userSettingsMenuItem;
     // DO NOT EDIT
 
     public final Stage stage;                                                              // The stage hosting this controller.
@@ -180,6 +183,7 @@ public class EDAmameController implements Initializable
     public EDAmameController(Stage stage)
     {
         this.stage = stage;
+        this.userSettingsMenuItem = userSettingsMenuItem;
         stage.setOnShown((event) -> ExecuteOnShown());
     }
 
@@ -224,98 +228,7 @@ public class EDAmameController implements Initializable
         LogToggleItemText();
         logger.log(Level.INFO, "Initialization Complete\n");
     }
-        private boolean showErrorPopup = true;
 
-    @FXML
-    private Label statusLabel;
-
-        public void start(Stage primaryStage) {
-            Label statusLabel = new Label("");
-            Button toggleButton = new Button("Toggle Error Display");
-            Button errorButton = new Button("Generate Error");
-
-            toggleButton.setOnAction(e -> {
-                showErrorPopup = !showErrorPopup;
-                statusLabel.setText(" Error display mode toggled : " + (showErrorPopup ? "ON" : "OFF"));
-            });
-
-            errorButton.setOnAction(e -> {
-                try {
-                    // Simulate an error
-                    int result = 5 / 0;
-                } catch (Exception ex) {
-                    if (showErrorPopup) {
-                        showErrorPopup(ex.getMessage());
-                    }
-                    statusLabel.setText(" Error : " + ex.getMessage());
-                }
-            });
-
-            VBox root = new VBox(statusLabel, toggleButton, errorButton);
-            Scene scene = new Scene(root, 300, 200);
-
-            primaryStage.setTitle("Error Display App");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        }
-
-    public void toggleButton() {
-        showErrorPopup = !showErrorPopup;
-        statusLabel.setText(" Error display mode toggled : " + (showErrorPopup ? "ON" : "OFF"));
-    }
-
-    public void generateError(String errorMessage) {
-        try {
-            // Simulate an error
-            int result = 5 / 0;
-        } catch (Exception ex) {
-            if (showErrorPopup) {
-                showErrorPopup(errorMessage);
-            }
-            statusLabel.setText(" Error : " + errorMessage);
-        }
-    }
-
-    public void generateError()
-    {
-        generateError("ERROR DETECTED!");
-    }
-
-        private void showErrorPopup(String message) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-        }
-
-        public static void main(String[] args) {
-            launch(args);
-        }
-
-        /*public void showErrorPopup() {
-            Popup errorPopup = new Popup();
-            errorPopup.getContent().add(new Label("Error: Something went wrong."));
-            errorPopup.show(errorButton.getScene().getWindow());
-        }
-        @FXML
-        public void onButtonClick(ActionEvent actionEvent) {
-            showErrorPopup();
-        }*/
-
-    /*public void showErrorPopup() {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText("Something went wrong.");
-        alert.showAndWait();
-    }
-
-    @FXML
-    public void onButtonClick(ActionEvent actionEvent) {
-        showErrorPopup();
-    }
-*/
     /**
      * Execute activites required to be done once the main Application Controller_Stage is finally shown. (Activities
      * performed in the {@link EDAmameController#initialize(URL, ResourceBundle)} happen before the various
@@ -348,6 +261,54 @@ public class EDAmameController implements Initializable
 
         logger.setUseParentHandlers(false);
         logger.addHandler(new TextAreaHandler(logText));
+    }
+
+    private String showErrorPopup = "ON";  // "ON" or "OFF" initial state
+        public void showErrorPopup(String errorMessage) throws InterruptedException {
+            if (showErrorPopup.equals("ON")) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText(errorMessage);
+                alert.showAndWait();
+            }
+            }
+
+        public void start(Stage primaryStage) {
+            StackPane root = new StackPane();
+            root.getChildren().add(statusBar);
+
+            Scene scene = new Scene(root, 200, 100);
+            primaryStage.setScene(scene);
+            primaryStage.setTitle("Error Popup Example");
+            primaryStage.show();
+
+            // Simulating updating the statusBar message
+            new Thread(() -> {
+                try {
+                    while (true) {
+                        String newMessage = "New status message at " + System.currentTimeMillis();
+                        statusBar.setText(newMessage);
+                        showErrorPopup(newMessage);
+                        Thread.sleep(3000); // Update every 3 seconds
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }).start();
+        }
+
+        public static void main(String[] args) {
+            launch(args);
+        }
+
+    @FXML
+    public void userSettingsMenuItem() throws InterruptedException {
+        showErrorPopup = showErrorPopup.equals("ON") ? "OFF" : "ON";
+        userSettingsMenuItem.setText(showErrorPopup.equals("ON") ? "Pop Ups is ON click for OFF" : "Pop Ups OFF click for ON");
+        if(showErrorPopup.equals("ON")){
+            showErrorPopup(statusBar.getText()); // Call showErrorPopup() with the message from statusBar
+        }
     }
 
     //// EDITOR FUNCTIONS ////
@@ -471,7 +432,7 @@ public class EDAmameController implements Initializable
 
         // Adding all the editor's menus...
         {
-            for (Map.Entry<String, ObservableList<MenuItem>> currEntry : editor.menus.entrySet())
+            for (Entry<String, ObservableList<MenuItem>> currEntry : editor.menus.entrySet())
             {
                 String currMenuName = currEntry.getKey();
                 ObservableList<MenuItem> currMenuItems = FXCollections.observableArrayList(GetClonedMenuItems(currEntry.getValue()));
@@ -538,7 +499,7 @@ public class EDAmameController implements Initializable
                     currMenuItems.put(currMenuItem, currMenuItemPriority);
                 }
 
-                Stream<Entry<MenuItem, Integer>> currMenuItemsSorted = currMenuItems.entrySet().stream().sorted(Map.Entry.comparingByValue());
+                Stream<Entry<MenuItem, Integer>> currMenuItemsSorted = currMenuItems.entrySet().stream().sorted(Entry.comparingByValue());
 
                 currMenu.getItems().clear();
                 currMenuItemsSorted.forEach(currMenuItem -> {currMenu.getItems().add(currMenuItem.getKey());});
@@ -1032,7 +993,7 @@ public class EDAmameController implements Initializable
         System.out.println("hi");
 
         String classpath = System.getProperty("java.class.path");
-        String[] classPathValues = classpath.split(java.io.File.pathSeparator);
+        String[] classPathValues = classpath.split(File.pathSeparator);
         for (String classPath: classPathValues) {
             System.out.println(classPath);
         }

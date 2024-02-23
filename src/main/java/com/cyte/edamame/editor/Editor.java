@@ -951,11 +951,10 @@ abstract public class Editor
         EDAmameController.editorSettingsWindow.settingsBox.getChildren().add(new Separator());
     }
 
-    public void SettingsApplyGlobal()
-    {}
-
     abstract public void SettingsLoadSpecific();
     abstract public void SettingsApplySpecific();
+    public void SettingsApplyGlobal()
+    {}
 
     //// NETLIST FUNCTIONS ////
 
