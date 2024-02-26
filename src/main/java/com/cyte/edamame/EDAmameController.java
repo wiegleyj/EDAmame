@@ -9,7 +9,6 @@
 // Implement gerber & drill file exports
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
-// Implement some way of reordering drawn nodes
 // Fix selection box appearing while dragging something
 // Fix snap point shapes not disappearing after deleting node
 // Fix file writing (?)

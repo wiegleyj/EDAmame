@@ -52,6 +52,16 @@ abstract public class EDANode
 
     //// GETTERS ////
 
+    public Rectangle GetShapeHighlighted()
+    {
+        return this.shapeHighlighted;
+    }
+
+    public Rectangle GetShapeSelected()
+    {
+        return this.shapeSelected;
+    }
+
     abstract public Node GetNode();
     abstract public PairMutable GetTranslate();
     abstract public PairMutable GetSnapPos();

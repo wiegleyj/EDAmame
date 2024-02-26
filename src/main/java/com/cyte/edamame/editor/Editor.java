@@ -176,8 +176,9 @@ abstract public class Editor
 
         //System.out.println(this.Editor_RenderSystem.RenderSystem_Nodes.size());
 
-        System.out.println(this.shapesHighlighted + ", " + this.shapesSelected);
+        //System.out.println(this.shapesHighlighted + ", " + this.shapesSelected);
         //System.out.println(this.linePreview);
+        //System.out.println(this.nodes.size() + " : " + this.paneHolder.getChildren().size());
     }
 
     //// GETTER FUNCTIONS ////
@@ -363,6 +364,42 @@ abstract public class Editor
     {
         for (int i = 0; i < this.nodes.size(); i++)
             this.nodes.get(i).HighlightCheck(this.PanePosListenerToHolder(new PairMutable(posEvent.GetLeftDouble(), posEvent.GetRightDouble())));
+    }
+
+    public int ShapeHighlightedFindByID(String id)
+    {
+        int nodeIdx = this.NodeFindByID(id);
+
+        if (nodeIdx != -1)
+            for (int i = 0; i < this.paneHighlights.getChildren().size(); i++)
+                if (this.paneHighlights.getChildren().get(i) == this.nodes.get(nodeIdx).GetShapeHighlighted())
+                    return i;
+
+        return -1;
+    }
+
+    public int ShapeSelectedFindByID(String id)
+    {
+        int nodeIdx = this.NodeFindByID(id);
+
+        if (nodeIdx != -1)
+            for (int i = 0; i < this.paneSelections.getChildren().size(); i++)
+                if (this.paneSelections.getChildren().get(i) == this.nodes.get(nodeIdx).GetShapeSelected())
+                    return i;
+
+        return -1;
+    }
+
+    public int NodePaneHolderFindById(String id)
+    {
+        int nodeIdx = this.NodeFindByID(id);
+
+        if (nodeIdx != -1)
+            for (int i = 0; i < this.paneHolder.getChildren().size(); i++)
+                if (this.paneHolder.getChildren().get(i) == this.nodes.get(nodeIdx).GetNode())
+                    return i;
+
+        return -1;
     }
 
     public int NodeFindByID(String id)
@@ -697,6 +734,62 @@ abstract public class Editor
                 this.LinePreviewRemove();
             else
                 this.NodesDeselectAll();
+        }
+
+        // Handling element reordering...
+        if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.UP))
+        {
+            for (int i = 0; i < this.nodes.size(); i++)
+            {
+                EDANode node = this.nodes.get(i);
+
+                if (node.selected && (i > 0))
+                {
+                    EDANode prevEDANode = this.nodes.remove(i - 1);
+                    this.nodes.add(i, prevEDANode);
+
+                    int prevNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+                    Node prevNode = this.paneHolder.getChildren().remove(prevNodePaneHolderIdx - 1);
+                    this.paneHolder.getChildren().add(prevNodePaneHolderIdx, prevNode);
+
+                    int prevShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+                    Node prevShapeHighlighted = this.paneHighlights.getChildren().remove(prevShapeHighlightedIdx - 1);
+                    this.paneHighlights.getChildren().add(prevShapeHighlightedIdx, prevShapeHighlighted);
+
+                    int prevShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+                    Node prevShapeSelected = this.paneSelections.getChildren().remove(prevShapeSelectedIdx - 1);
+                    this.paneSelections.getChildren().add(prevShapeSelectedIdx, prevShapeSelected);
+
+                    System.out.println(i + "\t" + prevNodePaneHolderIdx + "\t" + prevShapeHighlightedIdx + "\t" + prevShapeSelectedIdx);
+                }
+            }
+        }
+        else if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.DOWN))
+        {
+            for (int i = (this.nodes.size() - 1); i >= 0; i--)
+            {
+                EDANode node = this.nodes.get(i);
+
+                if (node.selected && (i < (this.nodes.size() - 1)))
+                {
+                    EDANode nextEDANode = this.nodes.remove(i + 1);
+                    this.nodes.add(i, nextEDANode);
+
+                    int nextNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+                    Node nextNode = this.paneHolder.getChildren().remove(nextNodePaneHolderIdx + 1);
+                    this.paneHolder.getChildren().add(nextNodePaneHolderIdx, nextNode);
+
+                    int nextShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+                    Node nextShapeHighlighted = this.paneHighlights.getChildren().remove(nextShapeHighlightedIdx + 1);
+                    this.paneHighlights.getChildren().add(nextShapeHighlightedIdx, nextShapeHighlighted);
+
+                    int nextShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+                    Node nextShapeSelected = this.paneSelections.getChildren().remove(nextShapeSelectedIdx + 1);
+                    this.paneSelections.getChildren().add(nextShapeSelectedIdx, nextShapeSelected);
+
+                    System.out.println(i + "\t" + nextNodePaneHolderIdx + "\t" + nextShapeHighlightedIdx + "\t" + nextShapeSelectedIdx);
+                }
+            }
         }
 
         // Handling element undo...
