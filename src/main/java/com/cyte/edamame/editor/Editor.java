@@ -743,25 +743,43 @@ abstract public class Editor
             {
                 EDANode node = this.nodes.get(i);
 
-                if (node.selected && (i > 0))
+                if (!node.selected)
+                    continue;
+
+                if (i > 0)
                 {
                     EDANode prevEDANode = this.nodes.remove(i - 1);
                     this.nodes.add(i, prevEDANode);
+                }
 
-                    int prevNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+                int prevNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+
+                if (prevNodePaneHolderIdx > 1)
+                {
                     Node prevNode = this.paneHolder.getChildren().remove(prevNodePaneHolderIdx - 1);
                     this.paneHolder.getChildren().add(prevNodePaneHolderIdx, prevNode);
+                }
 
-                    int prevShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+                int prevShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+
+                if (prevShapeHighlightedIdx > 0)
+                {
                     Node prevShapeHighlighted = this.paneHighlights.getChildren().remove(prevShapeHighlightedIdx - 1);
                     this.paneHighlights.getChildren().add(prevShapeHighlightedIdx, prevShapeHighlighted);
+                }
 
-                    int prevShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+                int prevShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+
+                if (prevShapeSelectedIdx > 0)
+                {
                     Node prevShapeSelected = this.paneSelections.getChildren().remove(prevShapeSelectedIdx - 1);
                     this.paneSelections.getChildren().add(prevShapeSelectedIdx, prevShapeSelected);
-
-                    System.out.println(i + "\t" + prevNodePaneHolderIdx + "\t" + prevShapeHighlightedIdx + "\t" + prevShapeSelectedIdx);
                 }
+
+                //System.out.println(i + "\t" + prevNodePaneHolderIdx + "\t" + prevShapeHighlightedIdx + "\t" + prevShapeSelectedIdx);
+
+                //for (int j = 0; j < this.paneHolder.getChildren().size(); j++)
+                //    System.out.println(this.paneHolder.getChildren().get(j).getClass().toString());
             }
         }
         else if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.DOWN))
@@ -770,25 +788,40 @@ abstract public class Editor
             {
                 EDANode node = this.nodes.get(i);
 
-                if (node.selected && (i < (this.nodes.size() - 1)))
+                if (!node.selected)
+                    continue;
+
+                if (i < (this.nodes.size() - 1))
                 {
                     EDANode nextEDANode = this.nodes.remove(i + 1);
                     this.nodes.add(i, nextEDANode);
+                }
 
-                    int nextNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+                int nextNodePaneHolderIdx = this.NodePaneHolderFindById(node.id);
+
+                if (nextNodePaneHolderIdx < (this.paneHolder.getChildren().size() - 4))
+                {
                     Node nextNode = this.paneHolder.getChildren().remove(nextNodePaneHolderIdx + 1);
                     this.paneHolder.getChildren().add(nextNodePaneHolderIdx, nextNode);
+                }
 
-                    int nextShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+                int nextShapeHighlightedIdx = this.ShapeHighlightedFindByID(node.id);
+
+                if (nextShapeHighlightedIdx < (this.paneHighlights.getChildren().size() - 1))
+                {
                     Node nextShapeHighlighted = this.paneHighlights.getChildren().remove(nextShapeHighlightedIdx + 1);
                     this.paneHighlights.getChildren().add(nextShapeHighlightedIdx, nextShapeHighlighted);
+                }
 
-                    int nextShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+                int nextShapeSelectedIdx = this.ShapeSelectedFindByID(node.id);
+
+                if (nextShapeSelectedIdx < (this.paneSelections.getChildren().size() - 1))
+                {
                     Node nextShapeSelected = this.paneSelections.getChildren().remove(nextShapeSelectedIdx + 1);
                     this.paneSelections.getChildren().add(nextShapeSelectedIdx, nextShapeSelected);
-
-                    System.out.println(i + "\t" + nextNodePaneHolderIdx + "\t" + nextShapeHighlightedIdx + "\t" + nextShapeSelectedIdx);
                 }
+
+                //System.out.println(i + "\t" + nextNodePaneHolderIdx + "\t" + nextShapeHighlightedIdx + "\t" + nextShapeSelectedIdx);
             }
         }
 
