@@ -644,6 +644,9 @@ abstract public class EDANode
             if (((Node)circle.getParent()).getClass() == Group.class)
                 point = GetPosInNodeParent(circle.getParent(), point);
 
+            point = editor.PaneHolderGetRealPos(point);
+            point = new PairMutable(point.GetLeftDouble(), -point.GetRightDouble());
+
             //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
             String newStr = "";
@@ -693,6 +696,16 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
                 points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
             }
+
+            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+            points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
+            points.set(3, editor.PaneHolderGetRealPos(points.get(3)));
+            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+            points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
+            points.set(3, new PairMutable(points.get(3).GetLeftDouble(), -points.get(3).GetRightDouble()));
+
 
             //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
             //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
@@ -744,6 +757,13 @@ abstract public class EDANode
                 points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
             }
 
+            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+            points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
+            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+            points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
+
             //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
             //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
             //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
@@ -791,6 +811,11 @@ abstract public class EDANode
                 points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
             }
 
+            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+
             //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
             //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
 
@@ -825,9 +850,24 @@ abstract public class EDANode
                 if (((Node)group.getParent()).getClass() == Group.class)
                     point = GetPosInNodeParent(group.getParent(), point);
 
-                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+                point = editor.PaneHolderGetRealPos(point);
+                point = new PairMutable(point.GetLeftDouble(), -point.GetRightDouble());
 
-                // TODO
+                //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                String newStr = "";
+
+                newStr += "G01*\n";
+
+                Circle ThroughHoleCircle = (Circle) group.getChildren().get(0);
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (ThroughHoleCircle.getRadius() * 2) + "*%\n";
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+                newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
+                newStr += "%TO.N,N/C*%\n";
+
+                newStr += "X" + point.GetLeftDouble() + "Y" + point.GetRightDouble() + "D03*\n";
+                return newStr;
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
             {
@@ -839,9 +879,30 @@ abstract public class EDANode
                 if (((Node)group.getParent()).getClass() == Group.class)
                     point = GetPosInNodeParent(group.getParent(), point);
 
-                editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+                point = editor.PaneHolderGetRealPos(point);
+                point = new PairMutable(point.GetLeftDouble(), -point.GetRightDouble());
 
-                // TODO
+                //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                String newStr = "";
+
+                newStr += "G01*\n";
+
+                Circle CircleChildOne = (Circle) group.getChildren().get(0);
+                Circle CircleChildTwo = (Circle) group.getChildren().get(1);
+                newStr += "%TA.AperFunction,ViaPad*%\n";
+                if (CircleChildOne.getRadius() > CircleChildTwo.getRadius())
+                {
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (CircleChildOne.getRadius() * 2) + "*%\n";
+                }
+                else
+                {
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (CircleChildTwo.getRadius() * 2) + "*%\n";
+                }
+                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+                newStr += "%TO.N,*%\n";
+                newStr += "X" + point.GetLeftDouble() + "Y" + point.GetRightDouble() + "D03*\n";
+                return newStr;
             }
             else
             {
