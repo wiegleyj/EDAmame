@@ -9,8 +9,6 @@
 // Implement gerber & drill file exports
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
-// Fix selection box appearing while dragging something
-// Fix snap point shapes not disappearing after deleting node
 // Fix file writing (?)
 // Refactor symbol saving so the shapes aren't all parented to a Group
 // Fix occasional dragging not recognized
@@ -367,7 +365,7 @@ public class EDAmameController implements Initializable
 
         // Adding all the editor's menus...
         {
-            for (Map.Entry<String, ObservableList<MenuItem>> currEntry : editor.menus.entrySet())
+            for (Map.Entry<String, ObservableList<MenuItem>> currEntry : editor.GetMenus().entrySet())
             {
                 String currMenuName = currEntry.getKey();
                 ObservableList<MenuItem> currMenuItems = FXCollections.observableArrayList(GetClonedMenuItems(currEntry.getValue()));
@@ -389,7 +387,7 @@ public class EDAmameController implements Initializable
                 if (existingIdx == -1)
                 {
                     Menu currMenu = new Menu(currMenuName);
-                    currMenu.setId("dynamicMenu_" + editor.id);
+                    currMenu.setId("dynamicMenu_" + editor.GetId());
                     currMenu.getItems().addAll(currMenuItems);
 
                     this.menuBar.getMenus().add(currMenu);
@@ -400,7 +398,7 @@ public class EDAmameController implements Initializable
                     for (int j = 0; j < currMenuItems.size(); j++)
                     {
                         MenuItem currMenuItem = currMenuItems.get(j);
-                        String currMenuItemId = "dynamicMenuItem_" + editor.id;
+                        String currMenuItemId = "dynamicMenuItem_" + editor.GetId();
 
                         if (currMenuItem.getId() != null)
                             currMenuItemId += "_" + currMenuItem.getId();
@@ -474,7 +472,7 @@ public class EDAmameController implements Initializable
             if (currMenu == null)
                 continue;
 
-            if ((currMenu.getId() != null) && currMenu.getId().contains("dynamicMenu") && currMenu.getId().contains(editor.id))
+            if ((currMenu.getId() != null) && currMenu.getId().contains("dynamicMenu") && currMenu.getId().contains(editor.GetId()))
             {
                 menuBar.getMenus().remove(i);
                 i--;
@@ -485,7 +483,7 @@ public class EDAmameController implements Initializable
                 {
                     MenuItem currMenuItem = currMenu.getItems().get(j);
 
-                    if ((currMenuItem.getId() != null) && currMenuItem.getId().contains("dynamicMenuItem") && currMenuItem.getId().contains(editor.id))
+                    if ((currMenuItem.getId() != null) && currMenuItem.getId().contains("dynamicMenuItem") && currMenuItem.getId().contains(editor.GetId()))
                     {
                         currMenu.getItems().remove(j);
                         j--;
@@ -505,7 +503,7 @@ public class EDAmameController implements Initializable
     public void EditorAdd(Editor editor)
     {
         Tab editorTab = editor.GetTab();
-        editorTab.setId("editorTab_" + editor.id);
+        editorTab.setId("editorTab_" + editor.GetId());
 
         // Adding editor's main tab...
         editors.put(editorTab, editor);

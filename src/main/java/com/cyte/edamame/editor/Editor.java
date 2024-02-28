@@ -44,10 +44,10 @@ abstract public class Editor
     //// GLOBAL VARIABLES ////
 
     /** Every editor can be uniquely identified by a random UUID (which do not persist across application execution. */
-    final public String id = UUID.randomUUID().toString();
+    final private String id = UUID.randomUUID().toString();
 
-    public Integer type = -1;
-    public String name = null;
+    private int type = -1;
+    private String name = null;
     
     // DO NOT EDIT
 
@@ -55,24 +55,24 @@ abstract public class Editor
     // The individual elements are extracted to these for use by the EDAmame Application.
 
     /** The main Editor_Tab for EDAmame to include in its main Editor_Tab list. */
-    protected Tab tab = null;
+    private Tab tab = null;
     /** An optional ToolBar to provide EDAmame to include/append to its toolbars. */
-    protected ToolBar toolBar = null;
+    private ToolBar toolBar = null;
     /** a list of Editor_Tabs to include in the navigation Editor_Tab pane when this editor is active. (can be empty) */
-    protected ObservableList<Tab> tabs = FXCollections.observableArrayList();
+    private ObservableList<Tab> tabs = FXCollections.observableArrayList();
     /**
      * A structure of menu items to include in EDAmame's Editor_Menus. Any menuitems associated with a string will
      * be inserted/visible under the menu with the same name in the EDAmame main menubar. The string must
      * match exactly including mneumonic underscores and such. Missing Editor_Menus at the EDAmame level are not created.
      */
-    public HashMap<String, ObservableList<MenuItem>> menus = new HashMap<String, ObservableList<MenuItem>>();    // NOTE: We have to use the hash map because a list would cause the menu items to disappear after the first editor dissection
+    private HashMap<String, ObservableList<MenuItem>> menus = new HashMap<String, ObservableList<MenuItem>>();    // NOTE: We have to use the hash map because a list would cause the menu items to disappear after the first editor dissection
 
-    public PairMutable zoomLimits;
-    public Double zoomFactor;
-    public Double mouseDragFactor;
-    public Double mouseDragCheckTimeout;
-    public Color selectionBoxColor;
-    public Double selectionBoxWidth;
+    private PairMutable zoomLimits;
+    private double zoomFactor;
+    private double mouseDragFactor;
+    private double mouseDragCheckTimeout;
+    private Color selectionBoxColor;
+    private double selectionBoxWidth;
 
     public Pane paneListener;
     public Pane paneHolder;
@@ -87,8 +87,8 @@ abstract public class Editor
     public Color gridBoxColor;
     public Integer maxShapes;
     public LinkedList<EDANode> nodes;
-    
-    public PairMutable center;
+
+    private PairMutable center;
     public boolean visible = false;
     public boolean pressedLMB = false;
     public boolean pressedRMB = false;
@@ -113,18 +113,17 @@ abstract public class Editor
 
     //// MAIN FUNCTIONS ////
 
-    public void Init(Integer type, String name)
+    public void Init(int type, String name)
     {
-        this.type = type;
-        this.name = name;
+        this.SetType(type);
+        this.SetName(name);
 
-        this.center = new PairMutable(0.0, 0.0);
-        this.zoomLimits = EDAmameController.Editor_ZoomLimits;
-        this.zoomFactor = EDAmameController.Editor_ZoomFactor;
-        this.mouseDragFactor = EDAmameController.Editor_MouseDragFactor;
-        this.mouseDragCheckTimeout = EDAmameController.Editor_MouseCheckTimeout;
-        this.selectionBoxColor = EDAmameController.Editor_SelectionBoxColors[this.type];
-        this.selectionBoxWidth = EDAmameController.Editor_SelectionBoxWidth;
+        this.SetZoomLimits(EDAmameController.Editor_ZoomLimits);
+        this.SetZoomFactor(EDAmameController.Editor_ZoomFactor);
+        this.SetMouseDragFactor(EDAmameController.Editor_MouseDragFactor);
+        this.SetMouseDragCheckTimeout(EDAmameController.Editor_MouseCheckTimeout);
+        this.SetSelectionBoxColor(EDAmameController.Editor_SelectionBoxColors[this.GetType()]);
+        this.SetSelectionBoxWidth(EDAmameController.Editor_SelectionBoxWidth);
 
         this.theaterSize = EDAmameController.Editor_TheaterSize;
         this.backgroundColor = EDAmameController.Editor_BackgroundColors[type];
@@ -132,6 +131,8 @@ abstract public class Editor
         this.gridBoxColor = EDAmameController.Editor_GridPointColors[type];
         this.maxShapes = EDAmameController.Editor_MaxShapes;
         this.nodes = new LinkedList<EDANode>();
+
+        this.SetCenter(new PairMutable(0.0, 0.0));
 
         this.undoRedoSystem = new MementoExperimental(this);
     }
@@ -147,7 +148,7 @@ abstract public class Editor
 
     public void Heartbeat()
     {
-        if ((this.type == -1) || (this.name == null))
+        if ((this.GetType() == -1) || (this.GetName() == null))
             throw new java.lang.Error("ERROR: Attempting to run editor without initializing it!");
 
         this.TestShapesClear();
@@ -181,25 +182,60 @@ abstract public class Editor
         //System.out.println(this.nodes.size() + " : " + this.paneHolder.getChildren().size());
     }
 
+    //// SETTER FUNCTIONS ////
+
+    public void SetType(int value) {this.type = value;}
+    public void SetName(String value) {this.name = value;}
+
+    public void SetTab(Tab value) {this.tab = value;}
+    public void SetToolBar(ToolBar value) {this.toolBar = value;}
+    public void SetControlTabs(ObservableList<Tab> value) {this.tabs = value;}
+    public void SetMenus(HashMap<String, ObservableList<MenuItem>> value) {this.menus = value;};
+
+    public void SetZoomLimits(PairMutable value) {this.zoomLimits = value;}
+    public void SetZoomFactor(double value) {this.zoomFactor = value;}
+    public void SetMouseDragFactor(double value) {this.mouseDragFactor = value;}
+    public void SetMouseDragCheckTimeout(double value) {this.mouseDragCheckTimeout = value;}
+    public void SetSelectionBoxColor(Color value) {this.selectionBoxColor = value;}
+    public void SetSelectionBoxWidth(double value) {this.selectionBoxWidth = value;}
+
+
+
+    public void SetCenter(PairMutable value) {this.center = value;}
+
     //// GETTER FUNCTIONS ////
+
+    public String GetId() {return this.id;}
+    public int GetType() {return this.type;}
+    public String GetName() {return this.name;}
 
     /**
      * Returns the main editor Tab node for inclusion by EDAmame.
      * @return the main Editor_Tab for this editor.
      */
-    public Tab GetTab() { return tab; }
-
+    public Tab GetTab() {return tab;}
     /**
      * Returns the optional ToolBar of this editor for inclusion by EDAmame.
      * @return The ToolBar if available, null otherwise.
      */
-    public ToolBar GetToolBar() { return toolBar; }
-
+    public ToolBar GetToolBar() {return toolBar;}
     /**
      * Returns a list of control Editor_Tabs for EDAmame to include in the main controls Editor_Tab pane.
      * @return A (possibly empty) list of control Editor_Tabs.
      */
-    public ObservableList<Tab> GetControlTabs() { return tabs; }
+    public ObservableList<Tab> GetControlTabs() {return tabs;}
+    public HashMap<String, ObservableList<MenuItem>> GetMenus() {return this.menus;}
+
+    public PairMutable GetZoomLimits() {return this.zoomLimits;}
+    public double GetZoomFactor() {return this.zoomFactor;}
+    public double GetMouseDragFactor() {return this.mouseDragFactor;}
+    public double GetMouseDragCheckTimeout() {return this.mouseDragCheckTimeout;}
+    public Color GetSelectionBoxColor() {return this.selectionBoxColor;}
+    public double GetSelectionBoxWidth() {return this.selectionBoxWidth;}
+
+
+
+    public PairMutable GetCenter() {return this.center;}
 
     //// PANE FUNCTIONS ////
 
@@ -248,8 +284,8 @@ abstract public class Editor
                     scale.GetRightDouble() - prevScale.GetRightDouble());
             PairMutable newPos = this.PaneHolderGetTranslate();
 
-            newPos.left = newPos.GetLeftDouble() + this.center.GetLeftDouble() * scaleDelta.GetLeftDouble();
-            newPos.right = newPos.GetRightDouble() + this.center.GetRightDouble() * scaleDelta.GetRightDouble();
+            newPos.left = newPos.GetLeftDouble() + this.GetCenter().GetLeftDouble() * scaleDelta.GetLeftDouble();
+            newPos.right = newPos.GetRightDouble() + this.GetCenter().GetRightDouble() * scaleDelta.GetRightDouble();
 
             this.PaneHolderSetTranslate(newPos);
         }
@@ -449,14 +485,14 @@ abstract public class Editor
 
     public void MouseDragUpdate(PairMutable posMouse)
     {
-        this.mouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.mouseDragFactor / this.zoom,
-                                                (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.mouseDragFactor / this.zoom);
+        this.mouseDragDiffPos = new PairMutable((posMouse.GetLeftDouble() - this.mouseDragFirstPos.GetLeftDouble()) * this.GetMouseDragFactor() / this.zoom,
+                                                (posMouse.GetRightDouble() - this.mouseDragFirstPos.GetRightDouble()) * this.GetMouseDragFactor() / this.zoom);
     }
 
     public void MouseDragReset(PairMutable posMouse)
     {
         this.mouseDragFirstPos = new PairMutable(posMouse);
-        this.mouseDragFirstCenter = new PairMutable(this.center.GetLeftDouble(), this.center.GetRightDouble());
+        this.mouseDragFirstCenter = new PairMutable(this.GetCenter().GetLeftDouble(), this.center.GetRightDouble());
         this.mouseDragPaneFirstPos = new PairMutable(this.PaneHolderGetTranslate());
 
         if (this.shapesSelected > 0)
@@ -557,7 +593,7 @@ abstract public class Editor
                 this.PaneHolderSetTranslate(new PairMutable(0.0, 0.0));
                 this.PaneHolderSetScale(new PairMutable(1.0, 1.0), false);
 
-                this.center = new PairMutable(0.0, 0.0);
+                this.SetCenter(new PairMutable(0.0, 0.0));
                 this.zoom = 1.0;
             }
         }
@@ -606,25 +642,25 @@ abstract public class Editor
                 {
                     this.selectionBox = new Rectangle(0.0, 0.0);
                     this.selectionBox.setFill(Color.TRANSPARENT);
-                    this.selectionBox.setStroke(this.selectionBoxColor);
-                    this.selectionBox.setStrokeWidth(this.selectionBoxWidth);
+                    this.selectionBox.setStroke(this.GetSelectionBoxColor());
+                    this.selectionBox.setStrokeWidth(this.GetSelectionBoxWidth());
 
                     this.paneListener.getChildren().add(1, this.selectionBox);
                 }
 
                 // Adjusting if the width & height are negative...
                 if (this.mouseDragDiffPos.GetLeftDouble() < 0)
-                    this.selectionBox.setTranslateX(this.mouseDragFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom / this.mouseDragFactor);
+                    this.selectionBox.setTranslateX(this.mouseDragFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom / this.GetMouseDragFactor());
                 else
                     this.selectionBox.setTranslateX(this.mouseDragFirstPos.GetLeftDouble());
 
                 if (this.mouseDragDiffPos.GetRightDouble() < 0)
-                    this.selectionBox.setTranslateY(this.mouseDragFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom / this.mouseDragFactor);
+                    this.selectionBox.setTranslateY(this.mouseDragFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom / this.GetMouseDragFactor());
                 else
                     this.selectionBox.setTranslateY(this.mouseDragFirstPos.GetRightDouble());
 
-                this.selectionBox.setWidth(Math.abs(this.mouseDragDiffPos.GetLeftDouble() * this.zoom / this.mouseDragFactor));
-                this.selectionBox.setHeight(Math.abs(this.mouseDragDiffPos.GetRightDouble() * this.zoom / this.mouseDragFactor));
+                this.selectionBox.setWidth(Math.abs(this.mouseDragDiffPos.GetLeftDouble() * this.zoom / this.GetMouseDragFactor()));
+                this.selectionBox.setHeight(Math.abs(this.mouseDragDiffPos.GetRightDouble() * this.zoom / this.GetMouseDragFactor()));
             }
         }
         else if (this.pressedRMB)
@@ -633,8 +669,8 @@ abstract public class Editor
             {
                 this.mouseDragReachedEdge = false;
 
-                this.center.left = this.mouseDragFirstCenter.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble();
-                this.center.right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
+                this.GetCenter().left = this.mouseDragFirstCenter.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble();
+                this.GetCenter().right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
 
                 this.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
                                                             this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
@@ -658,15 +694,15 @@ abstract public class Editor
         else
         {
             if (event.getDeltaY() < 0)
-                if ((this.zoom / this.zoomFactor) <= this.zoomLimits.GetLeftDouble())
-                    this.zoom = this.zoomLimits.GetLeftDouble();
+                if ((this.zoom / this.GetZoomFactor()) <= this.GetZoomLimits().GetLeftDouble())
+                    this.zoom = this.GetZoomLimits().GetLeftDouble();
                 else
-                    this.zoom /= this.zoomFactor;
+                    this.zoom /= this.GetZoomFactor();
             else
-            if ((this.zoom * this.zoomFactor) >= this.zoomLimits.GetRightDouble())
-                this.zoom = this.zoomLimits.GetRightDouble();
+            if ((this.zoom * this.GetZoomFactor()) >= this.GetZoomLimits().GetRightDouble())
+                this.zoom = this.GetZoomLimits().GetRightDouble();
             else
-                this.zoom *= this.zoomFactor;
+                this.zoom *= this.GetZoomFactor();
 
             this.PaneHolderSetScale(new PairMutable(this.zoom, this.zoom), true);
         }
@@ -924,7 +960,7 @@ abstract public class Editor
         // When we drag the mouse (from inside the viewport)...
         this.paneListener.setOnMouseDragged(event -> {
             // Only execute callback if we're past the check timeout
-            if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.mouseDragCheckTimeout)
+            if (((System.nanoTime() - this.mouseDragLastTime) / 1e9) < this.GetMouseDragCheckTimeout())
                 return;
 
             // Updating the current mouse drag positions
@@ -1442,7 +1478,7 @@ abstract public class Editor
 
         // Searching the scene for all the required elements
         Iterator<Node> nodeIterator = ((VBox)root).getChildren().iterator();
-        String prefix = this.id;
+        String prefix = this.GetId();
         Pane foundPaneListener = null;
         Pane foundPaneHolder = null;
         Pane foundPaneHighlights = null;
@@ -1456,15 +1492,15 @@ abstract public class Editor
 
             if (node.getClass() == ToolBar.class)
             {
-                EDAmameController.logger.log(Level.INFO, "Dissecting a ToolBar in Editor \"" + id + "\"...\n");
+                EDAmameController.logger.log(Level.INFO, "Dissecting a ToolBar in Editor \"" + this.GetId() + "\"...\n");
 
-                toolBar = (ToolBar) node;
-                toolBar.setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
-                toolBar.setId(prefix + "_TOOLBAR");
+                this.SetToolBar((ToolBar)node);
+                this.GetToolBar().setVisible(false); // toolbar starts invisible. Becomes visible on Tab selection.
+                this.GetToolBar().setId(prefix + "_TOOLBAR");
             }
             else if (node.getClass() == MenuBar.class)
             {
-                EDAmameController.logger.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + id + "\"...\n");
+                EDAmameController.logger.log(Level.INFO, "Dissecting a MenuBar in Editor \"" + this.GetId() + "\"...\n");
 
                 ObservableList<Menu> menus = ((MenuBar)node).getMenus();
 
@@ -1473,15 +1509,15 @@ abstract public class Editor
                     Menu currMenu = menus.get(i);
                     String currMenuName = currMenu.getText();
 
-                    if (!this.menus.containsKey(currMenuName))
-                        this.menus.put(currMenuName, FXCollections.observableArrayList());
+                    if (!this.GetMenus().containsKey(currMenuName))
+                        this.GetMenus().put(currMenuName, FXCollections.observableArrayList());
 
-                    this.menus.get(currMenuName).addAll(currMenu.getItems());
+                    this.GetMenus().get(currMenuName).addAll(currMenu.getItems());
                 }
             }
             else if (node.getClass() == TabPane.class)
             {
-                EDAmameController.logger.log(Level.INFO, "Dissecting a TabPane in Editor \"" + id + "\"...\n");
+                EDAmameController.logger.log(Level.INFO, "Dissecting a TabPane in Editor \"" + this.GetId() + "\"...\n");
 
                 TabPane paneNode = (TabPane)node;
                 Iterator<Tab> tabIterator = paneNode.getTabs().iterator();
@@ -1534,19 +1570,19 @@ abstract public class Editor
                                                         {
                                                             foundPaneSelections = (Pane)nextNodeD;
 
-                                                            EDAmameController.logger.log(Level.INFO, "Found selections pane of an editor with name \"" + this.name + "\".\n");
+                                                            EDAmameController.logger.log(Level.INFO, "Found selections pane of an editor with name \"" + this.GetName() + "\".\n");
                                                         }
                                                         else if (foundPaneHighlights == null)
                                                         {
                                                             foundPaneHighlights = (Pane)nextNodeD;
 
-                                                            EDAmameController.logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.name + "\".\n");
+                                                            EDAmameController.logger.log(Level.INFO, "Found highlights pane of an editor with name \"" + this.GetName() + "\".\n");
                                                         }
                                                         else if (foundPaneSnaps == null)
                                                         {
                                                             foundPaneSnaps = (Pane)nextNodeD;
 
-                                                            EDAmameController.logger.log(Level.INFO, "Found snaps pane of an editor with name \"" + this.name + "\".\n");
+                                                            EDAmameController.logger.log(Level.INFO, "Found snaps pane of an editor with name \"" + this.GetName() + "\".\n");
                                                         }
                                                         else
                                                         {
@@ -1557,7 +1593,7 @@ abstract public class Editor
                                                     {
                                                         foundCanvas = (Canvas)nextNodeD;
 
-                                                        EDAmameController.logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.name + "\".\n");
+                                                        EDAmameController.logger.log(Level.INFO, "Found canvas of an editor with name \"" + this.GetName() + "\".\n");
                                                     }
                                                     else
                                                     {
@@ -1581,28 +1617,28 @@ abstract public class Editor
 
                         // Setting the pointers to the editor Editor_Tab
                         item.setText(EDAmameController.Editor_Names[editorType]);
-                        tab = item;
+                        this.SetTab(item);
                     }
                     else
                     {
-                        tabs.add(item);
+                        this.GetControlTabs().add(item);
                     }
                 }
             }
         }
 
         if (foundPaneListener == null)
-            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate listener pane for an editor with name \"" + this.GetName() + "\"!");
         if (foundPaneHolder == null)
-            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate holder pane for an editor with name \"" + this.GetName() + "\"!");
         if (foundPaneHighlights == null)
-            throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate highlights pane for an editor with name \"" + this.GetName() + "\"!");
         if (foundPaneSelections == null)
-            throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate selections pane for an editor with name \"" + this.GetName() + "\"!");
         if (foundPaneSnaps == null)
-            throw new InvalidClassException("Unable to locate snaps pane for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate snaps pane for an editor with name \"" + this.GetName() + "\"!");
         if (foundCanvas == null)
-            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.name + "\"!");
+            throw new InvalidClassException("Unable to locate canvas for an editor with name \"" + this.GetName() + "\"!");
 
         this.paneListener = foundPaneListener;
         this.paneHolder = foundPaneHolder;

@@ -42,7 +42,7 @@ public class EditorSettings
             settingsWindow.stage = new Stage();
             settingsWindow.stage.setScene(scene);
 
-            switch (editorValue.type)
+            switch (editorValue.GetType())
             {
                 case 0:
                     settingsWindow.stage.setTitle("Symbol Editor Settings");
