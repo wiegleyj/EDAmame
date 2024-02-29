@@ -29,7 +29,7 @@
                      <MenuItem id="11" mnemonicParsing="false" onAction="#EditorSchematicNewPressed" text="New Schematic Editor" />
                      <MenuItem id="12" mnemonicParsing="false" onAction="#EditorFootprintNewPressed" text="New Footprint Editor" />
                      <MenuItem id="13" mnemonicParsing="false" onAction="#EditorPCBNewPressed" text="New PCB Editor" />
-                     <MenuItem fx:id="userSettingsMenuItem" mnemonicParsing="false" onAction="#userSettingsMenuItem" text="Toggle Popup Error Settings" />
+                     <MenuItem id="14" fx:id="userSettingsMenuItem" mnemonicParsing="false" onAction="#userSettingsMenuItem" text="Pop Ups is OFF toggle to ON" />
                      <MenuItem id="20" mnemonicParsing="false" onAction="#Exit" text="Exit Program" />
                  </items>
                </Menu>

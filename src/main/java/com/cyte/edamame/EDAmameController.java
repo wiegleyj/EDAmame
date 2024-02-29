@@ -40,14 +40,12 @@ import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.input.InputMethodEvent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Modality;
-import javafx.stage.Screen;
-import javafx.stage.Stage;
-import javafx.stage.Window;
+import javafx.stage.*;
 import javafx.util.Duration;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;
@@ -148,7 +146,7 @@ public class EDAmameController implements Initializable
     @FXML
     private SplitPane splitPane;                 // The main split pane separating always available global controls on the left from editor Editor_Tabs on right.
     @FXML
-    private StackPane stackPaneControls;         // The stack pane on left of split used to contain different control setups.
+    private static StackPane stackPaneControls;         // The stack pane on left of split used to contain different control setups.
     @FXML
     private TabPane tabPaneControls;             // The TabPane used to hold all the main controls. Displayed in the "navigation" pane of the controls stack.
     @FXML
@@ -187,7 +185,6 @@ public class EDAmameController implements Initializable
     public EDAmameController(Stage stage)
     {
         this.stage = stage;
-        this.userSettingsMenuItem = userSettingsMenuItem;
         stage.setOnShown((event) -> ExecuteOnShown());
     }
 
@@ -249,6 +246,7 @@ public class EDAmameController implements Initializable
     static public void SetStatusBar(String msg)
     {
         statusBarGlobal.setText(msg);
+        showErrorPopup(msg);
     }
 
     /**
@@ -267,31 +265,36 @@ public class EDAmameController implements Initializable
         logger.addHandler(new TextAreaHandler(logText));
     }
 
-    private String showErrorPopup = "ON";  // "ON" or "OFF" initial state
-        public void showErrorPopup(String errorMessage) throws InterruptedException {
-            if (showErrorPopup.equals("ON") && !errorMessage.contains("EDAmame Status Area")) {
+    private static boolean showErrorPopup = false;  // "ON" or "OFF" initial state
+    public static void showErrorPopup(String errorMessage) {
+        if (showErrorPopup && !errorMessage.contains("EDAmame Status Area")) {
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
                 alert.setContentText(errorMessage);
-                // Centering the alert window
-                Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-                double centerX = screenBounds.getMinX() + (screenBounds.getWidth() - 450) / 2;
-                double centerY = screenBounds.getMinY() + (screenBounds.getHeight() - 125) / 2;
-                alert.setX(centerX);
-                alert.setY(centerY);
+            // Calculate the X and Y positions to center the alert window on the primary screen
+            double centerX = Screen.getPrimary().getVisualBounds().getMinX() + (Screen.getPrimary().getVisualBounds().getWidth() - 450) / 2;
+            double centerY = Screen.getPrimary().getVisualBounds().getMinY() + (Screen.getPrimary().getVisualBounds().getHeight() - 125) / 2;
+            // Set the alert window position to be centered
+            alert.setX(centerX - alert.getDialogPane().getPrefWidth() / 2);
+            alert.setY(centerY - alert.getDialogPane().getPrefHeight() / 2);
                 alert.showAndWait();
             }
             }
 
     @FXML
-    public void userSettingsMenuItem() throws InterruptedException {
-        showErrorPopup = showErrorPopup.equals("ON") ? "OFF" : "ON";
-        userSettingsMenuItem.setText(showErrorPopup.equals("ON") ? "Pop Ups is ON click for OFF" : "Pop Ups OFF click for ON");
-        if(showErrorPopup.equals("ON")){
-            showErrorPopup(statusBar.getText()); // Call showErrorPopup() with the message from statusBar
+    public void userSettingsMenuItem() {
+        // Toggle the state of showErrorPopup
+        if (showErrorPopup){
+            showErrorPopup = false;
+            userSettingsMenuItem.setText("Pop Ups is OFF toggle to ON");
         }
-    }
+        else {
+            showErrorPopup = true;
+            userSettingsMenuItem.setText("Pop Ups is ON toggle to OFF");
+        }
+        }
+
     public static void main(String[] args) {
         launch(args);
     }
@@ -615,7 +618,7 @@ public class EDAmameController implements Initializable
     }
 
     //// SAVING & LOADING FUNCTIONS ////
-    
+
     /**
      * Saves the window position and size of the application as Java Preferences.
      *
