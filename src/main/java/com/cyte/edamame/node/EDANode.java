@@ -12,6 +12,8 @@ import com.cyte.edamame.editor.Editor;
 import com.cyte.edamame.misc.PairMutable;
 import com.cyte.edamame.misc.SnapPoint;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.UUID;
 import java.util.LinkedList;
 
@@ -656,19 +658,31 @@ abstract public class EDANode
             if (circle.getFill() != Color.TRANSPARENT)
                 newStr += "G36*\n";
             else {
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + circle.getStrokeWidth() + "*%\n";
+                Double apertureValue = (circle.getStrokeWidth() / 10);
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
                 newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
             }
 
-            newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
+            Double radius = circle.getRadius();
+            int radiusFormattedFinal;
+            Double radiusDividedByTen = radius / 10;
+            if ((radiusDividedByTen % 1) == 0) {
+                radiusFormattedFinal = radiusDividedByTen.intValue();
+            } else {
+                String radiusAsString = (String.valueOf(radiusDividedByTen)).replace(".", "");
+                radiusFormattedFinal = Integer.parseInt(radiusAsString);
+            }
+
+            newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
             newStr += "G75*\nG03*\n";
-            newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble()
-                    + "I" + (circle.getRadius() * -1) + "J0D01*\n";
+
+            newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                    + "I" + (PositionFormatting(radius) * -1) + "J0D01*\n";
             newStr += "G01*\n";
-            newStr += "X" + (point.GetLeftDouble()-circle.getRadius()) + "Y" + point.GetRightDouble() + "D02*\n";
+            newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
             newStr += "G75*\nG03*\n";
-            newStr += "X" + (point.GetLeftDouble()+circle.getRadius()) + "Y" + point.GetRightDouble()
-                    + "I" + circle.getRadius() + "J0D01*\n";
+            newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                    + "I" + PositionFormatting(radius) + "J0D01*\n";
             newStr += "G01*\n";
 
             if (circle.getFill() != Color.TRANSPARENT)
@@ -719,19 +733,20 @@ abstract public class EDANode
             if (rectangle.getFill() != Color.TRANSPARENT)
                 newStr += "G36*\n";
             else {
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + rectangle.getStrokeWidth() + "*%\n";
+                Double apertureValue = (rectangle.getStrokeWidth() / 10);
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
                 newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
             }
             for (int i = 0; i < points.size(); i++)
             {
                 if (i == 0) {
-                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
                     if (rectangle.getFill() != Color.TRANSPARENT)
                         newStr += "G01*\n";
                 } else
-                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
+                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
             }
-            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
+            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
 
             if (rectangle.getFill() != Color.TRANSPARENT)
                 newStr += "G37*\n";
@@ -775,19 +790,20 @@ abstract public class EDANode
             if (triangle.getFill() != Color.TRANSPARENT)
                 newStr += "G36*\n";
             else {
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + triangle.getStrokeWidth() + "*%\n";
+                Double apertureValue = (triangle.getStrokeWidth() / 10);
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
                 newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
             }
             for (int i = 0; i < points.size(); i++)
             {
                 if (i == 0) {
-                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D02*\n";
+                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
                     if (triangle.getFill() != Color.TRANSPARENT)
                         newStr += "G01*\n";
                 } else
-                    newStr += "X" + points.get(i).GetLeftDouble() + "Y" + points.get(i).GetRightDouble() + "D01*\n";
+                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
             }
-            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D01*\n";
+            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
 
             if (triangle.getFill() != Color.TRANSPARENT)
                 newStr += "G37*\n";
@@ -822,11 +838,14 @@ abstract public class EDANode
             String newStr = "";
 
             newStr += "G01*\n";
-            newStr += "%ADD" + Editor.GerberApertureCounter + "C," + line.getStrokeWidth() + "*%\n";
+            Double apertureValue = (line.getStrokeWidth() / 10);
+            newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
             newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
 
-            newStr += "X" + points.get(0).GetLeftDouble() + "Y" + points.get(0).GetRightDouble() + "D02*\n";
-            newStr += "X" + points.get(1).GetLeftDouble() + "Y" + points.get(1).GetRightDouble() + "D01*\n";
+            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) +
+                    "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D02*\n";
+            newStr += "X" + PositionFormatting(points.get(1).GetLeftDouble()) +
+                    "Y" + PositionFormatting(points.get(1).GetRightDouble()) + "D01*\n";
 
             return newStr;
         }
@@ -860,13 +879,14 @@ abstract public class EDANode
                 newStr += "G01*\n";
 
                 Circle ThroughHoleCircle = (Circle) group.getChildren().get(0);
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (ThroughHoleCircle.getRadius() * 2) + "*%\n";
+
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(ThroughHoleCircle.getRadius() * 2) + "*%\n";
                 newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
 
                 newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
                 newStr += "%TO.N,N/C*%\n";
 
-                newStr += "X" + point.GetLeftDouble() + "Y" + point.GetRightDouble() + "D03*\n";
+                newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
                 return newStr;
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
@@ -893,15 +913,15 @@ abstract public class EDANode
                 newStr += "%TA.AperFunction,ViaPad*%\n";
                 if (CircleChildOne.getRadius() > CircleChildTwo.getRadius())
                 {
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (CircleChildOne.getRadius() * 2) + "*%\n";
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(CircleChildOne.getRadius() * 2) + "*%\n";
                 }
                 else
                 {
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + (CircleChildTwo.getRadius() * 2) + "*%\n";
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(CircleChildTwo.getRadius() * 2) + "*%\n";
                 }
                 newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
                 newStr += "%TO.N,*%\n";
-                newStr += "X" + point.GetLeftDouble() + "Y" + point.GetRightDouble() + "D03*\n";
+                newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
                 return newStr;
             }
             else
@@ -978,5 +998,43 @@ abstract public class EDANode
         {
             return " fill=\"#" + addZeros + "\"";
         }
+    }
+
+    static public int PositionFormatting(Double OriginalValue)
+    {
+        Double dividedByTen = OriginalValue / 10;
+        Double roundedValue = EDANode.round(dividedByTen, 6);
+        String roundedAsString = String.valueOf(roundedValue);
+        int decimalIndex = roundedAsString.indexOf(".");
+        String integerValue = roundedAsString.substring(0, decimalIndex);
+        String fractionalValue = roundedAsString.substring(decimalIndex+1);
+        while (fractionalValue.length() < 6)
+        {
+            fractionalValue += "0";
+        }
+        return Integer.parseInt(integerValue + fractionalValue);
+    }
+
+    static public String PositionFormattingDouble(Double OriginalValue)
+    {
+        Double dividedByTen = OriginalValue / 10;
+        Double roundedValue = EDANode.round(dividedByTen, 6);
+        String roundedAsString = String.valueOf(roundedValue);
+        int decimalIndex = roundedAsString.indexOf(".");
+        String integerValue = roundedAsString.substring(0, decimalIndex);
+        String fractionalValue = roundedAsString.substring(decimalIndex+1);
+        while (fractionalValue.length() < 6)
+        {
+            fractionalValue += "0";
+        }
+        return integerValue + "." + fractionalValue;
+    }
+
+    public static double round(double value, int places) {
+        if (places < 0) throw new IllegalArgumentException();
+
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(places, RoundingMode.HALF_UP);
+        return bd.doubleValue();
     }
 }
