@@ -655,38 +655,43 @@ abstract public class EDANode
 
             newStr += "G01*\n";
 
-            if (circle.getFill() != Color.TRANSPARENT)
-                newStr += "G36*\n";
-            else {
+            Double radius = circle.getRadius();
+
+            if (circle.getFill() != Color.TRANSPARENT) //FILLED IN CIRCLE
+            {
+                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(radius) + "*%\n";
+                newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                newStr += "G75*\nG03*\n";
+
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                        + "I" + (((PositionFormatting(radius)) / 2) * -1) + "J0D01*\n";
+                newStr += "G01*\n";
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                newStr += "G75*\nG03*\n";
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                        + "I" + ((PositionFormatting(radius)) / 2) + "J0D01*\n";
+                newStr += "G01*\n";
+            }
+            else //BORDER ONLY CIRCLE
+            {
                 Double apertureValue = (circle.getStrokeWidth() / 10);
                 newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
                 newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                newStr += "G75*\nG03*\n";
+
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                        + "I" + (PositionFormatting(radius) * -1) + "J0D01*\n";
+                newStr += "G01*\n";
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                newStr += "G75*\nG03*\n";
+                newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                        + "I" + PositionFormatting(radius) + "J0D01*\n";
+                newStr += "G01*\n";
             }
-
-            Double radius = circle.getRadius();
-            int radiusFormattedFinal;
-            Double radiusDividedByTen = radius / 10;
-            if ((radiusDividedByTen % 1) == 0) {
-                radiusFormattedFinal = radiusDividedByTen.intValue();
-            } else {
-                String radiusAsString = (String.valueOf(radiusDividedByTen)).replace(".", "");
-                radiusFormattedFinal = Integer.parseInt(radiusAsString);
-            }
-
-            newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-            newStr += "G75*\nG03*\n";
-
-            newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
-                    + "I" + (PositionFormatting(radius) * -1) + "J0D01*\n";
-            newStr += "G01*\n";
-            newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-            newStr += "G75*\nG03*\n";
-            newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
-                    + "I" + PositionFormatting(radius) + "J0D01*\n";
-            newStr += "G01*\n";
-
-            if (circle.getFill() != Color.TRANSPARENT)
-                newStr += "G37*\n";
 
             return newStr;
         }
@@ -1017,6 +1022,7 @@ abstract public class EDANode
 
     static public String PositionFormattingDouble(Double OriginalValue)
     {
+        System.out.println(OriginalValue);
         Double dividedByTen = OriginalValue / 10;
         Double roundedValue = EDANode.round(dividedByTen, 6);
         String roundedAsString = String.valueOf(roundedValue);
@@ -1027,6 +1033,7 @@ abstract public class EDANode
         {
             fractionalValue += "0";
         }
+        System.out.println(integerValue);
         return integerValue + "." + fractionalValue;
     }
 
