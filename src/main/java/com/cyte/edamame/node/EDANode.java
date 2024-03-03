@@ -1022,7 +1022,6 @@ abstract public class EDANode
 
     static public String PositionFormattingDouble(Double OriginalValue)
     {
-        System.out.println(OriginalValue);
         Double dividedByTen = OriginalValue / 10;
         Double roundedValue = EDANode.round(dividedByTen, 6);
         String roundedAsString = String.valueOf(roundedValue);
@@ -1033,7 +1032,6 @@ abstract public class EDANode
         {
             fractionalValue += "0";
         }
-        System.out.println(integerValue);
         return integerValue + "." + fractionalValue;
     }
 
