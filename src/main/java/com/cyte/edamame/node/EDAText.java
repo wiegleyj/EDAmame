@@ -412,7 +412,7 @@ public class EDAText extends EDANode
         colors.add(this.text.getFill());
 
         textContents.add(this.text.getText());
-        textFontSizes.add(this.text.getFont().getSize());
+        textFontSizes.add(this.text.getFont().getSize() / 10);
 
         return true;
     }
@@ -490,7 +490,7 @@ public class EDAText extends EDANode
                     double fontSize = Double.parseDouble(fontSizeStr);
 
                     if (((fontSize >= EDAmameController.EditorSymbol_TextFontSizeMin) && (fontSize <= EDAmameController.EditorSymbol_TextFontSizeMax)))
-                        this.text.setFont(new Font("Arial", fontSize));
+                        this.text.setFont(new Font("Arial", fontSize * 10));
                     else
                         EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_TextFontSizeMin + ", " + EDAmameController.EditorSymbol_TextFontSizeMax + ")");
                 }
@@ -510,7 +510,7 @@ public class EDAText extends EDANode
         layers.add(this.text.getId());
 
         textContents.add(this.text.getText());
-        textFontSizes.add(this.text.getFont().getSize());
+        textFontSizes.add(this.text.getFont().getSize() / 10);
 
         return true;
     }
@@ -590,7 +590,7 @@ public class EDAText extends EDANode
                     double fontSize = Double.parseDouble(fontSizeStr);
 
                     if (((fontSize >= EDAmameController.EditorSymbol_TextFontSizeMin) && (fontSize <= EDAmameController.EditorSymbol_TextFontSizeMax)))
-                        this.text.setFont(new Font("Arial", fontSize));
+                        this.text.setFont(new Font("Arial", fontSize * 10));
                     else
                         EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_TextFontSizeMin + ", " + EDAmameController.EditorSymbol_TextFontSizeMax + ")");
                 }
@@ -610,7 +610,7 @@ public class EDAText extends EDANode
         layers.add(this.text.getId());
 
         textContents.add(this.text.getText());
-        textFontSizes.add(this.text.getFont().getSize());
+        textFontSizes.add(this.text.getFont().getSize() / 10);
 
         return true;
     }
@@ -690,7 +690,7 @@ public class EDAText extends EDANode
                     double fontSize = Double.parseDouble(fontSizeStr);
 
                     if (((fontSize >= EDAmameController.EditorSymbol_TextFontSizeMin) && (fontSize <= EDAmameController.EditorSymbol_TextFontSizeMax)))
-                        this.text.setFont(new Font("Arial", fontSize));
+                        this.text.setFont(new Font("Arial", fontSize * 10));
                     else
                         EDAmameController.SetStatusBar("Unable to apply text font size because the entered field is is outside the limits! (Font size limits: " + EDAmameController.EditorSymbol_TextFontSizeMin + ", " + EDAmameController.EditorSymbol_TextFontSizeMax + ")");
                 }

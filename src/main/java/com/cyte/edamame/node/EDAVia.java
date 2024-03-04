@@ -69,7 +69,7 @@ public class EDAVia extends EDAGroup
         if (this.group.getChildren().size() != 2)
             throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have 2 children!");
 
-        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()));
+        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()) / 10);
 
         return true;
     }
@@ -102,8 +102,8 @@ public class EDAVia extends EDAGroup
 
                     if ((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax))
                     {
-                        ((Circle)this.group.getChildren().get(0)).setRadius(radius);
-                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2);
+                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 10);
+                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2 * 10);
                     }
                     else
                     {
@@ -126,7 +126,7 @@ public class EDAVia extends EDAGroup
         if (this.group.getChildren().size() != 2)
             throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have 2 children!");
 
-        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()));
+        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()) / 10);
 
         return true;
     }
@@ -159,8 +159,8 @@ public class EDAVia extends EDAGroup
 
                     if ((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax))
                     {
-                        ((Circle)this.group.getChildren().get(0)).setRadius(radius);
-                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2);
+                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 10);
+                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2 * 10);
                     }
                     else
                     {

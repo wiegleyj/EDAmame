@@ -305,13 +305,14 @@ public class EditorSymbol extends Editor
 
                             if (CheckStringCircleBounds(stringRadius) && CheckStringBorderSize(stringStrokeSize) && CheckShapeTransparency(stringStrokeSize, strokeColor, fillColor))
                             {
-                                Circle circle = new Circle(Double.parseDouble(stringRadius), fillColor);
+                                Circle circle = new Circle(Double.parseDouble(stringRadius) * 10, fillColor);
 
                                 circle.setTranslateX(dropPos.GetLeftDouble());
                                 circle.setTranslateY(dropPos.GetRightDouble());
 
+                                circle.setStrokeType(StrokeType.INSIDE);
                                 circle.setStroke(strokeColor);
-                                circle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                circle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 EDACircle circleNode = new EDACircle("Circle", circle, true, false, this);
                                 circleNode.Add();
@@ -329,13 +330,14 @@ public class EditorSymbol extends Editor
 
                             if (CheckStringRectBounds(stringWidth, stringHeight) && CheckStringBorderSize(stringStrokeSize) && CheckShapeTransparency(stringStrokeSize, strokeColor, fillColor))
                             {
-                                Rectangle rectangle = new Rectangle(Double.parseDouble(stringWidth), Double.parseDouble(stringHeight), fillColor);
+                                Rectangle rectangle = new Rectangle(Double.parseDouble(stringWidth) * 10, Double.parseDouble(stringHeight) * 10, fillColor);
 
                                 rectangle.setTranslateX(dropPos.GetLeftDouble());
                                 rectangle.setTranslateY(dropPos.GetRightDouble());
 
+                                rectangle.setStrokeType(StrokeType.INSIDE);
                                 rectangle.setStroke(strokeColor);
-                                rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 EDARectangle rectangleNode = new EDARectangle("Rectangle", rectangle, true, false, this);
                                 rectangleNode.Add();
@@ -354,16 +356,17 @@ public class EditorSymbol extends Editor
                             {
                                 Polygon triangle = new Polygon();
                                 double middleLength = Double.parseDouble(stringMiddleHeight);
-                                triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                            middleLength / 2, middleLength / 2,
-                                                            0.0, -middleLength / 2);
+                                triangle.getPoints().setAll(-middleLength / 2 * 10, middleLength / 2 * 10,
+                                                            middleLength / 2 * 10, middleLength / 2 * 10,
+                                                            0.0, -middleLength / 2 * 10);
                                 triangle.setFill(fillColor);
 
                                 triangle.setTranslateX(dropPos.GetLeftDouble());
                                 triangle.setTranslateY(dropPos.GetRightDouble());
 
+                                triangle.setStrokeType(StrokeType.INSIDE);
                                 triangle.setStroke(strokeColor);
-                                triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 EDATriangle triangleNode = new EDATriangle("Triangle", triangle, true, false, this);
                                 triangleNode.Add();
@@ -406,7 +409,7 @@ public class EditorSymbol extends Editor
                                             this.linePreview.setEndX(dropPos.GetLeftDouble());
                                             this.linePreview.setEndY(dropPos.GetRightDouble());
 
-                                            this.linePreview.setStrokeWidth(width);
+                                            this.linePreview.setStrokeWidth(width * 10);
                                             this.linePreview.setStroke(color);
 
                                             EDALine lineNode = new EDALine("linePreview", this.linePreview, false, true, this);
@@ -454,7 +457,7 @@ public class EditorSymbol extends Editor
                                         else
                                         {
                                             Text text = new Text(stringTextContent);
-                                            text.setFont(new Font("Arial", fontSize));
+                                            text.setFont(new Font("Arial", fontSize * 10));
 
                                             text.setFill(color);
 
@@ -506,7 +509,8 @@ public class EditorSymbol extends Editor
                                             Group pin = new Group();
                                             //pin.setId("PIN_" + stringPinLabel);
 
-                                            Circle pinCircle = new Circle(pinRadius, pinColor);
+                                            Circle pinCircle = new Circle(pinRadius * 10, pinColor);
+                                            pinCircle.setStrokeType(StrokeType.INSIDE);
                                             pinCircle.setStroke(Color.TRANSPARENT);
                                             pinCircle.setStrokeWidth(0);
 

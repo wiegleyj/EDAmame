@@ -7,6 +7,7 @@
 
 // TODO:
 // Implement gerber & drill file exports
+// Prevent footprint & PCB shapes from being dropped if no fill & no border
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition
 // Fix file writing (?)
@@ -92,32 +93,32 @@ public class EDAmameController implements Initializable
     final static public Color Editor_PCBExposedColor = Color.ORANGE;
     final static public Color Editor_PCBViaColor = Color.WHITE;
 
-    final static public Double EditorSymbol_CircleRadiusMin = 10.0;
-    final static public Double EditorSymbol_CircleRadiusMax = 100.0;
-    final static public Double EditorSymbol_RectWidthMin = 10.0;
-    final static public Double EditorSymbol_RectWidthMax = 500.0;
-    final static public Double EditorSymbol_RectHeightMin = 10.0;
-    final static public Double EditorSymbol_RectHeightMax = 500.0;
-    final static public Double EditorSymbol_TriLenMin = 10.0;
-    final static public Double EditorSymbol_TriLenMax = 500.0;
+    final static public Double EditorSymbol_CircleRadiusMin = 1.0;
+    final static public Double EditorSymbol_CircleRadiusMax = 10.0;
+    final static public Double EditorSymbol_RectWidthMin = 1.0;
+    final static public Double EditorSymbol_RectWidthMax = 50.0;
+    final static public Double EditorSymbol_RectHeightMin = 1.0;
+    final static public Double EditorSymbol_RectHeightMax = 50.0;
+    final static public Double EditorSymbol_TriLenMin = 1.0;
+    final static public Double EditorSymbol_TriLenMax = 50.0;
     final static public Double EditorSymbol_BorderMin = 0.0;
-    final static public Double EditorSymbol_BorderMax = 10.0;
-    final static public Double EditorSymbol_TextFontSizeMin = 10.0;
-    final static public Double EditorSymbol_TextFontSizeMax = 100.0;
+    final static public Double EditorSymbol_BorderMax = 3.0;
+    final static public Double EditorSymbol_TextFontSizeMin = 1.0;
+    final static public Double EditorSymbol_TextFontSizeMax = 10.0;
     final static public Double EditorSymbol_LineWidthMin = 1.0;
-    final static public Double EditorSymbol_LineWidthMax = 20.0;
-    final static public Double EditorSymbol_PinRadiusMin = 5.0;
-    final static public Double EditorSymbol_PinRadiusMax = 10.0;
-    final static public Double EditorSymbol_WireWidthMin = 3.0;
-    final static public Double EditorSymbol_WireWidthMax = 10.0;
+    final static public Double EditorSymbol_LineWidthMax = 3.0;
+    final static public Double EditorSymbol_PinRadiusMin = 1.0;
+    final static public Double EditorSymbol_PinRadiusMax = 5.0;
+    final static public Double EditorSymbol_WireWidthMin = 1.0;
+    final static public Double EditorSymbol_WireWidthMax = 3.0;
     final static public int EditorSymbol_MaxChars = 10;
 
-    final static public Double EditorFootprint_HoleRadiusOuterMin = 5.0;
-    final static public Double EditorFootprint_HoleRadiusOuterMax = 10.0;
-    final static public Double EditorFootprint_HoleRadiusInnerMin = 5.0;
-    final static public Double EditorFootprint_HoleRadiusInnerMax = 10.0;
-    final static public Double EditorFootprint_ViaRadiusMin = 1.0;
-    final static public Double EditorFootprint_ViaRadiusMax = 5.0;
+    final static public Double EditorFootprint_HoleRadiusOuterMin = 0.5;
+    final static public Double EditorFootprint_HoleRadiusOuterMax = 5.0;
+    final static public Double EditorFootprint_HoleRadiusInnerMin = 0.5;
+    final static public Double EditorFootprint_HoleRadiusInnerMax = 5.0;
+    final static public Double EditorFootprint_ViaRadiusMin = 0.5;
+    final static public Double EditorFootprint_ViaRadiusMax = 2.0;
 
     final static public Logger logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
 

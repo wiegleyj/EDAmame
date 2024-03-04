@@ -404,10 +404,10 @@ public class EDACircle extends EDANode
 
         colors.add(this.circle.getFill());
 
-        strokeWidths.add(this.circle.getStrokeWidth());
+        strokeWidths.add(this.circle.getStrokeWidth() / 10);
         strokes.add(this.circle.getStroke());
 
-        circlesRadii.add(this.circle.getRadius());
+        circlesRadii.add(this.circle.getRadius() / 10);
 
         return true;
     }
@@ -462,7 +462,7 @@ public class EDACircle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.circle.setStrokeWidth(newStrokeWidth);
+                        this.circle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -515,7 +515,7 @@ public class EDACircle extends EDANode
                     Double newRadius = Double.parseDouble(radiusStr);
 
                     if ((newRadius >= EDAmameController.EditorSymbol_CircleRadiusMin) && (newRadius <= EDAmameController.EditorSymbol_CircleRadiusMax))
-                        this.circle.setRadius(newRadius);
+                        this.circle.setRadius(newRadius * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
                 }
@@ -539,9 +539,9 @@ public class EDACircle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.circle.getStrokeWidth());
+        strokeWidths.add(this.circle.getStrokeWidth() / 10);
 
-        circlesRadii.add(this.circle.getRadius());
+        circlesRadii.add(this.circle.getRadius() / 10);
 
         return true;
     }
@@ -601,7 +601,7 @@ public class EDACircle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.circle.setStrokeWidth(newStrokeWidth);
+                        this.circle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -650,7 +650,7 @@ public class EDACircle extends EDANode
                     Double newRadius = Double.parseDouble(radiusStr);
 
                     if ((newRadius >= EDAmameController.EditorSymbol_CircleRadiusMin) && (newRadius <= EDAmameController.EditorSymbol_CircleRadiusMax))
-                        this.circle.setRadius(newRadius);
+                        this.circle.setRadius(newRadius * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
                 }
@@ -674,9 +674,9 @@ public class EDACircle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.circle.getStrokeWidth());
+        strokeWidths.add(this.circle.getStrokeWidth() / 10);
 
-        circlesRadii.add(this.circle.getRadius());
+        circlesRadii.add(this.circle.getRadius() / 10);
 
         return true;
     }
@@ -736,7 +736,7 @@ public class EDACircle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.circle.setStrokeWidth(newStrokeWidth);
+                        this.circle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -785,7 +785,7 @@ public class EDACircle extends EDANode
                     Double newRadius = Double.parseDouble(radiusStr);
 
                     if ((newRadius >= EDAmameController.EditorSymbol_CircleRadiusMin) && (newRadius <= EDAmameController.EditorSymbol_CircleRadiusMax))
-                        this.circle.setRadius(newRadius);
+                        this.circle.setRadius(newRadius * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply circle radii because the entered field is outside the limits! (Radius limits: " + EDAmameController.EditorSymbol_CircleRadiusMin + ", " + EDAmameController.EditorSymbol_CircleRadiusMax + ")");
                 }

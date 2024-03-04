@@ -69,8 +69,8 @@ public class EDAHole extends EDAGroup
         if (this.group.getChildren().size() != 1)
             throw new java.lang.Error("ERROR: Attempting to load a hole into the footprint editor properties window that doesn't have 1 child!");
 
-        holeOuterRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() + ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2);
-        holeInnerRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() - ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2);
+        holeOuterRadii.add((((Circle)this.group.getChildren().get(0)).getRadius() + ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2) / 10);
+        holeInnerRadii.add((((Circle)this.group.getChildren().get(0)).getRadius() - ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2) / 10);
 
         return true;
     }
@@ -118,8 +118,8 @@ public class EDAHole extends EDAGroup
                                 }
                                 else
                                 {
-                                    ((Circle)this.group.getChildren().get(0)).setRadius((outerRadii + innerRadii) / 2);
-                                    ((Circle)this.group.getChildren().get(0)).setStrokeWidth(outerRadii - innerRadii);
+                                    ((Circle)this.group.getChildren().get(0)).setRadius((outerRadii + innerRadii) / 2 * 10);
+                                    ((Circle)this.group.getChildren().get(0)).setStrokeWidth((outerRadii - innerRadii) * 10);
                                 }
                             }
                             else
@@ -153,8 +153,8 @@ public class EDAHole extends EDAGroup
         if (this.group.getChildren().size() != 1)
             throw new java.lang.Error("ERROR: Attempting to load a hole into the footprint editor properties window that doesn't have 1 child!");
 
-        holeOuterRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() + ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2);
-        holeInnerRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() - ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2);
+        holeOuterRadii.add((((Circle)this.group.getChildren().get(0)).getRadius() + ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2) / 10);
+        holeInnerRadii.add((((Circle)this.group.getChildren().get(0)).getRadius() - ((Circle)this.group.getChildren().get(0)).getStrokeWidth() / 2) / 10);
 
         return true;
     }
@@ -202,8 +202,8 @@ public class EDAHole extends EDAGroup
                                 }
                                 else
                                 {
-                                    ((Circle)this.group.getChildren().get(0)).setRadius((outerRadii + innerRadii) / 2);
-                                    ((Circle)this.group.getChildren().get(0)).setStrokeWidth(outerRadii - innerRadii);
+                                    ((Circle)this.group.getChildren().get(0)).setRadius((outerRadii + innerRadii) / 2 * 10);
+                                    ((Circle)this.group.getChildren().get(0)).setStrokeWidth((outerRadii - innerRadii) * 10);
                                 }
                             }
                             else

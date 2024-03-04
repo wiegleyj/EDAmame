@@ -407,11 +407,11 @@ public class EDARectangle extends EDANode
 
         colors.add(this.rectangle.getFill());
 
-        strokeWidths.add(this.rectangle.getStrokeWidth());
+        strokeWidths.add(this.rectangle.getStrokeWidth() / 10);
         strokes.add(this.rectangle.getStroke());
 
-        rectsWidths.add(this.rectangle.getWidth());
-        rectsHeights.add(this.rectangle.getHeight());
+        rectsWidths.add(this.rectangle.getWidth() / 10);
+        rectsHeights.add(this.rectangle.getHeight() / 10);
 
         return true;
     }
@@ -466,7 +466,7 @@ public class EDARectangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.rectangle.setStrokeWidth(newStrokeWidth);
+                        this.rectangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -523,7 +523,7 @@ public class EDARectangle extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (newWidth <= EDAmameController.EditorSymbol_RectWidthMax))
-                        this.rectangle.setWidth(newWidth);
+                        this.rectangle.setWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + ")");
                 }
@@ -537,7 +537,7 @@ public class EDARectangle extends EDANode
                     Double newHeight = Double.parseDouble(heightStr);
 
                     if ((newHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (newHeight <= EDAmameController.EditorSymbol_RectHeightMax))
-                        this.rectangle.setHeight(newHeight);
+                        this.rectangle.setHeight(newHeight * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
                 }
@@ -561,10 +561,10 @@ public class EDARectangle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.rectangle.getStrokeWidth());
+        strokeWidths.add(this.rectangle.getStrokeWidth() / 10);
 
-        rectsWidths.add(this.rectangle.getWidth());
-        rectsHeights.add(this.rectangle.getHeight());
+        rectsWidths.add(this.rectangle.getWidth() / 10);
+        rectsHeights.add(this.rectangle.getHeight() / 10);
 
         return true;
     }
@@ -624,7 +624,7 @@ public class EDARectangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.rectangle.setStrokeWidth(newStrokeWidth);
+                        this.rectangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -677,7 +677,7 @@ public class EDARectangle extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (newWidth <= EDAmameController.EditorSymbol_RectWidthMax))
-                        this.rectangle.setWidth(newWidth);
+                        this.rectangle.setWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + ")");
                 }
@@ -691,7 +691,7 @@ public class EDARectangle extends EDANode
                     Double newHeight = Double.parseDouble(heightStr);
 
                     if ((newHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (newHeight <= EDAmameController.EditorSymbol_RectHeightMax))
-                        this.rectangle.setHeight(newHeight);
+                        this.rectangle.setHeight(newHeight * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
                 }
@@ -715,10 +715,10 @@ public class EDARectangle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.rectangle.getStrokeWidth());
+        strokeWidths.add(this.rectangle.getStrokeWidth() / 10);
 
-        rectsWidths.add(this.rectangle.getWidth());
-        rectsHeights.add(this.rectangle.getHeight());
+        rectsWidths.add(this.rectangle.getWidth() / 10);
+        rectsHeights.add(this.rectangle.getHeight() / 10);
 
         return true;
     }
@@ -778,7 +778,7 @@ public class EDARectangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.rectangle.setStrokeWidth(newStrokeWidth);
+                        this.rectangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -831,7 +831,7 @@ public class EDARectangle extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_RectWidthMin) && (newWidth <= EDAmameController.EditorSymbol_RectWidthMax))
-                        this.rectangle.setWidth(newWidth);
+                        this.rectangle.setWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_RectWidthMin + ", " + EDAmameController.EditorSymbol_RectWidthMax + ")");
                 }
@@ -845,7 +845,7 @@ public class EDARectangle extends EDANode
                     Double newHeight = Double.parseDouble(heightStr);
 
                     if ((newHeight >= EDAmameController.EditorSymbol_RectHeightMin) && (newHeight <= EDAmameController.EditorSymbol_RectHeightMax))
-                        this.rectangle.setHeight(newHeight);
+                        this.rectangle.setHeight(newHeight * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply rectangle heights because the entered field is outside the limits! (Height limits: " + EDAmameController.EditorSymbol_RectHeightMin + ", " + EDAmameController.EditorSymbol_RectHeightMax + ")");
                 }

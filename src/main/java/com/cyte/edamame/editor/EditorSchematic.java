@@ -222,7 +222,7 @@ public class EditorSchematic extends Editor
                                         this.linePreview.setEndX(dropPos.GetLeftDouble());
                                         this.linePreview.setEndY(dropPos.GetRightDouble());
 
-                                        this.linePreview.setStrokeWidth(width);
+                                        this.linePreview.setStrokeWidth(width * 10);
                                         this.linePreview.setStroke(color);
 
                                         EDALine lineNode = new EDALine("linePreview", this.linePreview, false, true, this);

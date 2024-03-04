@@ -24,10 +24,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Circle;
-import javafx.scene.shape.Line;
-import javafx.scene.shape.Polygon;
-import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.*;
 import javafx.scene.text.Font;
 import javafx.scene.text.Text;
 
@@ -304,7 +301,7 @@ public class EditorFootprint extends Editor
 
                             if (CheckStringCircleBounds(stringRadius) && CheckStringBorderSize(stringStrokeSize))
                             {
-                                Circle circle = new Circle(Double.parseDouble(stringRadius));
+                                Circle circle = new Circle(Double.parseDouble(stringRadius) * 10);
 
                                 if (this.circleFill.isSelected())
                                     circle.setFill(layerColor);
@@ -314,8 +311,9 @@ public class EditorFootprint extends Editor
                                 circle.setTranslateX(dropPos.GetLeftDouble());
                                 circle.setTranslateY(dropPos.GetRightDouble());
 
+                                circle.setStrokeType(StrokeType.INSIDE);
                                 circle.setStroke(layerColor);
-                                circle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                circle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 circle.setId(this.layerBox.getValue());
 
@@ -333,7 +331,7 @@ public class EditorFootprint extends Editor
 
                             if (CheckStringRectBounds(stringWidth, stringHeight) && CheckStringBorderSize(stringStrokeSize))
                             {
-                                Rectangle rectangle = new Rectangle(Double.parseDouble(stringWidth), Double.parseDouble(stringHeight));
+                                Rectangle rectangle = new Rectangle(Double.parseDouble(stringWidth) * 10, Double.parseDouble(stringHeight) * 10);
 
                                 if (this.rectangleFill.isSelected())
                                     rectangle.setFill(layerColor);
@@ -343,8 +341,9 @@ public class EditorFootprint extends Editor
                                 rectangle.setTranslateX(dropPos.GetLeftDouble());
                                 rectangle.setTranslateY(dropPos.GetRightDouble());
 
+                                rectangle.setStrokeType(StrokeType.INSIDE);
                                 rectangle.setStroke(layerColor);
-                                rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                rectangle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 rectangle.setId(this.layerBox.getValue());
 
@@ -363,9 +362,9 @@ public class EditorFootprint extends Editor
                             {
                                 Polygon triangle = new Polygon();
                                 double middleLength = Double.parseDouble(stringMiddleHeight);
-                                triangle.getPoints().setAll(-middleLength / 2, middleLength / 2,
-                                                            middleLength / 2, middleLength / 2,
-                                                            0.0, -middleLength / 2);
+                                triangle.getPoints().setAll(-middleLength / 2 * 10, middleLength / 2 * 10,
+                                                            middleLength / 2 * 10, middleLength / 2 * 10,
+                                                            0.0, -middleLength / 2 * 10);
 
                                 if (this.triangleFill.isSelected())
                                     triangle.setFill(layerColor);
@@ -375,8 +374,9 @@ public class EditorFootprint extends Editor
                                 triangle.setTranslateX(dropPos.GetLeftDouble());
                                 triangle.setTranslateY(dropPos.GetRightDouble());
 
+                                triangle.setStrokeType(StrokeType.INSIDE);
                                 triangle.setStroke(layerColor);
-                                triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize));
+                                triangle.setStrokeWidth(Double.parseDouble(stringStrokeSize) * 10);
 
                                 triangle.setId(this.layerBox.getValue());
 
@@ -414,7 +414,7 @@ public class EditorFootprint extends Editor
                                         this.linePreview.setEndX(dropPos.GetLeftDouble());
                                         this.linePreview.setEndY(dropPos.GetRightDouble());
 
-                                        this.linePreview.setStrokeWidth(width);
+                                        this.linePreview.setStrokeWidth(width * 10);
                                         this.linePreview.setStroke(layerColor);
 
                                         EDALine lineNode = new EDALine("linePreview", this.linePreview, false, true, this);
@@ -454,7 +454,7 @@ public class EditorFootprint extends Editor
                                     else
                                     {
                                         Text text = new Text(stringTextContent);
-                                        text.setFont(new Font("Arial", fontSize));
+                                        text.setFont(new Font("Arial", fontSize * 10));
 
                                         text.setFill(layerColor);
 
@@ -515,8 +515,9 @@ public class EditorFootprint extends Editor
 
                                                 Circle holeCircle = new Circle();
                                                 holeCircle.setFill(Color.TRANSPARENT);
-                                                holeCircle.setRadius((radiusOuter + radiusInner) / 2);
-                                                holeCircle.setStrokeWidth(radiusOuter - radiusInner);
+                                                holeCircle.setRadius((radiusOuter + radiusInner) / 2 * 10);
+                                                holeCircle.setStrokeType(StrokeType.INSIDE);
+                                                holeCircle.setStrokeWidth((radiusOuter - radiusInner) * 10);
                                                 holeCircle.setStroke(EDAmameController.Editor_PCBExposedColor);
 
                                                 hole.getChildren().add(holeCircle);
@@ -558,13 +559,15 @@ public class EditorFootprint extends Editor
 
                                     Circle viaOuterCircle = new Circle();
                                     viaOuterCircle.setFill(EDAmameController.Editor_PCBExposedColor);
-                                    viaOuterCircle.setRadius(radius);
+                                    viaOuterCircle.setRadius(radius * 10);
+                                    viaOuterCircle.setStrokeType(StrokeType.INSIDE);
                                     viaOuterCircle.setStrokeWidth(0);
                                     viaOuterCircle.setStroke(Color.TRANSPARENT);
 
                                     Circle viaInnerCircle = new Circle();
                                     viaInnerCircle.setFill(EDAmameController.Editor_PCBViaColor);
-                                    viaInnerCircle.setRadius(radius / 2);
+                                    viaInnerCircle.setRadius(radius / 2 * 10);
+                                    viaInnerCircle.setStrokeType(StrokeType.INSIDE);
                                     viaInnerCircle.setStrokeWidth(0);
                                     viaInnerCircle.setStroke(Color.TRANSPARENT);
 

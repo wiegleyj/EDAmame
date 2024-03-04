@@ -406,10 +406,10 @@ public class EDATriangle extends EDANode
 
         colors.add(this.triangle.getFill());
 
-        strokeWidths.add(this.triangle.getStrokeWidth());
+        strokeWidths.add(this.triangle.getStrokeWidth() / 10);
         strokes.add(this.triangle.getStroke());
 
-        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+        trisLens.add((this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0)) / 10);
 
         return true;
     }
@@ -464,7 +464,7 @@ public class EDATriangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.triangle.setStrokeWidth(newStrokeWidth);
+                        this.triangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -517,7 +517,7 @@ public class EDATriangle extends EDANode
                     Double newLen = Double.parseDouble(lenStr);
 
                     if ((newLen >= EDAmameController.EditorSymbol_TriLenMin) && (newLen <= EDAmameController.EditorSymbol_TriLenMax))
-                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
+                        this.triangle.getPoints().setAll(-newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, 0.0, -newLen / 2 * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
                 }
@@ -541,9 +541,9 @@ public class EDATriangle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.triangle.getStrokeWidth());
+        strokeWidths.add(this.triangle.getStrokeWidth() / 10);
 
-        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+        trisLens.add((this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0)) / 10);
 
         return true;
     }
@@ -603,7 +603,7 @@ public class EDATriangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.triangle.setStrokeWidth(newStrokeWidth);
+                        this.triangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -652,7 +652,7 @@ public class EDATriangle extends EDANode
                     Double newLen = Double.parseDouble(lenStr);
 
                     if ((newLen >= EDAmameController.EditorSymbol_TriLenMin) && (newLen <= EDAmameController.EditorSymbol_TriLenMax))
-                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
+                        this.triangle.getPoints().setAll(-newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, 0.0, -newLen / 2 * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
                 }
@@ -676,9 +676,9 @@ public class EDATriangle extends EDANode
         else
             fills.add(true);
 
-        strokeWidths.add(this.triangle.getStrokeWidth());
+        strokeWidths.add(this.triangle.getStrokeWidth() / 10);
 
-        trisLens.add(this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0));
+        trisLens.add((this.triangle.getPoints().get(2) - this.triangle.getPoints().get(0)) / 10);
 
         return true;
     }
@@ -738,7 +738,7 @@ public class EDATriangle extends EDANode
                     Double newStrokeWidth = Double.parseDouble(strokeWidthStr);
 
                     if ((newStrokeWidth >= EDAmameController.EditorSymbol_BorderMin) && (newStrokeWidth <= EDAmameController.EditorSymbol_BorderMax))
-                        this.triangle.setStrokeWidth(newStrokeWidth);
+                        this.triangle.setStrokeWidth(newStrokeWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply shape border width because the entered field is outside the limits! (Border width limits: " + EDAmameController.EditorSymbol_BorderMin + ", " + EDAmameController.EditorSymbol_BorderMax + ")");
                 }
@@ -787,7 +787,7 @@ public class EDATriangle extends EDANode
                     Double newLen = Double.parseDouble(lenStr);
 
                     if ((newLen >= EDAmameController.EditorSymbol_TriLenMin) && (newLen <= EDAmameController.EditorSymbol_TriLenMax))
-                        this.triangle.getPoints().setAll(-newLen / 2, newLen / 2, newLen / 2, newLen / 2, 0.0, -newLen / 2);
+                        this.triangle.getPoints().setAll(-newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, newLen / 2 * 10, 0.0, -newLen / 2 * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply triangle lengths because the entered field is outside the limits! (Length limits: " + EDAmameController.EditorSymbol_TriLenMin + ", " + EDAmameController.EditorSymbol_TriLenMax + ")");
                 }

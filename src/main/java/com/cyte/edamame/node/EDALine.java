@@ -313,7 +313,7 @@ public class EDALine extends EDANode
 
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
-        lineWidths.add(this.line.getStrokeWidth());
+        lineWidths.add(this.line.getStrokeWidth() / 10);
 
         return true;
     }
@@ -395,7 +395,7 @@ public class EDALine extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_LineWidthMin) && (newWidth <= EDAmameController.EditorSymbol_LineWidthMax))
-                        this.line.setStrokeWidth(newWidth);
+                        this.line.setStrokeWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_LineWidthMin + ", " + EDAmameController.EditorSymbol_LineWidthMax + ")");
                 }
@@ -416,7 +416,7 @@ public class EDALine extends EDANode
 
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
-        lineWidths.add(this.line.getStrokeWidth());
+        lineWidths.add(this.line.getStrokeWidth() / 10);
 
         return true;
     }
@@ -500,7 +500,7 @@ public class EDALine extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_LineWidthMin) && (newWidth <= EDAmameController.EditorSymbol_LineWidthMax))
-                        this.line.setStrokeWidth(newWidth);
+                        this.line.setStrokeWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_LineWidthMin + ", " + EDAmameController.EditorSymbol_LineWidthMax + ")");
                 }
@@ -521,7 +521,7 @@ public class EDALine extends EDANode
 
         lineEndPosX.add(this.line.getEndX());
         lineEndPosY.add(this.line.getEndY());
-        lineWidths.add(this.line.getStrokeWidth());
+        lineWidths.add(this.line.getStrokeWidth() / 10);
 
         return true;
     }
@@ -605,7 +605,7 @@ public class EDALine extends EDANode
                     Double newWidth = Double.parseDouble(widthStr);
 
                     if ((newWidth >= EDAmameController.EditorSymbol_LineWidthMin) && (newWidth <= EDAmameController.EditorSymbol_LineWidthMax))
-                        this.line.setStrokeWidth(newWidth);
+                        this.line.setStrokeWidth(newWidth * 10);
                     else
                         EDAmameController.SetStatusBar("Unable to apply line widths because the entered field is outside the limits! (Width limits: " + EDAmameController.EditorSymbol_LineWidthMin + ", " + EDAmameController.EditorSymbol_LineWidthMax + ")");
                 }
