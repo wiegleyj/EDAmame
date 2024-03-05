@@ -892,6 +892,7 @@ abstract public class EDANode
                 newStr += "%TO.N,N/C*%\n";
 
                 newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                newStr += "%TD*%\n";
                 return newStr;
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
