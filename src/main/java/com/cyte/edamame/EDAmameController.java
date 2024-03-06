@@ -107,10 +107,10 @@ public class EDAmameController implements Initializable
     final static public Double EditorSymbol_TextFontSizeMax = 10.0;
     final static public Double EditorSymbol_LineWidthMin = 0.1;
     final static public Double EditorSymbol_LineWidthMax = 5.0;
-    final static public Double EditorSymbol_PinRadiusMin = 1.0;
+    final static public Double EditorSymbol_PinRadiusMin = 0.5;
     final static public Double EditorSymbol_PinRadiusMax = 5.0;
-    final static public Double EditorSymbol_WireWidthMin = 1.0;
-    final static public Double EditorSymbol_WireWidthMax = 3.0;
+    final static public Double EditorSymbol_WireWidthMin = 0.1;
+    final static public Double EditorSymbol_WireWidthMax = 5.0;
     final static public int EditorSymbol_MaxChars = 10;
 
     final static public Double EditorFootprint_HoleRadiusOuterMin = 0.1;
