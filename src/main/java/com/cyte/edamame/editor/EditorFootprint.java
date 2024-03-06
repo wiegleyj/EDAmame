@@ -515,7 +515,7 @@ public class EditorFootprint extends Editor
 
                                                 Circle holeCircle = new Circle();
                                                 holeCircle.setFill(Color.TRANSPARENT);
-                                                holeCircle.setRadius((radiusOuter + radiusInner) / 2 * 10);
+                                                holeCircle.setRadius(radiusOuter * 10);
                                                 holeCircle.setStrokeType(StrokeType.INSIDE);
                                                 holeCircle.setStrokeWidth((radiusOuter - radiusInner) * 10);
                                                 holeCircle.setStroke(EDAmameController.Editor_PCBExposedColor);

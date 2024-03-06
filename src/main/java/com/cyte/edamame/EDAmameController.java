@@ -105,19 +105,19 @@ public class EDAmameController implements Initializable
     final static public Double EditorSymbol_BorderMax = 3.0;
     final static public Double EditorSymbol_TextFontSizeMin = 1.0;
     final static public Double EditorSymbol_TextFontSizeMax = 10.0;
-    final static public Double EditorSymbol_LineWidthMin = 1.0;
-    final static public Double EditorSymbol_LineWidthMax = 3.0;
-    final static public Double EditorSymbol_PinRadiusMin = 1.0;
-    final static public Double EditorSymbol_PinRadiusMax = 5.0;
+    final static public Double EditorSymbol_LineWidthMin = 0.1;
+    final static public Double EditorSymbol_LineWidthMax = 5.0;
+    final static public Double EditorSymbol_PinRadiusMin = 0.1;
+    final static public Double EditorSymbol_PinRadiusMax = 1.0;
     final static public Double EditorSymbol_WireWidthMin = 1.0;
     final static public Double EditorSymbol_WireWidthMax = 3.0;
     final static public int EditorSymbol_MaxChars = 10;
 
-    final static public Double EditorFootprint_HoleRadiusOuterMin = 0.5;
+    final static public Double EditorFootprint_HoleRadiusOuterMin = 0.1;
     final static public Double EditorFootprint_HoleRadiusOuterMax = 5.0;
-    final static public Double EditorFootprint_HoleRadiusInnerMin = 0.5;
+    final static public Double EditorFootprint_HoleRadiusInnerMin = 0.1;
     final static public Double EditorFootprint_HoleRadiusInnerMax = 5.0;
-    final static public Double EditorFootprint_ViaRadiusMin = 0.5;
+    final static public Double EditorFootprint_ViaRadiusMin = 0.1;
     final static public Double EditorFootprint_ViaRadiusMax = 2.0;
 
     final static public Logger logger = Logger.getLogger(EDAmame.class.getName());     // The logger for the entire application. All classes/modules should obtain and use this static logger.
