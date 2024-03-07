@@ -272,12 +272,6 @@ public class EDAmameController implements Initializable
                 alert.setTitle("Error");
                 alert.setHeaderText(null);
                 alert.setContentText(errorMessage);
-            // Calculate the X and Y positions to center the alert window on the primary screen
-            double centerX = Screen.getPrimary().getVisualBounds().getMinX() + (Screen.getPrimary().getVisualBounds().getWidth() - 450) / 2;
-            double centerY = Screen.getPrimary().getVisualBounds().getMinY() + (Screen.getPrimary().getVisualBounds().getHeight() - 125) / 2;
-            // Set the alert window position to be centered
-            alert.setX(centerX - alert.getDialogPane().getPrefWidth() / 2);
-            alert.setY(centerY - alert.getDialogPane().getPrefHeight() / 2);
                 alert.showAndWait();
             }
             }
@@ -287,11 +281,11 @@ public class EDAmameController implements Initializable
         // Toggle the state of showErrorPopup
         if (showErrorPopup){
             showErrorPopup = false;
-            userSettingsMenuItem.setText("Pop Ups is OFF toggle to ON");
+            userSettingsMenuItem.setText("Error Popup [OFF]");
         }
         else {
             showErrorPopup = true;
-            userSettingsMenuItem.setText("Pop Ups is ON toggle to OFF");
+            userSettingsMenuItem.setText("Error Popup [ON]");
         }
         }
 
