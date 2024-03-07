@@ -20,37 +20,50 @@
 // Implement proper getters & setters for all class fields
 
 package com.cyte.edamame;
+
 import com.cyte.edamame.editor.*;
-import com.cyte.edamame.misc.PairMutable;
 import com.cyte.edamame.memento.TextAreaHandler;
-
-import java.util.*;
-import java.util.Map.*;
-import java.util.stream.*;
-
-import javafx.collections.*;
-import javafx.fxml.*;
-import javafx.stage.*;
-import javafx.scene.*;
+import com.cyte.edamame.misc.PairMutable;
+import javafx.animation.Animation;
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.Node;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.layout.*;
-import javafx.scene.paint.*;
-import javafx.scene.input.*;
-import javafx.application.*;
-import javafx.geometry.*;
+import javafx.scene.input.InputMethodEvent;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.stage.*;
+import javafx.util.Duration;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.*;
+import java.util.Map.Entry;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
+import java.util.stream.Stream;
 
-import javafx.animation.Animation;
-import javafx.animation.Timeline;
-import javafx.animation.KeyFrame;
-import javafx.util.Duration;
+import static javafx.application.Application.launch;
 
 /**
  * Main Controller for the {@link EDAmame} Application.<p>
@@ -131,7 +144,7 @@ public class EDAmameController implements Initializable
     @FXML
     private SplitPane splitPane;                 // The main split pane separating always available global controls on the left from editor Editor_Tabs on right.
     @FXML
-    private StackPane stackPaneControls;         // The stack pane on left of split used to contain different control setups.
+    private static StackPane stackPaneControls;         // The stack pane on left of split used to contain different control setups.
     @FXML
     private TabPane tabPaneControls;             // The TabPane used to hold all the main controls. Displayed in the "navigation" pane of the controls stack.
     @FXML
@@ -141,8 +154,12 @@ public class EDAmameController implements Initializable
     @FXML
     private MenuBar menuBar;                     // The main EDAmame menu bar.
     @FXML
-    public Label statusBar;                      // Load the menu config loader...
-
+    //public Label statusBar;
+    public Label statusBar = new Label("EDAmame Status Area:");                      // Load the menu config loader...
+    @FXML
+    private Button errorButton;                  // The error button.
+    @FXML
+    private MenuItem userSettingsMenuItem;
     // DO NOT EDIT
 
     public final Stage stage;                                                              // The stage hosting this controller.
@@ -227,6 +244,7 @@ public class EDAmameController implements Initializable
     static public void SetStatusBar(String msg)
     {
         statusBarGlobal.setText(msg);
+        showErrorPopup(msg);
     }
 
     /**
@@ -243,6 +261,34 @@ public class EDAmameController implements Initializable
 
         logger.setUseParentHandlers(false);
         logger.addHandler(new TextAreaHandler(logText));
+    }
+
+    private static boolean showErrorPopup = false;  // "ON" or "OFF" initial state
+    public static void showErrorPopup(String errorMessage) {
+        if (showErrorPopup && !errorMessage.contains("EDAmame Status Area")) {
+                Alert alert = new Alert(Alert.AlertType.ERROR);
+                alert.setTitle("Error");
+                alert.setHeaderText(null);
+                alert.setContentText(errorMessage);
+                alert.showAndWait();
+            }
+            }
+
+    @FXML
+    public void userSettingsMenuItem() {
+        // Toggle the state of showErrorPopup
+        if (showErrorPopup){
+            showErrorPopup = false;
+            userSettingsMenuItem.setText("Error Popup [OFF]");
+        }
+        else {
+            showErrorPopup = true;
+            userSettingsMenuItem.setText("Error Popup [ON]");
+        }
+        }
+
+    public static void main(String[] args) {
+        launch(args);
     }
 
     //// EDITOR FUNCTIONS ////
@@ -433,7 +479,7 @@ public class EDAmameController implements Initializable
                     currMenuItems.put(currMenuItem, currMenuItemPriority);
                 }
 
-                Stream<Entry<MenuItem, Integer>> currMenuItemsSorted = currMenuItems.entrySet().stream().sorted(Map.Entry.comparingByValue());
+                Stream<Entry<MenuItem, Integer>> currMenuItemsSorted = currMenuItems.entrySet().stream().sorted(Entry.comparingByValue());
 
                 currMenu.getItems().clear();
                 currMenuItemsSorted.forEach(currMenuItem -> {currMenu.getItems().add(currMenuItem.getKey());});
@@ -564,7 +610,7 @@ public class EDAmameController implements Initializable
     }
 
     //// SAVING & LOADING FUNCTIONS ////
-    
+
     /**
      * Saves the window position and size of the application as Java Preferences.
      *
@@ -927,7 +973,7 @@ public class EDAmameController implements Initializable
         System.out.println("hi");
 
         String classpath = System.getProperty("java.class.path");
-        String[] classPathValues = classpath.split(java.io.File.pathSeparator);
+        String[] classPathValues = classpath.split(File.pathSeparator);
         for (String classPath: classPathValues) {
             System.out.println(classPath);
         }

@@ -35,6 +35,7 @@
                <Menu mnemonicParsing="false" text="STATIC_2">
                  <items>
                    <MenuItem id="10" fx:id="menuLogItem" mnemonicParsing="false" onAction="#LogToggleVisibility" text="LogTab" />
+                     <MenuItem id="14" fx:id="userSettingsMenuItem" mnemonicParsing="false" onAction="#userSettingsMenuItem" text="Error Popup [OFF]" />
                  </items>
                </Menu>
             </menus></MenuBar>
@@ -53,7 +54,7 @@
        <VBox BorderPane.alignment="CENTER">
            <StackPane />
            <HBox style="-fx-background-color: #dcdcdc;">
-               <Label fx:id="statusBar" text="EDAmame Status Area" />
+               <Label fx:id="statusBar" text="EDAmame Status Area :" />
            </HBox>
        </VBox>
    </bottom>
