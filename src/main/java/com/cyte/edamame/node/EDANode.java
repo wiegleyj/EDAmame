@@ -14,6 +14,7 @@ import com.cyte.edamame.misc.SnapPoint;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.LinkedList;
 
@@ -45,6 +46,11 @@ abstract public class EDANode
     public String[] conns;
 
     public Editor editor;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name, shapeHighlighted, shapeSelected, highlighted, highlightedMouse, highlightedBox, selected, mousePressPos, passive, snapPoints);
+    }
 
     //// SETTERS ////
 

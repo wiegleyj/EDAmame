@@ -16,12 +16,22 @@ package com.cyte.edamame.memento;
  *
  * @author Jeff Wiegley
  * @author jeffrey.wiegley@gmail.com
-  */
-@FunctionalInterface
+ */
 public interface Originator {
     /**
      * Create a {@link Memento} that remembers the {@link Originator}'s state at the time saveToMemento was executed.
      * @return a {@link Memento} object representing the {@link Originator}'s current state.
      */
     Memento saveToMemento();
+
+    /**
+     * Checks if the state has changed since the last memento was saved.
+     * @return true if the state has changed, false otherwise.
+     */
+    boolean hasStateChanged();
+
+    /**
+     * Notifies the Originator that its current state has been recorded.
+     */
+    void stateRecorded();
 }

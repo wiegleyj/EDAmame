@@ -8,7 +8,7 @@
 package com.cyte.edamame.editor;
 import com.cyte.edamame.EDAmameApplication;
 import com.cyte.edamame.EDAmameController;
-import com.cyte.edamame.memento.MementoExperimental;
+import com.cyte.edamame.memento.*;
 import com.cyte.edamame.netlist.NetListExperimental;
 import com.cyte.edamame.netlist.NetListExperimentalNode;
 import com.cyte.edamame.node.*;
@@ -39,7 +39,7 @@ import java.io.InvalidClassException;
  * @author Jeff Wiegley, Ph.D.
  * @author jeffrey.wiegley@gmail.com
  */
-abstract public class Editor
+abstract public class Editor implements Originator, Recorded, StateHashable
 {
     //// GLOBAL VARIABLES ////
 
@@ -87,8 +87,7 @@ abstract public class Editor
     public Color gridBoxColor;
     public Integer maxShapes;
     public LinkedList<EDANode> nodes;
-
-    private PairMutable center;
+    public PairMutable center;
     public boolean visible = false;
     public boolean pressedLMB = false;
     public boolean pressedRMB = false;
@@ -109,7 +108,9 @@ abstract public class Editor
     public double snapGridSpacing = -1;
     static public int GerberApertureCounter = 10;
 
-    public MementoExperimental undoRedoSystem = null;
+    //public MementoExperimental undoRedoSystem = null;
+    private Recorder recorder;
+    private int lastNodesHash = 0;
 
     //// MAIN FUNCTIONS ////
 
@@ -134,7 +135,8 @@ abstract public class Editor
 
         this.SetCenter(new PairMutable(0.0, 0.0));
 
-        this.undoRedoSystem = new MementoExperimental(this);
+        this.recorder = new Recorder(this);
+        registerRecorder(recorder);
     }
 
     /**
@@ -160,11 +162,11 @@ abstract public class Editor
         // Handling centering of holder pane & crosshair...
         {
             PairMutable canvasSize = new PairMutable(this.canvas.getWidth(),
-                                                     this.canvas.getHeight());
+                    this.canvas.getHeight());
             PairMutable paneSize = new PairMutable(this.paneListener.getWidth(),
-                                                   this.paneListener.getHeight());
+                    this.paneListener.getHeight());
             PairMutable centeredPos = new PairMutable(paneSize.GetLeftDouble() / 2 - canvasSize.GetLeftDouble() / 2,
-                                                      paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
+                    paneSize.GetRightDouble() / 2 - canvasSize.GetRightDouble() / 2);
 
             this.paneHolder.setLayoutX(centeredPos.GetLeftDouble());
             this.paneHolder.setLayoutY(centeredPos.GetRightDouble());
@@ -559,7 +561,7 @@ abstract public class Editor
     {
         if (this.pressedLMB)
         {
-            this.undoRedoSystem.NodeHistoryUpdate();
+            recorder.update();
         }
         else if (this.pressedRMB)
         {}
@@ -582,7 +584,7 @@ abstract public class Editor
 
             // Handling shape deselection (only if we're not moving any shapes or drawing any lines)
             if (!this.shapesMoving &&
-                (this.linePreview == null))
+                    (this.linePreview == null))
                 this.NodesDeselectAll();
         }
         else if (this.pressedRMB)
@@ -625,8 +627,8 @@ abstract public class Editor
         {
             // Handling moving of the shapes (only if we have some shapes selected, we're not holding the box selection key and we're not drawing any lines)
             if ((this.shapesSelected > 0) &&
-                !EDAmameController.IsKeyPressed(KeyCode.SHIFT) &&
-                (this.linePreview == null))
+                    !EDAmameController.IsKeyPressed(KeyCode.SHIFT) &&
+                    (this.linePreview == null))
             {
                 for (int i = 0; i < this.nodes.size(); i++)
                     this.nodes.get(i).Move();
@@ -636,7 +638,7 @@ abstract public class Editor
 
             // Handling the box selection (only if we have no shapes selected, we are not moving the viewport and we're not drawing any lines)
             if (((this.shapesSelected == 0) || EDAmameController.IsKeyPressed(KeyCode.SHIFT)) &&
-                (this.linePreview == null))
+                    (this.linePreview == null))
             {
                 if (this.selectionBox == null)
                 {
@@ -673,7 +675,7 @@ abstract public class Editor
                 this.GetCenter().right = this.mouseDragFirstCenter.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble();
 
                 this.PaneHolderSetTranslate(new PairMutable(this.mouseDragPaneFirstPos.GetLeftDouble() + this.mouseDragDiffPos.GetLeftDouble() * this.zoom,
-                                                            this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
+                        this.mouseDragPaneFirstPos.GetRightDouble() + this.mouseDragDiffPos.GetRightDouble() * this.zoom));
             }
         }
     }
@@ -863,11 +865,11 @@ abstract public class Editor
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Z))
-            this.undoRedoSystem.NodesUndo();
+            recorder.undo();
 
         // Handling element undo...
         if (EDAmameController.IsKeyPressed(KeyCode.CONTROL) && EDAmameController.IsKeyPressed(KeyCode.Y))
-            this.undoRedoSystem.NodesRedo();
+            recorder.redo();
     }
 
     public void OnKeyReleasedGlobal(KeyEvent event)
@@ -1101,7 +1103,7 @@ abstract public class Editor
         for (int i = 0; i < this.nodes.size(); i++)
             this.nodes.get(i).PropsApplyGlobal(propsBox);
 
-        this.undoRedoSystem.NodeHistoryUpdate();
+        recorder.update();
     }
 
     abstract public void PropsLoadSpecific();
@@ -1238,10 +1240,10 @@ abstract public class Editor
             if ((currWireConn.GetLeftPair().right != null) && (currWireConn.GetRightPair().right != null))
             {
                 this.NetListWireConnAdd(netList,
-                                               currWireConn.GetLeftPair().GetLeftString(),
-                                               currWireConn.GetLeftPair().GetRightString(),
-                                               currWireConn.GetRightPair().GetLeftString(),
-                                               currWireConn.GetRightPair().GetRightString());
+                        currWireConn.GetLeftPair().GetLeftString(),
+                        currWireConn.GetLeftPair().GetRightString(),
+                        currWireConn.GetRightPair().GetLeftString(),
+                        currWireConn.GetRightPair().GetRightString());
             }
             else if (currWireConn.GetLeftPair().right != null)
             {
@@ -1265,10 +1267,10 @@ abstract public class Editor
                 if (connectedPinIdx != -1)
                 {
                     this.NetListWireConnAdd(netList,
-                                                   currWireConn.GetLeftPair().GetLeftString(),
-                                                   currWireConn.GetLeftPair().GetRightString(),
-                                                   pinSymbolIDs.get(connectedPinIdx),
-                                                   pinLabels.get(connectedPinIdx));
+                            currWireConn.GetLeftPair().GetLeftString(),
+                            currWireConn.GetLeftPair().GetRightString(),
+                            pinSymbolIDs.get(connectedPinIdx),
+                            pinLabels.get(connectedPinIdx));
                 }
             }
             else if (currWireConn.GetRightPair().right != null)
@@ -1292,10 +1294,10 @@ abstract public class Editor
 
                 if (connectedPinIdx != -1)
                     this.NetListWireConnAdd(netList,
-                                            pinSymbolIDs.get(connectedPinIdx),
-                                            pinLabels.get(connectedPinIdx),
-                                            currWireConn.GetRightPair().GetLeftString(),
-                                            currWireConn.GetRightPair().GetRightString());
+                            pinSymbolIDs.get(connectedPinIdx),
+                            pinLabels.get(connectedPinIdx),
+                            currWireConn.GetRightPair().GetLeftString(),
+                            currWireConn.GetRightPair().GetRightString());
             }
         }
 
@@ -1403,7 +1405,7 @@ abstract public class Editor
         double scaledSpacing = this.snapGridSpacing * 10;
 
         return new PairMutable(Math.round(pos.GetLeftDouble() / scaledSpacing) * scaledSpacing,
-                               Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
+                Math.round(pos.GetRightDouble() / scaledSpacing) * scaledSpacing);
     }
 
     public double PosSnapToGridPoint(double pos)
@@ -1799,5 +1801,45 @@ abstract public class Editor
                 i--;
             }
         }
+    }
+
+    //// MEMENTO IMPLEMENTATION ////
+
+    /// ORIGINATOR IMPLEMENTATION ///
+    @Override
+    public Memento saveToMemento() {
+        return new Memento() {
+            private final LinkedList<EDANode> nodes = new LinkedList<>(Editor.this.NodesClone());
+
+            @Override
+            public Memento restore() {
+                Editor.this.NodesClear();
+                Editor.this.NodesAdd(nodes);
+                return this;
+            }
+        };
+    }
+
+    @Override
+    public boolean hasStateChanged() {
+        int currentHash = StateHashUtil.generateStateHash(this);
+        return currentHash != lastNodesHash;
+    }
+
+    @Override
+    public void stateRecorded() {
+        this.lastNodesHash = StateHashUtil.generateStateHash(this);
+    }
+
+    /// RECORDER IMPLEMENTATION ///
+    @Override
+    public void registerRecorder(Recorder recorder) {
+        this.recorder = recorder;
+    }
+
+    /// HASH IMPLEMENTATION ///
+    @Override
+    public Collection<?> getState() {
+        return this.nodes;
     }
 }

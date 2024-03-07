@@ -7,8 +7,10 @@
 
 package com.cyte.edamame.memento;
 
-import com.cyte.edamame.memento.Recorder;
-
+/**
+ * Defines an interface for objects that can register a Recorder for tracking state changes.
+ * Implementing this interface allows objects to be part of an undo/redo framework by recording their states as Mementos.
+ */
 public interface Recorded {
     void registerRecorder(Recorder recorder);
 }
