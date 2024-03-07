@@ -160,7 +160,7 @@ public class EditorPCB extends Editor
             return;
         }
 
-        for (int layerCount = 0; layerCount < 4; layerCount++)
+        for (int layerCount = 0; layerCount < 6; layerCount++)
         {
             String data = "";
 
@@ -185,6 +185,14 @@ public class EditorPCB extends Editor
                 case 3:
                     data += "%TF.FileFunction,Profile,NP*%\n";
                     layerName = "Edge Cuts";
+                    break;
+                case 4:
+                    data += "%TF.FileFunction,Soldermask,Top*%\n";
+                    layerName = "Mask Front";
+                    break;
+                case 5:
+                    data += "%TF.FileFunction,Soldermask,Bot*%\n";
+                    layerName = "Mask Rear";
                     break;
             }
             data += "%FSLAX46Y46*%\n";

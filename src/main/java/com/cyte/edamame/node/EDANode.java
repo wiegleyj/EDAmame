@@ -887,18 +887,32 @@ abstract public class EDANode
 
                 String newStr = "";
 
-                newStr += "G01*\n";
-
                 Circle ThroughHoleCircle = (Circle) group.getChildren().get(0);
 
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(ThroughHoleCircle.getRadius() * 2) + "*%\n";
-                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+                if (layer.equals("Edge Cuts"))
+                {
+                    // creating the hole (inner radius)
 
-                newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
-                newStr += "%TO.N,N/C*%\n";
+                    newStr += "G01*\n";
 
-                newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
-                newStr += "%TD*%\n";
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(ThroughHoleCircle.getRadius() * 2) + "*%\n";
+                    newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+                    newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
+                    newStr += "%TO.N,N/C*%\n";
+
+                    newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                    newStr += "%TD*%\n";
+                }
+                else if (layer.equals("Mask Front"))
+                {
+                    // creating the front exposed copper (outer radius)
+                }
+                else if (layer.equals("Mask Rear"))
+                {
+                    // creating the rear exposed copper (outer radius)
+                }
+
                 return newStr;
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
