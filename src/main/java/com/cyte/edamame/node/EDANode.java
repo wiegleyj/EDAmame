@@ -657,11 +657,11 @@ abstract public class EDANode
 
             //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
+            double radius = circle.getRadius();
+
             String newStr = "";
 
             newStr += "G01*\n";
-
-            Double radius = circle.getRadius();
 
             if (circle.getFill() != Color.TRANSPARENT) //FILLED IN CIRCLE
             {
@@ -885,9 +885,11 @@ abstract public class EDANode
 
                 //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
-                String newStr = "";
+                Circle ThroughHoleCircle = (Circle)group.getChildren().get(0);
+                double outerRadius = ThroughHoleCircle.getRadius();
+                double innerRadius = ThroughHoleCircle.getRadius() - ThroughHoleCircle.getStrokeWidth();
 
-                Circle ThroughHoleCircle = (Circle) group.getChildren().get(0);
+                String newStr = "";
 
                 if (layer.equals("Edge Cuts"))
                 {
@@ -895,7 +897,7 @@ abstract public class EDANode
 
                     newStr += "G01*\n";
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(ThroughHoleCircle.getRadius() * 2) + "*%\n";
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
                     newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
 
                     newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
@@ -907,10 +909,40 @@ abstract public class EDANode
                 else if (layer.equals("Mask Front"))
                 {
                     // creating the front exposed copper (outer radius)
+
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
+                    newStr += "G01*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
+                    newStr += "G01*\n";
                 }
                 else if (layer.equals("Mask Rear"))
                 {
                     // creating the rear exposed copper (outer radius)
+
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
+                    newStr += "G01*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
+                    newStr += "G01*\n";
                 }
 
                 return newStr;
@@ -930,24 +962,67 @@ abstract public class EDANode
 
                 //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
+                Circle viaCircle1 = (Circle)group.getChildren().get(0);
+                Circle viaCircle2 = (Circle)group.getChildren().get(1);
+                double outerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius());
+                double innerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius()) - Math.min(viaCircle1.getRadius(), viaCircle2.getRadius());
+
                 String newStr = "";
 
-                newStr += "G01*\n";
+                if (layer.equals("Edge Cuts"))
+                {
+                    // creating the hole (inner radius)
 
-                Circle CircleChildOne = (Circle) group.getChildren().get(0);
-                Circle CircleChildTwo = (Circle) group.getChildren().get(1);
-                newStr += "%TA.AperFunction,ViaPad*%\n";
-                if (CircleChildOne.getRadius() > CircleChildTwo.getRadius())
-                {
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(CircleChildOne.getRadius() * 2) + "*%\n";
+                    newStr += "G01*\n";
+
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
+                    newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+                    newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
+                    newStr += "%TO.N,N/C*%\n";
+
+                    newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                    newStr += "%TD*%\n";
                 }
-                else
+                else if (layer.equals("Copper Front"))
                 {
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(CircleChildTwo.getRadius() * 2) + "*%\n";
+                    // creating the front copper (outer radius)
+
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
+                    newStr += "G01*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
+                    newStr += "G01*\n";
                 }
-                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
-                newStr += "%TO.N,*%\n";
-                newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                else if (layer.equals("Copper Rear"))
+                {
+                    // creating the rear copper (outer radius)
+
+                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
+                    newStr += "G01*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    newStr += "G75*\nG03*\n";
+                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
+                    newStr += "G01*\n";
+                }
+
                 return newStr;
             }
             else

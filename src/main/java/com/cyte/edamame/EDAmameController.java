@@ -6,7 +6,7 @@
  */
 
 // TODO:
-// Implement gerber & drill file exports
+// Implement gerber file text export
 // Prevent footprint & PCB shapes from being dropped if no fill & no border
 // Fix holes overlaying traces completely
 // Fix net list wire chain recognition

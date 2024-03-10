@@ -179,7 +179,7 @@ public class EditorPCB extends Editor
                     layerName = "Copper Rear";
                     break;
                 case 2:
-                    data += "%TF.FileFunction,Legend,Bot*%\n";
+                    data += "%TF.FileFunction,Legend,Top*%\n";
                     layerName = "Silkscreen";
                     break;
                 case 3:
