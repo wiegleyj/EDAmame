@@ -96,7 +96,7 @@ public class EDAPin extends EDAGroup
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     ((Shape)this.group.getChildren().get(0)).setFill(color);
                     ((Shape)this.group.getChildren().get(1)).setFill(color);

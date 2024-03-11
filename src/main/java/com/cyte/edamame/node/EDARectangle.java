@@ -435,7 +435,7 @@ public class EDARectangle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.rectangle.setFill(color);
                 }
@@ -488,7 +488,7 @@ public class EDARectangle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.rectangle.setStroke(color);
                 }
@@ -556,7 +556,7 @@ public class EDARectangle extends EDANode
 
         layers.add(this.rectangle.getId());
 
-        if (this.rectangle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.rectangle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -595,7 +595,7 @@ public class EDARectangle extends EDANode
                     this.rectangle.setId(layer);
                     this.rectangle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.rectangle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.rectangle.getFill(), Color.TRANSPARENT))
                         this.rectangle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))
@@ -710,7 +710,7 @@ public class EDARectangle extends EDANode
 
         layers.add(this.rectangle.getId());
 
-        if (this.rectangle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.rectangle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -749,7 +749,7 @@ public class EDARectangle extends EDANode
                     this.rectangle.setId(layer);
                     this.rectangle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.rectangle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.rectangle.getFill(), Color.TRANSPARENT))
                         this.rectangle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))

@@ -1661,7 +1661,7 @@ abstract public class Editor implements Originator, Recorded, StateHashable
             double strokeDouble = Double.parseDouble(strokeSize);
             if ((strokeDouble == 0) || (!strokeColor.isOpaque()))
             {
-                if (!((fillColor != null) && (fillColor != Color.TRANSPARENT) && (fillColor.hashCode() != 0x00000000)) || (fillColor.getOpacity() != 1.0))
+                if (!((fillColor != null) && !EDAmameController.AreColorsEqual(fillColor, Color.TRANSPARENT)) || (fillColor.getOpacity() != 1.0))
                 {
                     EDAmameController.SetStatusBar("Unable to drop shape because the entered fill and border is transparent!");
                     return false;

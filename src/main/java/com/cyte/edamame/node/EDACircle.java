@@ -431,7 +431,7 @@ public class EDACircle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.circle.setFill(color);
                 }
@@ -484,7 +484,7 @@ public class EDACircle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.circle.setStroke(color);
                 }
@@ -534,7 +534,7 @@ public class EDACircle extends EDANode
 
         layers.add(this.circle.getId());
 
-        if (this.circle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.circle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -572,7 +572,7 @@ public class EDACircle extends EDANode
                     this.circle.setId(layer);
                     this.circle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.circle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.circle.getFill(), Color.TRANSPARENT))
                         this.circle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))
@@ -669,7 +669,7 @@ public class EDACircle extends EDANode
 
         layers.add(this.circle.getId());
 
-        if (this.circle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.circle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -707,7 +707,7 @@ public class EDACircle extends EDANode
                     this.circle.setId(layer);
                     this.circle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.circle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.circle.getFill(), Color.TRANSPARENT))
                         this.circle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))

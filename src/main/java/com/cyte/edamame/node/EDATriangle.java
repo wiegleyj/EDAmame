@@ -433,7 +433,7 @@ public class EDATriangle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.triangle.setFill(color);
                 }
@@ -486,7 +486,7 @@ public class EDATriangle extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.triangle.setStroke(color);
                 }
@@ -536,7 +536,7 @@ public class EDATriangle extends EDANode
 
         layers.add(this.triangle.getId());
 
-        if (this.triangle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.triangle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -574,7 +574,7 @@ public class EDATriangle extends EDANode
                     this.triangle.setId(layer);
                     this.triangle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.triangle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.triangle.getFill(), Color.TRANSPARENT))
                         this.triangle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))
@@ -671,7 +671,7 @@ public class EDATriangle extends EDANode
 
         layers.add(this.triangle.getId());
 
-        if (this.triangle.getFill() == Color.TRANSPARENT)
+        if (EDAmameController.AreColorsEqual((Color)this.triangle.getFill(), Color.TRANSPARENT))
             fills.add(false);
         else
             fills.add(true);
@@ -709,7 +709,7 @@ public class EDATriangle extends EDANode
                     this.triangle.setId(layer);
                     this.triangle.setStroke(Editor.GetPCBLayerColor(layer));
 
-                    if (this.triangle.getFill() != Color.TRANSPARENT)
+                    if (!EDAmameController.AreColorsEqual((Color)this.triangle.getFill(), Color.TRANSPARENT))
                         this.triangle.setFill(Editor.GetPCBLayerColor(layer));
                 }
                 else if (!layerChoiceBox.getValue().equals("<mixed>"))

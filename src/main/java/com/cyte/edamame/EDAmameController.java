@@ -910,6 +910,11 @@ public class EDAmameController implements Initializable
 
     //// SUPPORT FUNCTIONS ////
 
+    static public boolean AreColorsEqual(Color colorA, Color colorB)
+    {
+        return (colorA == colorB) || colorA.toString().equals(colorB.toString());
+    }
+
     static public <T> boolean IsListAllEqual(LinkedList<T> list)
     {
         return list.stream().distinct().limit(2).count() <= 1;

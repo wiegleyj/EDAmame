@@ -436,7 +436,7 @@ public class EDAText extends EDANode
 
                 Color color = colorPicker.getValue();
 
-                if ((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000))
+                if ((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT))
                 {
                     this.text.setFill(color);
                 }

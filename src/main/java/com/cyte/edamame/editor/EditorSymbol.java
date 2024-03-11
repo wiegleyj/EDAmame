@@ -396,7 +396,7 @@ public class EditorSymbol extends Editor
                                     }
                                     else
                                     {
-                                        if (!((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                        if (!((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT)))
                                         {
                                             EDAmameController.SetStatusBar("Unable to drop line because the entered color field is transparent!");
                                         }
@@ -450,7 +450,7 @@ public class EditorSymbol extends Editor
                                     }
                                     else
                                     {
-                                        if (!((color != null) && (color != Color.TRANSPARENT) && (color.hashCode() != 0x00000000)))
+                                        if (!((color != null) && !EDAmameController.AreColorsEqual(color, Color.TRANSPARENT)))
                                         {
                                             EDAmameController.SetStatusBar("Unable to drop text because the entered font color field is transparent!");
                                         }
@@ -500,7 +500,7 @@ public class EditorSymbol extends Editor
                                     }
                                     else
                                     {
-                                        if (!((pinColor != null) && (pinColor != Color.TRANSPARENT) && (pinColor.hashCode() != 0x00000000)))
+                                        if (!((pinColor != null) && !EDAmameController.AreColorsEqual(pinColor, Color.TRANSPARENT)))
                                         {
                                             EDAmameController.SetStatusBar("Unable to drop pin because the entered font color field is transparent!");
                                         }

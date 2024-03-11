@@ -644,221 +644,208 @@ abstract public class EDANode
         {
             Circle circle = (Circle)node;
 
-            if (!circle.getId().equals(layer))
-                return "";
-
-            PairMutable point = GetPosInNodeParent(circle, new PairMutable(0.0, 0.0));
-
-            if (((Node)circle.getParent()).getClass() == Group.class)
-                point = GetPosInNodeParent(circle.getParent(), point);
-
-            point = editor.PaneHolderGetRealPos(point);
-            point = new PairMutable(point.GetLeftDouble(), -point.GetRightDouble());
-
-            //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
-
-            double radius = circle.getRadius();
-
-            String newStr = "";
-
-            newStr += "G01*\n";
-
-            if (circle.getFill() != Color.TRANSPARENT) //FILLED IN CIRCLE
+            if (circle.getId().equals(layer))
             {
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(radius) + "*%\n";
-                newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+                PairMutable point = GetPosInNodeParent(circle, new PairMutable(0.0, 0.0));
 
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                newStr += "G75*\nG03*\n";
+                if (((Node) circle.getParent()).getClass() == Group.class)
+                    point = GetPosInNodeParent(circle.getParent(), point);
 
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
-                        + "I" + (((PositionFormatting(radius)) / 2) * -1) + "J0D01*\n";
-                newStr += "G01*\n";
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                newStr += "G75*\nG03*\n";
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
-                        + "I" + ((PositionFormatting(radius)) / 2) + "J0D01*\n";
-                newStr += "G01*\n";
+                point = editor.PaneHolderGetRealPos(point);
+                point = new PairMutable(point.GetLeftDouble(), -point.GetRightDouble());
+
+                //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
+
+                double radius = circle.getRadius();
+
+                str += "G01*\n";
+
+                if (!EDAmameController.AreColorsEqual((Color)circle.getFill(), Color.TRANSPARENT)) //FILLED IN CIRCLE
+                {
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(radius) + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (((PositionFormatting(radius)) / 2) * -1) + "J0D01*\n";
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(radius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + ((PositionFormatting(radius)) / 2) + "J0D01*\n";
+                    str += "G01*\n";
+                } else //BORDER ONLY CIRCLE
+                {
+                    Double apertureValue = (circle.getStrokeWidth() / 10);
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
+
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + (PositionFormatting(radius) * -1) + "J0D01*\n";
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
+                            + "I" + PositionFormatting(radius) + "J0D01*\n";
+                    str += "G01*\n";
+                }
             }
-            else //BORDER ONLY CIRCLE
-            {
-                Double apertureValue = (circle.getStrokeWidth() / 10);
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
-                newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
-
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                newStr += "G75*\nG03*\n";
-
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
-                        + "I" + (PositionFormatting(radius) * -1) + "J0D01*\n";
-                newStr += "G01*\n";
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble())-PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                newStr += "G75*\nG03*\n";
-                newStr += "X" + (PositionFormatting(point.GetLeftDouble())+PositionFormatting(radius)) + "Y" + PositionFormatting(point.GetRightDouble())
-                        + "I" + PositionFormatting(radius) + "J0D01*\n";
-                newStr += "G01*\n";
-            }
-
-            return newStr;
         }
         else if (node.getClass() == Rectangle.class)
         {
             Rectangle rectangle = (Rectangle)node;
 
-            if (!rectangle.getId().equals(layer))
-                return "";
-
-            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
-            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, 0.0)));
-            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), 0.0)));
-            points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), rectangle.getHeight())));
-            points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, rectangle.getHeight())));
-
-            if (((Node)rectangle.getParent()).getClass() == Group.class)
+            if (rectangle.getId().equals(layer))
             {
-                points.set(0, GetPosInNodeParent(rectangle.getParent(), points.get(0)));
-                points.set(1, GetPosInNodeParent(rectangle.getParent(), points.get(1)));
-                points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
-                points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
+                LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+                points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, 0.0)));
+                points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), 0.0)));
+                points.add(GetPosInNodeParent(rectangle, new PairMutable(rectangle.getWidth(), rectangle.getHeight())));
+                points.add(GetPosInNodeParent(rectangle, new PairMutable(0.0, rectangle.getHeight())));
+
+                if (((Node) rectangle.getParent()).getClass() == Group.class)
+                {
+                    points.set(0, GetPosInNodeParent(rectangle.getParent(), points.get(0)));
+                    points.set(1, GetPosInNodeParent(rectangle.getParent(), points.get(1)));
+                    points.set(2, GetPosInNodeParent(rectangle.getParent(), points.get(2)));
+                    points.set(3, GetPosInNodeParent(rectangle.getParent(), points.get(3)));
+                }
+
+                points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+                points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+                points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
+                points.set(3, editor.PaneHolderGetRealPos(points.get(3)));
+                points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+                points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+                points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
+                points.set(3, new PairMutable(points.get(3).GetLeftDouble(), -points.get(3).GetRightDouble()));
+
+                //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
+
+                str += "G01*\n";
+
+                if (!EDAmameController.AreColorsEqual((Color)rectangle.getFill(), Color.TRANSPARENT))
+                    str += "G36*\n";
+                else
+                {
+                    Double apertureValue = (rectangle.getStrokeWidth() / 10);
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
+                    str += "D" + Editor.GerberApertureCounter++ + "*\n";
+                }
+                for (int i = 0; i < points.size(); i++)
+                {
+                    if (i == 0)
+                    {
+                        str += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
+
+                        if (!EDAmameController.AreColorsEqual((Color)rectangle.getFill(), Color.TRANSPARENT))
+                            str += "G01*\n";
+                    } else
+                        str += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
+                }
+                str += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
+
+                if (!EDAmameController.AreColorsEqual((Color)rectangle.getFill(), Color.TRANSPARENT))
+                    str += "G37*\n";
             }
-
-            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
-            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
-            points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
-            points.set(3, editor.PaneHolderGetRealPos(points.get(3)));
-            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
-            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
-            points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
-            points.set(3, new PairMutable(points.get(3).GetLeftDouble(), -points.get(3).GetRightDouble()));
-
-
-            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(3), 10.0, Color.BLUE, 1, false);
-
-            String newStr = "";
-
-            newStr += "G01*\n";
-
-            if (rectangle.getFill() != Color.TRANSPARENT)
-                newStr += "G36*\n";
-            else {
-                Double apertureValue = (rectangle.getStrokeWidth() / 10);
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
-                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
-            }
-            for (int i = 0; i < points.size(); i++)
-            {
-                if (i == 0) {
-                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
-                    if (rectangle.getFill() != Color.TRANSPARENT)
-                        newStr += "G01*\n";
-                } else
-                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
-            }
-            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
-
-            if (rectangle.getFill() != Color.TRANSPARENT)
-                newStr += "G37*\n";
-
-            return newStr;
         }
         else if (node.getClass() == Polygon.class)
         {
             Polygon triangle = (Polygon)node;
 
-            if (!triangle.getId().equals(layer))
-                return "";
-
-            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
-            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(0), triangle.getPoints().get(1))));
-            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(2), triangle.getPoints().get(3))));
-            points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(4), triangle.getPoints().get(5))));
-
-            if (((Node)triangle.getParent()).getClass() == Group.class)
+            if (triangle.getId().equals(layer))
             {
-                points.set(0, GetPosInNodeParent(triangle.getParent(), points.get(0)));
-                points.set(1, GetPosInNodeParent(triangle.getParent(), points.get(1)));
-                points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
+                LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+                points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(0), triangle.getPoints().get(1))));
+                points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(2), triangle.getPoints().get(3))));
+                points.add(GetPosInNodeParent(triangle, new PairMutable(triangle.getPoints().get(4), triangle.getPoints().get(5))));
+
+                if (((Node) triangle.getParent()).getClass() == Group.class)
+                {
+                    points.set(0, GetPosInNodeParent(triangle.getParent(), points.get(0)));
+                    points.set(1, GetPosInNodeParent(triangle.getParent(), points.get(1)));
+                    points.set(2, GetPosInNodeParent(triangle.getParent(), points.get(2)));
+                }
+
+                points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+                points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+                points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
+                points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+                points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+                points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
+
+                //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
+
+                str += "G01*\n";
+
+                if (!EDAmameController.AreColorsEqual((Color)triangle.getFill(), Color.TRANSPARENT))
+                    str += "G36*\n";
+                else
+                {
+                    Double apertureValue = (triangle.getStrokeWidth() / 10);
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
+                    str += "D" + Editor.GerberApertureCounter++ + "*\n";
+                }
+                for (int i = 0; i < points.size(); i++)
+                {
+                    if (i == 0)
+                    {
+                        str += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
+                        if (!EDAmameController.AreColorsEqual((Color)triangle.getFill(), Color.TRANSPARENT))
+                            str += "G01*\n";
+                    } else
+                        str += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
+                }
+                str += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
+
+                if (!EDAmameController.AreColorsEqual((Color)triangle.getFill(), Color.TRANSPARENT))
+                    str += "G37*\n";
             }
-
-            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
-            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
-            points.set(2, editor.PaneHolderGetRealPos(points.get(2)));
-            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
-            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
-            points.set(2, new PairMutable(points.get(2).GetLeftDouble(), -points.get(2).GetRightDouble()));
-
-            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(2), 10.0, Color.BLUE, 1, false);
-
-            String newStr = "";
-
-            newStr += "G01*\n";
-
-            if (triangle.getFill() != Color.TRANSPARENT)
-                newStr += "G36*\n";
-            else {
-                Double apertureValue = (triangle.getStrokeWidth() / 10);
-                newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
-                newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
-            }
-            for (int i = 0; i < points.size(); i++)
-            {
-                if (i == 0) {
-                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D02*\n";
-                    if (triangle.getFill() != Color.TRANSPARENT)
-                        newStr += "G01*\n";
-                } else
-                    newStr += "X" + PositionFormatting(points.get(i).GetLeftDouble()) + "Y" + PositionFormatting(points.get(i).GetRightDouble()) + "D01*\n";
-            }
-            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) + "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D01*\n";
-
-            if (triangle.getFill() != Color.TRANSPARENT)
-                newStr += "G37*\n";
-
-            return newStr;
         }
         else if (node.getClass() == Line.class)
         {
             Line line = (Line)node;
 
-            if (!line.getId().equals(layer))
-                return "";
-
-            LinkedList<PairMutable> points = new LinkedList<PairMutable>();
-            points.add(GetPosInNodeParent(line, new PairMutable(line.getStartX(), line.getStartY())));
-            points.add(GetPosInNodeParent(line, new PairMutable(line.getEndX(), line.getEndY())));
-
-            if (((Node)line.getParent()).getClass() == Group.class)
+            if (line.getId().equals(layer))
             {
-                points.set(0, GetPosInNodeParent(line.getParent(), points.get(0)));
-                points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
+                LinkedList<PairMutable> points = new LinkedList<PairMutable>();
+                points.add(GetPosInNodeParent(line, new PairMutable(line.getStartX(), line.getStartY())));
+                points.add(GetPosInNodeParent(line, new PairMutable(line.getEndX(), line.getEndY())));
+
+                if (((Node) line.getParent()).getClass() == Group.class)
+                {
+                    points.set(0, GetPosInNodeParent(line.getParent(), points.get(0)));
+                    points.set(1, GetPosInNodeParent(line.getParent(), points.get(1)));
+                }
+
+                points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
+                points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
+                points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
+                points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
+
+                //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
+                //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
+
+                str += "G01*\n";
+                Double apertureValue = (line.getStrokeWidth() / 10);
+                str += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
+                str += "D" + Editor.GerberApertureCounter++ + "*\n";
+
+                str += "X" + PositionFormatting(points.get(0).GetLeftDouble()) +
+                        "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D02*\n";
+                str += "X" + PositionFormatting(points.get(1).GetLeftDouble()) +
+                        "Y" + PositionFormatting(points.get(1).GetRightDouble()) + "D01*\n";
             }
-
-            points.set(0, editor.PaneHolderGetRealPos(points.get(0)));
-            points.set(1, editor.PaneHolderGetRealPos(points.get(1)));
-            points.set(0, new PairMutable(points.get(0).GetLeftDouble(), -points.get(0).GetRightDouble()));
-            points.set(1, new PairMutable(points.get(1).GetLeftDouble(), -points.get(1).GetRightDouble()));
-
-            //editor.TestShapeAdd(points.get(0), 10.0, Color.BLUE, 1, false);
-            //editor.TestShapeAdd(points.get(1), 10.0, Color.BLUE, 1, false);
-
-            String newStr = "";
-
-            newStr += "G01*\n";
-            Double apertureValue = (line.getStrokeWidth() / 10);
-            newStr += "%ADD" + Editor.GerberApertureCounter + "C," + apertureValue + "*%\n";
-            newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
-
-            newStr += "X" + PositionFormatting(points.get(0).GetLeftDouble()) +
-                    "Y" + PositionFormatting(points.get(0).GetRightDouble()) + "D02*\n";
-            newStr += "X" + PositionFormatting(points.get(1).GetLeftDouble()) +
-                    "Y" + PositionFormatting(points.get(1).GetRightDouble()) + "D01*\n";
-
-            return newStr;
         }
         else if (node.getClass() == Text.class)
         {
@@ -889,63 +876,59 @@ abstract public class EDANode
                 double outerRadius = ThroughHoleCircle.getRadius();
                 double innerRadius = ThroughHoleCircle.getRadius() - ThroughHoleCircle.getStrokeWidth();
 
-                String newStr = "";
-
                 if (layer.equals("Edge Cuts"))
                 {
                     // creating the hole (inner radius)
 
-                    newStr += "G01*\n";
+                    str += "G01*\n";
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
-                    newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
+                    str += "D" + Editor.GerberApertureCounter++ + "*\n";
 
-                    newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
-                    newStr += "%TO.N,N/C*%\n";
+                    str += "%TO.P,REF\\u002A\\u002A,1*%\n";
+                    str += "%TO.N,N/C*%\n";
 
-                    newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
-                    newStr += "%TD*%\n";
+                    str += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                    str += "%TD*%\n";
                 }
                 else if (layer.equals("Mask Front"))
                 {
                     // creating the front exposed copper (outer radius)
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
-                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
-                    newStr += "G01*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
-                    newStr += "G01*\n";
+                    str += "G01*\n";
                 }
                 else if (layer.equals("Mask Rear"))
                 {
                     // creating the rear exposed copper (outer radius)
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
-                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
-                    newStr += "G01*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
-                    newStr += "G01*\n";
+                    str += "G01*\n";
                 }
-
-                return newStr;
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
             {
@@ -967,68 +950,64 @@ abstract public class EDANode
                 double outerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius());
                 double innerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius()) - Math.min(viaCircle1.getRadius(), viaCircle2.getRadius());
 
-                String newStr = "";
-
                 if (layer.equals("Edge Cuts"))
                 {
                     // creating the hole (inner radius)
 
-                    newStr += "G01*\n";
+                    str += "G01*\n";
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
-                    newStr += "D" + Editor.GerberApertureCounter++ + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(innerRadius * 2) + "*%\n";
+                    str += "D" + Editor.GerberApertureCounter++ + "*\n";
 
-                    newStr += "%TO.P,REF\\u002A\\u002A,1*%\n";
-                    newStr += "%TO.N,N/C*%\n";
+                    str += "%TO.P,REF\\u002A\\u002A,1*%\n";
+                    str += "%TO.N,N/C*%\n";
 
-                    newStr += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
-                    newStr += "%TD*%\n";
+                    str += "X" + PositionFormatting(point.GetLeftDouble()) + "Y" + PositionFormatting(point.GetRightDouble()) + "D03*\n";
+                    str += "%TD*%\n";
                 }
                 else if (layer.equals("Copper Front"))
                 {
                     // creating the front copper (outer radius)
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
-                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
-                    newStr += "G01*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
-                    newStr += "G01*\n";
+                    str += "G01*\n";
                 }
                 else if (layer.equals("Copper Rear"))
                 {
                     // creating the rear copper (outer radius)
 
-                    newStr += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
-                    newStr += "D" + (Editor.GerberApertureCounter++) + "*\n";
+                    str += "%ADD" + Editor.GerberApertureCounter + "C," + PositionFormattingDouble(outerRadius) + "*%\n";
+                    str += "D" + (Editor.GerberApertureCounter++) + "*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
 
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + (((PositionFormatting(outerRadius)) / 2) * -1) + "J0D01*\n";
-                    newStr += "G01*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
-                    newStr += "G75*\nG03*\n";
-                    newStr += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
+                    str += "G01*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) - (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble()) + "D02*\n";
+                    str += "G75*\nG03*\n";
+                    str += "X" + (PositionFormatting(point.GetLeftDouble()) + (PositionFormatting(outerRadius)) / 2) + "Y" + PositionFormatting(point.GetRightDouble())
                             + "I" + ((PositionFormatting(outerRadius)) / 2) + "J0D01*\n";
-                    newStr += "G01*\n";
+                    str += "G01*\n";
                 }
-
-                return newStr;
             }
             else
             {
                 for (int i = 0; i < group.getChildren().size(); i++)
-                    NodeToGerberStr(group.getChildren().get(i), layer, editor);
+                    str += EDANode.NodeToGerberStr(group.getChildren().get(i), layer, editor);
             }
         }
         else
