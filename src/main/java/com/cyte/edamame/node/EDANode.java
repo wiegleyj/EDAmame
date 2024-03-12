@@ -932,8 +932,8 @@ abstract public class EDANode
             }
             else if ((node.getId() != null) && node.getId().equals("Via"))
             {
-                if (group.getChildren().size() != 2)
-                    throw new java.lang.Error("ERROR: Attempting to convert a via without 2 children to a Gerber string!");
+                if (group.getChildren().size() != 1)
+                    throw new java.lang.Error("ERROR: Attempting to convert a via without a child to a Gerber string!");
 
                 PairMutable point = GetPosInNodeParent(group, GetPosInNodeParent(group.getChildren().get(0), new PairMutable(0.0, 0.0)));
 
@@ -945,10 +945,8 @@ abstract public class EDANode
 
                 //editor.TestShapeAdd(point, 10.0, Color.BLUE, 1, false);
 
-                Circle viaCircle1 = (Circle)group.getChildren().get(0);
-                Circle viaCircle2 = (Circle)group.getChildren().get(1);
-                double outerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius());
-                double innerRadius = Math.max(viaCircle1.getRadius(), viaCircle2.getRadius()) - Math.min(viaCircle1.getRadius(), viaCircle2.getRadius());
+                double outerRadius = ((Circle)group.getChildren().get(0)).getRadius();
+                double innerRadius = ((Circle)group.getChildren().get(0)).getRadius() - ((Circle)group.getChildren().get(0)).getStrokeWidth();
 
                 if (layer.equals("Edge Cuts"))
                 {

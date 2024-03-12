@@ -216,8 +216,8 @@ public class EditorFootprint extends Editor
                 }
                 else if ((group.getId() != null) && group.getId().equals("Via"))
                 {
-                    if (group.getChildren().size() != 2)
-                        throw new java.lang.Error("ERROR: Attempting to load a via into footprint editor without 2 children!");
+                    if (group.getChildren().size() != 1)
+                        throw new java.lang.Error("ERROR: Attempting to load a via into footprint editor without a child!");
 
                     EDAVia via = new EDAVia("Via", group, false, this);
                     via.Add();
@@ -557,22 +557,14 @@ public class EditorFootprint extends Editor
                                 {
                                     Group via = new Group();
 
-                                    Circle viaOuterCircle = new Circle();
-                                    viaOuterCircle.setFill(EDAmameController.Editor_PCBExposedColor);
-                                    viaOuterCircle.setRadius(radius * 10);
-                                    viaOuterCircle.setStrokeType(StrokeType.INSIDE);
-                                    viaOuterCircle.setStrokeWidth(0);
-                                    viaOuterCircle.setStroke(Color.TRANSPARENT);
+                                    Circle viaCircle = new Circle();
+                                    viaCircle.setFill(EDAmameController.Editor_PCBViaColor);
+                                    viaCircle.setRadius(radius * 2 * 10);
+                                    viaCircle.setStrokeType(StrokeType.INSIDE);
+                                    viaCircle.setStrokeWidth(radius * 10);
+                                    viaCircle.setStroke(EDAmameController.Editor_PCBExposedColor);
 
-                                    Circle viaInnerCircle = new Circle();
-                                    viaInnerCircle.setFill(EDAmameController.Editor_PCBViaColor);
-                                    viaInnerCircle.setRadius(radius / 2 * 10);
-                                    viaInnerCircle.setStrokeType(StrokeType.INSIDE);
-                                    viaInnerCircle.setStrokeWidth(0);
-                                    viaInnerCircle.setStroke(Color.TRANSPARENT);
-
-                                    via.getChildren().add(viaOuterCircle);
-                                    via.getChildren().add(viaInnerCircle);
+                                    via.getChildren().add(viaCircle);
 
                                     via.setTranslateX(dropPos.GetLeftDouble());
                                     via.setTranslateY(dropPos.GetRightDouble());

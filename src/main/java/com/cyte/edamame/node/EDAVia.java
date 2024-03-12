@@ -66,10 +66,10 @@ public class EDAVia extends EDAGroup
         if (!this.selected)
             return false;
 
-        if (this.group.getChildren().size() != 2)
-            throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have 2 children!");
+        if (this.group.getChildren().size() != 1)
+            throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have a child!");
 
-        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()) / 10);
+        viaRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() / 10 / 2);
 
         return true;
     }
@@ -79,8 +79,8 @@ public class EDAVia extends EDAGroup
         if (!this.selected)
             return;
 
-        if (this.group.getChildren().size() != 2)
-            throw new java.lang.Error("ERROR: Attempting to apply a via from the footprint editor properties window that doesn't have 2 children!");
+        if (this.group.getChildren().size() != 1)
+            throw new java.lang.Error("ERROR: Attempting to apply a via from the footprint editor properties window that doesn't have a child!");
 
         // Applying via radii...
         {
@@ -102,8 +102,8 @@ public class EDAVia extends EDAGroup
 
                     if ((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax))
                     {
-                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 10);
-                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2 * 10);
+                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 2 * 10);
+                        ((Circle)this.group.getChildren().get(0)).setStrokeWidth(radius * 10);
                     }
                     else
                     {
@@ -123,10 +123,10 @@ public class EDAVia extends EDAGroup
         if (!this.selected)
             return false;
 
-        if (this.group.getChildren().size() != 2)
-            throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have 2 children!");
+        if (this.group.getChildren().size() != 1)
+            throw new java.lang.Error("ERROR: Attempting to load a via into the footprint editor properties window that doesn't have a child!");
 
-        viaRadii.add(Math.max(((Circle)this.group.getChildren().get(0)).getRadius(), ((Circle)this.group.getChildren().get(1)).getRadius()) / 10);
+        viaRadii.add(((Circle)this.group.getChildren().get(0)).getRadius() / 10 / 2);
 
         return true;
     }
@@ -136,8 +136,8 @@ public class EDAVia extends EDAGroup
         if (!this.selected)
             return;
 
-        if (this.group.getChildren().size() != 2)
-            throw new java.lang.Error("ERROR: Attempting to apply a via from the footprint editor properties window that doesn't have 2 children!");
+        if (this.group.getChildren().size() != 1)
+            throw new java.lang.Error("ERROR: Attempting to apply a via from the footprint editor properties window that doesn't have a child!");
 
         // Applying via radii...
         {
@@ -159,8 +159,8 @@ public class EDAVia extends EDAGroup
 
                     if ((radius >= EDAmameController.EditorFootprint_ViaRadiusMin) && (radius <= EDAmameController.EditorFootprint_ViaRadiusMax))
                     {
-                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 10);
-                        ((Circle)this.group.getChildren().get(1)).setRadius(radius / 2 * 10);
+                        ((Circle)this.group.getChildren().get(0)).setRadius(radius * 2 * 10);
+                        ((Circle)this.group.getChildren().get(0)).setStrokeWidth(radius * 10);
                     }
                     else
                     {
